@@ -150,9 +150,34 @@ const TermosDeUso = () => {
             <p>O consentimento pode ser revogado a qualquer momento via solicitação formal, sem prejuízo do tratamento realizado anteriormente.</p>
           </section>
 
-          {/* 12. Disposições Gerais */}
+          {/* 12. Autorização de Imagem e Publicidade Institucional dos Profissionais de Saúde */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">⚖️ 12. Disposições Gerais</h2>
+            <h2 className="text-lg font-display font-black text-foreground">📸 12. Autorização de Uso de Imagem, Nome e Publicidade Institucional (Profissionais de Saúde) ⚖️</h2>
+            <p>
+              Ao realizar o credenciamento profissional na plataforma mediante o clique de aceite nos termos de cadastro ou ao firmar digitalmente o Contrato de Credenciamento Médico, o(a) <strong className="text-foreground">MÉDICO(A) ou PROFISSIONAL DE SAÚDE</strong> outorga à <strong className="text-foreground">Planta y Raiz Ltda</strong> autorização prévia, expressa, voluntária e gratuita para o uso e veiculação de sua imagem e dados profissionais, sob as seguintes condições irrevogáveis enquanto perdurar o credenciamento:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5">
+              <li>
+                <strong className="text-foreground">Elementos Autorizados:</strong> Fotografia de perfil profissional, nome completo, número de registro no Conselho Regional de Medicina (CRM/UF), Registro de Qualificação de Especialista (RQE), especialidades e títulos acadêmicos verídicos;
+              </li>
+              <li>
+                <strong className="text-foreground">Canais e Mídias Abrangidos:</strong> Veiculação nas redes sociais e plataformas digitais oficiais da Planta y Raíz, incluindo, mas não se limitando a: Meta Platforms (Instagram e Facebook), Google Ads e YouTube, TikTok, LinkedIn, vitrine pública de profissionais do website (plantayraiz.com.br/profissionais), landing pages e materiais institucionais de captação e acolhimento;
+              </li>
+              <li>
+                <strong className="text-foreground">Finalidade Institucional e Educativa:</strong> A veiculação destina-se unicamente à apresentação do corpo clínico credenciado, divulgação da disponibilidade de telemedicina e orientações de saúde pública e medicina canábica/integrativa, em estrita conformidade com a <strong className="text-foreground">Resolução CFM nº 2.336/2023</strong> (que regulamenta a publicidade médica) e com o Código de Ética Médica;
+              </li>
+              <li>
+                <strong className="text-foreground">Blindagem Ética e Reputacional:</strong> A plataforma compromete-se a não vincular a imagem do profissional a promessas de resultado, sensacionalismo, garantias de cura, autopromoção desmedida ou qualquer prática vedada pelos órgãos de classe;
+              </li>
+              <li>
+                <strong className="text-foreground">Revogação:</strong> O consentimento de uso de imagem poderá ser revogado a qualquer momento mediante solicitação formal pelo e-mail <code className="text-foreground bg-muted px-1.5 py-0.5 rounded text-xs">contato@plantayraiz.com.br</code>, suspendendo novas veiculações no prazo de até 5 (cinco) dias úteis, sem efeito retroativo sobre materiais impressos ou campanhas já finalizadas.
+              </li>
+            </ul>
+          </section>
+
+          {/* 13. Disposições Gerais */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-display font-black text-foreground">⚖️ 13. Disposições Gerais</h2>
             <p>Estes Termos são regidos pelas leis da República Federativa do Brasil. Fica eleito o foro da Comarca de São Paulo — SP para dirimir quaisquer controvérsias.</p>
             <p>A Planta y Raiz reserva-se o direito de alterar estes Termos a qualquer momento, mediante notificação prévia aos usuários cadastrados. Alterações substantivas exigirão novo consentimento expresso.</p>
           </section>

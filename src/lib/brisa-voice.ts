@@ -16,22 +16,22 @@ const MALE_VOICE_PATTERN =
 const FEMALE_VOICE_TIERS: { rule: RegExp; score: number }[] = [
   // Tier 1: Vozes neurais naturais ultrarrealistas (Edge / Windows 11 Online)
   { rule: /microsoft.*(francisca|thalita|brenda|leticia|yara|raquel).*online.*natural/i, score: 100 },
-  { rule: /microsoft.*(francisca|thalita|brenda|leticia|yara|raquel)/i, score: 90 },
+  { rule: /microsoft.*(francisca|thalita|brenda|leticia|yara|raquel)/i, score: 92 },
 
-  // Tier 2: Vozes nativas Apple / iOS / macOS
+  // Tier 2: Voz natural Google Português do Brasil (Android / Chrome)
+  { rule: /google.*português.*(brasil|do brasil)/i, score: 88 },
+
+  // Tier 3: Vozes nativas Apple / iOS / macOS
   { rule: /(luciana|joana|fernanda|camila|helena|victoria|siri)/i, score: 85 },
 
-  // Tier 3: Vozes desktop Windows SAPI femininas
+  // Tier 4: Vozes desktop Windows SAPI femininas
   { rule: /microsoft.*(maria|heloisa)/i, score: 80 },
 
-  // Tier 4: Vozes neurais Android / Chrome female tags
+  // Tier 5: Vozes neurais Android / Chrome female tags
   { rule: /(pt-br-x-afs|pt-br-x-afd|pt-br-x-cfs|pt-br-female)/i, score: 75 },
 
-  // Tier 5: Vozes explicitamente marcadas com termos femininos
+  // Tier 6: Vozes explicitamente marcadas com termos femininos
   { rule: /(female|feminina|mulher|woman)/i, score: 70 },
-
-  // Tier 6: Voz padrão do Google em português (apenas se passar pelo filtro anti-masculino)
-  { rule: /google.*português.*(brasil|do brasil)/i, score: 50 },
 ];
 
 export interface BrisaVoiceConfig {
@@ -90,7 +90,7 @@ if (typeof window !== "undefined") {
  */
 export function getBrisaVoiceConfig(): BrisaVoiceConfig {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    return { voice: null, pitch: 1.15, rate: 1.02, isCertifiedFemale: false };
+    return { voice: null, pitch: 1.03, rate: 1.10, isCertifiedFemale: false };
   }
 
   let voices = cachedVoices;
@@ -111,8 +111,8 @@ export function getBrisaVoiceConfig(): BrisaVoiceConfig {
   );
 
   if (ptVoices.length === 0) {
-    // Se não há vozes em português cadastradas, usa pitch elevado para feminilizar o sintetizador
-    return { voice: null, pitch: 1.25, rate: 1.02, isCertifiedFemale: false };
+    // Se não há vozes em português cadastradas, usa pitch ligeiramente elevado para tom acolhedor
+    return { voice: null, pitch: 1.06, rate: 1.10, isCertifiedFemale: false };
   }
 
   // 1. Blacklist ativa: remove sumariamente qualquer voz masculina identificada
@@ -142,19 +142,20 @@ export function getBrisaVoiceConfig(): BrisaVoiceConfig {
     const isCertifiedFemale = bestScore >= 70;
     return {
       voice: bestVoice,
-      // Vozes femininas certificadas usam pitch natural e acolhedor (1.12); vozes neutras recebem pitch 1.25
-      pitch: isCertifiedFemale ? 1.12 : 1.25,
-      rate: 1.02,
+      // Vozes femininas certificadas usam pitch acústico natural (1.03); vozes neutras recebem leve ajuste (1.08)
+      // Cadência de 1.10 garante ritmo de fala humana dinâmica, sem arrastar nem soar robótica
+      pitch: isCertifiedFemale ? 1.03 : 1.08,
+      rate: 1.10,
       isCertifiedFemale,
     };
   }
 
-  // 3. Trava de emergência: se o sistema possui APENAS voz masculina (ex.: Windows com apenas Daniel instalado),
-  // forçamos pitch elevado (1.35) para elevar os formantes fundamentais para o registro feminino (220Hz-250Hz).
+  // 3. Trava de emergência: se o sistema possui APENAS voz masculina básica,
+  // aplicamos ajuste de pitch equilibrado (1.12) sem distorcer o processador de áudio
   return {
     voice: ptVoices[0],
-    pitch: 1.35,
-    rate: 1.02,
+    pitch: 1.12,
+    rate: 1.10,
     isCertifiedFemale: false,
   };
 }

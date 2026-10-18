@@ -28,10 +28,11 @@ export const BrisaVoiceAssistant = () => {
       recognition.onstart = () => {
         setIsListening(true);
         setTranscript('');
+        // Se nenhum som for detectado em 6s, aciona acolhimento
         silenceTimeoutRef.current = setTimeout(() => {
           if (recognitionRef.current) recognitionRef.current.stop();
           handleSilence();
-        }, 5000);
+        }, 6000);
       };
 
       recognition.onresult = (event: any) => {
@@ -40,10 +41,24 @@ export const BrisaVoiceAssistant = () => {
           silenceTimeoutRef.current = null;
         }
         let current = '';
+        let hasFinal = false;
         for (let i = event.resultIndex; i < event.results.length; i++) {
           current += event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            hasFinal = true;
+          }
         }
         setTranscript(current);
+
+        // VAD Inteligente de Alta Velocidade:
+        // Se a fala foi finalizada pela API ou se o usuário pausou por 1.2s, encerra imediatamente a escuta
+        if (hasFinal && current.trim().length > 3) {
+          if (recognitionRef.current) recognitionRef.current.stop();
+        } else if (current.trim().length > 0) {
+          silenceTimeoutRef.current = setTimeout(() => {
+            if (recognitionRef.current) recognitionRef.current.stop();
+          }, 1200);
+        }
       };
 
       recognition.onend = () => {
@@ -74,7 +89,7 @@ export const BrisaVoiceAssistant = () => {
   }, [isListening, transcript]);
 
   const handleSilence = () => {
-    const msg = 'Sou a Enfermeira Brisa, em que posso ajudar hoje para melhorar sua saúde?';
+    const msg = 'Olá! Sou a Enfermeira Brisa. Posso te orientar sobre nossos exames com IA, agendamento de consultas com nossos médicos da vitrine e dar dicas de saúde. Como posso te ajudar?';
     setBrisaResponse(msg);
     speak(msg);
   };

@@ -92,7 +92,7 @@ const OfertaEspecial = () => {
             {nome}, garantimos seu desconto <span className="text-primary">por tempo limitado</span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">
-            Dr. Edilson preparou sua orientação técnica personalizada. Não deixe seu tratamento parar.
+            A equipe clínica da Planta y Raíz Ltda preparou sua orientação técnica personalizada. Não deixe seu tratamento parar.
           </p>
         </div>
 

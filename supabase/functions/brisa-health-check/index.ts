@@ -5,7 +5,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' };
 
 const WAHA_URL  = (Deno.env.get('WAHA_API_URL') || 'waha-production-4e9c.up.railway.app').replace(/\/$/, '');
-const WAHA_KEY  = Deno.env.get('WAHA_API_KEY') || 'planta123';
+const WAHA_KEY  = Deno.env.get('WAHA_API_KEY') || '';
 const SB_URL    = Deno.env.get('SUPABASE_URL') || '';
 const SB_KEY    = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const EV_URL    = (Deno.env.get('EVOLUTION_API_URL') || '').replace(/\/$/, '');

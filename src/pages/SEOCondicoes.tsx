@@ -198,6 +198,60 @@ const conditions: Record<string, {
       "Loflin et al. (2017) — Subst Use Misuse: Cannabis e sintomas de TDAH — padrões de uso",
     ],
   },
+  "dor-neuropatica": {
+    title: "Telemedicina para Dor Neuropática | Tratamento Integrativo | Planta y Raíz",
+    h1: "Como Funciona a Telemedicina para Dor Neuropática",
+    description: "Entenda como o tratamento com canabinoides e telemedicina especializada atua no alívio de dor neuropática, neuropatia diabética e neuralgias.",
+    cid: "M79.2 / G62",
+    content: [
+      "A dor neuropática é causada por lesão ou disfunção do sistema nervoso periférico ou central, atingindo mais de 10 milhões de brasileiros com sensações de queimação, choque e formigamento.",
+      "Canabinoides como o CBD e THC modulam os canais iônicos TRPV1 e os receptores CB1 na medula espinhal, inibindo a hiperexcitabilidade neuronal e reduzindo a alodinia mecânica.",
+      "Por meio da telemedicina em estrita conformidade com a Resolução CFM nº 2.314/2022, o paciente realiza a consulta com neurologistas e especialistas em dor sem sair de casa, recebendo prescrição digital válida em todo o Brasil.",
+      "Estudos clínicos (Nurmikko et al., 2007; Selvarajah et al., 2019) demonstram melhora significativa no alívio da dor neuropática e redução substancial na dependência de opioides e anticonvulsivantes.",
+    ],
+    strains: ["Harlequin (CBD 5:2)", "Cannatonic (CBD 1:1)", "ACDC (CBD 24:1)", "Jack Herer (Sativa)"],
+    studies: [
+      "Nurmikko et al. (2007) — Pain: Sativex eficaz no alívio da dor neuropática periférica intratável",
+      "Selvarajah et al. (2019) — Diabetes Care: Tratamento canabinoide na neuropatia diabética dolorosa",
+      "Mücke et al. (2018) — Cochrane Database Syst Rev: Medicamentos à base de cannabis para dor neuropática crônica",
+    ],
+  },
+  "renovacao-receita-especial": {
+    title: "Renovação de Receita de Controle Especial Online | Passo a Passo | Planta y Raíz",
+    h1: "Renovação de Receita de Controle Especial Online: Passo a Passo",
+    description: "Saiba como renovar sua receita médica de controle especial e prescrição canabinoide online com assinatura digital ICP-Brasil e entrega ágil.",
+    cid: "Z76.0",
+    content: [
+      "A renovação de receitas médicas de controle especial e produtos controlados pela Anvisa pode ser realizada por telemedicina com médicos devidamente credenciados no CFM.",
+      "A Portaria SVS/MS nº 344/1998 e a Lei Federal nº 14.510/2022 autorizam a emissão de prescrições digitais com certificado digital padrão ICP-Brasil / Gov.br, aceitas em farmácias físicas e digitais em todo o território nacional.",
+      "Na Planta y Raíz, o paciente passa por uma triagem rápida com a Enfermeira Brisa, anexa seu histórico médico ou receita anterior e é atendido pelo médico prescritor para reavaliação de dosagem e emissão do laudo.",
+      "O documento é enviado em minutos diretamente no seu WhatsApp e e-mail com QR Code de validação do Conselho Federal de Medicina (Validador CFM).",
+    ],
+    strains: ["Receituário de Controle Especial (C1)", "Notificação de Receita B", "Prescrição Digital ICP-Brasil", "Validador CFM Integrado"],
+    studies: [
+      "Conselho Federal de Medicina (CFM) — Resolução nº 2.314/2022: Regulamentação da Telemedicina no Brasil",
+      "Ministério da Saúde — Portaria SVS/MS nº 344/1998 e atualizações para prescrição digital",
+      "Lei Federal nº 14.510/2022 — Autorização e diretrizes para a telessaúde em todo o território nacional",
+    ],
+  },
+  "regulamentacao-anvisa-rdc-660": {
+    title: "Regulamentação Anvisa RDC 660/2022: O que o Paciente Precisa Saber | Planta y Raíz",
+    h1: "Regulamentação da Anvisa RDC 660: O que o Paciente Precisa Saber",
+    description: "Guia completo e descomplicado sobre a RDC 660/2022 da Anvisa: como importar cannabis medicinal legalmente, documentos necessários e autorização automática.",
+    cid: "RDC 660",
+    content: [
+      "A Resolução RDC nº 660/2022 da ANVISA estabelece os critérios e procedimentos para a importação excepcional de produtos derivados de Cannabis por pessoa física, para uso próprio e mediante prescrição médica.",
+      "O processo é 100% digital e gratuito através do Portal de Serviços do Governo Federal (Gov.br), com aprovação automática em minutos para produtos pré-cadastrados na lista positiva da agência reguladora.",
+      "Para solicitar a autorização da Anvisa, o paciente necessita apenas de: receita médica válida emitida por profissional com CRM e comprovante de residência no Brasil.",
+      "A equipe clínica da Planta y Raíz auxilia o paciente em cada etapa da solicitação, desde a emissão da receita e laudo técnico pelo médico credenciado até a liberação alfandegária e entrega na sua residência.",
+    ],
+    strains: ["Produtos de Grau Farmacêutico ANVISA", "Fitocomplexo Full Spectrum", "Canabidiol Puro (Broad Spectrum / Isolate)", "Rastreabilidade e COA Auditado"],
+    studies: [
+      "ANVISA — Resolução da Diretoria Colegiada - RDC nº 660, de 30 de março de 2022",
+      "Ministério da Economia / Governo Digital — Simplificação da Autorização de Importação de Canabinoides",
+      "ANVISA — RDC nº 327/2019: Autorização sanitária para fabricação e importação de produtos de Cannabis em farmácias",
+    ],
+  },
 };
 
 const SEOCondicoes = () => {
@@ -311,19 +365,18 @@ const SEOCondicoes = () => {
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="p-6 md:p-8 text-center">
                 <Shield size={32} className="text-primary mx-auto mb-3" />
-                <h2 className="text-xl font-display font-black text-foreground mb-2">Consulte um Especialista</h2>
-                <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                  Agende uma consulta com um médico prescritor especializado em cannabis medicinal.
-                  Triagem gratuita com IA + matching automático.
+                <h2 className="text-xl md:text-2xl font-display font-black text-foreground mb-2">Inicie Seu Cuidado Médico Agora</h2>
+                <p className="text-sm text-muted-foreground mb-6 max-w-lg mx-auto">
+                  Agende sua orientação com médicos prescritores habilitados pelo CFM ou inicie sua triagem clínica gratuita agora mesmo no WhatsApp com a nossa assistente inteligente.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12 px-6" asChild>
-                    <Link to="/consulta-rapida">
-                      <Stethoscope size={16} className="mr-2" /> Orientação Técnica Rápida (IA)
-                    </Link>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                  <Button className="font-black bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl h-12 px-6 shadow-md transition-all hover:scale-105" asChild>
+                    <a href="https://wa.me/5511991363154?text=Ol%C3%A1%2C%20Enfermeira%20Brisa!%20Vi%20a%20p%C3%A1gina%20de%20tratamentos%20e%20gostaria%20de%20fazer%20minha%20triagem." target="_blank" rel="noopener noreferrer">
+                      <Stethoscope size={16} className="mr-2" /> Fale com a Enfª Brisa e faça sua triagem agora
+                    </a>
                   </Button>
-                  <Button variant="outline" className="font-black rounded-2xl h-12 px-6 border-primary/30 text-primary" asChild>
-                    <Link to="/profissionais">Ver Profissionais</Link>
+                  <Button variant="outline" className="font-black rounded-2xl h-12 px-6 border-primary/30 text-primary hover:bg-primary/10" asChild>
+                    <Link to="/profissionais">Ver Médicos Prescritores</Link>
                   </Button>
                 </div>
               </CardContent>

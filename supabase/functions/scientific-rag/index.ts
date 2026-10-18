@@ -60,7 +60,7 @@ serve(async (req) => {
     });
     if (error) throw error;
 
-    const cleaned = (articles ?? []).map((a: any) => ({
+    const cleaned: { title: string; authors: unknown; year: number | null; url: string; doi: string; abstract: string }[] = (articles ?? []).map((a: any) => ({
       title: a.title, authors: a.authors, year: a.year,
       url: a.url, doi: a.doi, abstract: (a.abstract || "").slice(0, 500),
     }));

@@ -1,0 +1,27 @@
+{
+  "updatedAt": "2026-10-02T18:37:41.818Z",
+  "goals": {
+    "doctors": {
+      "goal": 50,
+      "currentInDb": 32,
+      "vitrinePublica": 29,
+      "brevoList6": 0,
+      "harvestedByAgent": 56,
+      "invitesSent": 2
+    },
+    "pharmacies": {
+      "goal": 2,
+      "currentInDb": 0,
+      "brevoList5": 0,
+      "harvestedByAgent": 38,
+      "invitesSent": 0
+    },
+    "patients": {
+      "goal": 1000,
+      "currentInDb": 12,
+      "brevoList7": 0,
+      "harvestedByAgent": 9,
+      "trafficEmailsSent": 4
+    }
+  }
+}

@@ -6,7 +6,7 @@ import path from 'path';
 import axios from 'axios';
 
 const WAHA_BASE = 'https://waha-production-4e9c.up.railway.app';
-const WAHA_KEY = 'planta123';
+const WAHA_KEY = process.env.WAHA_API_KEY || '';
 const WAHA_SESSION = 'default';
 const SB_FUNCTION_URL = 'https://tkxxoghzhvhjzdoomgss.supabase.co/functions/v1/brisa-waha-connect';
 

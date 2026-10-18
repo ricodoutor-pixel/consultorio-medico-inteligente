@@ -26,7 +26,7 @@ function webhookSecretOk(req: Request): boolean {
 
 const GEMINI_KEY   = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || '';
 const WAHA_URL     = (Deno.env.get('WAHA_API_URL') || 'waha-production-4e9c.up.railway.app').replace(/\/+$/, '');
-const WAHA_KEY     = Deno.env.get('WAHA_API_KEY') || 'planta123';
+const WAHA_KEY     = Deno.env.get('WAHA_API_KEY') || '';
 const WAHA_SESSION = Deno.env.get('WAHA_SESSION') || 'default';
 const EVO_URL      = (Deno.env.get('EVOLUTION_API_URL') || '').replace(/\/+$/, '');
 const EVO_KEY      = Deno.env.get('EVOLUTION_API_KEY') || '';

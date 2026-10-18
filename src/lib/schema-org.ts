@@ -194,7 +194,7 @@ export const articleSchema: SchemaOrgConfig = {
 };
 
 /**
- * Schema.org Physician — Dr. Edilson Bezerra (CRM-CE 10963) (CRM 49354/PR)
+ * Schema.org Physician — Dr. Edilson Bezerra (CRM 10963 - Sta Cruz BO) (CRM 49354/PR)
  * Supervisora Técnica da plataforma Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
  */
 export const physicianSchema: SchemaOrgConfig = {

@@ -91,7 +91,7 @@ async function sendToContact(contact, retryCount = 0) {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-Api-Key': 'planta123'
+                'X-Api-Key': process.env.WAHA_API_KEY || ''
             },
             body: body
         });

@@ -30,10 +30,15 @@ Deno.serve(async (req) => {
     const results = { reports_sent: 0, errors: 0 };
 
     // Get all active verified doctors
-    const { data: doctors } = await supabase
+    const { data: doctors, error: doctorsError } = await supabase
       .from("doctors")
-      .select("id, user_id, pix_key, is_verified")
+      .select("id, user_id, is_verified")
       .eq("is_verified", true);
+
+    if (doctorsError) {
+      console.error("Revenue report: failed to load doctors:", doctorsError);
+      return jsonRes({ error: "Failed to load doctors", details: doctorsError.message }, 500);
+    }
 
     for (const doc of doctors || []) {
       try {

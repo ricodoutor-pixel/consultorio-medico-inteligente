@@ -41,7 +41,7 @@ const BREVO_SMTP_URL  = 'https://api.brevo.com/v3/smtp/email';
 const SMTP_HOST       = process.env.SMTP_HOST || 'smtp.hostinger.com';
 const SMTP_PORT       = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER       = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS       = process.env.SMTP_PASS || '95654045Pa#';
+const SMTP_PASS       = process.env.SMTP_PASS || '';
 
 const SENDER_EMAIL    = 'contato@plantayraiz.com.br';
 const SENDER_NAME     = 'Planta y Raíz Expansão';

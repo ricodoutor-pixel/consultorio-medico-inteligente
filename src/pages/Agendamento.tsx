@@ -90,7 +90,8 @@ const Agendamento = () => {
 
   const fetchDoctors = async () => {
     const { data } = await supabase.from("doctors_public").select("*");
-    if (data) setDoctors(data as unknown as Doctor[]);
+    const list = (data || []) as unknown as Doctor[];
+    setDoctors(list);
   };
 
   // Fetch available slots for a doctor on a specific date
@@ -104,7 +105,7 @@ const Agendamento = () => {
       .eq("slot_date", dateStr)
       .order("time_slot");
 
-    if (!error && data) {
+    if (!error && data && data.length > 0) {
       // Filter: show available OR reserved by current user (their own temp reservation)
       const now = new Date().toISOString();
       const filtered = data.filter((s: any) => {
@@ -115,9 +116,10 @@ const Agendamento = () => {
       setSlots(filtered as SlotInfo[]);
     } else {
       setSlots([]);
+      if (error) toast({ title: "Não foi possível carregar os horários", variant: "destructive" });
     }
     setLoadingSlots(false);
-  }, [userId]);
+  }, [userId, toast]);
 
   // Reserve a slot temporarily (15 min)
   const reserveSlot = async (slot: SlotInfo) => {
@@ -126,6 +128,7 @@ const Agendamento = () => {
       return;
     }
     setReserving(true);
+
     const reservedUntil = new Date(Date.now() + RESERVATION_MINUTES * 60 * 1000).toISOString();
 
     const { error } = await supabase
@@ -141,7 +144,7 @@ const Agendamento = () => {
     if (error) {
       toast({ title: "Horário indisponível", description: "Alguém reservou este horário. Tente outro.", variant: "destructive" });
       // Refresh slots
-      if (selectedDoctor && selectedDate) fetchSlots(selectedDoctor.id, selectedDate);
+      if (schedulingDoctorId && selectedDate) fetchSlots(schedulingDoctorId, selectedDate);
     } else {
       setSelectedTime(slot.time_slot);
       setSelectedSlotId(slot.id);

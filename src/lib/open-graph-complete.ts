@@ -34,8 +34,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // HOME
   home: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-home.jpg`,
     url: `${BASE_URL}/`,
     type: 'website',
@@ -45,8 +45,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // TELEMEDICINA
   telemedicina: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-telemedicina.jpg`,
     url: `${BASE_URL}/telemedicina`,
     type: 'website',
@@ -56,8 +56,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // PROFISSIONAIS
   profissionais: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-profissionais.jpg`,
     url: `${BASE_URL}/profissionais`,
     type: 'website',
@@ -67,8 +67,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // AGENDAMENTO
   agendamento: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-agendamento.jpg`,
     url: `${BASE_URL}/agendamento`,
     type: 'website',
@@ -78,8 +78,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // BIBLIOTECA CIENTÍFICA
   biblioteca: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-biblioteca.jpg`,
     url: `${BASE_URL}/biblioteca`,
     type: 'website',
@@ -89,8 +89,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // BLOG
   blog: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-blog.jpg`,
     url: `${BASE_URL}/blog`,
     type: 'website',
@@ -100,8 +100,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // FAQ
   faq: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-faq.jpg`,
     url: `${BASE_URL}/faq`,
     type: 'website',
@@ -111,8 +111,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // PREÇOS
   precos: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-precos.jpg`,
     url: `${BASE_URL}/precos`,
     type: 'website',
@@ -122,8 +122,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // CLUB
   club: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-club.jpg`,
     url: `${BASE_URL}/club`,
     type: 'website',
@@ -133,8 +133,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // COMO FUNCIONA
   comoFunciona: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-como-funciona.jpg`,
     url: `${BASE_URL}/como-funciona`,
     type: 'website',
@@ -144,8 +144,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // CADASTRO
   cadastro: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-cadastro.jpg`,
     url: `${BASE_URL}/cadastro`,
     type: 'website',
@@ -155,8 +155,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // TRATAMENTO DOR CRÔNICA
   tratamentoDorCronica: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-tratamento-dor.jpg`,
     url: `${BASE_URL}/tratamento-dor-cronica`,
     type: 'article',
@@ -166,8 +166,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // TRATAMENTO ANSIEDADE
   tratamentoAnsiedade: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-tratamento-ansiedade.jpg`,
     url: `${BASE_URL}/tratamento-ansiedade-saude-mental`,
     type: 'article',
@@ -177,8 +177,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // COMUNIDADE
   comunidade: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-comunidade.jpg`,
     url: `${BASE_URL}/comunidade`,
     type: 'website',
@@ -188,8 +188,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // SHOPPING
   shopping: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-shopping.jpg`,
     url: `${BASE_URL}/shopping`,
     type: 'website',
@@ -199,8 +199,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
 
   // CONTATO
   contato: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-contato.jpg`,
     url: `${BASE_URL}/contato`,
     type: 'website',
@@ -213,8 +213,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   // ============================================================================
 
   cursos: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-cursos.jpg`,
     url: `${BASE_URL}/cursos`,
     type: 'website',
@@ -223,8 +223,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   webinars: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-webinars.jpg`,
     url: `${BASE_URL}/webinars`,
     type: 'website',
@@ -233,8 +233,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   ebook: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-ebook.jpg`,
     url: `${BASE_URL}/ebook`,
     type: 'article',
@@ -243,8 +243,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   consultaVideo: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-consulta-video.jpg`,
     url: `${BASE_URL}/consulta-video`,
     type: 'website',
@@ -253,8 +253,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   quizTriagem: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-quiz-triagem.jpg`,
     url: `${BASE_URL}/quiz-triagem`,
     type: 'website',
@@ -263,8 +263,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   forum: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-forum.jpg`,
     url: `${BASE_URL}/forum`,
     type: 'website',
@@ -273,8 +273,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   consultorio: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-consultorio.jpg`,
     url: `${BASE_URL}/consultorio`,
     type: 'website',
@@ -283,8 +283,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   dispensario: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-dispensario.jpg`,
     url: `${BASE_URL}/dispensario`,
     type: 'website',
@@ -293,8 +293,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   cadastroProfissional: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-cadastro-profissional.jpg`,
     url: `${BASE_URL}/cadastro-profissional`,
     type: 'website',
@@ -303,8 +303,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   legal: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-legal.jpg`,
     url: `${BASE_URL}/legal`,
     type: 'website',
@@ -313,8 +313,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   politicaPrivacidade: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-privacidade.jpg`,
     url: `${BASE_URL}/politica-privacidade`,
     type: 'website',
@@ -323,8 +323,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   termosDeUso: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-termos.jpg`,
     url: `${BASE_URL}/termos-uso`,
     type: 'website',
@@ -333,8 +333,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   lgpdDireitos: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-lgpd.jpg`,
     url: `${BASE_URL}/lgpd-direitos`,
     type: 'website',
@@ -343,8 +343,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   globalCompliance: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-compliance.jpg`,
     url: `${BASE_URL}/global-compliance`,
     type: 'website',
@@ -353,8 +353,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   impactoSocial: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-impacto.jpg`,
     url: `${BASE_URL}/impacto-social`,
     type: 'website',
@@ -363,8 +363,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   voluntarios: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-voluntarios.jpg`,
     url: `${BASE_URL}/voluntarios`,
     type: 'website',
@@ -373,8 +373,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   indicacoes: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-indicacoes.jpg`,
     url: `${BASE_URL}/indicacoes`,
     type: 'website',
@@ -387,8 +387,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   // ============================================================================
 
   pay: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-pay.jpg`,
     url: `${BASE_URL}/pay`,
     type: 'website',
@@ -397,8 +397,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   carteira: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-carteira.jpg`,
     url: `${BASE_URL}/carteira`,
     type: 'website',
@@ -407,8 +407,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   login: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-login.jpg`,
     url: `${BASE_URL}/login`,
     type: 'website',
@@ -417,8 +417,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   downloadApp: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-app.jpg`,
     url: `${BASE_URL}/download-app`,
     type: 'website',
@@ -427,8 +427,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   notificacoes: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-notificacoes.jpg`,
     url: `${BASE_URL}/notificacoes`,
     type: 'website',
@@ -437,8 +437,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   ofertaEspecial: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-oferta.jpg`,
     url: `${BASE_URL}/oferta-especial`,
     type: 'website',
@@ -447,8 +447,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   status: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-status.jpg`,
     url: `${BASE_URL}/status`,
     type: 'website',
@@ -457,8 +457,8 @@ export const openGraphConfigsComplete: Record<string, OpenGraphConfig> = {
   },
 
   notFound: {
-    title: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R - Planta y Raiz Ltda',
-    description: 'Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!',
+    title: 'Planta y Raíz — Telemedicina e Saúde Integrativa',
+    description: 'Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.',
     image: `${BASE_IMAGE}/og-404.jpg`,
     url: `${BASE_URL}/404`,
     type: 'website',

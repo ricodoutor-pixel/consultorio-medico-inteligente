@@ -80,11 +80,47 @@ const urls = [
   { loc: "/tratamentos/alzheimer", priority: "0.8", changefreq: "monthly" },
   { loc: "/tratamentos/epilepsia", priority: "0.8", changefreq: "monthly" },
   { loc: "/tratamentos/autismo", priority: "0.8", changefreq: "monthly" },
-  { loc: "/tratamentos/fibromialgia", priority: "0.8", changefreq: "monthly" }
+  { loc: "/tratamentos/fibromialgia", priority: "0.8", changefreq: "monthly" },
+
+  // Nível Especial - Cards dos Profissionais Prescritores (Indexação Primária Google - 0.9)
+  { loc: "/profissionais/med-victor-fonseca", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-milton-urban", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-barbara-matos", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-geovana-torres", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-daniel-kobayashi", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-jose-geraldo", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-ana-karoliny", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-albert-machado", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-sadi-menta", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-mariana-alves", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-breno-boueri", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-joao-pedro", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-grace-conceicao", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-raissa-chagas", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-diego-cartaxo", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-gustavo-nobre", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-leuma-netta", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-luiz-medina", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-ana-paula", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-adeonis-oliveira", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-alexandre-stramandinoli", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-0", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-guilherme-campos", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-gustavo-simoes", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-jose-roberto", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-angela-beatriz", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-ingrid-chiullo", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-marianna", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/mock-olivia", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/mock-suelen", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-arthur-barretto", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-rafaella-soletti", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-otavio-bassete", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-eduardo-correa", priority: "0.9", changefreq: "weekly" }
 ];
 
 const today = new Date().toISOString().split('T')[0];
-const baseUrl = "https://www.plantayraiz.com.br";
+const baseUrl = "https://plantayraiz.com.br";
 
 let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -26,6 +26,8 @@ import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
 import { DoctorContractModal } from "@/components/doctor/DoctorContractModal";
+import { ConsultationOfferBanner } from "@/components/doctor/ConsultationOfferBanner";
+
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
@@ -36,6 +38,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { isMasterAdminEmail } from "@/lib/admin-auth";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 const tooltipStyle = { background: "hsl(240 15% 7%)", border: "1px solid hsl(240 10% 14%)", borderRadius: "14px", color: "hsl(240 10% 93%)" };
@@ -73,10 +76,27 @@ const DashboardMedico = () => {
     if (!session) { setLoading(false); return; }
 
     try {
-      const [{ data: doctorRaw }, { data: profileRaw }] = await Promise.all([
-        supabase.from("doctors").select("*").eq("user_id", session.user.id).single(),
+      let [{ data: doctorRaw }, { data: profileRaw }] = await Promise.all([
+        supabase.from("doctors").select("*").eq("user_id", session.user.id).maybeSingle(),
         supabase.from("profiles").select("full_name, avatar_url, cpf").eq("id", session.user.id).maybeSingle(),
       ]);
+
+      // Se for conta de Administrador Geral (Dr. Edilson), vincula automaticamente ao perfil oficial do Diretor Técnico
+      if (!doctorRaw && isMasterAdminEmail(session.user.email)) {
+        const { data: adminDoc } = await supabase
+          .from("doctors")
+          .select("*")
+          .or(`user_id.eq.${session.user.id},crm.eq.10963`)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (adminDoc) {
+          doctorRaw = adminDoc;
+          if (adminDoc.user_id !== session.user.id) {
+            supabase.from("doctors").update({ user_id: session.user.id }).eq("id", adminDoc.id).then();
+          }
+        }
+      }
 
       const doctor = doctorRaw;
       const profile = profileRaw;
@@ -257,13 +277,13 @@ const DashboardMedico = () => {
 
       await supabase.from("notifications").insert({
         user_id: selectedRequest.patient_id,
-        title: "📋 Nova Orientação Técnica Necessária",
+        title: "📋 Nova Consulta Médica Necessária",
         message: "Seu médico analisou sua solicitação e recomenda uma nova consulta antes de renovar a receita. Agende pelo Dashboard.",
         type: "info",
         action_url: "/agendamento",
       });
 
-      toast({ title: "Orientação Técnica solicitada", description: "Paciente notificado para agendar nova consulta." });
+      toast({ title: "Consulta médica solicitada", description: "Paciente notificado para agendar nova consulta." });
       setRenewalRequests(prev => prev.filter(r => r.id !== selectedRequest.id));
       setReviewModalOpen(false);
     } catch (err) {
@@ -311,11 +331,38 @@ const DashboardMedico = () => {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto flex min-h-[70dvh] max-w-2xl items-center justify-center px-4 pt-24 text-center">
-          <Card className="border-border">
-            <CardContent className="p-8">
-              <AlertTriangle className="mx-auto mb-4 h-10 w-10 text-destructive" />
-              <h1 className="mb-2 text-xl font-bold text-foreground">Perfil médico indisponível</h1>
-              <p className="text-muted-foreground">Não foi possível carregar seu perfil, contate o suporte.</p>
+          <Card className="border-border shadow-xl bg-card">
+            <CardContent className="p-8 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
+                <Stethoscope className="w-8 h-8" />
+              </div>
+              <h1 className="text-xl font-bold text-foreground">Ambiente Profissional da Planta y Raíz</h1>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                Não localizamos um consultório médico vinculado a esta conta de login. Se você é um profissional de saúde, complete seu cadastro para liberar seu painel clínico.
+              </p>
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button 
+                  onClick={() => navigate("/cadastro-profissional")} 
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold w-full sm:w-auto"
+                >
+                  Completar Cadastro Profissional
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => window.open("https://wa.me/5511991363154?text=Ol%C3%A1%20Enfermeira%20Brisa%2C%20preciso%20de%20ajuda%20para%20acessar%20meu%20painel%20m%C3%A9dico", "_blank")} 
+                  className="gap-2 w-full sm:w-auto"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-400" />
+                  Suporte Enfª Brisa
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate("/")} 
+                  className="w-full sm:w-auto text-xs"
+                >
+                  Voltar ao Início
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </main>
@@ -329,7 +376,9 @@ const DashboardMedico = () => {
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <ConsultationOfferBanner doctorId={doctorData?.id} />
             {/* Header */}
+
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <div className="flex flex-col items-start gap-2">
                 <VipUpgradePopup role="medico" inline className="ml-1" />
@@ -852,7 +901,7 @@ const DashboardMedico = () => {
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <FileBarChart size={18} className="text-primary" /> Relatório Pré-Orientação Técnica (Brisa IA)
+              <FileBarChart size={18} className="text-primary" /> Relatório Clínico e Triagem Prévia (Brisa IA)
             </SheetTitle>
             <SheetDescription>Resumo da triagem do paciente antes da consulta</SheetDescription>
           </SheetHeader>
@@ -883,7 +932,7 @@ const DashboardMedico = () => {
 
               <Card className="border-border">
                 <CardContent className="p-4">
-                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Orientação Técnica</h4>
+                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Consulta Médica</h4>
                   <p className="text-xs text-muted-foreground">Horário: {format(new Date(selectedPatientTriage.appointment.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
                   <p className="text-xs text-muted-foreground">Tipo: {selectedPatientTriage.appointment.type}</p>
                   <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-green capitalize">{selectedPatientTriage.appointment.status}</Badge>
@@ -1026,7 +1075,7 @@ const DashboardMedico = () => {
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
             <Button variant="outline" className="rounded-xl" onClick={handleRequestConsultation} disabled={processing}>
               {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <Calendar size={14} className="mr-1" />}
-              Solicitar Nova Orientação Técnica
+              Solicitar Nova Consulta Médica
             </Button>
             <Button className="rounded-xl bg-primary" onClick={handleApproveRenewal} disabled={processing}>
               {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <CheckCircle2 size={14} className="mr-1" />}

@@ -42,6 +42,14 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
     item.sku === "consulta_premium" ? premiumPrice || PREMIUM_SUGGESTED_PRICE : item.price;
 
   const handleSelect = async (item: ServiceMenuItem) => {
+    // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
+    // leva à seção explicativa da landing, que conduz triagem → pagamento → sala.
+    // Não exige sessão aqui — a própria página trata login.
+    if (item.redirectToEdilson) {
+      navigate("/telemedicina#orientacao-tecnica");
+      return;
+    }
+
     setLoadingSku(item.sku);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -56,14 +64,19 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
         body: {
           sku: item.sku,
           doctorId,
-          returnUrl: item.redirectToEdilson
-            ? "https://www.plantayraiz.com.br/brisa-orientacao"
-            : "https://www.plantayraiz.com.br/quiz-triagem",
+          returnUrl: `https://www.plantayraiz.com.br/atendimento?paid=1&sku=${item.sku}${doctorId ? `&doctorId=${doctorId}` : ""}`,
         },
       });
       if (error) throw error;
 
       if (data?.init_point) {
+        // O pagamento vem SEMPRE primeiro: guardamos a referência para o
+        // servidor confirmar a cobrança antes de abrir triagem e consulta.
+        if (data?.external_reference) {
+          localStorage.setItem("pyr_consulta_external_reference", data.external_reference);
+        }
+        localStorage.setItem("pyr_consulta_sku", item.sku);
+        if (doctorId) localStorage.setItem("pyr_consulta_doctor", doctorId);
         toast.success("Redirecionando para o Mercado Pago…");
         window.location.href = data.init_point;
       } else {
@@ -142,8 +155,14 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
         })}
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {FIXED_SERVICE_NOTICE} Após o pagamento você passa pela triagem da Enfª Brisa e é direcionado
-        à consulta com {doctorName}.
+        {FIXED_SERVICE_NOTICE} O pagamento vem sempre primeiro: após a confirmação você passa pela
+        triagem da Enfª Brisa e é direcionado à consulta com {doctorName}.
+      </p>
+      <p className="text-[11px] text-muted-foreground">
+        <strong className="text-foreground">Orientação Técnica</strong> é modalidade exclusiva do{" "}
+        <strong className="text-foreground">Dr. Edilson Bezerra On</strong> (agente em nuvem com mais de
+        40.000 estudos científicos), que orienta tecnicamente e encaminha ao especialista. Nenhum outro
+        profissional da vitrine realiza essa modalidade.
       </p>
     </div>
   );

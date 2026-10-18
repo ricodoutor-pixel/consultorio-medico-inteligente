@@ -9,7 +9,7 @@ dotenv.config();
 const SB_URL = process.env.VITE_SUPABASE_URL || '';
 const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 const WAHA_API_URL = (process.env.WAHA_API_URL || 'waha-production-4e9c.up.railway.app').replace(/\/$/, '');
-const WAHA_API_KEY = process.env.WAHA_API_KEY || 'planta123';
+const WAHA_API_KEY = process.env.WAHA_API_KEY || '';
 const WAHA_SESSION = process.env.WAHA_SESSION || 'default';
 
 const INVITATION_MESSAGE = `Olá!\n\nSou a Brisa 🌿, assistente virtual da clínica digital Planta y Raiz. Estamos ampliando nossa plataforma de telemedicina e ecossistema de saúde focada em tratamentos naturais.\n\nGostaríamos de convidá-lo(a) para conhecer nossa plataforma. Somos uma clínica com infraestrutura completa e cadastro 100% gratuito para pacientes, médicos e parceiros!\n\nPara saber mais e fazer seu cadastro gratuitamente, acesse: https://plantayraiz.com.br\n\nQualquer dúvida, estou à disposição!`;

@@ -15,13 +15,12 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       updateViaCache: 'none' // Sempre buscar SW atualizado
     });
 
-    await registration.update();
-
     console.log('[PWA] Service Worker registrado com sucesso.');
 
     // Verificar atualizações a cada 30 minutos
     setInterval(() => {
-      registration.update();
+      if (document.visibilityState !== 'visible' || !navigator.onLine) return;
+      void registration.update().catch(() => {});
       console.log('[PWA] Verificando atualizações do Service Worker...');
     }, 30 * 60 * 1000);
 
@@ -48,12 +47,8 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     }
 
-    let refreshed = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshed) return;
-      refreshed = true;
-      window.location.reload();
-    });
+    // A nova versão assume o cache sem interromper triagem, pagamento ou Jitsi.
+    // O HTML atualizado será buscado na próxima navegação/reabertura.
 
     return registration;
   } catch (error) {

@@ -19,20 +19,11 @@ export function isMasterAdminEmail(email?: string | null): boolean {
 }
 
 /**
- * Valida a permissão de administrador via banco de dados (tabela user_roles)
- * com auto-recuperação transparente (auto-healing) para as contas mestre.
+ * Valida a permissão de administrador EXCLUSIVAMENTE via banco (user_roles + RLS).
+ * Nunca concede papel a partir do navegador nem por e-mail.
  */
 export async function verifyAndEnsureAdmin(user: { id: string; email?: string | null }): Promise<boolean> {
-  if (isMasterAdminEmail(user.email)) {
-    try {
-      await supabase
-        .from("user_roles")
-        .upsert({ user_id: user.id, role: "admin" });
-    } catch {
-      // non-blocking
-    }
-    return true;
-  }
+
 
   const { data: role } = await supabase
     .from("user_roles")

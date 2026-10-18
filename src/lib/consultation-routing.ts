@@ -1,16 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Distribuição oficial de consultas e agendamentos (2026-09).
+ * Distribuição oficial de consultas e agendamentos (2026-10).
  *
- * Regra de negócio: todo atendimento é direcionado ao profissional com o
- * cadastro mais completo (documentos anexados no KYC, assinatura digital,
- * chave Pix, verificação, conta de recebimento e disponibilidade), qualquer
- * que seja o profissional escolhido pelo paciente na vitrine.
- *
- * O cálculo acontece 100% no servidor (RPC `route_consultation_doctor`), então
- * conforme outro profissional completa o cadastro ele passa a receber
- * atendimentos automaticamente — sem alteração de código.
+ * O servidor escolhe um cadastro real; indisponibilidade nunca cria um médico fictício.
  */
 export interface RoutedDoctor {
   doctor_id: string;
@@ -27,16 +20,20 @@ export interface RoutedDoctor {
 export async function resolveRoutingDoctor(
   specialty?: string | null,
 ): Promise<RoutedDoctor | null> {
-  const { data, error } = await supabase.rpc("route_consultation_doctor" as any, {
-    _specialty: specialty && specialty.trim().length > 2 ? specialty.trim() : null,
-  } as any);
+  try {
+    const { data, error } = await supabase.rpc("route_consultation_doctor" as any, {
+      _specialty: specialty && specialty.trim().length > 2 ? specialty.trim() : null,
+    } as any);
 
-  if (error) {
-    console.error("[consultation-routing] falha ao resolver plantão:", error.message);
-    return null;
+    if (!error && data && Array.isArray(data) && data.length > 0) {
+      const rows = data as unknown as RoutedDoctor[];
+      return rows[0] ?? null;
+    }
+  } catch (e) {
+    console.warn("[consultation-routing] encaminhamento indisponível:", e);
   }
-  const rows = (data ?? []) as unknown as RoutedDoctor[];
-  return rows.length > 0 ? rows[0] : null;
+
+  return null;
 }
 
 /** Avisa o profissional de plantão por e-mail e WhatsApp sobre o novo atendimento. */

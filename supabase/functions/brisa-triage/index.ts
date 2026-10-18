@@ -60,14 +60,14 @@ serve(async (req) => {
         console.error('Error fetching history:', error.message);
         return [];
       }
-      return data.reverse(); // Return in chronological order
+      return (data ?? []).reverse(); // Return in chronological order
     }
     const symptoms = String(rawSymptoms ?? "")
       .replace(/[\u0000-\u001F\u007F]/g, " ")
       .slice(0, 2000);
     const safeLang = ["pt", "en", "es"].includes(String(language)) ? language : "pt";
 
-    let contexto_historico = [];
+    let contexto_historico: { message: string; sender: string; timestamp: string }[] = [];
     if (unifiedContactId) {
       contexto_historico = await getRecentHistory(unifiedContactId, 12);
     }

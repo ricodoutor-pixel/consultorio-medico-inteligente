@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const user = 'contato@plantayraiz.com.br';
-const pass = '95654045Pa#';
+const pass = process.env.SMTP_PASS || '';
 
 const hosts = [
   { host: 'smtp.hostinger.com', port: 465, secure: true },

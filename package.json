@@ -10,6 +10,7 @@
     "build:dev": "vite build --mode development && node scripts/ensure-static-seo-assets.mjs",
     "prerender:seo": "bunx tsx scripts/prerender-seo.ts || npx tsx scripts/prerender-seo.ts",
     "lint": "eslint .",
+    "test": "vitest run",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "validate:env": "node scripts/validate-env.mjs",

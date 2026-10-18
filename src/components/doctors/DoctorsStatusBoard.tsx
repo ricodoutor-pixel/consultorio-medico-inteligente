@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { Loader2, Stethoscope } from "lucide-react";
+import { ensureDoctorTitle } from "@/lib/doctor-title";
 import { useDoctors } from "@/hooks/useDoctors";
 
 interface Props {
@@ -16,7 +17,10 @@ export function DoctorsStatusBoard({ variant = "public", title = "Médicos na pl
 
   // Sort: online first, then alphabetical
   const doctors = useMemo(() => {
-    return [...rawDoctors].sort((a, b) => {
+    return rawDoctors.filter((doctor) => {
+      const registration = `${doctor.crm || ""} ${doctor.document_type || ""} ${doctor.specialty || ""}`;
+      return !/crmv|veterin/i.test(registration);
+    }).sort((a, b) => {
       const ao = a.is_online && (a.is_available ?? true) ? 0 : 1;
       const bo = b.is_online && (b.is_available ?? true) ? 0 : 1;
       if (ao !== bo) return ao - bo;
@@ -53,7 +57,7 @@ export function DoctorsStatusBoard({ variant = "public", title = "Médicos na pl
           <ul className="divide-y divide-border">
             {doctors.map((d) => {
               const online = Boolean(d.is_online && (d.is_available ?? true));
-              const name = d.full_name || `Dr(a). ${d.crm}`;
+              const name = ensureDoctorTitle(d.full_name) || `Dr(a). ${d.crm}`;
               const doc =
                 d.document_type === "ci" ? `CI ${d.crm} - BO` : `CRM ${d.crm}${d.crm_state ? `/${d.crm_state}` : ""}`;
               const local = d.city ? `${d.city}${d.country ? `, ${d.country}` : ""}` : d.country || "";

@@ -18,8 +18,6 @@ async function testOthers() {
 
   const passwords = [
     "password_here",
-    "95654045pa#",
-    "95654045",
     "PlantaRaiz2026#",
     "Admin123!"
   ];

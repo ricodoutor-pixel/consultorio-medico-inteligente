@@ -105,7 +105,7 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     bioPh: "Descreva sua formação, anos de experiência clínica e abordagem canabinoide...",
     submit: "Enviar Cadastro & Iniciar Verificação KYC",
     submitting: "Processando e criptografando dados...",
-    lgpd: "Autorizo o tratamento dos meus dados pessoais conforme a LGPD/GDPR e concordo com os Termos de Uso e Política de Privacidade da plataforma Planta & Raiz.",
+    lgpd: "Declaro que li e concordo com os Termos de Uso e Política de Privacidade da Planta y Raíz, e autorizo expressamente o tratamento dos meus dados (LGPD) e a veiculação da minha imagem profissional, nome, CRM e especialidade nas redes sociais (Meta/Instagram, Facebook, Google e mídias institucionais) para divulgação dos serviços de telemedicina da plataforma, em estrita conformidade com a Resolução CFM nº 2.336/2023.",
     chat: "Chat Clínico", video: "Teleconsulta por Vídeo", both: "Chat + Vídeo HD",
     intlNotice: "Profissional Internacional: para atuar e prescrever em nossa rede, anexe a cópia do Passaporte e a comprovação de permanência ou registro internacional.",
     passportSignLabel: "Foto do Passaporte (Página com Foto e Assinatura) *",
@@ -143,7 +143,7 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     bioPh: "Describa su experiencia clínica, especialidades y enfoque cannabinoide...",
     submit: "Enviar Registro & Iniciar Verificación KYC",
     submitting: "Procesando y cifrando datos...",
-    lgpd: "Autorizo el tratamiento de mis datos personales conforme a la normativa de protección de datos y acepto los Términos de Uso y Política de Privacidad de Planta & Raíz.",
+    lgpd: "Declaro que he leído y acepto los Términos de Uso y Política de Privacidad de Planta y Raíz, y autorizo expresamente el tratamiento de mis datos personales y el uso de mi imagen profesional, nombre, registro médico y especialidad en redes sociales (Meta/Instagram, Facebook y Google) y campañas de telemedicina de la plataforma, conforme a la normativa ética aplicable.",
     chat: "Chat Clínico", video: "Videoconsulta", both: "Chat + Video HD",
     intlNotice: "Profesional Internacional: para atender y prescribir en nuestra red, adjunte copia de su Pasaporte y comprobante de permanencia o licencia internacional.",
     passportSignLabel: "Foto del Pasaporte (Página con Foto y Firma) *",
@@ -181,7 +181,7 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     bioPh: "Describe your clinical experience, board certifications, and cannabinoid medicine expertise...",
     submit: "Submit Registration & Start KYC Verification",
     submitting: "Encrypting and submitting data...",
-    lgpd: "I authorize the processing of my personal data under GDPR/LGPD regulations and agree to the Terms of Service and Privacy Policy of Planta & Raíz.",
+    lgpd: "I declare that I have read and agree to Planta y Raíz's Terms of Use and Privacy Policy, and expressly authorize the processing of my personal data and the promotional use of my professional image, name, medical license, and specialty on social media channels (Meta/Instagram, Facebook, Google) and institutional telemedicine campaigns, in compliance with ethical medical guidelines.",
     chat: "Clinical Chat", video: "HD Video Consultation", both: "Chat + HD Video",
     intlNotice: "International Practitioner: attach your Passport (photo & signature page) and proof of stay, visa, or international medical license.",
     passportSignLabel: "Passport Photo (Photo & Signature Page) *",
@@ -476,10 +476,10 @@ const CadastroProfissional = () => {
         });
         return;
       }
-      if (!isCuidador && (!kycFiles["crm_front"] || !kycFiles["icp_brasil"])) {
+      if (!isCuidador && !kycFiles["crm_front"]) {
         toast({
-          title: "Documentos Incompletos",
-          description: "Obrigatório enviar a FRENTE do seu registro profissional e Assinatura Digital ICP-Brasil.",
+          title: "Documento Incompleto",
+          description: "Obrigatório enviar a FRENTE do seu registro profissional.",
           variant: "destructive",
         });
         return;
@@ -502,6 +502,10 @@ const CadastroProfissional = () => {
             country,
             phone: form.telefone,
             language: lang,
+            terms_accepted: true,
+            terms_accepted_at: new Date().toISOString(),
+            image_rights_authorized: true,
+            social_media_advertising_authorized: true,
           },
         },
       });
@@ -542,26 +546,49 @@ const CadastroProfissional = () => {
         if (!file) continue;
         const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
         
-        // Assinatura ICP-Brasil vai para bucket 'avatars'
+        // Assinatura ICP-Brasil / Eletrônica
         if (kind === "icp_brasil") {
-          const path = `documents/${userId}/signature_${Date.now()}.${ext}`;
+          const path = `${userId}/signature_${Date.now()}.${ext}`;
           uploads.push(
-            supabase.storage
-              .from('avatars')
-              .upload(path, file, { upsert: true, contentType: file.type || undefined })
-              .then(async ({ error, data }) => {
-                if (error) throw error;
-                if (data?.path) {
-                  const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(data.path);
-                  if (publicUrlData?.publicUrl) {
-                    await (supabase.from("doctors") as any).update({ signature_url: publicUrlData.publicUrl }).eq("user_id", userId);
+            (async () => {
+              try {
+                let publicUrl = "";
+                const { error: upErr, data: upData } = await supabase.storage
+                  .from('avatars')
+                  .upload(path, file, { upsert: true, contentType: file.type || undefined });
+                
+                if (!upErr && upData?.path) {
+                  const { data: pUrl } = supabase.storage.from('avatars').getPublicUrl(upData.path);
+                  publicUrl = pUrl?.publicUrl || "";
+                } else {
+                  // Fallback para KYC_BUCKET
+                  const { error: kycErr, data: kycData } = await supabase.storage
+                    .from(KYC_BUCKET)
+                    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+                  if (!kycErr && kycData?.path) {
+                    const { data: pUrl } = supabase.storage.from(KYC_BUCKET).getPublicUrl(kycData.path);
+                    publicUrl = pUrl?.publicUrl || "";
                   }
                 }
-              })
-              .catch((err) => {
-                console.error("[signature upload]", err);
-              })
+
+                if (publicUrl) {
+                  await Promise.all([
+                    (supabase.from("doctors") as any).update({ signature_url: publicUrl }).eq("user_id", userId),
+                    supabase.from("profiles").update({ signature_url: publicUrl } as any).eq("id", userId)
+                  ]);
+                }
+              } catch (err) {
+                console.error("[signature upload error]", err);
+              }
+            })()
           );
+
+          kycRows.push({
+            doctor_user_id: userId,
+            document_kind: kind,
+            storage_path: path,
+            verification_status: "pending",
+          });
           continue;
         }
 
@@ -1130,19 +1157,19 @@ const CadastroProfissional = () => {
                           <>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{t.passportSignLabel}</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("passport_signature")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("passport_signature")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{t.stayStampLabel}</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("stay_stamp")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("stay_stamp")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">Registro Médico / License ({currentCountryConfig.name}) *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">Comprovante de Endereço / Residência *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" />
                             </div>
                           </>
                         ) : (
@@ -1151,25 +1178,28 @@ const CadastroProfissional = () => {
                               <>
                                 <div className="space-y-1">
                                   <Label className="text-xs font-bold text-muted-foreground">{categoryCouncil.docFrentLabel} *</Label>
-                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" required />
+                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" />
                                 </div>
                                 <div className="space-y-1">
-                                  <Label className="text-xs font-bold text-muted-foreground">{categoryCouncil.docFrentLabel.replace("frente","verso").replace("Frente","Verso")} *</Label>
-                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} className="bg-muted border-border text-xs" required />
+                                  <Label className="text-xs font-bold text-muted-foreground">{categoryCouncil.docFrentLabel.replace("frente","verso").replace("Frente","Verso")}</Label>
+                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} className="bg-muted border-border text-xs" />
                                 </div>
                                 <div className="space-y-1 sm:col-span-2">
-                                  <Label className="text-xs font-bold text-muted-foreground">Assinatura Digital (ICP-Brasil) — Imagem *</Label>
-                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} className="bg-muted border-border text-xs" required />
+                                  <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold text-muted-foreground">Assinatura Digital / Eletrônica (ICP-Brasil, Imagem ou PDF)</Label>
+                                    <span className="text-[10px] text-emerald-400 font-medium">Opcional no cadastro (pode ativar no painel)</span>
+                                  </div>
+                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} className="bg-muted border-border text-xs" />
                                 </div>
                               </>
                             )}
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{KYC_LABELS.cpf_doc} *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{KYC_LABELS.address_proof} *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" />
                             </div>
                           </>
                         )}
@@ -1248,17 +1278,25 @@ const CadastroProfissional = () => {
                     </Select>
                   </div>
 
-                  {/* Termos de Consentimento */}
-                  <div className="flex items-start space-x-3 p-4 rounded-xl bg-muted/20 border border-border">
-                    <Checkbox
-                      id="lgpd"
-                      checked={lgpdConsent}
-                      onCheckedChange={(checked) => setLgpdConsent(!!checked)}
-                      className="mt-1"
-                    />
-                    <label htmlFor="lgpd" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                      {t.lgpd}
-                    </label>
+                  {/* Termos de Consentimento & Autorização de Imagem em Redes Sociais */}
+                  <div className="p-4 rounded-2xl bg-muted/20 border border-border space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <Checkbox
+                        id="lgpd"
+                        checked={lgpdConsent}
+                        onCheckedChange={(checked) => setLgpdConsent(!!checked)}
+                        className="mt-1"
+                      />
+                      <label htmlFor="lgpd" className="text-xs text-foreground/90 leading-relaxed cursor-pointer">
+                        {t.lgpd}
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-2 pt-2.5 border-t border-border/50 text-[11px] text-emerald-400 font-medium">
+                      <Sparkles size={14} className="shrink-0 text-emerald-400" />
+                      <span>
+                        <strong>Autorização com 1 clique:</strong> Ao marcar esta opção, você autoriza o uso da sua foto profissional, nome e CRM em campanhas institucionais e redes sociais (Meta/Instagram, Facebook e Google) da Planta y Raíz.
+                      </span>
+                    </div>
                   </div>
 
                   {/* Botão de Submissão */}

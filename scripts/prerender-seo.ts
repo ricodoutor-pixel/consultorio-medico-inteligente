@@ -207,6 +207,52 @@ const TREATMENTS: TreatmentPage[] = [
   },
 ];
 
+interface DoctorSEOItem {
+  id: string;
+  name: string;
+  crm: string;
+  category: string;
+  specialty: string;
+  bio: string;
+}
+
+const DOCTOR_PAGES: DoctorSEOItem[] = [
+  { id: "med-victor-fonseca", name: "Dr. Victor Henrique Bueno da Fonseca", crm: "CRM 206873/SP", category: "Médico Prescritor", specialty: "Clínica Médica e Psiquiatria Integrativa", bio: "Médico graduado pela UNIRIO com vasta experiência em Medicina Canabinoide e saúde mental." },
+  { id: "med-milton-urban", name: "Dr. Milton Dimas Tadeu Urban", crm: "CRM 58169/SP", category: "Médico Prescritor", specialty: "Medicina do Trabalho e Clínica Canabinoide", bio: "Mais de 30 anos de experiência médica no acolhimento de dores crônicas e medicina canabinoide." },
+  { id: "med-barbara-matos", name: "Dra. Barbara Eliane Matos", crm: "CRM 12361/SC", category: "Médico Prescritor", specialty: "Medicina Canabinoide e Integrativa", bio: "Atendimento acolhedor e humanizado focado em fitocanabinoides." },
+  { id: "med-geovana-torres", name: "Dra. Geovana Torres Mozaner", crm: "CRM 98083/MG • 247790/SP", category: "Médico Prescritor", specialty: "Medicina Canabinoide e Saúde Integrativa", bio: "Prescritora com experiência em tratamentos personalizados de canabinoides." },
+  { id: "med-daniel-kobayashi", name: "Dr. Daniel Kobayashi Colombo", crm: "CRM 5460/RO • 10346/MT", category: "Médico Prescritor", specialty: "Medicina da Família e Canabinologia", bio: "Médico prescritor dedicado à melhora da qualidade de vida dos pacientes." },
+  { id: "med-jose-geraldo", name: "Dr. José Geraldo Barbugli Abbade Filho", crm: "CRM 32584/MG", category: "Médico Prescritor", specialty: "Medicina do Trabalho e Canabinoides", bio: "Especialista em manejo de dores e estresse crônico com canabinoides." },
+  { id: "med-ana-karoliny", name: "Dra. Ana Karoliny Martins", crm: "CRM 13942/RN", category: "Médico Prescritor", specialty: "Medicina Canabinoide e Saúde Integral", bio: "Médica prescritora dedicada à escuta ativa e terapias avançadas com fitocanabinoides." },
+  { id: "med-albert-machado", name: "Dr. Albert Machado Tenorio", crm: "CRM 34660/PE", category: "Médico Prescritor", specialty: "Gastroenterologia e Cannabis Medicinal", bio: "Especialista com RQE focado no eixo cérebro-intestino e modulação endocanabinoide." },
+  { id: "med-sadi-menta", name: "Dr. Sadi Roberto Menta", crm: "CRM 16301/SC", category: "Médico Prescritor", specialty: "Medicina Canabinoide e Dor Crônica", bio: "Vasta experiência clínica em tratamentos com canabinoides." },
+  { id: "med-mariana-alves", name: "Dra. Mariana Alves Rezende", crm: "CRM 135012-9/RJ", category: "Médico Prescritor", specialty: "Medicina Endocanabinoide e Clínica Geral", bio: "Pós-graduada e dedicada ao cuidado de dores crônicas, ansiedade e insônia." },
+  { id: "med-breno-boueri", name: "Dr. Breno Boueri Affonso", crm: "CRM 75492/SP", category: "Médico Prescritor", specialty: "Diagnóstico por Imagem e Radiologia Intervencionista", bio: "Mais de 32 anos de experiência médica e atuação de destaque no tratamento humanizado com cannabis." },
+  { id: "med-joao-pedro", name: "Dr. João Pedro Girardello Detoni", crm: "CRM 42912/RS", category: "Médico Prescritor", specialty: "Clínica Médica e Terapia Canabinoide", bio: "RQE em Clínica Médica, excelência clínica e acompanhamento próximo do paciente." },
+  { id: "med-grace-conceicao", name: "Dra. Grace Adriana Lopes Conceição", crm: "CRM 190386/SP • 10372/BA", category: "Médico Prescritor", specialty: "Psiquiatria e Medicina Canabinoide", bio: "Membro da SBEC, foco em saúde mental, TEA, TDAH e ansiedade com canabinoides." },
+  { id: "med-raissa-chagas", name: "Dra. Raíssa Ruperto Souza das Chagas", crm: "CRM 26470/DF", category: "Médico Prescritor", specialty: "Medicina Canabinoide e Clínica Médica", bio: "Médica prescritora com abordagem humanizada e focada em qualidade de vida." },
+  { id: "med-diego-cartaxo", name: "Dr. Diego Cartaxo Jacome", crm: "CRM 14828/PB", category: "Médico Prescritor", specialty: "Nutrologia e Medicina do Trabalho", bio: "Tratamento integrativo e modulação metabólica com canabinoides." },
+  { id: "med-gustavo-nobre", name: "Dr. Gustavo Nobre Damiani Pereira", crm: "CRM 35632/PR", category: "Médico Prescritor", specialty: "Medicina Canabinoide e Dor Crônica", bio: "Acompanhamento especializado de pacientes com dores persistentes." },
+  { id: "med-leuma-netta", name: "Dra. Leuma Leão Netta", crm: "CRM 85182/MG", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Médica prescritora com foco no cuidado humanizado." },
+  { id: "med-luiz-medina", name: "Prof. Dr. Luiz Roberto Medina dos Santos", crm: "CRM 11496/SC", category: "Médico Prescritor", specialty: "Cirurgia de Cabeça e Pescoço e SBEC", bio: "Doutorado pela FMUSP, membro da SBEC e referência nacional." },
+  { id: "med-ana-paula", name: "Dra. Ana Paula Ferreira Lima", crm: "CRM 36942/PR", category: "Médico Prescritor", specialty: "Medicina da Família e Canabinoides", bio: "Cuidado integral à família e manejo terapêutico de canabinoides." },
+  { id: "med-adeonis-oliveira", name: "Dr. Adeonis Oliveira Lima", crm: "CRM 9060/SE", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Médico prescritor de cannabis medicinal." },
+  { id: "med-alexandre-stramandinoli", name: "Dr. Alexandre Stramandinoli Correa da Silva", crm: "CRM 17266/PB", category: "Médico Prescritor", specialty: "Cirurgia e Medicina Canabinoide", bio: "Atuação médica com condutas baseadas em evidências científicas." },
+  { id: "med-0", name: "Dr. Edilson Bezerra", crm: "CRM 10963 - Sta Cruz (BO)", category: "Médico Prescritor", specialty: "Farmacologia e Cannabis Medicinal", bio: "Fundador e diretor técnico com foco na democratização do acesso a canabinoides." },
+  { id: "med-guilherme-campos", name: "Dr. Guilherme Campos Silva", crm: "CRM 49694/PR", category: "Médico Prescritor", specialty: "Medicina Física e Reabilitação", bio: "RQE em Fisiatria, reabilitação neuromotora e manejo da dor crônica." },
+  { id: "med-gustavo-simoes", name: "Dr. Gustavo Simoes Llivi Ibanez", crm: "CRM 7684/RO", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Médico prescritor dedicado à clínica médica e dor." },
+  { id: "med-jose-roberto", name: "Dr. José Roberto Silva Coutinho", crm: "CRM 5266864-8/RJ", category: "Médico Prescritor", specialty: "Cardiologia e Medicina Canabinoide", bio: "Especialista em Cardiologia e modulação do sistema cardiovascular e dor." },
+  { id: "med-angela-beatriz", name: "Dra. Angela Beatriz Mercado Acevedo", crm: "CRM 5258084-6/RJ", category: "Médico Prescritor", specialty: "Medicina Física, Reabilitação e Acupuntura", bio: "RQEs em Fisiatria e Acupuntura, pioneira no tratamento integrativo da dor." },
+  { id: "med-ingrid-chiullo", name: "Dra. Ingrid Chiullo Miranda", crm: "CRM 216629/SP", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Médica prescritora com abordagem empática e personalizada." },
+  { id: "med-marianna", name: "Dra. Marianna Coimbra Arzamendia", crm: "CRM 12110/MS", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Atendimento focado no alívio de sintomas e bem-estar do paciente." },
+  { id: "mock-olivia", name: "Dra. Olivia Zimeri", crm: "CRM Z-4466260", category: "Médico Prescritor", specialty: "Medicina Integrativa", bio: "Médica prescritora parceira da Planta y Raíz." },
+  { id: "mock-suelen", name: "Dra. Suelen Naves Rodrigues", crm: "CRM 49354/PR", category: "Médico Prescritor", specialty: "Supervisão Técnica e Canabinologia", bio: "Supervisora Técnica da Planta y Raíz, especialista em medicina canabinoide." },
+  { id: "med-arthur-barretto", name: "Dr. Arthur de Vasconcelos Paes Barretto", crm: "CRMV-SP 06871", category: "Médico Veterinário Prescritor", specialty: "Medicina Veterinária Integrativa e Acupuntura", bio: "Graduado pela USP em 1992, mais de 34 anos de atuação, editor da Revista Clínica Veterinária e membro da SBEC." },
+  { id: "med-rafaella-soletti", name: "Dra. Rafaella da Rocha Soletti", crm: "CRMV-SC 13542", category: "Médico Veterinário Prescritor", specialty: "Pequenos Animais e Endocanabinologia Veterinária", bio: "Graduada pela UDESC e pós-graduada em Cannabis Medicinal pela Faculdade Iguaçu, especialista em clínica e endocanabinologia para cães e gatos." },
+  { id: "med-otavio-bassete", name: "Dr. Otávio Paiva Bassete", crm: "CRMV 21907/PR", category: "Médico Veterinário Prescritor", specialty: "Medicina Veterinária Integrativa", bio: "Especialista em terapias complementares e modulação do sistema endocanabinoide animal." },
+  { id: "med-eduardo-correa", name: "Dr. Eduardo Migueis Correa", crm: "CRMV 19333 - SP", category: "Médico Veterinário Prescritor", specialty: "Medicina Veterinária Canabinoide", bio: "Médico veterinário prescritor de fitocanabinoides." },
+];
+
 // Páginas estáticas adicionais — apenas título/descrição/H1 e parágrafo introdutório
 interface StaticPage { path: string; title: string; description: string; h1: string; intro: string[]; }
 const STATIC_PAGES: StaticPage[] = [
@@ -698,6 +744,40 @@ function injectSEO(
   return html;
 }
 
+function buildDoctorHTML(d: DoctorSEOItem): string {
+  return `
+<article>
+  <header>
+    <h1>${d.name} — ${d.category} (${d.crm})</h1>
+    <p>Especialidade: ${d.specialty}</p>
+  </header>
+  <section>
+    <p>${d.bio}</p>
+    <p>Atendimento online por telemedicina regulamentada pela ANVISA e conselhos federais de medicina/medicina veterinária. Agendamento de orientações técnicas e consultas integrativas na Planta y Raíz.</p>
+  </section>
+  <section>
+    <h2>Serviços e Agendamento</h2>
+    <p><a href="/profissionais/${d.id}">Ver Card e Horários Disponíveis</a> · <a href="https://wa.me/5511991363154">Agendar via WhatsApp Enfª Brisa</a></p>
+  </section>
+</article>`.trim();
+}
+
+function buildDoctorSchema(d: DoctorSEOItem): string {
+  const isVet = d.category.toLowerCase().includes("veterinário");
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": isVet ? "VeterinaryCare" : "Physician",
+    "@id": `${BASE_URL}/profissionais/${d.id}#profile`,
+    name: d.name,
+    description: d.bio,
+    url: `${BASE_URL}/profissionais/${d.id}`,
+    medicalSpecialty: d.specialty,
+    priceRange: "R$ 30 - R$ 150",
+    telephone: "+5511991363154",
+    address: { "@type": "PostalAddress", addressCountry: "BR" }
+  });
+}
+
 function writeRoute(path: string, html: string) {
   const cleanPath = path === "/" ? "/index.html" : `${path}/index.html`;
   const fullPath = resolve(DIST, cleanPath.replace(/^\//, ""));
@@ -737,6 +817,19 @@ function main() {
       extraJsonLd: buildMedicalSchema(t),
     });
     writeRoute(`/tratamentos/${t.slug}`, html);
+    count++;
+  }
+
+  // Perfis individuais de profissionais médicos e veterinários (/profissionais/:id)
+  for (const d of DOCTOR_PAGES) {
+    const html = injectSEO(template, {
+      title: `${d.name} - ${d.category} (${d.crm}) | Planta y Raiz`,
+      description: `${d.name} (${d.crm}) é ${d.category} de Cannabis Medicinal na Planta y Raíz. ${d.bio.slice(0, 140)}... Agende telemedicina e atendimento online.`,
+      canonical: `${BASE_URL}/profissionais/${d.id}`,
+      bodyHTML: buildDoctorHTML(d),
+      extraJsonLd: buildDoctorSchema(d),
+    });
+    writeRoute(`/profissionais/${d.id}`, html);
     count++;
   }
 

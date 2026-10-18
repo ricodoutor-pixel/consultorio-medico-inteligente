@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const WAHA_API_URL = (process.env.WAHA_API_URL || 'https://waha-production-4e9c.up.railway.app').replace(/\/$/, '');
-const WAHA_API_KEY = process.env.WAHA_API_KEY || 'planta123';
+const WAHA_API_KEY = process.env.WAHA_API_KEY || '';
 
 async function diagnose() {
   const base = WAHA_API_URL.startsWith('http') ? WAHA_API_URL : `https://${WAHA_API_URL}`;

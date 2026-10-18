@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
 
 const ALLOWED_ORIGINS = [
   "https://plantayraiz.com.br",
@@ -40,20 +41,20 @@ const json = (body: unknown, status = 200, req?: Request) => {
  *  planos   → 3 planos universais (paciente/médico/lojista) a R$99/mês
  */
 const CATALOG: Record<string, { title: string; amount: number; recurring?: boolean }> = {
-  orientacao_tecnica: { title: "Orientação Técnica (Planta y Raiz)", amount: 30 },
-  orientacao: { title: "Orientação Técnica (Planta y Raiz)", amount: 30 },
-  retorno_consulta: { title: "Retorno com o Profissional", amount: 90 },
-  consulta_chat: { title: "Consulta por Chat (com receita assinada)", amount: 100 },
-  consulta_video: { title: "Consulta por Vídeo (com receita assinada)", amount: 150 },
-  consulta_premium: { title: "Consulta Premium (Vídeo + Chat)", amount: 180 },
-  consulta_canabinoide: { title: "Consulta Canabinoide Especializada", amount: 250 },
-  plano_paciente: { title: "Plano Paciente (mensal)", amount: 99, recurring: true },
-  plano_medico: { title: "Plano Médico (mensal)", amount: 99, recurring: true },
-  plano_lojista: { title: "Plano Lojista (mensal)", amount: 99, recurring: true },
-  plano_basic: { title: "Plano Individual Básico", amount: 49.90, recurring: true },
-  plano_professional: { title: "Plano Médico Profissional", amount: 99.90, recurring: true },
-  plano_premium: { title: "Plano Saúde Verde Família", amount: 199.90, recurring: true },
-  plano_enterprise: { title: "Plano Empresa & Parceiros", amount: 499.90, recurring: true },
+  orientacao_tecnica: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
+  orientacao: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
+  retorno_consulta: { title: "Retorno de Consulta — Planta y Raíz Ltda", amount: 90 },
+  consulta_chat: { title: "Consulta por Chat — Planta y Raíz Ltda", amount: 100 },
+  consulta_video: { title: "Consulta por Vídeo — Planta y Raíz Ltda", amount: 150 },
+  consulta_premium: { title: "Consulta Premium — Planta y Raíz Ltda", amount: 180 },
+  consulta_canabinoide: { title: "Consulta Especializada — Planta y Raíz Ltda", amount: 250 },
+  plano_paciente: { title: "Plano Paciente — Planta y Raíz Ltda", amount: 99, recurring: true },
+  plano_medico: { title: "Plano Médico — Planta y Raíz Ltda", amount: 99, recurring: true },
+  plano_lojista: { title: "Plano Lojista — Planta y Raíz Ltda", amount: 99, recurring: true },
+  plano_basic: { title: "Plano Individual Básico — Planta y Raíz Ltda", amount: 49.90, recurring: true },
+  plano_professional: { title: "Plano Médico Profissional — Planta y Raíz Ltda", amount: 99.90, recurring: true },
+  plano_premium: { title: "Plano Saúde Verde Família — Planta y Raíz Ltda", amount: 199.90, recurring: true },
+  plano_enterprise: { title: "Plano Empresa & Parceiros — Planta y Raíz Ltda", amount: 499.90, recurring: true },
 };
 
 /** Módulos/apps de monitoramento do Consultório Digital (preço server-side). */
@@ -84,6 +85,30 @@ const LEGACY_SKU_MAP: Record<string, string> = {
   premium_mensal: "plano_paciente",
   vip_mensal: "plano_medico",
 };
+
+/** SKUs da Orientação Técnica (web). */
+const isOrientacaoSku = (sku: unknown): sku is string =>
+  typeof sku === "string" && sku.startsWith("orientacao");
+
+const filled = (v: unknown) => typeof v === "string" ? v.trim().length > 0 : v !== null && v !== undefined && v !== "";
+
+/** Red flags indicam emergência? Aceita boolean, array ou texto ("nenhum"/"não" = sem emergência). */
+function hasEmergencyRedFlags(triage: Record<string, unknown>): boolean {
+  if (triage.emergency === true) return true;
+  const rf = triage.red_flags;
+  if (rf === true) return true;
+  const none = /^(nenhum|nenhuma|nao|não|no|none|false|0|-)?$/i;
+  if (Array.isArray(rf)) return rf.some((x) => !none.test(String(x ?? "").trim()));
+  if (typeof rf === "string") return !none.test(rf.trim());
+  return false;
+}
+
+/** Triagem mínima exigida antes de criar a ordem da Orientação Técnica. */
+function isTriageReady(triage: unknown): triage is Record<string, unknown> {
+  if (!triage || typeof triage !== "object" || Array.isArray(triage)) return false;
+  const t = triage as Record<string, unknown>;
+  return filled(t.nome) && filled(t.queixa) && filled(t.tempo) && !hasEmergencyRedFlags(t);
+}
 
 Deno.serve(async (req) => {
   const cors = getCorsHeaders(req);
@@ -124,7 +149,8 @@ Deno.serve(async (req) => {
       shipping_carrier,
       shipping_days,
       amount: directAmount,
-      description: directDesc
+      description: directDesc,
+      triage
     } = await req.json();
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
@@ -219,14 +245,20 @@ Deno.serve(async (req) => {
     } else if (appointmentId && typeof appointmentId === "string") {
       const { data: appt } = await supabase
         .from("appointments")
-        .select("id, amount, patient_id, doctor_id, status")
+        .select("id, amount, patient_id, doctor_id, status, type")
         .eq("id", appointmentId)
         .maybeSingle();
       if (!appt) return json({ error: "Consulta não encontrada" }, 404, req);
       if (appt.patient_id !== userId) return json({ error: "Forbidden" }, 403, req);
-      amount = round2(Number(appt.amount || 0));
+      const fixedPrice = fixedConsultationPrice(appt.type);
+      amount = fixedPrice ?? round2(Number(appt.amount || 0));
+      if (fixedPrice !== null && Number(appt.amount) !== fixedPrice) {
+        const { error: priceError } = await supabase.from("appointments")
+          .update({ amount: fixedPrice }).eq("id", appt.id).eq("payment_status", "pending");
+        if (priceError) return json({ error: "Não foi possível registrar o valor da consulta" }, 500, req);
+      }
       if (!(amount > 0)) return json({ error: "Consulta sem valor válido" }, 400, req);
-      title = "Consulta médica — Planta y Raiz";
+      title = appt.type === "video" ? CATALOG.consulta_video.title : appt.type === "chat" ? CATALOG.consulta_chat.title : "Consulta médica — Planta y Raiz";
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
 
@@ -255,6 +287,9 @@ Deno.serve(async (req) => {
       }
 
       if (!item) return json({ error: "SKU inválido" }, 400, req);
+      if (isOrientacaoSku(sku) && !isTriageReady(triage)) {
+        return json({ error: "triage_required" }, 400, req);
+      }
       title = item.title;
       amount = item.amount;
       // Consulta Premium é o único serviço com valor definido pelo profissional.
@@ -275,7 +310,7 @@ Deno.serve(async (req) => {
         (sku.startsWith("consulta") || sku.startsWith("orientacao") || sku.startsWith("retorno"));
       if (isTelemedSku && !item.recurring) {
         marketplaceFee = round2(amount * FEE_TELEMEDICINE);
-        if (typeof doctorId === "string") {
+        if (typeof doctorId === "string" && !isOrientacaoSku(sku)) {
           const { data: doc } = await supabase
             .from("doctors")
             .select("mp_collector_id")
@@ -296,7 +331,8 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";
-    const success = typeof returnUrl === "string" && returnUrl.startsWith(siteUrl)
+    const isAllowedSuccess = typeof returnUrl === "string" && ALLOWED_ORIGINS.some((origin) => returnUrl.startsWith(origin));
+    const success = isAllowedSuccess
       ? returnUrl
       : `${siteUrl}/payment-success`;
 
@@ -350,6 +386,47 @@ Deno.serve(async (req) => {
       };
     }
 
+    // Orientação Técnica: grava a ordem + triagem ANTES da preferência (AGENTS.md).
+    const isOrientacaoOrder = type === "sku" && isOrientacaoSku(sku);
+    if (isOrientacaoOrder) {
+      const t = (triage ?? {}) as Record<string, unknown>;
+      const meta = (authData.user.user_metadata ?? {}) as Record<string, unknown>;
+      let patientPhone = String(t.whatsapp ?? t.telefone ?? t.phone ?? meta.phone ?? meta.whatsapp ?? "").replace(/\D/g, "");
+      if (!/^\d{10,15}$/.test(patientPhone)) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("whatsapp, phone")
+          .eq("id", userId)
+          .maybeSingle();
+        patientPhone = String((prof as any)?.whatsapp || (prof as any)?.phone || "").replace(/\D/g, "");
+      }
+      const patientName = String(t.nome || meta.full_name || authData.user.email?.split("@")[0] || "Paciente").trim().slice(0, 120);
+      const platformFee = round2(amount * FEE_TELEMEDICINE);
+      const nowIso = new Date().toISOString();
+
+      const { error: orderErr } = await supabase.from("orientacao_tecnica_orders").insert({
+        external_reference: externalReference,
+        user_id: userId,
+        patient_name: patientName.length >= 2 ? patientName : "Paciente",
+        patient_whatsapp: /^\d{10,15}$/.test(patientPhone) ? patientPhone : null,
+        patient_email: authData.user.email || null,
+        amount,
+        platform_fee: platformFee,
+        doctor_payout: round2(amount - platformFee),
+        payment_method: "mercadopago",
+        status: "pending",
+        currency: "BRL",
+        topic: `Orientação: ${String(t.queixa).slice(0, 100)}`,
+        ai_analysis: JSON.stringify(t),
+        created_at: nowIso,
+        updated_at: nowIso,
+      });
+      if (orderErr) {
+        console.error("[mp-checkout] orientacao order insert", orderErr.message);
+        return json({ error: "Não foi possível registrar a triagem da Orientação Técnica" }, 500, req);
+      }
+    }
+
     const mpResponse = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -361,10 +438,21 @@ Deno.serve(async (req) => {
 
     if (!mpResponse.ok) {
       console.error("[mp-checkout] MP error", mpResponse.status, await mpResponse.text());
+      if (isOrientacaoOrder) {
+        await supabase.from("orientacao_tecnica_orders")
+          .update({ status: "failed", updated_at: new Date().toISOString() })
+          .eq("external_reference", externalReference);
+      }
       return json({ error: "Erro ao criar pagamento no Mercado Pago" }, 502);
     }
 
     const mpData = await mpResponse.json();
+
+    if (isOrientacaoOrder) {
+      await supabase.from("orientacao_tecnica_orders")
+        .update({ mp_preference_id: String(mpData.id), updated_at: new Date().toISOString() })
+        .eq("external_reference", externalReference);
+    }
 
     // Comprovante de liquidação direta gravado na transação
     const settlementReceipt = splitDetails
@@ -400,9 +488,11 @@ Deno.serve(async (req) => {
     return json({
       init_point: mpData.init_point,
       preference_id: mpData.id,
+      external_reference: externalReference,
       amount,
       split: splitDetails,
     });
+
   } catch (e) {
     console.error("[mp-checkout]", e);
     return json({ error: "Erro interno" }, 500);

@@ -5,6 +5,7 @@ import type { Professional } from "@/types/professional";
 import { professionals as baseProfessionals } from "@/data/professionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
+import { ensureDoctorTitle } from "@/lib/doctor-title";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 
@@ -62,6 +63,20 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("angela beatriz") || n.includes("mercado") || c.includes("5258084") || c.includes("52580846")) return "/avatars/dra-angela-beatriz.jpg";
   if (n.includes("ingrid") && (n.includes("chiullo") || n.includes("miranda") || c.includes("216629"))) return "/avatars/dra-ingrid-chiullo.jpg";
   if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
+  if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return "/avatars/dr-luiz-roberto-medina.jpg";
+  if (n.includes("victor henrique") || n.includes("fonseca") || c.includes("206873")) return "/avatars/dr-victor-fonseca.jpg?v=2";
+  if (n.includes("otavio") || n.includes("otávio") || n.includes("bassete") || c.includes("21907")) return "/avatars/dr-otavio-bassete.jpg";
+  if (n.includes("sadi") || n.includes("menta") || c.includes("16301")) return "/avatars/dr-sadi-menta.jpg?v=1";
+  if (n.includes("geovana") || n.includes("mozaner") || c.includes("98083") || c.includes("247790")) return "/avatars/dra-geovana-torres.jpg?v=1";
+  if (n.includes("grace") || n.includes("conceicao") || n.includes("conceição") || c.includes("190386") || c.includes("190.386") || c.includes("10372")) return "/avatars/dra-grace-conceicao.jpg?v=1";
+  if (n.includes("frederico") && n.includes("menezes")) return "/avatars/dr-antonio-silva.jpg";
+  if (n.includes("mariana") && (n.includes("alves") || n.includes("rezende") || c.includes("135012"))) return "/avatars/dra-mariana-alves.jpg";
+  if (n.includes("breno") || n.includes("boueri") || n.includes("affonso") || c.includes("75492")) return "/avatars/dr-breno-boueri.jpg?v=4";
+  if (n.includes("milton") || n.includes("urban") || c.includes("58169")) return "/avatars/dr-milton-urban.jpg?v=4";
+  if (n.includes("raissa") || n.includes("raíssa") || n.includes("ruperto") || n.includes("chagas") || c.includes("26470")) return "/avatars/dra-raissa-chagas.jpg?v=1";
+  if (n.includes("ana karoliny") || (n.includes("karoliny") && n.includes("martins")) || c.includes("13942")) return "/avatars/dra-ana-karoliny.jpg?v=1";
+  if (n.includes("arthur") || n.includes("barretto") || c.includes("6871")) return "/avatars/dr-arthur-barretto.jpg?v=1";
+  if (n.includes("rafaella") || n.includes("soletti") || c.includes("13542")) return "/avatars/dra-rafaella-soletti.jpg?v=1";
 
   // 2. Especialistas e terapeutas das demais categorias oficiais tratadas
   if (n.includes("fernando") && n.includes("ribeiro")) return "/avatars/dr-fernando-ribeiro.jpg";
@@ -77,6 +92,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("renata") && n.includes("costa")) return "/avatars/dra-renata-costa.jpg";
   if (n.includes("yuki") && n.includes("tanaka")) return "/avatars/dra-yuki-tanaka.jpg";
   if (n.includes("lucas") && n.includes("ferreira")) return "/avatars/dr-lucas-ferreira.jpg";
+  if (n.includes("juliana") && n.includes("ferreira")) return "/avatars/dra-juliana-ferreira.jpg";
   if (n.includes("carlos") && n.includes("herrera")) return "/avatars/dr-carlos-herrera.jpg";
   if (n.includes("valentina") && n.includes("reyes")) return "/avatars/dra-valentina-reyes.jpg";
   if (n.includes("rafael") && n.includes("mendes")) return "/avatars/dr-rafael-mendes.jpg";
@@ -131,8 +147,10 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
  * Normalizador de nome para conferência e deduplicação
  */
 function normalizeDoctorKey(name: string, crm?: string | null): string {
+  // Remove TODOS os títulos iniciais (Dr., Dra., Prof., Profa., etc.),
+  // mesmo combinados ("Prof. Dr. ..."), para não perder o perfil estático.
   const n = (name || "").toLowerCase()
-    .replace(/^dr\.\s*|^dra\.\s*|^prof\.\s*|^profa\.\s*|^enf\.\s*|^téc\.\s*|^aux\.\s*/i, "")
+    .replace(/^((dr|dra|prof|profa|enf|téc|tec|aux)\.\s*)+/i, "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
   return n;
@@ -173,30 +191,89 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
   }, []);
 
   const professionals = useMemo<Professional[]>(() => {
-    // FONTE ÚNICA: a vitrine exibe SOMENTE os profissionais realmente cadastrados
-    // e liberados pelo administrador na página de KYC (view `doctors_public`).
-    // Nenhum profissional fictício ou lista fixa é usado aqui.
-    const baseByCrm = new Map<string, Professional>();
-    const baseByName = new Map<string, Professional>();
-    for (const base of baseProfessionals) {
-      const cleanCrm = (base.crm || "").replace(/\D/g, "");
-      if (cleanCrm) baseByCrm.set(cleanCrm, base);
-      const key = normalizeDoctorKey(base.name);
-      if (key) baseByName.set(key, base);
+    // 1. Mapeamento de busca rápida dos dados reais do banco
+    const dbMapByCrm = new Map<string, DoctorRow>();
+    const dbMapByName = new Map<string, DoctorRow>();
+
+    for (const doc of dbDoctors) {
+      if (doc.crm) {
+        const cleanCrm = doc.crm.replace(/\D/g, "");
+        if (cleanCrm) dbMapByCrm.set(cleanCrm, doc);
+      }
+      const normName = normalizeDoctorKey(doc.full_name || "");
+      if (normName) dbMapByName.set(normName, doc);
     }
 
-    const mapped: Professional[] = dbDoctors
-      .filter((doc) => doc.is_verified === true)
-      .map((doc) => {
-        const fullName = doc.full_name || "Profissional";
-        const cleanCrm = (doc.crm || "").replace(/\D/g, "");
-        const base =
-          (cleanCrm ? baseByCrm.get(cleanCrm) : undefined) ||
-          baseByName.get(normalizeDoctorKey(fullName));
+    const matchedDbDoctorIds = new Set<string>();
+    const docsCountById = new Map<string, number>();
 
-        const registration = doc.crm
-          ? `${doc.crm}${doc.crm_state ? ` - ${doc.crm_state}` : ""}`
-          : "";
+    // 2. Itera sobre os profissionais oficiais configurados (baseProfessionals)
+    // Isso garante que TODOS os médicos tratados com jaleco e esteto, além das demais categorias (veterinários, terapeutas, etc.),
+    // apareçam com 100% de estabilidade mesmo se o banco estiver indisponível ou vazio.
+    const enrichedList: Professional[] = baseProfessionals.map((base) => {
+      if (!base) return base;
+
+      const cleanBaseCrm = (base.crm || "").replace(/\D/g, "");
+      const normBaseName = normalizeDoctorKey(base.name);
+
+      const matchedDb = (cleanBaseCrm ? dbMapByCrm.get(cleanBaseCrm) : null) || 
+                        dbMapByName.get(normBaseName);
+
+      if (matchedDb) {
+        matchedDbDoctorIds.add(matchedDb.id);
+      }
+
+      // Foto tratada oficial SEMPRE tem prioridade absoluta
+      const treatedAvatar = resolveDoctorAvatar(base.name, base.crm || "", matchedDb?.avatar_url || base.imageUrl);
+      const cfmPrint = getDoctorCfmPrint(base.crm || base.name) || base.cfmPrintUrl;
+
+      const isEdilson = cleanBaseCrm === "10963" || (base.name && base.name.toLowerCase().includes("edilson"));
+      const registration = isEdilson ? "10963 - Sta Cruz (BO)" : (base.crm || (matchedDb?.crm ? `${matchedDb.crm}${matchedDb.crm_state ? ` - ${matchedDb.crm_state}` : ""}` : ""));
+
+      if (!matchedDb) {
+        docsCountById.set(base.id, 0);
+        return {
+          ...base,
+          crm: registration,
+          imageUrl: treatedAvatar || base.imageUrl,
+          cfmPrintUrl: cfmPrint,
+          tags: isEdilson ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"] : base.tags,
+        };
+      }
+
+      docsCountById.set(base.id, matchedDb.kyc_docs_count ?? 0);
+
+      const priceValue = Number(matchedDb.price_video_chat ?? matchedDb.consultation_price ?? base.priceValue ?? 150) || 150;
+
+      // Enriquece com informações em tempo real do banco de dados
+      return {
+        ...base,
+        dbId: matchedDb.id,
+        crm: registration,
+        imageUrl: treatedAvatar || base.imageUrl,
+        cfmPrintUrl: cfmPrint,
+        bio: (matchedDb.bio && matchedDb.bio.trim() !== "") ? matchedDb.bio.trim() : base.bio,
+        online: Boolean(matchedDb.is_online && (matchedDb.is_available ?? true)),
+        rating: matchedDb.rating ?? base.rating,
+        consults: matchedDb.total_consultations ?? base.consults,
+        price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
+        priceValue,
+        premiumPrice: matchedDb.price_video_chat ?? base.premiumPrice,
+        plan_tier: matchedDb.plan_tier ?? base.plan_tier,
+        tags: isEdilson ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"] : (base.tags ?? [matchedDb.specialty || "Cannabis Medicinal", "Prescritor"]),
+      };
+    });
+
+    // 3. Adicionar novos profissionais cadastrados no banco (aprovados / verificados) que não estavam na lista base
+    const newlyAddedFromDb: Professional[] = dbDoctors
+      .filter((doc) => doc.is_verified === true && !matchedDbDoctorIds.has(doc.id))
+      .map((doc) => {
+        const fullName = doc.full_name ? ensureDoctorTitle(doc.full_name) : "Profissional";
+        const cleanCrm = (doc.crm || "").replace(/\D/g, "");
+        const isEdilson = cleanCrm === "10963" || (fullName && fullName.toLowerCase().includes("edilson"));
+        const registration = isEdilson
+          ? "10963 - Sta Cruz (BO)"
+          : (doc.crm ? `${doc.crm}${doc.crm_state ? ` - ${doc.crm_state}` : ""}` : "");
         const isVet =
           /crmv/i.test(doc.crm || "") ||
           /veterin/i.test(doc.specialty || "") ||
@@ -205,18 +282,20 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         const priceValue = Number(doc.price_video_chat ?? doc.consultation_price ?? 150) || 150;
         const avatar = resolveDoctorAvatar(fullName, doc.crm || "", doc.avatar_url) || doc.avatar_url || "";
 
+        docsCountById.set(`db-${doc.id}`, doc.kyc_docs_count ?? 0);
+
         return {
-          id: base?.id ?? `db-${doc.id}`,
+          id: `db-${doc.id}`,
           dbId: doc.id,
           name: fullName,
           category: isVet ? "Médico Veterinário Prescritor" : MEDICOS_CATEGORY,
           councilLabel: isVet ? "CRMV" : "CRM",
-          bio: doc.bio || base?.bio || "",
-          experience: base?.experience ?? "",
-          tags: base?.tags ?? [doc.specialty || "Cannabis Medicinal", "Prescritor"],
+          bio: doc.bio || "",
+          experience: "",
+          tags: isEdilson ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"] : [doc.specialty || "Cannabis Medicinal", "Prescritor"],
           price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
           priceValue,
-          whatsapp: base?.whatsapp ?? "",
+          whatsapp: "",
           rating: doc.rating ?? null,
           consults: doc.total_consultations ?? 0,
           avatar: fullName
@@ -226,27 +305,42 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
             .map((part) => part.charAt(0).toUpperCase())
             .join(""),
           imageUrl: avatar,
-          paymentLink: base?.paymentLink ?? "",
-          services: base?.services ?? [],
-          slots: base?.slots ?? [],
-          reviews: base?.reviews ?? [],
+          paymentLink: "",
+          services: [],
+          slots: [],
+          reviews: [],
           online: Boolean(doc.is_online && (doc.is_available ?? true)),
-          premiumPrice: doc.price_video_chat ?? base?.premiumPrice,
+          premiumPrice: doc.price_video_chat,
           crm: registration,
-          cfmPrintUrl: getDoctorCfmPrint(doc.crm || fullName) || base?.cfmPrintUrl,
-          flags: base?.flags ?? (doc.country === "BO" ? ["🇧🇴"] : ["🇧🇷"]),
+          cfmPrintUrl: getDoctorCfmPrint(doc.crm || fullName),
+          flags: doc.country === "BO" ? ["🇧🇴"] : ["🇧🇷"],
           plan_tier: doc.plan_tier ?? "free",
-          _docsCount: doc.kyc_docs_count ?? 0,
-        } as Professional & { _docsCount: number };
+        };
       });
 
-    // Ordem oficial: fixos primeiro, depois quem tem mais documentos no cadastro.
-    return mapped.sort((a, b) =>
+    const fullList = [...enrichedList, ...newlyAddedFromDb];
+
+    // 4. Separa os médicos prescritores para ordenar com precisão (Dr. Victor #1 VIP e completude)
+    const medicos = fullList.filter((p) => p && p.category === MEDICOS_CATEGORY);
+    const nonMedicos = fullList.filter((p) => p && p.category !== MEDICOS_CATEGORY);
+
+    medicos.sort((a, b) =>
       compareDoctorsByCompleteness(
-        { name: a.name, registration: a.crm, docsCount: (a as Professional & { _docsCount?: number })._docsCount ?? 0 },
-        { name: b.name, registration: b.crm, docsCount: (b as Professional & { _docsCount?: number })._docsCount ?? 0 },
+        { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
+        { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
       ),
     );
+
+    // Dr. Victor Henrique Bueno da Fonseca sempre em 1º lugar absoluto na vitrine médica (posição 0)
+    const victorIdx = medicos.findIndex(
+      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor")
+    );
+    if (victorIdx > 0) {
+      const [victorDoc] = medicos.splice(victorIdx, 1);
+      medicos.unshift(victorDoc);
+    }
+
+    return [...medicos, ...nonMedicos];
   }, [dbDoctors]);
 
   return { professionals, realCount: professionals.length, loading };

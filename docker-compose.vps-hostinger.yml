@@ -1,0 +1,107 @@
+# ==========================================================================
+# Stack WhatsApp — VPS Hostinger (srv2036020.hstgr.cloud)
+# Projeto Docker na VPS: "whatsapp"
+#
+# - Evolution API publicada via Traefik (já instalado na VPS) com HTTPS
+#   automático em https://${EVOLUTION_DOMAIN}
+# - Postgres e Redis SEM portas públicas (apenas rede interna do projeto)
+# - n8n NÃO está aqui: usa-se o n8n já existente (projeto n8n-a3wy)
+# - Nenhuma senha padrão: todas as variáveis são obrigatórias (:?)
+#   Valores ficam no .env local (EVOLUTION_API_KEY_VPS, VPS_POSTGRES_PASSWORD,
+#   VPS_REDIS_PASSWORD) e são enviados como "environment" do projeto na VPS.
+# ==========================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: evolution
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: evolution
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolution -d evolution"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?defina REDIS_PASSWORD}"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.7
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.evolution.rule=Host(`${EVOLUTION_DOMAIN:?defina EVOLUTION_DOMAIN}`)
+      - traefik.http.routers.evolution.entrypoints=websecure
+      - traefik.http.routers.evolution.tls.certresolver=letsencrypt
+      - traefik.http.services.evolution.loadbalancer.server.port=8080
+    environment:
+      - SERVER_TYPE=http
+      - SERVER_PORT=8080
+      - SERVER_URL=https://${EVOLUTION_DOMAIN}
+      - LOG_LEVEL=ERROR,WARN,INFO
+      - LOG_BAILEYS=error
+      - DEL_INSTANCE=false
+      - LANGUAGE=pt-BR
+
+      # Autenticação (chave global obrigatória em todas as chamadas)
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY:?defina EVOLUTION_API_KEY}
+      - AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=false
+
+      # Banco de dados
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:${POSTGRES_PASSWORD}@postgres:5432/evolution?schema=evolution_api
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution_plantayraiz
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      - DATABASE_SAVE_MESSAGE_UPDATE=true
+      - DATABASE_SAVE_DATA_CONTACTS=true
+      - DATABASE_SAVE_DATA_CHATS=true
+
+      # Cache Redis
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://:${REDIS_PASSWORD}@redis:6379/1
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_REDIS_SAVE_INSTANCES=true
+      - CACHE_LOCAL_ENABLED=false
+
+      # Identificação da sessão no WhatsApp (aparece em "Aparelhos conectados")
+      - CONFIG_SESSION_PHONE_CLIENT=Planta y Raiz
+      - CONFIG_SESSION_PHONE_NAME=Chrome
+      - QRCODE_LIMIT=30
+
+      # Webhook global -> n8n existente na VPS
+      - WEBHOOK_GLOBAL_ENABLED=true
+      - WEBHOOK_GLOBAL_URL=${N8N_WEBHOOK_URL:?defina N8N_WEBHOOK_URL}
+      - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=false
+      - WEBHOOK_EVENTS_MESSAGES_UPSERT=true
+      - WEBHOOK_EVENTS_MESSAGES_UPDATE=true
+      - WEBHOOK_EVENTS_CONNECTION_UPDATE=true
+      - WEBHOOK_EVENTS_QRCODE_UPDATED=true
+    volumes:
+      - evolution_instances:/evolution/instances
+
+volumes:
+  postgres_data:
+  redis_data:
+  evolution_instances:

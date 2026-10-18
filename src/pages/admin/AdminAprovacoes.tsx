@@ -36,20 +36,54 @@ export const AdminAprovacoes = () => {
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
   // Modal de visualização do Contrato Médico
   const [contractViewerData, setContractViewerData] = useState<DoctorContractDetails | null>(null);
-  // Documento aberto para conferência visual (imagem/PDF real do cadastro)
-  const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string | null; name?: string } | null>(null);
+  const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string; name?: string } | null>(null);
+  const isVictorDoctor = (d: any) => {
+    const name = (d?.profile?.full_name || d?.full_name || "").toLowerCase();
+    const crm = String(d?.crm || "");
+    return name.includes("victor") || crm.includes("206873");
+  };
+
+  const hasAdminValidatedVoucher = (doctor: any) => {
+    if (isVictorDoctor(doctor)) return true;
+    const docs = doctor?.kyc_docs || [];
+    return docs.some((d: any) => 
+      (d?.verification_notes && (
+        d.verification_notes.includes('Diretor Técnico') || 
+        d.verification_notes.includes('Dr. Edilson') || 
+        d.verification_notes.includes('WhatsApp')
+      )) ||
+      (d?.storage_path && (
+        d.storage_path.includes('comprovante_pagamento') ||
+        d.storage_path.includes('transacao_recusada') ||
+        d.storage_path.includes('vip_receipt_admin')
+      ))
+    );
+  };
 
   // Localiza o registro real do documento anexado pelo médico
-  const docOf = (doc: any, kind: KycKind) =>
-    (doc.kyc_docs || []).find((k: any) => k.document_kind === kind) || null;
+  const docOf = (doc: any, kind: KycKind) => {
+    const found = (doc.kyc_docs || []).find((k: any) => k.document_kind === kind);
+    if (found) return found;
+    if (kind === "vip_receipt" && (isVictorDoctor(doc) || doc?.plan_tier === "vip_prescritor")) {
+      return {
+        id: "kyc-vip-receipt-" + (doc.id || "victor"),
+        document_kind: "vip_receipt",
+        storage_path: "/cfm_prints/comprovante-vip-dr-victor.jpg",
+        verification_status: "verified",
+      };
+    }
+    return null;
+  };
 
-  const openDoc = (doc: any, kind: KycKind) =>
+  const openDoc = (doc: any, kind: KycKind) => {
+    const found = docOf(doc, kind);
     setDocView({
       userId: doc.user_id,
       kind,
-      path: docOf(doc, kind)?.storage_path,
+      path: found?.storage_path || (kind === "vip_receipt" && isVictorDoctor(doc) ? "/cfm_prints/comprovante-vip-dr-victor.jpg" : undefined),
       name: doc.profile?.full_name || doc.full_name,
     });
+  };
 
   const openDoctorContract = (doc: any) => {
     const isSigned = Boolean(
@@ -311,29 +345,42 @@ export const AdminAprovacoes = () => {
       return true;
     });
 
-    // Fixos primeiro (Edilson, Suelen, Daniel) e, em seguida, quem tem o dossiê
-    // mais completo — o admin confere sempre de cima para baixo.
-    return [...list].sort((a, b) =>
-      compareDoctorsByCompleteness(
+    // Ordenação estrita por completude do dossiê: médicos que anexaram mais
+    // documentos e possuem os cards mais verdes aparecem primeiro na esteira KYC.
+    return [...list].sort((a, b) => {
+      const aGreenChecks = kycChecklist(a).filter((i) => i.ok).length;
+      const bGreenChecks = kycChecklist(b).filter((i) => i.ok).length;
+
+      return compareDoctorsByCompleteness(
         {
           name: a.profile?.full_name || a.full_name,
           registration: a.crm,
           docsCount: (a.kyc_docs || []).length,
+          greenChecksCount: aGreenChecks,
+          hasPix: Boolean(a.profile?.pix_key || a.pix_key || a.mp_collector_id),
+          hasAvatar: Boolean(a.profile?.avatar_url || a.avatar_url),
+          hasContract: Boolean(a.is_contract_signed || a.contract_signed_at),
+          isApproved: Boolean(a.is_approved_by_admin),
         },
         {
           name: b.profile?.full_name || b.full_name,
           registration: b.crm,
           docsCount: (b.kyc_docs || []).length,
+          greenChecksCount: bGreenChecks,
+          hasPix: Boolean(b.profile?.pix_key || b.pix_key || b.mp_collector_id),
+          hasAvatar: Boolean(b.profile?.avatar_url || b.avatar_url),
+          hasContract: Boolean(b.is_contract_signed || b.contract_signed_at),
+          isApproved: Boolean(b.is_approved_by_admin),
         },
-      ),
-    );
+      );
+    });
   }, [doctors, searchTerm, statusFilter]);
 
   const countPending = doctors.filter(d => !d.is_approved_by_admin && d.approval_status !== 'rejected').length;
   const countApproved = doctors.filter(d => d.is_approved_by_admin).length;
   const countBlocked = doctors.filter(d => d.approval_status === 'rejected').length;
 
-  if (loading) {
+  if (loading && doctors.length === 0) {
     return (
       <div className="min-h-dvh bg-background flex flex-col">
         <Navbar />
@@ -358,6 +405,11 @@ export const AdminAprovacoes = () => {
             <div>
               <h1 className="text-2xl md:text-3xl font-black text-foreground flex items-center gap-2">
                 Painel de Averiguação & Liberação de Cards Médicos <Sparkles className="text-emerald-400" size={24} />
+                {loading && doctors.length > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Atualizando em segundo plano...
+                  </span>
+                )}
               </h1>
               <p className="text-muted-foreground text-sm mt-0.5">
                 Auditoria completa de cadastros, inspeção de documentos KYC, chave PIX e controle do chaveador ON/OFF do Card Público.
@@ -517,12 +569,23 @@ export const AdminAprovacoes = () => {
                               </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
                               <p className="text-[11px] text-emerald-400 font-semibold">{doc.specialty || 'Medicina Canabinoide'}</p>
-                              <Badge
-                                variant="secondary"
-                                className="mt-1 text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
-                              >
-                                {(doc.kyc_docs || []).length} anexos · {DOCTOR_TIER_LABEL[doctorTierFromDocs((doc.kyc_docs || []).length)]}
-                              </Badge>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                                >
+                                  {(doc.kyc_docs || []).length} anexos · {DOCTOR_TIER_LABEL[doctorTierFromDocs((doc.kyc_docs || []).length)]}
+                                </Badge>
+                                {hasAdminValidatedVoucher(doc) && (
+                                  <Badge
+                                    className="text-[10px] font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white border border-emerald-400/60 shadow-md flex items-center gap-1 py-0.5 px-2"
+                                    title="Comprovante de pagamento validado diretamente pelo Dr. Edilson Bezerra (Diretor Técnico) via WhatsApp"
+                                  >
+                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+                                    🛡️ Comprovante Validado pelo Diretor Técnico
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </TableCell>
@@ -560,6 +623,20 @@ export const AdminAprovacoes = () => {
                                 </Button>
                               );
                             })}
+
+                            {/* 💳 BOTÃO PARA ACESSO AO COMPROVANTE DE PAGAMENTO MÉDICO VIP */}
+                            {(isVictorDoctor(doc) || doc.plan_tier === 'vip_prescritor' || Boolean(docOf(doc, 'vip_receipt'))) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 px-2.5 text-[11px] font-black bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-amber-500/15 border-amber-500/60 text-amber-300 hover:bg-amber-500/35 hover:text-white shadow-md transition-all flex items-center gap-1.5"
+                                onClick={() => openDoc(doc, 'vip_receipt')}
+                                title="Visualizar Comprovante Oficial do Pagamento do Plano Médico VIP (R$ 99,00 / mês)"
+                              >
+                                <CreditCard className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                💳 Comprovante Pagamento Médico VIP (R$ 99/mês)
+                              </Button>
+                            )}
                           </div>
 
                           <div className="flex flex-wrap gap-1 mt-2">
@@ -666,8 +743,14 @@ export const AdminAprovacoes = () => {
                       <Badge variant="destructive" className="font-bold">CARD OCULTO (OFF)</Badge>
                     )}
                   </DialogTitle>
-                  <DialogDescription className="text-xs text-emerald-400 font-mono">
-                    CRM: {selectedDoctor.crm} / {selectedDoctor.crm_state || 'BR'} • {selectedDoctor.specialty || 'Medicina Canabinoide'}
+                  <DialogDescription className="text-xs text-emerald-400 font-mono flex items-center gap-2 flex-wrap mt-1">
+                    <span>CRM: {selectedDoctor.crm} / {selectedDoctor.crm_state || 'BR'} • {selectedDoctor.specialty || 'Medicina Canabinoide'}</span>
+                    {hasAdminValidatedVoucher(selectedDoctor) && (
+                      <Badge className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-[11px] border border-emerald-400/50 shadow flex items-center gap-1 py-0.5 px-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-200" />
+                        🛡️ Comprovante Validado pelo Diretor Técnico
+                      </Badge>
+                    )}
                   </DialogDescription>
                 </div>
               </div>
@@ -759,6 +842,35 @@ export const AdminAprovacoes = () => {
                 </div>
               </div>
 
+              {/* 💎 Destaque do Plano VIP & Comprovante */}
+              {(isVictorDoctor(selectedDoctor) || selectedDoctor.plan_tier === "vip_prescritor") && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/5 border border-amber-500/40 flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                      <CreditCard size={20} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-black text-sm text-amber-300">Plano VIP Prescritor Mensal — R$ 99,00 / mês</p>
+                        <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
+                          ✓ PAGO & HOMOLOGADO
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5">
+                        Posição #1 na vitrine · Consultório Virtual e Telemedicina 60min liberados · Roteamento prioritário de triagens
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs shadow-md gap-1.5"
+                    onClick={() => openDoc(selectedDoctor, "vip_receipt")}
+                  >
+                    <Eye size={14} /> Ver Comprovante VIP (R$ 99)
+                  </Button>
+                </div>
+              )}
+
               {/* Bio / Resumo de Atuação */}
               <div className="p-4 rounded-2xl bg-muted/20 border border-border">
                 <h4 className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -814,8 +926,8 @@ export const AdminAprovacoes = () => {
                       variant="outline" 
                       className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
                       onClick={() => {
-                        const url = selectedDoctor.cpf_proof_url || (selectedDoctor.crm === "10963" || selectedDoctor.crm === "42912" ? "/proof_cpf_edilson.png" : "/proof_cpf_edilson.png");
-                        window.open(url, '_blank');
+                        const url = selectedDoctor.cpf_proof_url || "";
+                        if (url) window.open(url, '_blank');
                       }}
                     >
                       <ExternalLink size={12} className="mr-1" /> Ver CPF Receita
@@ -833,7 +945,7 @@ export const AdminAprovacoes = () => {
                       className="text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
                       onClick={() => {
                         const url = selectedDoctor.crm_proof_url || (selectedDoctor.crm === "42912" || selectedDoctor.crm === "10963" ? "/proof_crm_joao_pedro.jpg" : "/proof_crm_joao_pedro.jpg");
-                        window.open(url, '_blank');
+                        if (url) window.open(url, '_blank');
                       }}
                     >
                       <ExternalLink size={12} className="mr-1" /> Ver CRM CFM

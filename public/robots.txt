@@ -1,13 +1,34 @@
 User-agent: *
 Allow: /
-Allow: /*
+Allow: /profissionais/
+Allow: /profissionais/*
+Allow: /telemedicina
+Allow: /tratamentos/
+Allow: /tratamentos/*
+Allow: /como-funciona
+Allow: /faq
+Allow: /termos
+Allow: /privacidade
+Allow: /reembolso
+
+# Áreas administrativas e privadas
+Disallow: /admin/
+Disallow: /admin-ceo
+Disallow: /dashboard/
+Disallow: /dashboard-medico/
+Disallow: /prontuario/
+Disallow: /medico/
 
 User-agent: Googlebot
 Allow: /
-Allow: /*
+Allow: /profissionais/
+Allow: /profissionais/*
+Allow: /telemedicina
+Allow: /tratamentos/
+Allow: /tratamentos/*
 
 User-agent: Googlebot-Image
-Allow: /
-Allow: /*
+Allow: /avatars/
+Allow: /assets/
 
 Sitemap: https://plantayraiz.com.br/sitemap.xml

@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -1902,8 +1902,10 @@ export type Database = {
           accepted_at: string | null
           amount: number
           appointment_id: string | null
+          attempt: number
           consultation_type: string
           created_at: string
+          declined_at: string | null
           distance_km: number | null
           doctor_id: string
           expires_at: string
@@ -1912,6 +1914,7 @@ export type Database = {
           patient_lat: number | null
           patient_lng: number | null
           payload: Json | null
+          response_token: string | null
           status: string
           triage_id: string | null
           updated_at: string
@@ -1920,8 +1923,10 @@ export type Database = {
           accepted_at?: string | null
           amount?: number
           appointment_id?: string | null
+          attempt?: number
           consultation_type?: string
           created_at?: string
+          declined_at?: string | null
           distance_km?: number | null
           doctor_id: string
           expires_at?: string
@@ -1930,6 +1935,7 @@ export type Database = {
           patient_lat?: number | null
           patient_lng?: number | null
           payload?: Json | null
+          response_token?: string | null
           status?: string
           triage_id?: string | null
           updated_at?: string
@@ -1938,8 +1944,10 @@ export type Database = {
           accepted_at?: string | null
           amount?: number
           appointment_id?: string | null
+          attempt?: number
           consultation_type?: string
           created_at?: string
+          declined_at?: string | null
           distance_km?: number | null
           doctor_id?: string
           expires_at?: string
@@ -1948,6 +1956,7 @@ export type Database = {
           patient_lat?: number | null
           patient_lng?: number | null
           payload?: Json | null
+          response_token?: string | null
           status?: string
           triage_id?: string | null
           updated_at?: string
@@ -5685,6 +5694,51 @@ export type Database = {
           ip?: string | null
           order_id?: string
           session_token_hash?: string
+        }
+        Relationships: []
+      }
+      ot_web_sessions: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          expires_at: string
+          external_reference: string
+          id: string
+          last_message_at: string | null
+          messages_count: number
+          mp_payment_id: string | null
+          started_at: string
+          status: string
+          triage: Json
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          expires_at: string
+          external_reference: string
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          mp_payment_id?: string | null
+          started_at?: string
+          status?: string
+          triage?: Json
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          external_reference?: string
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          mp_payment_id?: string | null
+          started_at?: string
+          status?: string
+          triage?: Json
+          user_id?: string
         }
         Relationships: []
       }
@@ -9449,6 +9503,22 @@ export type Database = {
         Args: { _notes?: string; _payment_row_id: string }
         Returns: Json
       }
+      consultation_doctor_pool: {
+        Args: { _specialty?: string }
+        Returns: {
+          approved_docs: number
+          crm: string
+          crm_state: string
+          doctor_id: string
+          full_name: string
+          is_online: boolean
+          kyc_green: boolean
+          phone: string
+          score: number
+          specialty: string
+          user_id: string
+        }[]
+      }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }
         Returns: undefined
@@ -9659,6 +9729,7 @@ export type Database = {
         }
         Returns: number
       }
+      normalize_doctor_title: { Args: { n: string }; Returns: string }
       open_ot_agent_session: {
         Args: { _minutes?: number; _name?: string; _phone: string }
         Returns: {

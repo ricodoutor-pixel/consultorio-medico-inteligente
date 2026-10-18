@@ -63,7 +63,7 @@ export const OFFICIAL_ANVISA_PRESCRIPTION: any = {
   digital_signature: "Assinatura Digital ICP-Brasil Padrão PAdES (SHA-256)",
   signature_hash: "E8B9A2F41C67D3E052B88901FA44B3092D84C701B2E3F90422AA10D756CB2E98",
   doctor_name: "Dr. Edilson Bezerra",
-  doctor_crm: "CRM 10963 - Sta Cruz (BO) / CE",
+  doctor_crm: "CRM 10963 - Sta Cruz (BO)",
   medications: [
     {
       name: "Epidiolex / Canabidiol 100 mg/mL (Extrato Puro de Cannabis Sativa)",
@@ -110,7 +110,7 @@ const DashboardPaciente = () => {
   const [newRxSaving, setNewRxSaving] = useState(false);
   const [newRxForm, setNewRxForm] = useState({
     doctorName: "Dr. Edilson Bezerra",
-    doctorCrm: "CRM 10963 - Sta Cruz (BO) / CE",
+    doctorCrm: "CRM 10963 - Sta Cruz (BO)",
     productName: "Epidiolex / Canabidiol 100 mg/mL",
     dosage: "10 gotas (0,5 mL) a cada 12 horas por via sublingual",
     cid: "G40.8 - Outras epilepsias e síndromes epilépticas (Refratária)",
@@ -320,7 +320,7 @@ Endereço: ${profile?.address || "Av. Paulista, 1842 - Bela Vista, São Paulo - 
 
 DADOS DO MÉDICO PRESCRITOR:
 Médico: ${rx.doctor_name || "Dr. Edilson Bezerra"}
-Registro Profissional: ${rx.doctor_crm || "CRM 10963 - Sta Cruz (BO) / CE"}
+Registro Profissional: ${rx.doctor_crm || "CRM 10963 - Sta Cruz (BO)"}
 
 PRESCRIÇÃO TERAPÊUTICA & MEDICAMENTOS:
 Diagnóstico CID-10: ${rx.diagnosis_cid || "G40.8 - Outras epilepsias e síndromes epilépticas"}
@@ -768,7 +768,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                                 <FileSignature size={12} className="text-primary" />
-                                Prescritor: <strong className="text-foreground">{rx.doctor_name || "Dr. Edilson Bezerra"}</strong> ({rx.doctor_crm || "CRM 10963 - Sta Cruz (BO) / CE"})
+                                Prescritor: <strong className="text-foreground">{rx.doctor_name || "Dr. Edilson Bezerra"}</strong> ({rx.doctor_crm || "CRM 10963 - Sta Cruz (BO)"})
                               </p>
                             </div>
 
@@ -986,7 +986,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                               }}
                               prescriptionData={{
                                 doctorName: rx.doctor_name || "Dr. Edilson Bezerra", 
-                                doctorCrm: rx.doctor_crm || "CRM 10963 - Sta Cruz (BO) / CE", 
+                                doctorCrm: rx.doctor_crm || "CRM 10963 - Sta Cruz (BO)",
                                 productName: meds[0]?.name || meds[0]?.medication || "Epidiolex / Canabidiol 100 mg/mL", 
                                 posology: meds[0]?.dosage || "10 gotas a cada 12 horas por via sublingual", 
                                 date: new Date(rx.created_at).toLocaleDateString("pt-BR")
@@ -1222,7 +1222,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                 <Input 
                   value={newRxForm.doctorCrm} 
                   onChange={e => setNewRxForm(prev => ({ ...prev, doctorCrm: e.target.value }))}
-                  placeholder="Ex: CRM 10963 - Sta Cruz (BO) / CE"
+                  placeholder="Ex: CRM 10963 - Sta Cruz (BO)"
                   required
                   className="text-xs"
                 />

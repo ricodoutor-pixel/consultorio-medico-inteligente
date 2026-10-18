@@ -79,7 +79,7 @@ const OrientacaoVideo = () => {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [doctorId, setDoctorId] = useState<string>("");
   const [appointmentType, setAppointmentType] = useState<string>("video");
-  const [doctorInfo, setDoctorInfo] = useState<{ name: string; photo: string }>({ name: "Médico", photo: "" });
+  const [doctorInfo, setDoctorInfo] = useState<{ name: string; photo: string }>({ name: "Dr. Victor Henrique Bueno da Fonseca", photo: "/avatars/dr-victor-fonseca.jpg" });
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -374,8 +374,8 @@ const OrientacaoVideo = () => {
         <div className="flex flex-1 overflow-hidden">
           {/* Video area */}
           <div className="flex-1 flex flex-col relative bg-black/90">
-            {/* rPPG Vital Signs Overlay (doctor only) */}
-            {isDoctor && <VitalSignsOverlay enabled={tcleAccepted} />}
+            {/* rPPG Vital Signs Overlay (doctor only — com aviso regulatório e dados reais apenas) */}
+            {isDoctor && <VitalSignsOverlay enabled={tcleAccepted} appointmentId={appointmentId || undefined} />}
 
             {/* Biometric Shield */}
             <BiometricShield enabled={tcleAccepted} isDoctor={isDoctor} />

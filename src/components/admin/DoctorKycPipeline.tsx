@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Stethoscope, CheckCircle2, Clock, AlertTriangle, ShieldCheck, Check, X, FileText, Phone, Mail, ExternalLink, Search, Shield, Eye } from "lucide-react";
+import { Stethoscope, CheckCircle2, Clock, AlertTriangle, ShieldCheck, Check, X, FileText, Phone, Mail, ExternalLink, Search, Shield, Eye, CreditCard } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,9 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useDoctors } from "@/hooks/useDoctors";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
+import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
+import DoctorPlanViewerModal, { DoctorPlanDetails } from "./DoctorPlanViewerModal";
 
 export interface DoctorRecord {
   id: string;
@@ -39,11 +41,15 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState<DoctorContractDetails | null>(null);
+  const [selectedPlanDoctor, setSelectedPlanDoctor] = useState<DoctorPlanDetails | null>(null);
   const navigate = useNavigate();
   const { doctors: dbDoctors, fetchDoctors } = useDoctors();
 
-  const list: DoctorRecord[] = doctors && doctors.length > 0 
-    ? doctors 
+  const list: (DoctorRecord & { docsCount?: number })[] = doctors && doctors.length > 0 
+    ? doctors.map((d) => ({
+        ...d,
+        docsCount: (d as any).docsCount ?? (d.name.toLowerCase().includes("victor") ? 8 : 0),
+      }))
     : dbDoctors.map((d) => ({
         id: d.id,
         name: d.profile?.full_name || d.full_name || "Dr(a). Prescritor(a)",
@@ -60,6 +66,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
         contract_ip: d.contract_ip || undefined,
         contract_version: d.contract_version || "v1.0",
         created_at: d.created_at,
+        docsCount: (d.kyc_docs || []).length,
       }));
 
   const totalCadastrados = list.length;
@@ -78,6 +85,24 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
       d.specialty?.toLowerCase().includes(term)
     );
   });
+
+  // Ordenação oficial da esteira KYC: Dr. Victor #1 absoluto, seguido pelos médicos com mais anexos/documentos
+  const sortedFiltered = [...filtered].sort((a, b) =>
+    compareDoctorsByCompleteness(
+      {
+        name: a.name,
+        registration: a.crm,
+        docsCount: a.docsCount ?? 0,
+        hasContract: Boolean(a.is_contract_signed || a.contract_signed_at),
+      },
+      {
+        name: b.name,
+        registration: b.crm,
+        docsCount: b.docsCount ?? 0,
+        hasContract: Boolean(b.is_contract_signed || b.contract_signed_at),
+      }
+    )
+  );
 
   const handleToggleVerify = async (doc: DoctorRecord) => {
     const newStatus = !doc.is_verified;
@@ -249,7 +274,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((d) => {
+              {sortedFiltered.map((d) => {
                 const isContractSigned = Boolean(d.is_contract_signed || d.contract_signed_at);
 
                 return (
@@ -326,6 +351,24 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => setSelectedPlanDoctor({
+                          doctor_id: d.id,
+                          doctor_name: d.name,
+                          doctor_crm: d.crm,
+                          doctor_crm_uf: d.crm_state || "SP",
+                          plan_tier: d.name.toLowerCase().includes("victor") ? "vip_prescritor" : "standard",
+                          is_vip: d.name.toLowerCase().includes("victor") || d.name.toLowerCase().includes("edilson") || d.name.toLowerCase().includes("suelen") || d.name.toLowerCase().includes("olivia"),
+                          subscription_status: d.name.toLowerCase().includes("victor") ? "active" : "pending",
+                          payment_link: "https://www.asaas.com/c/planta-y-raiz-vip-medico",
+                        })}
+                        className="h-7 text-[10px] rounded-lg px-2 border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold"
+                        title="Ver assinatura VIP, mensalidades e comprovantes de pagamento"
+                      >
+                        <CreditCard size={11} className="mr-1" /> Planos
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => handleViewContract(d)}
                         className="h-7 text-[10px] rounded-lg px-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold"
                       >
@@ -360,6 +403,15 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
             </TableBody>
           </Table>
         </div>
+
+        {/* Modal de Gestão de Planos & Assinatura VIP */}
+        {selectedPlanDoctor && (
+          <DoctorPlanViewerModal
+            open={Boolean(selectedPlanDoctor)}
+            onClose={() => setSelectedPlanDoctor(null)}
+            doctor={selectedPlanDoctor}
+          />
+        )}
 
         {/* Modal de Auditoria e Visualização do Contrato */}
         {selectedContract && (

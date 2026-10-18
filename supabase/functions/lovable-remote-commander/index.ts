@@ -14,7 +14,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://www.plantayraiz.com.br",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
@@ -84,6 +84,19 @@ serve(async (req) => {
       if (error) throw error;
       await audit(action, key, null, true, undefined, ip ?? undefined);
       return json({ ok: true, item: data });
+    }
+
+    // 🔒 TRAVA HUMANA: set/delete só executam com confirm:true. Sem isso (ou com dry_run:true) = simulação.
+    if ((action === "set" || action === "delete") && (body?.confirm !== true || body?.dry_run === true)) {
+      if (!key) return json({ error: "key required" }, 400);
+      const { data: current } = await supabase
+        .from("system_settings").select("key, value").eq("key", key).maybeSingle();
+      await audit(`${action}_dry_run`, key, body?.value ?? null, true, undefined, ip ?? undefined);
+      return json({
+        ok: true, dry_run: true, action, key, current: current ?? null,
+        proposed: action === "set" ? body?.value ?? null : null,
+        message: "Simulação. Reenvie com confirm:true para executar.",
+      });
     }
 
     if (action === "set") {

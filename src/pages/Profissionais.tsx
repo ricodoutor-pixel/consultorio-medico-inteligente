@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
+import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2, Search, X, Calendar } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
@@ -46,11 +46,12 @@ function useRotatingOnline(base: Professional[]): Professional[] {
     } catch (e) {}
 
     // Filter out doctors blocked/turned OFF by admin
-    const visibleDocs = base.filter((p) => cardOverrides[p.id] !== false);
+    const visibleDocs = base.filter((p) => Boolean(p) && cardOverrides[p.id] !== false);
 
     return visibleDocs.map((p) => {
       // Check direct online status set by doctor in /consultorio or admin in /admin/aprovacoes-medicas
-      const directStatus = localStorage.getItem(`doctor_online_status_${p.id}`);
+      const directStatus = localStorage.getItem(`doctor_online_status_${p.id}`) ??
+                           (p.dbId ? localStorage.getItem(`doctor_online_status_${p.dbId}`) : null);
       if (directStatus !== null) {
         return { ...p, online: directStatus === 'true' };
       }
@@ -83,19 +84,18 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
-/** Médicos com Plano Med VIP ativo (selo exibido no card). */
-const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
+/** Médicos com Plano Med VIP ativo (selo exibido no card). Apenas Dr. Victor, Dr. Edilson, Dra. Suelen e Dra. Olívia */
+const VIP_DOCTOR_MATCHERS = ["victor", "edilson", "suelen", "olivia"];
 const isVipDoctor = (p: Professional) => {
-  if (p.plan_tier && p.plan_tier !== 'free') return true;
-  return VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+  const name = (p.name || "").toLowerCase();
+  return VIP_DOCTOR_MATCHERS.some((n) => name.includes(n));
 };
 
 const getDoctorSealTier = (p: Professional) => {
   const name = (p.name || "").toLowerCase();
-  if (name.includes("edilson") || name.includes("suelen") || name.includes("olivia") || p.plan_tier === "premium") {
+  if (name.includes("victor") || name.includes("edilson") || name.includes("suelen") || name.includes("olivia")) {
     return "premium";
   }
-  if (p.plan_tier && p.plan_tier !== 'free') return p.plan_tier;
   return "basic";
 };
 
@@ -116,7 +116,89 @@ const ServiceTagsRow = () => (
 
 
 const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: Professional[] }) => {
-  const pro = professionals.find((p) => p.id === id);
+  const navigate = useNavigate();
+  const pro = professionals.find((p) => p.id === id || p.dbId === id || (p.dbId && `db-${p.dbId}` === id));
+
+  useEffect(() => {
+    if (!pro) return;
+    const doctorSpecialty = (pro.tags && pro.tags[0]) || (pro.category === "Médicos Prescritores" ? "Clínica Geral e Saúde Integrativa" : pro.category);
+    const crmLabel = pro.crm ? ` (${(pro.councilLabel || "CRM")} ${pro.crm})` : "";
+    const pageTitle = `${pro.name} — ${doctorSpecialty} | Consulta online${crmLabel}`;
+    document.title = pageTitle;
+
+    const setMeta = (attr: "name" | "property", key: string, content: string) => {
+      let el = document.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+
+    let desc = `${pro.name}, ${doctorSpecialty}${crmLabel}. Telemedicina e consulta online na Planta y Raíz com prescrição médica individual.`;
+    if (desc.length > 155) {
+      desc = desc.slice(0, 152) + "...";
+    }
+    setMeta("name", "description", desc);
+    setMeta("name", "keywords", `${pro.name}, ${pro.crm || ""}, ${doctorSpecialty}, telemedicina, consulta online, Planta y Raiz`);
+    setMeta("property", "og:title", pageTitle);
+    setMeta("property", "og:description", desc);
+    setMeta("property", "og:url", `https://plantayraiz.com.br/profissionais/${pro.id}`);
+    if (pro.imageUrl) {
+      const fullImg = pro.imageUrl.startsWith("http") ? pro.imageUrl : `https://plantayraiz.com.br${pro.imageUrl}`;
+      setMeta("property", "og:image", fullImg);
+    }
+    setMeta("name", "twitter:title", pageTitle);
+    setMeta("name", "twitter:description", desc);
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.href = `https://plantayraiz.com.br/profissionais/${pro.id}`;
+
+    // Injeta Schema.org JSON-LD para indexação e rich snippets do Google
+    const isVet = pro.category.toLowerCase().includes("veterinário");
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": isVet ? "VeterinaryCare" : "Physician",
+      "@id": `https://plantayraiz.com.br/profissionais/${pro.id}#profile`,
+      "name": pro.name,
+      "description": pro.bio,
+      "url": `https://plantayraiz.com.br/profissionais/${pro.id}`,
+      "image": pro.imageUrl ? (pro.imageUrl.startsWith("http") ? pro.imageUrl : `https://plantayraiz.com.br${pro.imageUrl}`) : undefined,
+      "medicalSpecialty": doctorSpecialty,
+      "identifier": pro.crm ? {
+        "@type": "PropertyValue",
+        "name": pro.councilLabel || (isVet ? "CRMV" : "CRM"),
+        "value": pro.crm
+      } : undefined,
+      "priceRange": "R$ 30 - R$ 150",
+      "telephone": pro.whatsapp ? `+${pro.whatsapp}` : "+5511991363154",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "BR"
+      }
+    };
+
+    let script = document.getElementById("doctor-schema-jsonld") as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = "doctor-schema-jsonld";
+      script.type = "application/ld+json";
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(jsonLd);
+
+    return () => {
+      const el = document.getElementById("doctor-schema-jsonld");
+      if (el) el.remove();
+    };
+  }, [pro]);
+
   if (!pro) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Profissional não encontrado.</div>;
 
   return (
@@ -176,13 +258,20 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
               <div className="flex flex-wrap gap-2 mb-4">
-                {pro.tags.map((t) => (
+                {(pro.tags || []).map((t) => (
                   <span key={t} className="px-2 py-1 rounded-full text-xs font-bold border border-border bg-card text-muted-foreground">{t}</span>
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
               <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {formatBRL(SERVICE_MENU[0].price)} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
+                <Button
+                  size="lg"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl gap-2 text-sm h-11 shadow-md shadow-primary/20"
+                  onClick={() => navigate(`/agendamento?pro=${pro.id}`)}
+                >
+                  <Calendar className="w-4 h-4" /> Agendar Consulta
+                </Button>
                 <WhatsAppContactButton name={pro.name} />
               </div>
             </CardContent>
@@ -203,7 +292,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
               <p className="text-sm text-muted-foreground mb-3">Horários para hoje (exemplo ilustrativo)</p>
               <div className="flex flex-wrap gap-2">
-                {pro.slots.map((slot) => (
+                {(pro.slots || []).map((slot) => (
                   <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm rounded-xl" asChild>
                     <Link to={`/falar-com-especialista?pro=${pro.id}`}>{slot}</Link>
                   </Button>
@@ -216,7 +305,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4">Avaliações</h2>
               <div className="space-y-3">
-                {pro.reviews.map((r, i) => (
+                {(pro.reviews || []).map((r, i) => (
                   <div key={i} className="p-3 rounded-2xl bg-muted/30 border border-border">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-black text-sm">{r.name}</span>
@@ -242,6 +331,7 @@ const Profissionais = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [searchQuery, setSearchQuery] = useState("");
   const { professionals: mergedPros, realCount } = useRealProfessionals();
   const professionals = useRotatingOnline(mergedPros);
 
@@ -290,6 +380,32 @@ const Profissionais = () => {
     }
   };
 
+  // Hooks SEMPRE antes de qualquer return condicional (Regras dos Hooks do React).
+  const filtered = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+
+    if (q) {
+      return professionals.filter((p) => {
+        const nameMatch = (p.name || "").toLowerCase().includes(q);
+        const crmMatch = (p.crm || "").toLowerCase().includes(q);
+        const bioMatch = (p.bio || "").toLowerCase().includes(q);
+        const catMatch = (p.category || "").toLowerCase().includes(q);
+        const tagMatch = (p.tags || []).some((t) => t.toLowerCase().includes(q));
+        return nameMatch || crmMatch || bioMatch || catMatch || tagMatch;
+      });
+    }
+
+    const list = professionals.filter((p) => p.category === activeCategory);
+    if (activeCategory === "Médicos Prescritores") {
+      const vIdx = list.findIndex((p) => (p.name || "").toLowerCase().includes("victor"));
+      if (vIdx !== -1) {
+        const [victorDoc] = list.splice(vIdx, 1);
+        list.unshift(victorDoc);
+      }
+    }
+    return list;
+  }, [professionals, activeCategory, searchQuery]);
+
   if (id) {
     return (
       <div className="min-h-dvh bg-background">
@@ -299,8 +415,6 @@ const Profissionais = () => {
       </div>
     );
   }
-
-  const filtered = professionals.filter((p) => p.category === activeCategory);
 
   return (
     <div className="min-h-dvh bg-background">
@@ -327,6 +441,46 @@ const Profissionais = () => {
           </motion.div>
 
 
+          {/* Barra de Busca de Médicos */}
+          <div className="mb-6 md:mb-8 max-w-2xl">
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 w-5 h-5 text-primary pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar médico por nome, CRM ou especialidade..."
+                className="w-full pl-12 pr-11 py-3.5 bg-card/80 hover:bg-card focus:bg-card border border-border/80 focus:border-primary rounded-2xl text-sm md:text-base text-foreground placeholder:text-muted-foreground outline-none transition-all shadow-sm focus:ring-2 focus:ring-primary/20"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3.5 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                  title="Limpar busca"
+                  aria-label="Limpar busca"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {searchQuery.trim() && (
+              <div className="flex items-center justify-between mt-2.5 px-2 text-xs text-muted-foreground">
+                <span>
+                  Resultados para <strong className="text-foreground font-black">"{searchQuery}"</strong>:{" "}
+                  <strong className="text-primary font-black">{filtered.length}</strong> profissional(is)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="text-primary hover:underline font-bold"
+                >
+                  Limpar filtro
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Tabs - scroll horizontal no mobile */}
 
           <div className="flex gap-1.5 md:gap-2 mb-6 md:mb-10 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
@@ -335,9 +489,12 @@ const Profissionais = () => {
               return (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setSearchQuery("");
+                  }}
                   className={`px-3 md:px-4 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-black border transition-colors whitespace-nowrap flex-shrink-0 min-h-[44px] ${
-                    activeCategory === cat
+                    activeCategory === cat && !searchQuery.trim()
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
                   }`}
@@ -348,8 +505,26 @@ const Profissionais = () => {
             })}
           </div>
 
-          {/* Cards - grid responsivo */}
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5" initial="hidden" animate="visible" variants={stagger} key={`${activeCategory}-${filtered.length}`}>
+          {/* Cards - grid responsivo ou estado vazio */}
+          {filtered.length === 0 ? (
+            <div className="text-center py-16 px-4 bg-card/40 border border-border/70 rounded-3xl max-w-lg mx-auto my-8">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 border border-primary/20">
+                <Search className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-1.5">Nenhum profissional encontrado</h3>
+              <p className="text-sm text-muted-foreground mb-5">
+                Não encontramos resultados para <strong className="text-foreground font-bold">"{searchQuery}"</strong>. Verifique o nome ou busque pelo CRM.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setSearchQuery("")}
+                className="rounded-xl border-primary text-primary hover:bg-primary/10 font-bold"
+              >
+                Limpar busca e ver todos
+              </Button>
+            </div>
+          ) : (
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5" initial="hidden" animate="visible" variants={stagger} key={`${activeCategory}-${filtered.length}-${searchQuery}`}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
                   <Card
@@ -366,7 +541,7 @@ const Profissionais = () => {
                                 <img
                                   src={p.imageUrl}
                                   alt={`${p.name}`}
-                                  className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${p.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
+                                  className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${(p.name || '').includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
                                   loading="lazy"
                                   decoding="async"
                                   width={64}
@@ -397,7 +572,9 @@ const Profissionais = () => {
                               ))}
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              <p className="text-xs text-primary font-bold">{p.category}</p>
+                              <p className="text-xs text-primary font-bold">
+                                {p.specialty || (p.tags && p.tags[0]) || p.category}
+                              </p>
                               <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide ${p.online ? 'text-green-300' : 'text-red-400'}`}>
                                 <span className="relative flex items-center justify-center w-6 h-6">
                                   <span className={`absolute inset-0 rounded-full animate-ping ${p.online ? 'bg-green-400/60' : 'bg-red-500/50'}`} style={{ animationDuration: '1.2s' }} />
@@ -432,7 +609,7 @@ const Profissionais = () => {
                       <div className="px-4 py-3">
                         <p className="text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{p.bio}</p>
                         <div className="flex flex-wrap gap-1 mb-2">
-                          {p.tags.slice(0, 3).map((t) => (
+                          {(p.tags || []).slice(0, 3).map((t) => (
                             <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border bg-card text-muted-foreground">{t}</span>
                           ))}
                         </div>
@@ -446,15 +623,26 @@ const Profissionais = () => {
                           </span>
                         </div>
 
-                        {/* Botão Agendar Orientação Técnica via WhatsApp */}
+                        {/* Orientação Técnica (triagem educativa da plataforma, R$ 30) → seção da landing Telemedicina */}
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${p.name}`)}`, "_blank", "noopener,noreferrer");
+                            navigate("/telemedicina#orientacao-tecnica");
                           }}
-                          className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10"
+                          className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10 shadow-md shadow-green-600/20"
                         >
-                          <Phone size={14} /> Agendar Orientação Técnica
+                          <Zap size={14} /> Orientação Técnica — R$ 30
+                        </Button>
+                        {/* Contato com a Enfª Brisa via WhatsApp (separado) */}
+                        <Button
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, gostaria de informações sobre atendimento com ${p.name}`)}`, "_blank", "noopener,noreferrer");
+                          }}
+                          className="mt-2 w-full font-bold rounded-xl gap-2 text-xs h-9"
+                        >
+                          <Phone size={13} /> Falar com a Enfª Brisa (WhatsApp)
                         </Button>
                       </div>
                     </CardContent>
@@ -462,14 +650,15 @@ const Profissionais = () => {
               </motion.div>
             ))}
           </motion.div>
+          )}
 
           {/* Mapa: médicos próximos a você */}
           <div className="mt-8 mb-6 md:mb-10">
             <DoctorsNearMeMap />
           </div>
 
-          <p className="text-xs text-muted-foreground text-center mt-6 md:mt-8">
-            ⚠️ Perfis ilustrativos. Prescrição e conduta dependem de avaliação individual.
+          <p className="text-xs text-muted-foreground text-center mt-6 md:mt-8 max-w-2xl mx-auto leading-relaxed">
+            Profissionais devidamente habilitados e inscritos em seus respectivos conselhos de classe (CFM, CRO, CRMV). A prescrição médica e a conduta clínica dependem exclusivamente de avaliação individualizada em consulta.
           </p>
         </div>
       </section>

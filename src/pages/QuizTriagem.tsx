@@ -237,8 +237,8 @@ const QuizTriagem = () => {
                       <Stethoscope className="w-7 h-7 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-foreground">{matchResult.bestMatch.doctor_name || matchResult.bestMatch.name || "Dr. Edilson Bezerra"}</h3>
-                      <p className="text-xs font-bold text-primary">{matchResult.bestMatch.crm || "CRM-SP 10963"} • {matchResult.bestMatch.specialty}</p>
+                      <h3 className="font-bold text-foreground">{matchResult.bestMatch.doctor_name || matchResult.bestMatch.name || "Dr. Victor Henrique Bueno da Fonseca"}</h3>
+                      <p className="text-xs font-bold text-primary">{matchResult.bestMatch.crm || "CRM 206873/SP"} • {matchResult.bestMatch.specialty || "Psiquiatria & Medicina Canabinoide"}</p>
                     </div>
                     <div className="ml-auto text-right">
                       <div className="flex items-center gap-1 text-[hsl(var(--gold))]">

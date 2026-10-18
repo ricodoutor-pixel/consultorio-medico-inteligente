@@ -73,12 +73,27 @@ export const TCLEConsentModal = ({
     const { data: sessionData } = await supabase.auth.getSession();
     const session = sessionData.session;
     if (!session) {
+      // Guest consent: save to localStorage so visitor can proceed with triage without bouncing!
+      // Once authenticated at checkout (completeTriage/payment), it will be synced to Supabase tcle_consents.
+      try {
+        localStorage.setItem(
+          "pyr_guest_tcle",
+          JSON.stringify({
+            checks,
+            doctorName,
+            version: TCLE_VERSION,
+            userAgent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : null,
+            acceptedAt: new Date().toISOString(),
+          })
+        );
+      } catch { /* storage fallback */ }
+
       toast({
-        title: "Login necessário",
-        description: "Faça login para registrar o consentimento (TCLE) na plataforma.",
-        variant: "destructive",
+        title: "TCLE aceito ✅",
+        description: "Seu consentimento foi registrado e será vinculado ao seu prontuário.",
       });
       setSaving(false);
+      onAccept();
       return;
     }
 
@@ -130,12 +145,12 @@ export const TCLEConsentModal = ({
   );
 
   const authWarning = authChecked && !isAuthed && (
-    <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
-      <AlertCircle size={16} className="mt-0.5 shrink-0" />
+    <div className="mb-4 flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/10 p-3 text-xs text-foreground">
+      <Shield size={16} className="mt-0.5 shrink-0 text-primary" />
       <div>
-        <p className="font-semibold">Login obrigatório</p>
-        <p className="opacity-90">
-          O registro do TCLE só pode ser feito por pacientes autenticados. Faça login antes de prosseguir.
+        <p className="font-semibold text-primary">Iniciando como Paciente Visitante</p>
+        <p className="text-muted-foreground">
+          Você pode assinar o termo e realizar a triagem prévia agora. Seu consentimento será vinculado ao seu prontuário ao finalizar o atendimento.
         </p>
       </div>
     </div>
@@ -209,7 +224,7 @@ export const TCLEConsentModal = ({
           </Button>
           <Button
             className="h-11 text-sm font-bold"
-            disabled={!allChecked || saving || !isAuthed}
+            disabled={!allChecked || saving}
             onClick={handleAccept}
           >
             {saving ? (

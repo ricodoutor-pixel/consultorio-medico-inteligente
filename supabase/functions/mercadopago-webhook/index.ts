@@ -184,6 +184,7 @@ Deno.serve(async (req) => {
     // Calculate split using Digital Franchise tiers
     const totalAmount = payment.transaction_amount || 0;
     const metadata = payment.metadata || {};
+    const round2 = (n: number) => Math.round(n * 100) / 100;
     const isMarketplace =
       metadata.type === "marketplace" || metadata.type === "marketplace_order";
 
@@ -433,10 +434,23 @@ Deno.serve(async (req) => {
           patient_phone: orientacaoPhone,
           patient_name: orientacaoName,
           patient_email: orientacaoEmail,
+          patient_user_id: metadata.user_id || null,
           raw_payload: payment,
           updated_at: new Date().toISOString(),
         }, { onConflict: "payment_id" });
       if (upsertErr) console.error("[brisa-orientacao] upsert error:", upsertErr);
+
+      const orderStatus = payment.status === "approved" ? "approved" : payment.status === "rejected" ? "rejected" : "pending";
+      const { error: orderUpdateError } = await supabase
+        .from("orientacao_tecnica_orders")
+        .update({
+          status: orderStatus,
+          mp_payment_id: String(payment.id),
+          mp_preference_id: payment.preference_id ? String(payment.preference_id) : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("external_reference", externalRef);
+      if (orderUpdateError) console.error("[brisa-orientacao] order update:", orderUpdateError.message);
 
       if (payment.status === "approved") {
         const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
@@ -444,6 +458,16 @@ Deno.serve(async (req) => {
         const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
         const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
         const amount = (payment.transaction_amount || 30).toFixed(2);
+
+        // Abre a sessão imediatamente; a próxima mensagem do paciente já entra na orientação paga.
+        if (orientacaoPhone) {
+          const { error: sessionError } = await supabase.rpc("open_ot_agent_session", {
+            _phone: orientacaoPhone,
+            _name: orientacaoName,
+            _minutes: 30,
+          });
+          if (sessionError) console.error("[brisa-orientacao] session open:", sessionError.message);
+        }
 
         // 1) Notifica Dr. Edilson
         if (evolutionUrl && evolutionKey) {
@@ -466,8 +490,8 @@ Deno.serve(async (req) => {
             const patientMsg =
               `✅ *Pagamento confirmado — Planta y Raiz*\n\n` +
               `Olá ${orientacaoName?.split(" ")[0] || ""}! Recebemos seu pagamento de *R$ ${amount}*.\n\n` +
-              `🩺 O *Dr. Edilson Bezerra (CRM-CE 10963)* (CRM-PR 49354) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
-              `Qualquer dúvida fale comigo, a Enfª Brisa, neste número.`;
+              `🤖 Seu atendimento com o *Dr. Edilson Bezerra ON* está liberado neste WhatsApp. Ele é um assistente de inteligência artificial supervisionado pelo Dr. Edilson Bezerra.\n\n` +
+              `Responda a esta mensagem para iniciar sua Orientação Técnica. A decisão clínica e qualquer prescrição permanecem sob responsabilidade de um médico humano habilitado.`;
             await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
               method: "POST",
               headers: { "Content-Type": "application/json", apikey: evolutionKey },
@@ -504,6 +528,180 @@ Deno.serve(async (req) => {
 
       return new Response(
         JSON.stringify({ status: "processed", module: "brisa_orientacao", payment_status: payment.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // === ORIENTAÇÃO TÉCNICA (R$ 30 - Web & Agente) ===
+    const isOrientacaoTecnica =
+      externalRef.startsWith("orientacao_tecnica") ||
+      externalRef.startsWith("orientacao:") ||
+      metadata.sku === "orientacao_tecnica" ||
+      metadata.sku === "orientacao" ||
+      metadata.type === "orientacao_tecnica";
+
+    if (isOrientacaoTecnica) {
+      const platformFee = round2(totalAmount * 0.07);
+      const doctorPayout = round2(totalAmount - platformFee);
+      // Preço autoritativo da Orientação Técnica: R$ 30. Valor menor nunca libera a sala.
+      const amountOk = Number(totalAmount) >= 30;
+      const approvedOk = payment.status === "approved" && amountOk;
+      if (payment.status === "approved" && !amountOk) {
+        console.error(`[orientacao-tecnica] valor inválido R$ ${totalAmount} para ${externalRef} — sala NÃO liberada`);
+      }
+      const orderStatus = approvedOk
+        ? "approved"
+        : payment.status === "approved"
+          ? "failed"
+          : payment.status === "rejected" ? "rejected" : "pending";
+      const { data: existingOrder } = await supabase
+        .from("orientacao_tecnica_orders")
+        .select("id, user_id, ai_analysis, patient_name")
+        .eq("external_reference", externalRef)
+        .maybeSingle();
+      const refUserId = externalRef.includes(":") ? externalRef.split(":")[1] : null;
+      const uuidLike = (v: unknown) => typeof v === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+      const orientacaoUserId: string | null =
+        (existingOrder as any)?.user_id || (uuidLike(metadata.user_id) ? metadata.user_id : null) || (uuidLike(refUserId) ? refUserId : null);
+
+      // 1. Atualiza ou insere em orientacao_tecnica_orders (fonte principal do Admin / Command Center 360)
+      const { data: updatedOrders } = await supabase
+        .from("orientacao_tecnica_orders")
+        .update({
+          status: orderStatus,
+          mp_payment_id: String(payment.id),
+          amount: totalAmount,
+          platform_fee: platformFee,
+          doctor_payout: doctorPayout,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("external_reference", externalRef)
+        .select("id");
+
+      if (!updatedOrders || updatedOrders.length === 0) {
+        const patientName = metadata.name || (payment.payer?.first_name ? `${payment.payer.first_name || ""} ${payment.payer.last_name || ""}`.trim() : null) || "Paciente";
+        const patientEmail = payment.payer?.email || metadata.user_email || null;
+        const patientPhone = metadata.phone ? String(metadata.phone).replace(/\D/g, "") : (payment.payer?.phone?.number || "");
+
+        await supabase.from("orientacao_tecnica_orders").insert({
+          external_reference: externalRef,
+          patient_name: patientName,
+          patient_email: patientEmail,
+          patient_whatsapp: patientPhone,
+          amount: totalAmount,
+          platform_fee: platformFee,
+          doctor_payout: doctorPayout,
+          payment_method: "mercadopago",
+          mp_payment_id: String(payment.id),
+          mp_preference_id: payment.preference_id ? String(payment.preference_id) : null,
+          status: orderStatus,
+          currency: "BRL",
+          topic: "Orientação Técnica",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      // 2. Registra em payment_webhooks para o Dashboard Financeiro e BI
+      await supabase.from("payment_webhooks").insert({
+        payment_id: String(payment.id),
+        status: payment.status,
+        amount: totalAmount,
+        payer_email: payment.payer?.email || "unknown",
+        raw_data: payment,
+        action: action,
+        platform_fee: platformFee,
+        doctor_payout: doctorPayout,
+        split_processed: payment.status === "approved",
+      });
+
+      // 3. Upsert em brisa_orientacao_payments para o painel /admin/brisa-orientacoes
+      await supabase.from("brisa_orientacao_payments").upsert({
+        payment_id: String(payment.id),
+        external_reference: externalRef,
+        status: payment.status,
+        amount: totalAmount,
+        patient_phone: metadata.phone ? String(metadata.phone).replace(/\D/g, "") : null,
+        patient_name: metadata.name || payment.payer?.first_name || "Paciente",
+        patient_email: payment.payer?.email || null,
+        patient_user_id: orientacaoUserId,
+        raw_payload: payment,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "payment_id" });
+
+      if (payment.status === "approved") {
+        // 4. Libera a sessão da Orientação Técnica no banco com status 'ready' (AGENTS.md)
+        if (orientacaoUserId) {
+          let triageObj: Record<string, unknown> = {};
+          if ((existingOrder as any)?.ai_analysis) {
+            try { triageObj = JSON.parse((existingOrder as any).ai_analysis); } catch { /* ignore */ }
+          }
+          await supabase.from("ot_web_sessions").upsert({
+            user_id: orientacaoUserId,
+            external_reference: externalRef,
+            mp_payment_id: String(payment.id),
+            triage: triageObj,
+            status: "ready",
+            messages_count: 0,
+            started_at: null,
+            expires_at: null,
+          }, { onConflict: "external_reference" });
+        }
+
+        // 4b. Registra transação em escrow_transactions para métricas de receita
+        await supabase.from("escrow_transactions").insert({
+          patient_id: orientacaoUserId,
+          amount: totalAmount,
+          platform_fee: platformFee,
+          doctor_payout: doctorPayout,
+          type: "consultation",
+          status: "completed",
+        });
+
+        // 5. Notificação WhatsApp ao Dr. Edilson Bezerra (Admin)
+        const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
+        const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
+        const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
+        const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
+
+        if (evolutionUrl && evolutionKey) {
+          const drMsg =
+            `💰 *PAGAMENTO CONFIRMADO — ORIENTAÇÃO TÉCNICA (TESTE REAL)* 🩺\n\n` +
+            `• *Valor Bruto:* R$ ${totalAmount.toFixed(2)}\n` +
+            `• *Taxa da Plataforma (7%):* R$ ${platformFee.toFixed(2)}\n` +
+            `• *Repasse Médico (93%):* R$ ${doctorPayout.toFixed(2)}\n` +
+            `• *Status:* APROVADO ✅\n` +
+            `• *Ref:* \`${externalRef}\`\n` +
+            `• *ID Mercado Pago:* \`${payment.id}\`\n` +
+            `• *Pagador:* ${payment.payer?.email || "—"}\n\n` +
+            `Todos os dados financeiros já foram armazenados no banco e estão visíveis no Painel Admin:\nhttps://www.plantayraiz.com.br/admin`;
+          await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", apikey: evolutionKey },
+            body: JSON.stringify({ number: adminPhone, text: drMsg }),
+          }).catch((err) => console.error("[orientacao-tecnica] dr notify:", err));
+        }
+
+        // 6. Notificação in-app aos administradores
+        const { data: adminRoles } = await supabase
+          .from("user_roles").select("user_id").eq("role", "admin");
+        if (adminRoles) {
+          for (const admin of adminRoles) {
+            await supabase.from("notifications").insert({
+              user_id: admin.user_id,
+              title: "💰 Orientação Técnica Paga (R$ 30)",
+              message: `Pagamento aprovado de R$ ${totalAmount.toFixed(2)}. Taxa retida: R$ ${platformFee.toFixed(2)}. Repasse: R$ ${doctorPayout.toFixed(2)}. Ref: ${externalRef}`,
+              type: "payment_received",
+              action_url: "/admin",
+            });
+          }
+        }
+
+        console.log(`✅ [orientacao-tecnica] R$ ${totalAmount} aprovado para ${externalRef} — split gravado`);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "orientacao_tecnica", payment_status: payment.status }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

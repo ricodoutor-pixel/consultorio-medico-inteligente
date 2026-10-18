@@ -105,20 +105,28 @@ export const Footer = () => {
           </div>
         </div>
 
+        {/* Banner de Transparência e Políticas de Saúde (Google Ads & CFM) */}
+        <div className="border border-primary/20 bg-primary/5 rounded-2xl p-4 sm:p-5 mt-8 text-center">
+          <p className="text-xs sm:text-sm font-bold text-foreground">
+            Telemedicina com médicos habilitados. A prescrição depende de avaliação individual.
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1.5 max-w-2xl mx-auto leading-relaxed">
+            A Planta y Raíz é exclusivamente uma plataforma de tecnologia e intermediação em saúde digital. A plataforma <strong>NÃO vende produtos, NÃO fabrica e NÃO entrega medicamentos</strong>. Toda prescrição é de responsabilidade médica individual com emissão digital conforme a Resolução CFM nº 2.314/2022 e ANVISA RDC 660/2022.
+          </p>
+        </div>
+
         {/* Disclaimer Legal — Intermediação Tecnológica */}
-        <div className="border-t border-border/30 mt-8 pt-5">
+        <div className="border-t border-border/30 mt-6 pt-5">
           <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground/80">
-              <strong className="text-foreground">Disclaimer Legal — Intermediação Tecnológica:</strong>{" "}
-              A Planta y Raiz atua estritamente como plataforma de tecnologia e intermediação em saúde digital.
+              <strong className="text-foreground">Transparência Legal — Intermediação Tecnológica:</strong>{" "}
+              A Planta y Raiz atua estritamente como plataforma de tecnologia e intermediação em telemedicina e saúde digital.
               A <strong>Bezerra Med Soluções Integradas Ltda.</strong> (CNPJ: 30.740.319/0001-14),
-              operando sob o nome fantasia <strong>Planta y Raiz</strong>, não possui vínculo com a produção,
-              fabricação, comercialização, distribuição ou entrega de produtos farmacêuticos ou
-              fitoterápicos. Não realizamos vendas diretas nem detemos posse ou propriedade dos
-              produtos. Toda a responsabilidade técnica pelo ato médico é do profissional
-              prescritor cadastrado (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)),
-              e a responsabilidade pela qualidade, entrega, eficácia e efeitos dos produtos é
-              exclusiva das farmácias e importadoras parceiras devidamente licenciadas pela ANVISA.
+              operando sob o nome fantasia <strong>Planta y Raiz</strong>, não realiza venda direta nem detém posse de medicamentos.
+              Toda a responsabilidade técnica pelo ato médico é do profissional prescritor habilitado
+              (supervisão técnica médica: Dra. Suelen Naves Rodrigues — CRM 49354/PR).
+              A aquisição de fitocanabinoides ou produtos derivados, quando prescritos pelo médico assistente,
+              ocorre de forma independente por meio de farmácias credenciadas ou processos de importação individual regulamentados pela ANVISA (RDC 660/2022).
             </p>
           </div>
         </div>

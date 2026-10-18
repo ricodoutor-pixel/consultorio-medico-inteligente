@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const {
       appointmentId,
-      doctorName = "Dr. Edilson Bezerra (CRM-CE 10963)",
+      doctorName = "Planta y Raíz Ltda",
       description,
       environment,
       countryCode,

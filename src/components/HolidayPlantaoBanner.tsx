@@ -1,34 +1,53 @@
 import React from "react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Sparkles, ArrowRight, Stethoscope } from "lucide-react";
 
 export const HolidayPlantaoBanner: React.FC = () => {
+  const warningText = "🚭 PARE DE FUMAR: O CIGARRO É EXTREMAMENTE PREJUDICIAL À SAÚDE! · CUIDE DA SUA SAÚDE PULMONAR E CARDIOVASCULAR · PLANTA Y RAÍZ MEDICINA INTEGRATIVA";
+
   return (
-    <div className="w-full bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border-y border-emerald-500/30 px-3 py-2.5 shadow-md relative z-30">
-      <div className="container mx-auto flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm text-emerald-100">
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <span className="font-extrabold uppercase tracking-wide text-emerald-300 flex items-center gap-1">
-            <Stethoscope className="w-3.5 h-3.5" /> Plantão de Feriado Ativo
-          </span>
-          <span className="hidden sm:inline text-emerald-200/80">•</span>
-          <span className="text-emerald-100/90 font-medium">
-            Telemedicina com médicos habilitados. A prescrição médica depende de avaliação individualizada.
-          </span>
+    <div className="w-full bg-gradient-to-r from-red-950 via-neutral-900 to-amber-950 border-y border-red-500/50 py-2 relative z-30 shadow-lg overflow-hidden">
+      <style>{`
+        @keyframes pyrMarquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-pyr-marquee {
+          display: inline-flex;
+          white-space: nowrap;
+          animation: pyrMarquee 28s linear infinite;
+        }
+        .animate-pyr-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+      <div className="container mx-auto flex items-center justify-between gap-3 px-3">
+        <div className="flex-1 overflow-hidden relative">
+          <div className="animate-pyr-marquee text-xs md:text-sm font-black tracking-wide text-amber-200">
+            <span className="inline-flex items-center gap-2 mx-6">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 animate-pulse" />
+              {warningText}
+            </span>
+            <span className="text-amber-400/60 font-bold mx-2">★★★</span>
+            <span className="inline-flex items-center gap-2 mx-6">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 animate-pulse" />
+              {warningText}
+            </span>
+            <span className="text-amber-400/60 font-bold mx-2">★★★</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="shrink-0 z-10 pl-2">
           <Link
-            to="/telemedicina?origem=banner_feriado"
-            className="inline-flex items-center gap-1 font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-3 py-1 rounded-full text-xs shadow-sm hover:shadow transition-all"
+            to="/telemedicina?origem=aviso_saude"
+            className="inline-flex items-center gap-1 font-bold text-white bg-red-600 hover:bg-red-500 px-3 py-1 rounded-full text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-105"
           >
-            Iniciar Atendimento <ArrowRight className="w-3 h-3" />
+            Orientação Médica <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
     </div>
   );
 };
+
+export default HolidayPlantaoBanner;

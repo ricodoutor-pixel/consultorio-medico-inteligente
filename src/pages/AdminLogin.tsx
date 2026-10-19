@@ -30,7 +30,25 @@ const AdminLogin = () => {
       });
 
       if (error || !data.user) {
-        toast({ title: "Acesso negado", description: "Credenciais inválidas.", variant: "destructive" });
+        const msg = error?.message || "";
+        const isNetwork =
+          error?.status === 0 ||
+          error?.name === "AuthRetryableFetchError" ||
+          /fetch|network|connection|failed/i.test(msg);
+
+        if (isNetwork) {
+          toast({
+            title: "Banco de dados pausado / inacessível",
+            description: "O projeto Supabase está pausado por inatividade no supabase.com. Acesse o painel e clique em 'Restore project' para reativar o banco.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Acesso negado",
+            description: msg || "Credenciais inválidas. Verifique seu e-mail e senha.",
+            variant: "destructive",
+          });
+        }
         setLoading(false);
         return;
       }

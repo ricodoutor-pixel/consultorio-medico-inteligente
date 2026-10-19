@@ -77,6 +77,9 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("ana karoliny") || (n.includes("karoliny") && n.includes("martins")) || c.includes("13942")) return "/avatars/dra-ana-karoliny.jpg?v=1";
   if (n.includes("arthur") || n.includes("barretto") || c.includes("6871")) return "/avatars/dr-arthur-barretto.jpg?v=1";
   if (n.includes("rafaella") || n.includes("soletti") || c.includes("13542")) return "/avatars/dra-rafaella-soletti.jpg?v=1";
+  if (n.includes("barbara") || n.includes("matos") || c.includes("12361")) return "/avatars/dra-barbara-matos.jpg";
+  if (n.includes("cartaxo") || (n.includes("diego") && n.includes("jacome")) || c.includes("14828")) return "/avatars/dr-diego-cartaxo.jpg";
+  if (n.includes("leuma") || n.includes("netta") || c.includes("85182")) return "/avatars/dra-leuma-netta.jpg";
 
   // 2. Especialistas e terapeutas das demais categorias oficiais tratadas
   if (n.includes("fernando") && n.includes("ribeiro")) return "/avatars/dr-fernando-ribeiro.jpg";

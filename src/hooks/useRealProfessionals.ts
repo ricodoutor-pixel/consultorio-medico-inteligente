@@ -147,13 +147,24 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
  * Normalizador de nome para conferência e deduplicação
  */
 function normalizeDoctorKey(name: string, crm?: string | null): string {
-  // Remove TODOS os títulos iniciais (Dr., Dra., Prof., Profa., etc.),
-  // mesmo combinados ("Prof. Dr. ..."), para não perder o perfil estático.
+  // Remove TODOS os títulos iniciais (Dra., Dr., Profa., Prof., etc.),
+  // ordenados com tokens mais longos primeiro, com ponto opcional e espaços.
   const n = (name || "").toLowerCase()
-    .replace(/^((dr|dra|prof|profa|enf|téc|tec|aux)\.\s*)+/i, "")
+    .replace(/^((dra|dr|profa|prof|enfa|enf|téc|tec|aux)\.?\s*)+/i, "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
   return n;
+}
+
+/**
+ * Extrai apenas o número do CRM principal, ignorando sufixos como RQE, UFs ou múltiplos CRMs.
+ * Ex: "34660/PE (Regular) RQE: 19896" -> "34660"
+ * Ex: "98083/MG • 247790/SP" -> "98083"
+ */
+function extractPrimaryCrm(crmRaw?: string | null): string {
+  if (!crmRaw) return "";
+  const firstChunk = crmRaw.split(/rqe|•|\/|\s-\s/i)[0] || "";
+  return firstChunk.replace(/\D/g, "");
 }
 
 export function useRealProfessionals(): { professionals: Professional[]; realCount: number; loading: boolean } {
@@ -197,7 +208,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     for (const doc of dbDoctors) {
       if (doc.crm) {
-        const cleanCrm = doc.crm.replace(/\D/g, "");
+        const cleanCrm = extractPrimaryCrm(doc.crm);
         if (cleanCrm) dbMapByCrm.set(cleanCrm, doc);
       }
       const normName = normalizeDoctorKey(doc.full_name || "");
@@ -213,7 +224,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const enrichedList: Professional[] = baseProfessionals.map((base) => {
       if (!base) return base;
 
-      const cleanBaseCrm = (base.crm || "").replace(/\D/g, "");
+      const cleanBaseCrm = extractPrimaryCrm(base.crm);
       const normBaseName = normalizeDoctorKey(base.name);
 
       const matchedDb = (cleanBaseCrm ? dbMapByCrm.get(cleanBaseCrm) : null) || 
@@ -264,65 +275,150 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       };
     });
 
-    // 3. Adicionar novos profissionais cadastrados no banco (aprovados / verificados) que não estavam na lista base
-    const newlyAddedFromDb: Professional[] = dbDoctors
-      .filter((doc) => doc.is_verified === true && !matchedDbDoctorIds.has(doc.id))
-      .map((doc) => {
-        const fullName = doc.full_name ? ensureDoctorTitle(doc.full_name) : "Profissional";
-        const cleanCrm = (doc.crm || "").replace(/\D/g, "");
-        const isEdilson = cleanCrm === "10963" || (fullName && fullName.toLowerCase().includes("edilson"));
-        const registration = isEdilson
-          ? "10963 - Sta Cruz (BO)"
-          : (doc.crm ? `${doc.crm}${doc.crm_state ? ` - ${doc.crm_state}` : ""}` : "");
-        const isVet =
-          /crmv/i.test(doc.crm || "") ||
-          /veterin/i.test(doc.specialty || "") ||
-          /veterin/i.test(doc.document_type || "");
+    // 3. Adicionar novos profissionais cadastrados no banco APROVADOS que não estavam na lista base
+    // REGRAS ESTRITAS:
+    // a) Apenas profissionais com is_approved === true (aprovados formalmente pelo Dr. Edilson).
+    // b) Excluir contas de teste/mock/e2e.
+    // c) Cada profissional deve ser classificado em sua categoria correta (médicos em Médicos Prescritores,
+    //    veterinários em Médico Veterinário, enfermeiros em Enfermagem, etc.). Jamais jogar não-médicos em Médicos Prescritores.
+    const newlyAddedFromDb: Professional[] = [];
 
-        const priceValue = Number(doc.price_video_chat ?? doc.consultation_price ?? 150) || 150;
-        const avatar = resolveDoctorAvatar(fullName, doc.crm || "", doc.avatar_url) || doc.avatar_url || "";
+    for (const doc of dbDoctors) {
+      if (matchedDbDoctorIds.has(doc.id)) continue;
+      // Somente aprovados pelo Dr. Edilson
+      if (doc.is_approved !== true) continue;
 
-        docsCountById.set(`db-${doc.id}`, doc.kyc_docs_count ?? 0);
+      const crmStr = (doc.crm || "").trim();
+      const rawFullName = (doc.full_name || "").trim();
 
-        return {
-          id: `db-${doc.id}`,
-          dbId: doc.id,
-          name: fullName,
-          category: isVet ? "Médico Veterinário Prescritor" : MEDICOS_CATEGORY,
-          councilLabel: isVet ? "CRMV" : "CRM",
-          bio: doc.bio || "",
-          experience: "",
-          tags: isEdilson ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"] : [doc.specialty || "Cannabis Medicinal", "Prescritor"],
-          price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
-          priceValue,
-          whatsapp: "",
-          rating: doc.rating ?? null,
-          consults: doc.total_consultations ?? 0,
-          avatar: fullName
-            .replace(/^(dr|dra|prof|profa)\.?\s*/i, "")
-            .split(/\s+/)
-            .slice(0, 2)
-            .map((part) => part.charAt(0).toUpperCase())
-            .join(""),
-          imageUrl: avatar,
-          paymentLink: "",
-          services: [],
-          slots: [],
-          reviews: [],
-          online: Boolean(doc.is_online && (doc.is_available ?? true)),
-          premiumPrice: doc.price_video_chat,
-          crm: registration,
-          cfmPrintUrl: getDoctorCfmPrint(doc.crm || fullName),
-          flags: doc.country === "BO" ? ["🇧🇴"] : ["🇧🇷"],
-          plan_tier: doc.plan_tier ?? "free",
-        };
+      // Ignora contas de teste/mock
+      if (/test|mock|e2e/i.test(crmStr) || /teste|demo/i.test(rawFullName)) continue;
+
+      const fullName = ensureDoctorTitle(rawFullName || "Profissional");
+      const cleanCrm = crmStr.replace(/\D/g, "");
+      const isEdilson = cleanCrm === "10963" || (fullName && fullName.toLowerCase().includes("edilson"));
+      const registration = isEdilson
+        ? "10963 - Sta Cruz (BO)"
+        : (crmStr ? `${crmStr}${doc.crm_state ? ` - ${doc.crm_state}` : ""}` : "");
+
+      const isVet =
+        /crmv/i.test(crmStr) ||
+        /veterin/i.test(doc.specialty || "") ||
+        /veterin/i.test(doc.document_type || "");
+
+      let category = "";
+      let councilLabel = "CRM";
+
+      if (isVet) {
+        category = "Médico Veterinário Prescritor";
+        councilLabel = "CRMV";
+      } else if (doc.council_type === "CRM" || (!doc.council_type && /^\d+/.test(crmStr))) {
+        category = MEDICOS_CATEGORY;
+        councilLabel = "CRM";
+      } else if (doc.council_type === "COREN" || crmStr.startsWith("ENF")) {
+        category = "Enfermagem";
+        councilLabel = "COREN";
+      } else if (crmStr.startsWith("TEC")) {
+        category = "Téc. Enfermagem";
+        councilLabel = "COREN-TÉC";
+      } else if (crmStr.startsWith("AUX")) {
+        category = "Aux. de Enfermagem";
+        councilLabel = "COREN-AUX";
+      } else if (doc.council_type === "CRF" || /farm/i.test(doc.specialty || "")) {
+        category = "Farmácia Clínica";
+        councilLabel = "CRF";
+      } else if (crmStr.startsWith("PSI")) {
+        category = "Psicologia & Terapias";
+        councilLabel = "CRP";
+      } else if (crmStr.startsWith("CUID")) {
+        category = "Cuidadores de Idosos";
+        councilLabel = "—";
+      } else if (crmStr.startsWith("ACU")) {
+        category = "Acupuntura";
+        councilLabel = "CRM / COFFITO";
+      } else if (crmStr.startsWith("JAR")) {
+        category = "Jardineiros & Cultivo";
+        councilLabel = "CREA / CFB";
+      } else if (crmStr.startsWith("OCU")) {
+        category = "Saúde Ocupacional";
+        councilLabel = "CRM / CREA";
+      } else if (crmStr.startsWith("INT")) {
+        category = "Medicina Integrativa";
+        councilLabel = "CRM";
+      }
+
+      // Se não pertencer a nenhuma categoria válida ou for não-médico sem conselho, não exibe na vitrine de prescritores
+      if (!category) continue;
+
+      const priceValue = Number(doc.price_video_chat ?? doc.consultation_price ?? 150) || 150;
+      const avatar = resolveDoctorAvatar(fullName, doc.crm || "", doc.avatar_url) || doc.avatar_url || "";
+
+      docsCountById.set(`db-${doc.id}`, doc.kyc_docs_count ?? 0);
+
+      newlyAddedFromDb.push({
+        id: `db-${doc.id}`,
+        dbId: doc.id,
+        name: fullName,
+        category,
+        councilLabel,
+        bio: doc.bio || "",
+        experience: "",
+        tags: isEdilson ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"] : [doc.specialty || "Cannabis Medicinal", "Prescritor"],
+        price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
+        priceValue,
+        whatsapp: "",
+        rating: doc.rating ?? null,
+        consults: doc.total_consultations ?? 0,
+        avatar: fullName
+          .replace(/^(dr|dra|prof|profa)\.?\s*/i, "")
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((part) => part.charAt(0).toUpperCase())
+          .join(""),
+        imageUrl: avatar,
+        paymentLink: "",
+        services: [],
+        slots: [],
+        reviews: [],
+        online: Boolean(doc.is_online && (doc.is_available ?? true)),
+        premiumPrice: doc.price_video_chat,
+        crm: registration,
+        cfmPrintUrl: getDoctorCfmPrint(doc.crm || fullName),
+        flags: doc.country === "BO" ? ["🇧🇴"] : ["🇧🇷"],
+        plan_tier: doc.plan_tier ?? "free",
       });
+    }
 
-    const fullList = [...enrichedList, ...newlyAddedFromDb];
+    const rawList = [...enrichedList, ...newlyAddedFromDb];
 
-    // 4. Separa os médicos prescritores para ordenar com precisão (Dr. Victor #1 VIP e completude)
-    const medicos = fullList.filter((p) => p && p.category === MEDICOS_CATEGORY);
-    const nonMedicos = fullList.filter((p) => p && p.category !== MEDICOS_CATEGORY);
+    // 4. DEDUPLICAÇÃO BLINDADA: Garante que NENHUM profissional apareça duplicado (por CRM ou nome normalizado)
+    const seenKeys = new Set<string>();
+    const deduplicatedList: Professional[] = [];
+
+    for (const p of rawList) {
+      if (!p) continue;
+      const cleanCrm = (p.crm || "").replace(/\D/g, "");
+      const normName = normalizeDoctorKey(p.name);
+      
+      // Chaves únicas por categoria + CRM ou categoria + nome normalizado
+      const crmKey = cleanCrm && cleanCrm.length >= 4 ? `${p.category}:crm:${cleanCrm}` : null;
+      const nameKey = normName ? `${p.category}:name:${normName}` : null;
+
+      if (crmKey && seenKeys.has(crmKey)) {
+        continue;
+      }
+      if (nameKey && seenKeys.has(nameKey)) {
+        continue;
+      }
+
+      if (crmKey) seenKeys.add(crmKey);
+      if (nameKey) seenKeys.add(nameKey);
+      deduplicatedList.push(p);
+    }
+
+    // 5. Separa os médicos prescritores para ordenar com precisão (Dr. Victor #1 VIP e completude)
+    const medicos = deduplicatedList.filter((p) => p && p.category === MEDICOS_CATEGORY);
+    const nonMedicos = deduplicatedList.filter((p) => p && p.category !== MEDICOS_CATEGORY);
 
     medicos.sort((a, b) =>
       compareDoctorsByCompleteness(

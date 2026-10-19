@@ -1133,7 +1133,7 @@ export const professionals: Professional[] = [
     paymentLink: "https://link.mercadopago.com.br/plantayraiz",
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["Hoje 09:00", "Hoje 11:00", "Hoje 14:00", "Hoje 16:30"],
-    crm: "21907/PR",
+    crm: "CRMV-PR 21907",
     reviews: [
       { name: "Tutor Verificado", rating: 5, text: "Excelente atendimento veterinário integrativo, muito cuidadoso e atencioso com meu pet." }
     ],
@@ -1155,7 +1155,7 @@ export const professionals: Professional[] = [
     avatar: "EC",
     imageUrl: drEduardoCorreaImg,
     online: true,
-    crm: "19333 - SP",
+    crm: "CRMV-SP 19333",
     hospital: "",
     hospitalUrl: "",
     services: STANDARD_DOCTOR_SERVICES,

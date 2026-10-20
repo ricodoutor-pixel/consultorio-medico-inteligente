@@ -1,5 +1,7 @@
 # Prompt para o agente Antigravity — BANCO UNIFICADO E ATIVO (09/09/2026)
 
+> **PROMPT HISTÓRICO, SUBSTITUÍDO EM 20/10/2026. Não copiar nem executar o texto antigo abaixo.** O título “ativo”, os totais e as alegações de acesso são da data original e não comprovam a situação atual. Use exclusivamente `docs/ORIENTACAO_ATUAL_AGENTES.md` junto com `AGENTS.md`; as instruções abaixo sobre eliminar catálogo-base, marcar cadastros, credenciais de serviço e completar dados não autorizam alterações. O catálogo-base da vitrine deve ser preservado.
+
 Copie e cole o texto abaixo inteiro para o agente.
 
 ---

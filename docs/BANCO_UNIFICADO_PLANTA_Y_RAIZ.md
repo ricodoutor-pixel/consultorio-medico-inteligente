@@ -1,5 +1,7 @@
 # Governança Oficial — Banco Unificado Planta y Raíz (09/09/2026)
 
+> Orientação operacional atual: `docs/ORIENTACAO_ATUAL_AGENTES.md` (20/10/2026). Este documento define governança; não certifica disponibilidade atual do banco, totais atuais ou destino efetivo de uma versão publicada. Não copiar chaves deste documento para reconfigurar arquivos gerados.
+
 Este documento estabelece o protocolo operacional definitivo, inviolável e unificado de dados para a plataforma **Planta y Raíz** ([plantayraiz.com.br](https://www.plantayraiz.com.br)).
 
 ---

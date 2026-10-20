@@ -1,5 +1,7 @@
 # Guia de ambiente e configuração
 
+> Antes de configurar qualquer ambiente, leia `docs/ORIENTACAO_ATUAL_AGENTES.md`. No Lovable, os arquivos gerados de conexão e `.env` são gerenciados pela plataforma e não devem ser sobrescritos por agentes. Falhas de conexão não autorizam usar o banco legado.
+
 ## Objetivo
 Este projeto deve manter um fluxo previsível entre desenvolvimento local, staging e produção, sem expor segredos no repositório.
 

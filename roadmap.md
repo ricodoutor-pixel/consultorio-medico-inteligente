@@ -1,5 +1,12 @@
 # Roadmap
 
+## Organização das orientações dos agentes — 20/10/2026
+
+- [x] Centralizar fonte oficial, limites e procedimento de incidente sem alterar conexões ou dados
+- [x] Sinalizar documentação histórica e eliminar instruções conflitantes do prompt operacional
+- [ ] Confirmar disponibilidade do Lovable Cloud e conferir conexão efetiva — bloqueado: backend ainda iniciando/aplicando alterações
+- [ ] Conferir totais atuais e divergências de cadastros — depende do backend oficial acessível
+
 ## Reinicialização do site — 11/10/2026
 
 - [ ] Otimizar o reaproveitamento de arquivos e evitar recarregamentos automáticos durante o uso

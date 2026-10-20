@@ -22,6 +22,7 @@ interface DoctorRow {
   total_consultations: number | null;
   is_online: boolean | null;
   is_verified: boolean | null;
+  is_approved?: boolean | null;
   document_type: string | null;
   country?: string | null;
   city?: string | null;

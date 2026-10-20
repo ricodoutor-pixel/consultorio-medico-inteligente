@@ -4,8 +4,9 @@
 
 - [x] Centralizar fonte oficial, limites e procedimento de incidente sem alterar conexões ou dados
 - [x] Sinalizar documentação histórica e eliminar instruções conflitantes do prompt operacional
-- [ ] Confirmar disponibilidade do Lovable Cloud e conferir conexão efetiva — bloqueado: backend ainda iniciando/aplicando alterações
-- [ ] Conferir totais atuais e divergências de cadastros — depende do backend oficial acessível
+- [x] Confirmar disponibilidade do Lovable Cloud e conferir conexão efetiva — oficial saudável; prévia usa oficial, site publicado usa legado
+- [x] Conferir totais de registros oficiais — 38 profissionais, 147 documentos KYC, 57 perfis e 1 vendor; sem inferir aprovações ou pacientes
+- [ ] Corrigir conexão do site publicado para o oficial — aguarda confirmação explícita do Dr. Edilson e ajuste autorizado no ambiente de publicação; não migrar dados automaticamente
 
 ## Reinicialização do site — 11/10/2026
 

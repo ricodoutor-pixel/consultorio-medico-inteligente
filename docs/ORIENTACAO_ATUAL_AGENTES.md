@@ -13,7 +13,9 @@ Atualizado em 20/10/2026. Leia este documento e o `AGENTS.md` antes de executar 
 
 O relatório externo enviado pelo Dr. Edilson informa uma troca do cliente e das variáveis de ambiente para o ambiente legado. O código disponível confirma um fallback legado no cliente gerado e o identificador oficial em `supabase/config.toml`; isso não confirma sozinho qual destino cada versão publicada utiliza.
 
-Na verificação desta conversa, o controle de estado do Lovable Cloud informou que o backend **ainda está iniciando ou aplicando alterações**. Não foi confirmado que está pausado. Uma falha de DNS, isoladamente, não prova pausa, perda de dados ou autorização para trocar o banco.
+Na verificação inicial desta conversa, o controle de estado do Lovable Cloud informou inicialização/alterações. Na conferência seguinte, informou **backend saudável, com banco e autenticação acessíveis**. Uma consulta somente leitura ao banco oficial às 15:24:39 UTC de 20/10/2026 retornou 38 registros em `doctors`, 147 em `doctor_kyc_documents`, 57 em `profiles` e 1 em `vendors`. Esses totais não equivalem a médicos aprovados, pacientes ou farmácias aprovadas: exigem filtros específicos.
+
+**Divergência confirmada no navegador nesta conversa:** requisições da prévia em `localhost:8080` usam o banco oficial; requisições de `https://www.plantayraiz.com.br` usam o ambiente legado. A disponibilidade do oficial não corrige automaticamente a configuração da versão publicada. Não foi confirmada a autoria/data do commit alegado pelo relatório externo. Uma falha de DNS, isoladamente, não prova pausa, perda de dados ou autorização para trocar o banco.
 
 **Não houve troca de conexão, restauração, exclusão nem publicação durante esta organização.**
 
@@ -50,6 +52,6 @@ Procedimento obrigatório:
 
 Relatórios históricos não substituem essas regras. Toda conclusão deve distinguir **confirmado agora**, **relatado por terceiro** e **ainda não verificado**. Não afirmar que uma migração ou publicação ocorreu sem evidência; não transformar indisponibilidade em autorização de migração.
 
-## 6. Próximo passo bloqueado
+## 6. Próximo passo aguardando confirmação
 
-A conferência dos totais atuais e da conexão completa depende de o Lovable Cloud terminar a inicialização/alteração e estar acessível. A organização documental não recupera nem migra o backend.
+O Lovable Cloud oficial está acessível. A versão publicada ainda consulta o legado; corrigir essa conexão exige confirmação explícita do Dr. Edilson e ajuste autorizado no ambiente de publicação. Não migrar nem mesclar dados do legado automaticamente. A organização documental não recupera nem migra o backend.

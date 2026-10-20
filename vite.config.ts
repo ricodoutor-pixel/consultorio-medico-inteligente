@@ -25,6 +25,15 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // FONTE ÚNICA DA VERDADE (Diretiva 2026): garante que qualquer build (Hostinger, CI, VPS ou local)
+  // aponte exclusivamente para o banco oficial shmbwdjuddvquszwkvuq, impedindo regressão para o banco legado.
+  define: {
+    "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify("shmbwdjuddvquszwkvuq"),
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify("https://shmbwdjuddvquszwkvuq.supabase.co"),
+    "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ"
+    ),
+  },
   // CRÍTICO: keepNames preserva nomes de funções/classes durante minify.
   // Sem isso, o Recharts (que usa padrão factory) quebra com "_ is not a function"
   // em produção — causando tela preta no Hostinger.

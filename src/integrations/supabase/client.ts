@@ -5,10 +5,10 @@ import { brokeredPreviewStorage } from './previewAuthStorage';
 
 const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
-  "https://tkxxoghzhvhjzdoomgss.supabase.co";
+  "https://shmbwdjuddvquszwkvuq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRreHhvZ2h6aHZoanpkb29tZ3NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc4NDYsImV4cCI6MjA4NzY1Mzg0Nn0.KxKdf9jh2-sum1AmtkqUuBf78xGc-OXF0814iiBdP1Y";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

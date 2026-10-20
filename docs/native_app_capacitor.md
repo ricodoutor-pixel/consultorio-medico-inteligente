@@ -1,4 +1,6 @@
 ﻿# Arquitetura de Empacotamento Nativo com Capacitor (iOS & Android)
+
+> **REFERÊNCIA HISTÓRICA — CONFIGURAÇÕES NATIVAS NÃO VALIDADAS NESTA CONVERSA.** Não aplicar o certificate pinning para o domínio legado abaixo nem inferir que plugins, lojas ou pipelines estão ativos. Leia `AGENTS.md` e `docs/ORIENTACAO_ATUAL_AGENTES.md` antes de qualquer alteração.
 **Projeto**: Planta y Raiz (`consultorio-medico-inteligente`)  
 **Data**: 05 de Setembro de 2026  
 **Identificador do Aplicativo (App ID)**: `br.com.plantayraiz.app`  

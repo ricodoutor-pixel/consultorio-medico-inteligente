@@ -1,4 +1,6 @@
 ﻿# Plano de Recuperação de Desastres (Disaster Recovery) & Continuidade de Negócios (BCP)
+
+> **PLANO HISTÓRICO — PROCEDIMENTO DE RESTAURAÇÃO ABAIXO NÃO AUTORIZADO.** O destino legado e o Cloudflare não representam a orientação atual. As afirmações de PITR, replicação e backups exigem verificação; não são prova de recursos ativos. Leia `docs/ORIENTACAO_ATUAL_AGENTES.md` e obtenha confirmação explícita do Dr. Edilson antes de qualquer restauração.
 **Projeto**: Planta y Raiz (`consultorio-medico-inteligente`)  
 **Data**: 05 de Setembro de 2026  
 **Ambiente Oficial**: Supabase Production (`tkxxoghzhvhjzdoomgss.supabase.co`) + Cloudflare Pages CDN  

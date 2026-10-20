@@ -1,5 +1,7 @@
 # Funções Supabase Edge — Estado Real de Produção
 
+> **INVENTÁRIO HISTÓRICO DE JULHO — NÃO É ESTADO ATUAL DE PRODUÇÃO.** Não executar as orientações de webhook ou deploy abaixo: apontam para o ambiente legado. Leia `AGENTS.md` e `docs/ORIENTACAO_ATUAL_AGENTES.md`; confirmar funções e canais atuais antes de agir.
+
 > **Gerado em 19/07/2026 por sincronização reversa (Supabase → GitHub).**
 > Este documento reflete o que está **de fato implantado e ativo** no projeto Supabase `tkxxoghzhvhjzdoomgss`, não o inventário completo de arquivos presentes no repositório.
 

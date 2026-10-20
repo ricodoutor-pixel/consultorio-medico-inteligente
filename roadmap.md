@@ -1,5 +1,13 @@
 # Roadmap
 
+## Organização das orientações dos agentes — 20/10/2026
+
+- [x] Centralizar fonte oficial, limites e procedimento de incidente sem alterar conexões ou dados
+- [x] Sinalizar documentação histórica e eliminar instruções conflitantes do prompt operacional
+- [x] Confirmar disponibilidade do Lovable Cloud e conferir conexão efetiva — oficial saudável; prévia usa oficial, site publicado usa legado
+- [x] Conferir totais de registros oficiais — 38 profissionais, 147 documentos KYC, 57 perfis e 1 vendor; sem inferir aprovações ou pacientes
+- [ ] Corrigir conexão do site publicado para o oficial — aguarda confirmação explícita do Dr. Edilson e ajuste autorizado no ambiente de publicação; não migrar dados automaticamente
+
 ## Reinicialização do site — 11/10/2026
 
 - [ ] Otimizar o reaproveitamento de arquivos e evitar recarregamentos automáticos durante o uso

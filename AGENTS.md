@@ -1,5 +1,8 @@
 # Project architecture rules
 
+- Agents must read `docs/ORIENTACAO_ATUAL_AGENTES.md` before operational work and treat historical audits as dated evidence, not current configuration; this prevents conflicting backend and deployment instructions.
+- The managed Lovable Cloud project is the sole operational data source; outages never authorize switching to a legacy backend or editing generated connection files, because that splits clinical and payment records.
+
 - The Orientation flow stores the completed triage before creating its Mercado Pago order, and unlocks service only from an approved webhook status; this prevents unpaid or context-free clinical sessions.
 - Public medical listings maintain base professional profiles from src/data/professionals.ts as the baseline and enrich with real-time status from approved backend records, ensuring vitrine doctors never disappear during network or backend desyncs.
 - Appointment routing uses the real server-returned doctor or the selected public record, and availability uses persisted slots only; synthetic identifiers cannot satisfy appointment foreign keys.

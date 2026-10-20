@@ -1,4 +1,6 @@
 ﻿# Relatório de Auditoria Forense — Produção vs. Código-Fonte
+
+> **ARQUIVO HISTÓRICO — NÃO EXECUTAR AS RECOMENDAÇÕES DE DEPLOY ABAIXO.** Contém destinos antigos e conclusões de uma auditoria de setembro, não a configuração atual. Para qualquer ação, leia `docs/ORIENTACAO_ATUAL_AGENTES.md`. Nenhuma indisponibilidade autoriza troca para o banco legado, limpeza de cadastros ou restauração automática.
 **Projeto**: Planta y Raiz (`consultorio-medico-inteligente`)  
 **Data**: 05 de Setembro de 2026  
 **Auditor**: Agente de Engenharia de Software Antigravity  

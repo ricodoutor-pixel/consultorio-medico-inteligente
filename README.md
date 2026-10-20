@@ -1,5 +1,7 @@
 # Welcome to your Lovable project
 
+> **Agentes: começar por `AGENTS.md` e `docs/ORIENTACAO_ATUAL_AGENTES.md`.** As notas antigas abaixo sobre WAHA, seeds, `.env` e publicação não autorizam execução nem comprovam a configuração atual. Hostinger é o ambiente principal das automações; o banco operacional é o Lovable Cloud oficial. Não trocar conexões, importar seeds ou reiniciar serviços com base neste README.
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/fed447b0-f55f-4fd2-96f2-f6a4d65e5be4

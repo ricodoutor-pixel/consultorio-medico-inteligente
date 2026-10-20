@@ -83,64 +83,8 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("leuma") || n.includes("netta") || c.includes("85182")) return "/avatars/dra-leuma-netta.jpg?v=3";
   if (n.includes("edna") || n.includes("marlisia") || c.includes("3227") || c.includes("9727")) return "/avatars/dra-edna-marlisia.jpg?v=1";
   if (n.includes("veronica") || n.includes("verônica") || (n.includes("christine") && n.includes("paiva")) || c.includes("20984") || c.includes("22902")) return "/avatars/dra-veronica-silva.jpg?v=1";
-
-  // 2. Especialistas e terapeutas das demais categorias oficiais tratadas
-  if (n.includes("fernando") && n.includes("ribeiro")) return "/avatars/dr-fernando-ribeiro.jpg";
-  if (n.includes("henrique") && n.includes("almeida")) return "/avatars/dr-henrique-almeida.jpg";
-  if (n.includes("mateo") && n.includes("lopez")) return "/avatars/dr-mateo-lopez.jpg";
-  if (n.includes("pablo") && n.includes("quispe")) return "/avatars/dr-pablo-quispe.jpg";
-  if (n.includes("tiago") && n.includes("barros")) return "/avatars/dr-tiago-barros.jpg";
-  if (n.includes("amanda") && n.includes("lima")) return "/avatars/dra-amanda-lima.jpg";
-  if (n.includes("bianca") && n.includes("martins")) return "/avatars/dra-bianca-martins.jpg";
-  if (n.includes("carolina") && n.includes("vasconcelos")) return "/avatars/dra-carolina-vasconcelos.jpg";
-  if (n.includes("isabela") && n.includes("nogueira")) return "/avatars/dra-isabela-nogueira.jpg";
-  if (n.includes("natalia") && n.includes("souza")) return "/avatars/dra-natalia-souza.jpg";
-  if (n.includes("renata") && n.includes("costa")) return "/avatars/dra-renata-costa.jpg";
-  if (n.includes("yuki") && n.includes("tanaka")) return "/avatars/dra-yuki-tanaka.jpg";
   if (n.includes("lucas") && n.includes("ferreira")) return "/avatars/dr-lucas-ferreira.jpg";
   if (n.includes("juliana") && n.includes("ferreira")) return "/avatars/dra-juliana-ferreira.jpg";
-  if (n.includes("carlos") && n.includes("herrera")) return "/avatars/dr-carlos-herrera.jpg";
-  if (n.includes("valentina") && n.includes("reyes")) return "/avatars/dra-valentina-reyes.jpg";
-  if (n.includes("rafael") && n.includes("mendes")) return "/avatars/dr-rafael-mendes.jpg";
-  if (n.includes("camila") && n.includes("duarte")) return "/avatars/dra-camila-duarte.jpg";
-  if (n.includes("wei") && n.includes("chen")) return "/avatars/dr-wei-chen.jpg";
-  if (n.includes("keiko") && n.includes("yamamoto")) return "/avatars/dra-keiko-yamamoto.jpg";
-  if (n.includes("thiago") && n.includes("verde")) return "/avatars/prof-thiago-verde.jpg";
-  if (n.includes("daniela") && n.includes("rojas")) return "/avatars/prof-daniela-rojas.jpg";
-  if (n.includes("bruno") && n.includes("tavares")) return "/avatars/dr-bruno-tavares.jpg";
-  if (n.includes("mei") && n.includes("lin")) return "/avatars/dra-mei-lin.jpg";
-  if (n.includes("ricardo") && n.includes("campos")) return "/avatars/prof-ricardo-campos.jpg";
-  if (n.includes("priscila") && n.includes("andrade")) return "/avatars/dra-priscila-andrade.jpg";
-  if (n.includes("paulo") && n.includes("nakamura")) return "/avatars/dr-paulo-nakamura.jpg";
-  if (n.includes("leticia") && n.includes("verde")) return "/avatars/profa-leticia-verde.jpg";
-  if (n.includes("victor") && n.includes("lima")) return "/avatars/dr-victor-lima.jpg";
-  if (n.includes("gabriela") && n.includes("moreira")) return "/avatars/dra-gabriela-moreira.jpg";
-  if (n.includes("sakura") && n.includes("ito")) return "/avatars/dra-sakura-ito.jpg";
-  if (n.includes("ravi") && n.includes("sharma")) return "/avatars/dr-ravi-sharma.jpg";
-  if (n.includes("diego") && n.includes("santos")) return "/avatars/prof-diego-santos.jpg";
-  if (n.includes("julia") && n.includes("oliveira")) return "/avatars/profa-julia-oliveira.jpg";
-  if (n.includes("maria") && (n.includes("aparecida") || n.includes("aux"))) return "/avatars/aux-enf-maria.jpg";
-  if (n.includes("jose") && (n.includes("nascimento") || n.includes("aux"))) return "/avatars/aux-enf-jose.jpg";
-  if (n.includes("ana") && (n.includes("beatriz") || n.includes("aux"))) return "/avatars/aux-enf-ana.jpg";
-  if (n.includes("francisca") && n.includes("souza")) return "/avatars/aux-enf-francisca.jpg";
-  if (n.includes("claudia") && n.includes("regina")) return "/avatars/aux-enf-claudia.jpg";
-  if (n.includes("patricia") && n.includes("mendonça")) return "/avatars/enf-patricia.jpg";
-  if (n.includes("rodrigo") && n.includes("alves")) return "/avatars/enf-rodrigo.jpg";
-  if (n.includes("claudia") && n.includes("nascimento")) return "/avatars/enf-claudia.jpg";
-  if (n.includes("marcos") && n.includes("vinicius")) return "/avatars/enf-marcos.jpg";
-  if (n.includes("fernanda") && n.includes("bastos")) return "/avatars/enf-fernanda.jpg";
-  if (n.includes("luciana") && n.includes("torres")) return "/avatars/enf-luciana.jpg";
-  if (n.includes("diego") && n.includes("santana")) return "/avatars/enf-diego.jpg";
-  if (n.includes("luciana") && n.includes("pereira")) return "/avatars/tec-enf-luciana.jpg";
-  if (n.includes("carlos") && n.includes("santos")) return "/avatars/tec-enf-carlos.jpg";
-  if (n.includes("rosangela") && n.includes("dias")) return "/avatars/tec-enf-rosangela.jpg";
-  if (n.includes("adriana") && n.includes("gomes")) return "/avatars/tec-enf-adriana.jpg";
-  if (n.includes("helena") && n.includes("barbosa")) return "/avatars/cuid-helena.jpg";
-  if (n.includes("jorge") && n.includes("moreira")) return "/avatars/cuid-jorge.jpg";
-  if (n.includes("sandra") && n.includes("oliveira")) return "/avatars/cuid-sandra.jpg";
-  if (n.includes("mariana") && n.includes("castello")) return "/avatars/dra-mariana-integrativa.jpg";
-  if (n.includes("roberto") && n.includes("figueiredo")) return "/avatars/dr-roberto-integrativa.jpg";
-  if (n.includes("beatriz") && n.includes("herbal")) return "/avatars/dra-beatriz-integrativa.jpg";
 
   // Se não é um profissional oficial tratado, usa o avatar atual se houver
   if (currentAvatar && currentAvatar.trim() !== "") {
@@ -297,8 +241,15 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const crmStr = (doc.crm || "").trim();
       const rawFullName = (doc.full_name || "").trim();
 
-      // Ignora contas de teste/mock
-      if (/test|mock|e2e/i.test(crmStr) || /teste|demo/i.test(rawFullName)) continue;
+      // Ignora contas de teste/mock e códigos fictícios do seed 08/09
+      if (
+        /test|mock|e2e/i.test(crmStr) ||
+        /^(12345|34567|45678|56789|67890|67891)$/i.test(crmStr.replace(/\D/g, "")) ||
+        /^(ENF|JAR|ACU|OCU|CUID|PSI|TEC|AUX|INT)-\d+/i.test(crmStr) ||
+        /teste|demo|perfil demonstrativo/i.test(rawFullName)
+      ) {
+        continue;
+      }
 
       const fullName = ensureDoctorTitle(rawFullName || "Profissional");
       const cleanCrm = crmStr.replace(/\D/g, "");
@@ -318,6 +269,15 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       if (isVet) {
         category = "Médico Veterinário Prescritor";
         councilLabel = "CRMV";
+      } else if (doc.council_type === "CRF" || /farm/i.test(doc.specialty || "")) {
+        // Farmacêuticos e farmácias pertencem exclusivamente à vitrine do Shopping / Saúde Verde
+        continue;
+      } else if (doc.council_type === "CRN" || /^crn/i.test(crmStr) || /nutri/i.test(doc.specialty || "")) {
+        category = "Nutricionistas";
+        councilLabel = "CRN";
+      } else if (doc.council_type === "CREFITO" || /^crefito/i.test(crmStr) || /fisio/i.test(doc.specialty || "")) {
+        category = "Fisioterapeutas";
+        councilLabel = "CREFITO";
       } else if (doc.council_type === "CRM" || (!doc.council_type && /^\d+/.test(crmStr))) {
         category = MEDICOS_CATEGORY;
         councilLabel = "CRM";
@@ -330,9 +290,6 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       } else if (crmStr.startsWith("AUX")) {
         category = "Aux. de Enfermagem";
         councilLabel = "COREN-AUX";
-      } else if (doc.council_type === "CRF" || /farm/i.test(doc.specialty || "")) {
-        category = "Farmácia Clínica";
-        councilLabel = "CRF";
       } else if (crmStr.startsWith("PSI")) {
         category = "Psicologia & Terapias";
         councilLabel = "CRP";

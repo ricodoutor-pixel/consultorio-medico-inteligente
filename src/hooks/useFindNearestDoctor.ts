@@ -106,7 +106,7 @@ export function useFindNearestDoctor(caseKeyword?: string) {
 
   const ranked = useMemo<ScoredProfessional[]>(() => {
     return professionals
-      .filter((p) => p.online) // apenas online
+      .filter((p) => p.category === 'Médicos Prescritores' && p.online) // apenas médicos prescritores online (veterinários não concorrem no rodízio humano)
       .map((p) => {
         let distanceKm: number | null = null;
         if (userCoords) {

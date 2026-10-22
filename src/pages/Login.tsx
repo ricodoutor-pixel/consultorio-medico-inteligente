@@ -37,7 +37,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const redirectTo = searchParams.get("redirect");
+  const redirectTo = searchParams.get("redirect") || searchParams.get("next");
   const initialType = (searchParams.get("type") || (redirectTo?.includes("lojista") || redirectTo?.includes("farmacia") ? "farmacia" : redirectTo?.includes("medico") || redirectTo?.includes("consultorio") ? "medico" : redirectTo?.includes("admin") ? "admin" : "paciente")) as PortalType;
 
   const [selectedPortal, setSelectedPortal] = useState<PortalType>(initialType);
@@ -402,7 +402,7 @@ export default function Login() {
                     <p className="text-xs text-muted-foreground">
                       Ainda não tem conta?{" "}
                       <Link 
-                        to={selectedPortal === "medico" ? "/cadastro-profissional" : selectedPortal === "farmacia" ? "/cadastro-farmacia" : "/cadastro"} 
+                        to={selectedPortal === "medico" ? "/cadastro-profissional" : selectedPortal === "farmacia" ? "/cadastro-farmacia" : `/cadastro${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`} 
                         className="text-emerald-400 font-bold hover:underline"
                       >
                         Cadastre-se como {selectedPortal}

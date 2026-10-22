@@ -207,7 +207,7 @@ const Cadastro = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirect");
+  const redirectTo = searchParams.get("redirect") || searchParams.get("next");
   const activeRefCode = searchParams.get("ref") || searchParams.get("ref_id") || getReferralCode();
 
   const currentCountryConfig = useMemo(() => {

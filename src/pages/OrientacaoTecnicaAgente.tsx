@@ -238,7 +238,15 @@ export default function OrientacaoTecnicaAgente() {
     if (authed === null || initDone.current) return;
     initDone.current = true;
     if (!authed) {
-      setPhase(returnedFromPayment ? "awaiting" : "intro");
+      const savedTriage = sessionStorage.getItem(TRIAGE_STORAGE_KEY);
+      let hasCompleteTriage = false;
+      if (savedTriage) {
+        try {
+          const parsed = JSON.parse(savedTriage);
+          hasCompleteTriage = QUESTIONS.every((item) => (parsed[item.id] || "").trim()) && !EMERGENCY_ANSWERS.has(parsed.red_flags || "");
+        } catch { /* ignora */ }
+      }
+      setPhase(returnedFromPayment ? "awaiting" : hasCompleteTriage ? "checkout" : "intro");
       return;
     }
     (async () => {
@@ -254,7 +262,16 @@ export default function OrientacaoTecnicaAgente() {
         } else if (st === "expired") {
           setPhase("room");
         } else {
-          setPhase("intro");
+          // Se já tem triagem completa salva na sessão, vai direto para o checkout
+          const savedTriage = sessionStorage.getItem(TRIAGE_STORAGE_KEY);
+          let hasCompleteTriage = false;
+          if (savedTriage) {
+            try {
+              const parsed = JSON.parse(savedTriage);
+              hasCompleteTriage = QUESTIONS.every((item) => (parsed[item.id] || "").trim()) && !EMERGENCY_ANSWERS.has(parsed.red_flags || "");
+            } catch { /* ignora */ }
+          }
+          setPhase(hasCompleteTriage ? "checkout" : "intro");
         }
       } catch (e) {
         console.error("[ot] status", e);

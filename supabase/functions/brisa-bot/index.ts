@@ -95,15 +95,58 @@ import {
 const PERSONA = BRISA_TRIAGE_PERSONA;
 
 
-// ── RESPOSTAS INSTANTÂNEAS ──────────────────────────────────────────────
+// ── RESPOSTAS INSTANTÂNEAS POR PERFIL (Médico, Paciente, Farmácia) ──────
 const MSGS = {
-  boas_vindas: `Olá! 🌿 Sou a *Enfermeira Brisa*, assistente da *Planta y Raiz* — clínica digital de Cannabis Medicinal.
+  boas_vindas: `Olá! 🌿 Sou a *Enfermeira Brisa*, assistente oficial da *Planta y Raíz* — clínica digital de Medicina Integrativa e Canabinoide.
 
-${ROTEIRO_ORIENTACAO_TECNICA}`,
+Para te atender com máxima precisão, como posso te direcionar hoje?
 
-  cadastrado: `Ótimo! Você já pode agendar sua Orientação Técnica com o Dr. Edilson Bezerra:
+1️⃣ *Sou Paciente* — Quero entender o tratamento, fazer triagem ou agendar Orientação Técnica (R$ 30).
+2️⃣ *Sou Médico(a) / Prescritor(a)* — Quero credenciar meu consultório virtual, suporte em prescrição e encaminhamentos.
+3️⃣ *Sou Farmácia / Lojista / Associação* — Quero integrar meus produtos ao Shopping e canal de dispensação.
 
-${ROTEIRO_ORIENTACAO_TECNICA}`,
+Pode responder com o *número* ou me contar como posso te ajudar! 💚`,
+
+  paciente: `Olá! 🌿💚 Sou a *Enfermeira Brisa*, assistente da *Planta y Raíz*.
+
+Estamos aqui para te acolher e facilitar seu acesso seguro à Medicina Canabinoide:
+
+📋 *Orientação Técnica Especializada (R$ 30):*
+Atendimento individualizado para entender seu histórico de saúde, tirar dúvidas sobre posologia, canabinoides e receber um Relatório Técnico Completo com encaminhamento clínico.
+
+👉 Faça sua triagem inicial e inicie direto pelo site:
+🔗 https://plantayraiz.com.br/orientacao-tecnica
+
+Como você está se sentindo hoje? Se preferir, me conte um pouco sobre sua queixa ou sintomas.`,
+
+  medico: `Olá, Doutor(a)! 👨‍⚕️🌿 É uma satisfação recebê-lo(a) na *Planta y Raíz*!
+
+Somos um ecossistema completo desenvolvido para médicos e profissionais prescritores:
+🩺 *Consultório Virtual Inteligente:* Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022).
+💰 *Split Automático 93/7:* Repasse de 93% líquido direto na sua conta bancária a cada consulta via Mercado Pago.
+📄 *Prescrição Eletrônica RDC 327/660:* Acesso a catálogo de produtos regulamentados com entrega em todo o Brasil.
+🎓 *Mentoria Técnica:* Suporte clínico e discussão de casos complexos com o Dr. Edilson Bezerra.
+
+👉 Conheça nossa estrutura e faça seu credenciamento:
+🔗 https://plantayraiz.com.br/cadastro-profissional
+🔗 https://plantayraiz.com.br/profissionais
+
+Como podemos apoiar a sua prática clínica hoje?`,
+
+  farmacia_lojista: `Olá! 🏪🌿 Bem-vindo(a) ao canal corporativo da *Planta y Raíz*!
+
+Conectamos farmácias, fornecedores e associações de cannabis medicinal a médicos prescritores e milhares de pacientes:
+📦 *Shopping & Vitrine Oficial:* Seus produtos em destaque na nossa farmácia digital.
+💰 *Split 95/5 no Checkout:* 95% do valor da venda vai direto para o lojista parceiro.
+🚚 *Integração com Prescrição Médica:* Pacientes recebem o carrinho já pronto com o produto prescrito pelo médico.
+
+👉 Cadastre sua farmácia ou produtos na plataforma:
+🔗 https://plantayraiz.com.br/cadastro
+
+Qual marca, produto ou associação você representa?`,
+
+  cadastrado: `Ótimo! Você já pode agendar sua Orientação Técnica ou acessar seu painel:
+👉 https://plantayraiz.com.br/orientacao-tecnica 🌿`,
 
   orientacao_tecnica: ROTEIRO_ORIENTACAO_TECNICA,
 
@@ -113,16 +156,6 @@ ${ROTEIRO_ORIENTACAO_TECNICA}`,
 
 ${ROTEIRO_ORIENTACAO_TECNICA}`,
 
-  medico: `Olá, Doutor(a)! 👨‍⚕️ Bem-vindo(a) à *Planta y Raiz*!
-
-Conheça nossa estrutura de Mentoria, Orientação Técnica e Consultório Virtual:
-👉 https://plantayraiz.com.br/profissionais 🌿`,
-
-  lojista: `Olá! 🏪 Interesse em parceria com a *Planta y Raiz*?
-
-Afiliados (até 30%), marketplace ANVISA e co-marketing:
-🔗 *https://plantayraiz.com.br* 🌿`,
-
   generica: ROTEIRO_ORIENTACAO_TECNICA,
 };
 
@@ -130,20 +163,21 @@ function norm(t: string) { return t.toLowerCase().normalize('NFD').replace(/[\u0
 
 function intent(text: string): keyof typeof MSGS {
   const t = norm(text);
+  if (/^2\b|\bmedico\b|\bmedica\b|\bdoutor?a?\b|\bdr\.?\b|\bdra\.?\b|crm\b|prescri|prescritor|especialista|minha clinica|sou medico|sou medica/.test(t)) return 'medico';
+  if (/^3\b|\bfarmacia\b|\blojista\b|\bparceiro\b|\bparceria\b|\bafiliado\b|\bdistribuid|\brevend|\bassocia|\bforneced|\blaboratorio\b|\bmarca\b/.test(t)) return 'farmacia_lojista';
+  if (/^1\b|\bpaciente\b|\bsou paciente\b|\bconsulta\b|\btratamento\b|\bminha dor\b|\bremedio\b|\breceita\b|\bsintoma\b|\bagendar\b/.test(t)) return 'paciente';
   if (/orientacao|tecnica|mentoria|edilson|bezerra|passo a passo|como funciona|atendimento/.test(t)) return 'orientacao_tecnica';
   if (/ja (tenho|fiz|possuo) cadastro|ja sou cadastrad|ja me cadastrei/.test(t)) return 'cadastrado';
-  if (/\bmedico\b|\bdoutor?a?\b|\bdr\.?\b|\bdra\.?\b|crm\b|prescri|especialista/.test(t)) return 'medico';
-  if (/lojista|parceiro|parceria|afiliado|comissao|distribuid|revend/.test(t)) return 'lojista';
   if (/cannabis|canabis|cbd|thc|canabidiol|maconha|epileps|autismo|fibromialgi|parkinson|ansiedade|insonia/.test(t)) return 'cannabis_info';
   if (/^(ola|oi|hey|bom dia|boa tarde|boa noite|tudo bem|salve|brisa|alo|hello|hola)/.test(t.trim())) return 'boas_vindas';
-  return 'orientacao_tecnica';
+  return 'boas_vindas';
 }
 
 function instantReply(text: string, name: string | null): string {
   const k = intent(text);
   const saud = name ? `Olá, *${name}*! ` : '';
   const msg = MSGS[k];
-  return (k === 'boas_vindas' || k === 'medico' || k === 'lojista') ? msg : saud + msg;
+  return (k === 'boas_vindas' || k === 'medico' || k === 'farmacia_lojista' || k === 'paciente') ? msg : saud + msg;
 }
 
 // ── PARSER WAHA universal ────────────────────────────────────────────────

@@ -42,6 +42,7 @@ export function MasterPortalSwitcher() {
   if (!isMaster) return null;
 
   const currentPath = location.pathname;
+  if (currentPath === "/orientacao-tecnica") return null;
 
   const portals = [
     { name: "Paciente", path: "/dashboard-paciente", icon: User, color: "text-emerald-400" },

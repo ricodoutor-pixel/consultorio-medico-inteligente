@@ -150,7 +150,8 @@ Deno.serve(async (req) => {
       shipping_days,
       amount: directAmount,
       description: directDesc,
-      triage
+      triage,
+      payment_method: requestedPaymentMethod,
     } = await req.json();
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
@@ -371,11 +372,41 @@ Deno.serve(async (req) => {
       ...(collectorId ? { collector_id: Number(collectorId) || collectorId } : {}),
     };
 
-    let endpoint = "https://api.mercadopago.com/checkout/preferences";
+    // Nome do paciente para o checkout / Pix
+    const tTriage = (triage ?? {}) as Record<string, unknown>;
+    const userMeta = (authData.user.user_metadata ?? {}) as Record<string, unknown>;
+    const patientName = String(tTriage.nome || userMeta.full_name || authData.user.email?.split("@")[0] || "Paciente").trim().slice(0, 120);
+
+    const isPixDirect = requestedPaymentMethod === "pix";
+    let endpoint = isPixDirect
+      ? "https://api.mercadopago.com/v1/payments"
+      : "https://api.mercadopago.com/checkout/preferences";
     let bodyData: any = preference;
 
-    // Use Mercado Pago Subscriptions API for recurring plans
-    if (type === "subscription") {
+    // Use Mercado Pago Payments API for direct PIX
+    if (isPixDirect) {
+      const pFirst = patientName.split(" ")[0] || "Paciente";
+      const pLast = patientName.split(" ").slice(1).join(" ") || "Cliente";
+      bodyData = {
+        transaction_amount: Number(amount.toFixed(2)),
+        description: title,
+        payment_method_id: "pix",
+        payer: {
+          email: payerEmail || (isSellerEmail ? "cliente@plantayraiz.com.br" : (authData.user.email || "contato@plantayraiz.com.br")),
+          first_name: pFirst,
+          last_name: pLast,
+        },
+        external_reference: externalReference,
+        notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
+        metadata: {
+          type,
+          user_id: userId,
+          sku: sku ?? null,
+          order_id: orderId ?? null,
+        },
+      };
+    } else if (type === "subscription") {
+      // Use Mercado Pago Subscriptions API for recurring plans
       endpoint = "https://api.mercadopago.com/preapproval";
       bodyData = {
         reason: title,
@@ -394,8 +425,8 @@ Deno.serve(async (req) => {
     // Orientação Técnica: grava a ordem + triagem ANTES da preferência (AGENTS.md).
     const isOrientacaoOrder = type === "sku" && isOrientacaoSku(sku);
     if (isOrientacaoOrder) {
-      const t = (triage ?? {}) as Record<string, unknown>;
-      const meta = (authData.user.user_metadata ?? {}) as Record<string, unknown>;
+      const t = tTriage;
+      const meta = userMeta;
       let patientPhone = String(t.whatsapp ?? t.telefone ?? t.phone ?? meta.phone ?? meta.whatsapp ?? "").replace(/\D/g, "");
       if (!/^\d{10,15}$/.test(patientPhone)) {
         const { data: prof } = await supabase
@@ -405,7 +436,6 @@ Deno.serve(async (req) => {
           .maybeSingle();
         patientPhone = String((prof as any)?.whatsapp || (prof as any)?.phone || "").replace(/\D/g, "");
       }
-      const patientName = String(t.nome || meta.full_name || authData.user.email?.split("@")[0] || "Paciente").trim().slice(0, 120);
       const platformFee = round2(amount * FEE_TELEMEDICINE);
       const nowIso = new Date().toISOString();
 
@@ -418,7 +448,7 @@ Deno.serve(async (req) => {
         amount,
         platform_fee: platformFee,
         doctor_payout: round2(amount - platformFee),
-        payment_method: "mercadopago",
+        payment_method: isPixDirect ? "pix" : "mercadopago",
         status: "pending",
         currency: "BRL",
         topic: `Orientação: ${String(t.queixa).slice(0, 100)}`,
@@ -452,6 +482,42 @@ Deno.serve(async (req) => {
     }
 
     const mpData = await mpResponse.json();
+
+    if (isPixDirect) {
+      const qrCode = mpData.point_of_interaction?.transaction_data?.qr_code;
+      const qrCodeBase64 = mpData.point_of_interaction?.transaction_data?.qr_code_base64;
+      const ticketUrl = mpData.point_of_interaction?.transaction_data?.ticket_url;
+
+      if (isOrientacaoOrder) {
+        await supabase.from("orientacao_tecnica_orders")
+          .update({
+            mp_payment_id: String(mpData.id),
+            status: mpData.status === "approved" ? "approved" : "pending",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("external_reference", externalReference);
+      }
+
+      await supabase.from("audit_log").insert({
+        user_id: userId,
+        action: "mp_pix_created",
+        table_name: "orientacao_tecnica_orders",
+        record_id: String(mpData.id),
+        new_data: { type, amount, external_reference: externalReference, payment_id: mpData.id },
+      });
+
+      return json({
+        success: true,
+        payment_method: "pix",
+        payment_id: mpData.id,
+        qr_code: qrCode,
+        qr_code_base64: qrCodeBase64,
+        ticket_url: ticketUrl,
+        external_reference: externalReference,
+        amount,
+        split: splitDetails,
+      });
+    }
 
     if (isOrientacaoOrder) {
       await supabase.from("orientacao_tecnica_orders")

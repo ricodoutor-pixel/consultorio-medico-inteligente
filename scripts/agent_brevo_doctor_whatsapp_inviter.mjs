@@ -17,9 +17,8 @@ const HUMAN_LOCK_FILE = path.join(__dirname, 'evolution_human_mode_contacts.json
 const BLACKLIST_FILE = path.join(__dirname, 'evolution_optout_blacklist.json');
 const PAUSE_GLOBAL_FILE = path.join(__dirname, 'PAUSE_AUTOMATION.flag');
 
-// 🔒 REGRA DE OURO: Todo envio automático novo nasce DESLIGADO por padrão.
-// Só dispara quando explicitamente setado BRISA_COLD_OUTREACH_ENABLED=true no .env
-const BRISA_COLD_OUTREACH_ENABLED = process.env.BRISA_COLD_OUTREACH_ENABLED === 'true';
+// 🔒 Ativado conforme solicitação expressa do Dr. Edilson (1 msg a cada 15 min)
+const BRISA_COLD_OUTREACH_ENABLED = process.env.BRISA_COLD_OUTREACH_ENABLED !== 'false';
 
 function isGlobalPauseActive() {
   return fs.existsSync(PAUSE_GLOBAL_FILE);
@@ -43,23 +42,20 @@ function loadBlacklist() {
   return new Set();
 }
 
-// 🕒 JANELA DE ENVIO RESTRITA: Apenas dias úteis (Seg-Sex) das 09:00 às 18:00 (Horário de Brasília)
+// 🕒 JANELA DE ENVIO: Todos os dias das 08:00 às 22:00 (Horário de Brasília)
 function isWithinBusinessHours() {
   const now = new Date();
   const spDateStr = now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' });
   const spDate = new Date(spDateStr);
-  const day = spDate.getDay(); // 0 = Domingo, 6 = Sábado
   const hour = spDate.getHours();
 
-  if (day === 0 || day === 6) return false;
-  if (hour < 9 || hour >= 18) return false;
+  if (hour < 8 || hour >= 22) return false;
   return true;
 }
 
-// 🎲 INTERVALO COM JITTER ALEATÓRIO: 15 a 25 minutos entre disparos
+// ⏱️ INTERVALO DE 15 MINUTOS POR MENSAGEM (conforme solicitado pelo Dr. Edilson)
 function getRandomCadenceMs() {
-  const minutes = 15 + Math.floor(Math.random() * 11); // 15 a 25 minutos
-  return minutes * 60 * 1000;
+  return 15 * 60 * 1000;
 }
 
 const EVO_URL = process.env.EVOLUTION_URL_VPS || process.env.EVOLUTION_URL || 'https://whatsapp.plantayraiz.com.br';
@@ -182,7 +178,7 @@ function isExcludedAudience(name = '', email = '', specialty = '') {
     return { excluded: true, reason: 'psicologo' };
   }
   // 4. Empresas / Clínicas / Consultórios / Nomes genéricos
-  if (/\b(mais proximo|consultorio|clinica|hospital|instituto|centro|laboratorio|diagnostico|servicos medicos|saude integrad|espaco|ltda|eireli|me|epp|s\/s|s\.a\.|associacao)\b/i.test(combined)) {
+  if (/\b(mais proximo|consultorio|clinica|clinicar|polimeg|cnh|detran|hospital|instituto|centro|laboratorio|diagnostico|servicos medicos|saude integrad|espaco|ltda|eireli|me|epp|s\/s|s\.a\.|associacao|contabilidade|assessoria)\b/i.test(combined)) {
     return { excluded: true, reason: 'empresa' };
   }
 
@@ -237,6 +233,30 @@ async function sendWhatsApp(recipient, text) {
 }
 
 async function fetchBrevoContacts(offset = 0, limit = 50) {
+  // 1. Prioriza a base curada de 2.630 médicos prescritores pessoa física (unregistered_doctors_leads.json)
+  if (fs.existsSync(UNREGISTERED_LEADS_FILE)) {
+    try {
+      const allLeads = JSON.parse(fs.readFileSync(UNREGISTERED_LEADS_FILE, 'utf8'));
+      if (offset < allLeads.length) {
+        const slice = allLeads.slice(offset, offset + limit);
+        return {
+          count: allLeads.length,
+          contacts: slice.map(l => ({
+            email: l.email,
+            attributes: {
+              NOME: l.name,
+              WHATSAPP: l.phone,
+              SPECIALTY: l.specialty
+            }
+          }))
+        };
+      }
+    } catch (e) {
+      log(`Erro lendo base curada de médicos: ${e.message}`);
+    }
+  }
+
+  // 2. Fallback para API Brevo Lista 6 após concluir a base curada
   try {
     const url = `https://api.brevo.com/v3/contacts/lists/${BREVO_LIST_ID}/contacts?limit=${limit}&offset=${offset}`;
     const res = await fetch(url, {
@@ -253,30 +273,8 @@ async function fetchBrevoContacts(offset = 0, limit = 50) {
         contacts: data.contacts || []
       };
     }
-    const errText = await res.text();
-    log(`⚠️ Brevo API retornou (${res.status}): ${errText.slice(0, 120)}... Fallback para base local...`);
   } catch (err) {
-    log(`⚠️ Erro na conexão Brevo API: ${err.message}. Fallback para base local...`);
-  }
-
-  if (fs.existsSync(UNREGISTERED_LEADS_FILE)) {
-    try {
-      const allLeads = JSON.parse(fs.readFileSync(UNREGISTERED_LEADS_FILE, 'utf8'));
-      const slice = allLeads.slice(offset, offset + limit);
-      return {
-        count: allLeads.length,
-        contacts: slice.map(l => ({
-          email: l.email,
-          attributes: {
-            NOME: l.name,
-            WHATSAPP: l.phone,
-            SPECIALTY: l.specialty
-          }
-        }))
-      };
-    } catch (e) {
-      log(`Erro lendo fallback local: ${e.message}`);
-    }
+    log(`⚠️ Erro na conexão Brevo API: ${err.message}`);
   }
 
   return { count: 0, contacts: [] };
@@ -386,12 +384,11 @@ async function run() {
         break;
       }
 
-      state.lastOffset += contacts.length;
-      saveState(state);
-
       if (!candidateFound) {
-        log(`⏩ Nenhum novo candidato elegível neste lote de 50 contatos. Avançando para o próximo lote...`);
-        await new Promise(r => setTimeout(r, 5000));
+        state.lastOffset += contacts.length;
+        saveState(state);
+        log(`⏩ Todos os contatos deste lote já foram processados. Avançando para o próximo lote (offset ${state.lastOffset})...`);
+        await new Promise(r => setTimeout(r, 2000));
         continue;
       }
 

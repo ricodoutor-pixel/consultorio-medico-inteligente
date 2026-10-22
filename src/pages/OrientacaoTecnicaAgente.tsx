@@ -19,7 +19,7 @@ import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight, AlertTriangle,
   CheckCircle2, Sparkles, BookOpen, FileText, ArrowRight, Paperclip, X, PauseCircle,
-  UserCheck, XCircle, Info, MapPin,
+  UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check,
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "pyr_ot_external_reference";
@@ -139,6 +139,13 @@ export default function OrientacaoTecnicaAgente() {
   const [userId, setUserId] = useState<string | null>(null);
 
   const [creatingCheckout, setCreatingCheckout] = useState(false);
+  const [creatingPix, setCreatingPix] = useState(false);
+  const [pixData, setPixData] = useState<{
+    qr_code: string;
+    qr_code_base64: string;
+    payment_id: string | number;
+  } | null>(null);
+  const [copiedPix, setCopiedPix] = useState(false);
   const [awaitingSince, setAwaitingSince] = useState<number>(Date.now());
 
   const [otState, setOtState] = useState<OtState>("none");
@@ -158,6 +165,7 @@ export default function OrientacaoTecnicaAgente() {
   const [generatingReport, setGeneratingReport] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const questionCardRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const initDone = useRef(false);
@@ -344,6 +352,7 @@ export default function OrientacaoTecnicaAgente() {
   const q = QUESTIONS[step];
 
   const saveAnswer = (value: string) => {
+    questionCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     const next = { ...answers, [q.id]: value };
     setAnswers(next);
     sessionStorage.setItem(TRIAGE_STORAGE_KEY, JSON.stringify(next));
@@ -413,6 +422,117 @@ export default function OrientacaoTecnicaAgente() {
       });
     } finally {
       setCreatingCheckout(false);
+    }
+  };
+
+  // ── Pagamento Pix In-Page (sem sair do site) ──────────────────────────
+  const startPixCheckout = async () => {
+    if (!triageComplete || emergency) return;
+    setCreatingPix(true);
+    try {
+      let session = (await supabase.auth.getSession()).data.session;
+      if (!session) {
+        try {
+          const { data: anonData } = await supabase.auth.signInAnonymously();
+          session = anonData?.session ?? null;
+        } catch {
+          /* anonymous sign in fallback */
+        }
+      }
+      if (!session) {
+        const nextUrl = window.location.pathname + window.location.search;
+        navigate(`/login?next=${encodeURIComponent(nextUrl)}`);
+        return;
+      }
+
+      const returnUrl = `${window.location.origin}/orientacao-tecnica?paid=1${urlOrigem ? `&origem=${encodeURIComponent(urlOrigem)}` : ""}`;
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: {
+          sku: "orientacao_tecnica",
+          payment_method: "pix",
+          returnUrl,
+          triage: answers,
+        },
+      });
+
+      if (error) {
+        let code = "";
+        try {
+          const ctx = (error as { context?: Response }).context;
+          if (ctx && typeof ctx.json === "function") code = String((await ctx.json())?.error || "");
+        } catch { /* corpo não-JSON */ }
+        if (code === "triage_required") {
+          toast({
+            title: "Triagem incompleta",
+            description: "Revise nome, queixa principal e tempo dos sintomas antes do pagamento.",
+            variant: "destructive",
+          });
+          setStep(0);
+          setPhase("triage");
+          return;
+        }
+        throw error;
+      }
+
+      const res = data as {
+        success?: boolean;
+        payment_method?: string;
+        qr_code?: string;
+        qr_code_base64?: string;
+        payment_id?: string | number;
+        external_reference?: string;
+        init_point?: string;
+      };
+
+      if (res?.qr_code && res?.qr_code_base64) {
+        setPixData({
+          qr_code: res.qr_code,
+          qr_code_base64: res.qr_code_base64,
+          payment_id: res.payment_id || "",
+        });
+        if (res.external_reference) {
+          localStorage.setItem(REF_STORAGE_KEY, res.external_reference);
+        }
+        setAwaitingSince(Date.now());
+        setPhase("awaiting");
+        toast({
+          title: "Pix gerado com sucesso!",
+          description: "Escaneie o QR Code ou copie o código Pix abaixo para pagar sem sair da página.",
+        });
+      } else if (res?.init_point) {
+        if (res.external_reference) localStorage.setItem(REF_STORAGE_KEY, res.external_reference);
+        window.location.href = res.init_point;
+      } else {
+        throw new Error("Não foi possível gerar o Pix na tela.");
+      }
+    } catch (e) {
+      console.error("[ot] pix checkout", e);
+      toast({
+        title: "Não foi possível gerar o Pix direto",
+        description: "Você pode tentar pelo checkout tradicional do Mercado Pago.",
+        variant: "destructive",
+      });
+    } finally {
+      setCreatingPix(false);
+    }
+  };
+
+  const copyPixCode = async () => {
+    if (!pixData?.qr_code) return;
+    try {
+      await navigator.clipboard.writeText(pixData.qr_code);
+      setCopiedPix(true);
+      toast({
+        title: "Código Pix copiado!",
+        description: "Cole no aplicativo do seu banco para concluir o pagamento de R$ 30.",
+      });
+      setTimeout(() => setCopiedPix(false), 4000);
+    } catch {
+      toast({
+        title: "Erro ao copiar",
+        description: "Selecione o código e copie manualmente.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -742,7 +862,7 @@ export default function OrientacaoTecnicaAgente() {
 
           {/* ── TRIAGEM ── */}
           {phase === "triage" && (
-            <Card className="border-border">
+            <Card ref={questionCardRef} className="border-border scroll-mt-24">
               <CardContent className="p-6 md:p-8">
                 <Progress value={((step + 1) / QUESTIONS.length) * 100} className="h-2 mb-2" />
                 <p className="text-xs text-muted-foreground font-bold text-right mb-6">
@@ -864,18 +984,35 @@ export default function OrientacaoTecnicaAgente() {
                       <p className="text-3xl font-display font-black text-gradient-green">R$ 30</p>
                     </div>
 
-                    <Button
-                      onClick={startCheckout}
-                      disabled={creatingCheckout || !triageComplete}
-                      className="w-full h-14 rounded-2xl font-black text-base shadow-lg hover:shadow-xl transition-all"
-                    >
-                      {creatingCheckout
-                        ? <><Loader2 className="animate-spin mr-2" size={18} /> Abrindo pagamento...</>
-                        : <>Pagar R$ 30 com Mercado Pago <ChevronRight size={18} className="ml-1" /></>}
-                    </Button>
+                    <div className="space-y-3">
+                      <Button
+                        onClick={startPixCheckout}
+                        disabled={creatingPix || creatingCheckout || !triageComplete}
+                        className="w-full h-14 rounded-2xl font-black text-base shadow-lg hover:shadow-xl transition-all bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2"
+                      >
+                        {creatingPix ? (
+                          <><Loader2 className="animate-spin" size={18} /> Gerando Pix na tela...</>
+                        ) : (
+                          <><QrCode size={20} /> Pagar R$ 30 com Pix (na tela — sem sair do site)</>
+                        )}
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        onClick={startCheckout}
+                        disabled={creatingPix || creatingCheckout || !triageComplete}
+                        className="w-full h-11 rounded-2xl font-semibold text-xs border-border text-muted-foreground hover:text-foreground"
+                      >
+                        {creatingCheckout ? (
+                          <><Loader2 className="animate-spin mr-2" size={14} /> Abrindo...</>
+                        ) : (
+                          <>Prefere Cartão de Crédito? Pagar via Mercado Pago <ChevronRight size={14} className="ml-1" /></>
+                        )}
+                      </Button>
+                    </div>
 
                     <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1 justify-center">
-                      <ShieldCheck size={12} /> Pix ou cartão. A sala abre automaticamente quando o Mercado Pago confirma o pagamento.
+                      <ShieldCheck size={12} className="text-primary" /> Pix instantâneo ou cartão. A sala abre automaticamente na confirmação.
                     </p>
                   </CardContent>
                 </Card>
@@ -883,40 +1020,113 @@ export default function OrientacaoTecnicaAgente() {
             </div>
           )}
 
-          {/* ── AGUARDANDO CONFIRMAÇÃO (somente status do servidor) ── */}
+          {/* ── AGUARDANDO CONFIRMAÇÃO COM PIX NA TELA OU CHECKOUT EXTERNO ── */}
           {phase === "awaiting" && (
-            <Card className="border-primary/30">
-              <CardContent className="p-6 md:p-8 text-center space-y-4">
-                <Loader2 className="animate-spin text-primary mx-auto" size={32} />
-                <h2 className="font-display font-black text-foreground text-lg">Aguardando a confirmação do pagamento</h2>
-                <p className="text-sm text-muted-foreground">
-                  Assim que o Mercado Pago confirmar, sua sala com o Dr. Edilson Bezerra ON é liberada aqui
-                  automaticamente. Pix costuma levar poucos segundos. Pode manter esta página aberta.
-                </p>
-                {authed === false && (
-                  <p className="text-xs text-amber-500">
-                    Entre na mesma conta usada no pagamento para acompanharmos a confirmação.{" "}
-                    <Link className="underline" to={`/login?next=${encodeURIComponent("/orientacao-tecnica?paid=1")}`}>Entrar</Link>
-                  </p>
+            <Card className="border-primary/30 shadow-lg">
+              <CardContent className="p-6 md:p-8 text-center space-y-5">
+                {pixData ? (
+                  <>
+                    <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-display font-black text-lg">
+                      <QrCode size={24} />
+                      <h2>Pagamento Pix — R$ 30,00</h2>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                      Abra o aplicativo do seu banco, escolha <strong>Pix &gt; Ler QR Code</strong> ou use a opção <strong>Pix Copia e Cola</strong>. Não é necessário sair desta página: a sala abre automaticamente logo após o pagamento!
+                    </p>
+
+                    {/* Imagem QR Code */}
+                    <div className="flex flex-col items-center justify-center py-2">
+                      <div className="p-3 bg-white rounded-2xl border-2 border-emerald-500/30 shadow-md">
+                        <img
+                          src={`data:image/png;base64,${pixData.qr_code_base64}`}
+                          alt="QR Code Pix"
+                          className="w-48 h-48 md:w-56 md:h-56 object-contain"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Código Pix Copia e Cola */}
+                    <div className="space-y-2 max-w-md mx-auto text-left">
+                      <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+                        Código Pix Copia e Cola
+                      </label>
+                      <div className="p-2.5 bg-muted/40 rounded-xl border border-border text-[11px] font-mono break-all line-clamp-2 select-all text-muted-foreground">
+                        {pixData.qr_code}
+                      </div>
+
+                      <Button
+                        onClick={copyPixCode}
+                        className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2 shadow"
+                      >
+                        {copiedPix ? (
+                          <><Check size={18} className="text-white" /> Código Pix Copiado com Sucesso!</>
+                        ) : (
+                          <><Copy size={18} /> Copiar Código Pix (Copia e Cola)</>
+                        )}
+                      </Button>
+                    </div>
+
+                    {/* Status de aguardo em tempo real */}
+                    <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 text-xs text-emerald-800 dark:text-emerald-300">
+                      <Loader2 className="animate-spin text-emerald-600 shrink-0" size={16} />
+                      <span>Aguardando confirmação do banco... Mantenha esta tela aberta.</span>
+                    </div>
+
+                    <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                        onClick={startCheckout}
+                        disabled={creatingCheckout}
+                      >
+                        {creatingCheckout ? "Abrindo..." : "Prefere pagar com Cartão de Crédito? Clique aqui"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs rounded-xl"
+                        onClick={() => setPhase(triageComplete ? "checkout" : "intro")}
+                      >
+                        Voltar à triagem
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Loader2 className="animate-spin text-primary mx-auto" size={32} />
+                    <h2 className="font-display font-black text-foreground text-lg">Aguardando a confirmação do pagamento</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Assim que o Mercado Pago confirmar, sua sala com o Dr. Edilson Bezerra ON é liberada aqui
+                      automaticamente. Pix costuma levar poucos segundos. Pode manter esta página aberta.
+                    </p>
+                    {authed === false && (
+                      <p className="text-xs text-amber-500">
+                        Entre na mesma conta usada no pagamento para acompanharmos a confirmação.{" "}
+                        <Link className="underline" to={`/login?next=${encodeURIComponent("/orientacao-tecnica?paid=1")}`}>Entrar</Link>
+                      </p>
+                    )}
+                    {awaitingLong && (
+                      <div className="rounded-2xl bg-muted/40 border border-border p-4 text-xs text-muted-foreground text-left flex gap-2">
+                        <Info size={14} className="shrink-0 mt-0.5 text-primary" />
+                        <span>
+                          Está demorando mais que o normal. Se o pagamento ainda não foi concluído, você pode voltar e
+                          gerar um novo. Se já pagou, fale com a Enfª Brisa pelo WhatsApp que verificamos para você.
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <Button
+                        variant="outline"
+                        className="rounded-2xl font-bold"
+                        onClick={() => setPhase(triageComplete ? "checkout" : "intro")}
+                      >
+                        Voltar ao pagamento
+                      </Button>
+                    </div>
+                  </>
                 )}
-                {awaitingLong && (
-                  <div className="rounded-2xl bg-muted/40 border border-border p-4 text-xs text-muted-foreground text-left flex gap-2">
-                    <Info size={14} className="shrink-0 mt-0.5 text-primary" />
-                    <span>
-                      Está demorando mais que o normal. Se o pagamento ainda não foi concluído, você pode voltar e
-                      gerar um novo. Se já pagou, fale com a Enfª Brisa pelo WhatsApp que verificamos para você.
-                    </span>
-                  </div>
-                )}
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <Button
-                    variant="outline"
-                    className="rounded-2xl font-bold"
-                    onClick={() => setPhase(triageComplete ? "checkout" : "intro")}
-                  >
-                    Voltar ao pagamento
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           )}

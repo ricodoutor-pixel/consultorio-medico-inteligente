@@ -336,9 +336,14 @@ Deno.serve(async (req) => {
       ? returnUrl
       : `${siteUrl}/payment-success`;
 
+    // Se o usuário logado for o próprio vendedor/admin da conta Mercado Pago (ex.: contato@plantayraiz.com.br),
+    // omitimos o payer.email para que o Mercado Pago permita a qualquer usuário pagar sem erro de autofaturamento.
+    const isSellerEmail = typeof authData.user.email === "string" && authData.user.email.toLowerCase().includes("plantayraiz");
+    const payerEmail = (!isSellerEmail && authData.user.email) ? authData.user.email : undefined;
+
     const preference = {
       items: [{ title, quantity: 1, unit_price: Number(amount.toFixed(2)), currency_id: "BRL" }],
-      payer: { email: authData.user.email ?? undefined },
+      payer: payerEmail ? { email: payerEmail } : {},
       back_urls: {
         success,
         failure: `${siteUrl}/payment/failure`,

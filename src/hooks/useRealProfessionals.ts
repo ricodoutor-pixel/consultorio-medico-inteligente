@@ -65,12 +65,12 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("ingrid") && (n.includes("chiullo") || n.includes("miranda") || c.includes("216629"))) return "/avatars/dra-ingrid-chiullo.jpg";
   if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
   if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return "/avatars/dr-luiz-roberto-medina.jpg";
-  if (n.includes("victor henrique") || n.includes("fonseca") || c.includes("206873")) return "/avatars/dr-victor-fonseca.jpg?v=2";
+  if (n.includes("stella") || n.includes("martinelli") || c.includes("21102111")) return "/avatars/dra-stella-martinelli.jpg?v=20261022";
+  if ((n.includes("victor") && n.includes("fonseca")) || n.includes("victor henrique") || c.includes("206873")) return "/avatars/dr-victor-fonseca.jpg?v=2";
   if (n.includes("otavio") || n.includes("otávio") || n.includes("bassete") || c.includes("21907")) return "/avatars/dr-otavio-bassete.jpg";
   if (n.includes("sadi") || n.includes("menta") || c.includes("16301")) return "/avatars/dr-sadi-menta.jpg?v=1";
   if (n.includes("geovana") || n.includes("mozaner") || c.includes("98083") || c.includes("247790")) return "/avatars/dra-geovana-torres.jpg?v=1";
   if (n.includes("grace") || n.includes("conceicao") || n.includes("conceição") || c.includes("190386") || c.includes("190.386") || c.includes("10372")) return "/avatars/dra-grace-conceicao.jpg?v=1";
-  if (n.includes("stella") || n.includes("martinelli") || c.includes("21102111")) return "/avatars/dra-stella-martinelli.jpg?v=3";
   if (n.includes("mariana") && (n.includes("alves") || n.includes("rezende") || c.includes("135012"))) return "/avatars/dra-mariana-alves.jpg";
   if (n.includes("breno") || n.includes("boueri") || n.includes("affonso") || c.includes("75492")) return "/avatars/dr-breno-boueri.jpg?v=4";
   if (n.includes("milton") || n.includes("urban") || c.includes("58169")) return "/avatars/dr-milton-urban.jpg?v=4";

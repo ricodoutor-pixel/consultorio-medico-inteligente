@@ -1178,7 +1178,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 0,
     avatar: "SM",
-    imageUrl: "/avatars/dra-stella-martinelli.jpg",
+    imageUrl: "/avatars/dra-stella-martinelli.jpg?v=20261022",
     flags: ["🇧🇷"],
     crm: "CRN-4 21102111/RJ",
     online: true,

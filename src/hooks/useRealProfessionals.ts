@@ -65,7 +65,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("ingrid") && (n.includes("chiullo") || n.includes("miranda") || c.includes("216629"))) return "/avatars/dra-ingrid-chiullo.jpg";
   if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
   if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return "/avatars/dr-luiz-roberto-medina.jpg";
-  if (n.includes("julio") || n.includes("sacomori") || c.includes("44830")) return "/avatars/dr-julio-sacomori.jpg?v=3";
+  if (n.includes("julio") || n.includes("sacomori") || c.includes("44830")) return "/avatars/dr-julio-sacomori-jaleco.jpg?v=20261025";
   if (n.includes("stella") || n.includes("martinelli") || c.includes("21102111")) return "/avatars/dra-stella-martinelli.jpg?v=20261022";
   if ((n.includes("victor") && n.includes("fonseca")) || n.includes("victor henrique") || c.includes("206873")) return "/avatars/dr-victor-fonseca.jpg?v=2";
   if (n.includes("otavio") || n.includes("otávio") || n.includes("bassete") || c.includes("21907")) return "/avatars/dr-otavio-bassete.jpg";

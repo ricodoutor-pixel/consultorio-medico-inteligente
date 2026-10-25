@@ -4,7 +4,7 @@
  * Protocolo: Cache-First com Network Fallback
  */
 
-const CACHE_VERSION = 'plantayraiz-v3.1';
+const CACHE_VERSION = 'plantayraiz-v3.2';
 const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.6';
 
 // Assets essenciais para cache imediato (apenas arquivos garantidamente existentes)

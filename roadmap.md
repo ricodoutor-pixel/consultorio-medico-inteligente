@@ -2,8 +2,8 @@
 
 ## Retirada autorizada de dois cards — 26/10/2026
 
-- [ ] Retirar Leuma e Ana Paula da vitrine e dos links SEO, preservando históricos e documentos
-- [ ] Validar ausência dos dois cards e dos links no sitemap
+- [x] Retirar Leuma e Ana Paula da vitrine e dos links SEO, preservando históricos e documentos
+- [x] Validar ausência dos dois cards e dos links no sitemap — navegador e dois testes passaram
 - [ ] Disponibilizar retirada no site publicado — depende de publicação autorizada
 
 ## Organização das orientações dos agentes — 20/10/2026

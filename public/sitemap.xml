@@ -553,18 +553,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://plantayraiz.com.br/profissionais/med-olivia-zimeri</loc>
-    <lastmod>2026-10-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://plantayraiz.com.br/profissionais/med-suelen-naves</loc>
-    <lastmod>2026-10-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://plantayraiz.com.br/profissionais/med-arthur-barretto</loc>
     <lastmod>2026-10-11</lastmod>
     <changefreq>weekly</changefreq>
@@ -587,5 +575,21 @@
     <lastmod>2026-10-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://plantayraiz.com.br/profissionais/med-edna-marlisia</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/profissionais/med-julio-sacomori</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/profissionais/med-veronica-silva</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

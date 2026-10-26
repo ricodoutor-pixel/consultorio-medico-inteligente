@@ -25,7 +25,6 @@ import cfmvDraRafaellaSoletti from "@/assets/cfm_prints/cfmv-dra-rafaella-solett
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draSuelenImg from "@/assets/dra-suelen-naves.jpg";
 import draMariannaImg from "@/assets/dra-marianna-arzamendia.jpg";
-import draAnaPaulaImg from "@/assets/dra-ana-paula-ferreira.jpg";
 import drJoseRobertoImg from "@/assets/dr-jose-roberto.jpg";
 import draAngelaBeatrizImg from "@/assets/dra-angela-beatriz.jpg";
 import drGustavoNobreImg from "@/assets/dr-gustavo-nobre.jpg";
@@ -702,31 +701,6 @@ export const professionals: Professional[] = [
     reviews: [],
   },
   {
-    id: "med-leuma-netta",
-    name: "Dra. Leuma Leão Netta",
-    category: "Médicos Prescritores",
-    bio: "Médica psiquiatra com mais de 9 anos de trajetória e mais de 5 mil atendimentos realizados. Sua abordagem em Medicina Canabinoide é individualizada, responsável e integrada à saúde mental do paciente, avaliando diagnóstico, histórico psiquiátrico, medicações em uso, sono, ansiedade, humor, cognição e possíveis riscos.",
-    flags: ["🇧🇷"],
-    experience: "9 anos",
-    tags: ["Psiquiatria", "Cannabis Medicinal", "Saúde Mental"],
-    price: "R$ 150,00",
-    priceValue: 150,
-    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
-    whatsapp: "5511991363154",
-    rating: 5.0,
-    consults: 0,
-    avatar: "LN",
-    imageUrl: "/avatars/dra-leuma-netta.jpg?v=3",
-    cfmPrintUrl: "/cfm_prints/cfm-leuma.png",
-    online: false,
-    crm: "85182/MG (Regular)",
-    hospital: "Planta y Raíz Ltda",
-    hospitalUrl: "https://plantayraiz.com.br",
-    services: STANDARD_DOCTOR_SERVICES,
-    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
-    reviews: [],
-  },
-  {
     id: "med-luiz-medina",
     name: "Prof. Dr. Luiz Roberto Medina dos Santos",
     category: "Médicos Prescritores",
@@ -777,31 +751,6 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Atendimento acolhedor e integrativo exemplar, aliando acupuntura e medicina canabinoide com muita clareza." }
     ],
-  },
-  {
-    id: "med-ana-paula",
-    name: "Dra. Ana Paula Ferreira Lima",
-    category: "Médicos Prescritores",
-    bio: "Médica graduada pela Universidade do Oeste Paulista (UNOESTE - Presidente Prudente, 2016), inscrita no CRM 36942/PR, com mais de 10 anos de dedicação à saúde. É fundadora da clínica virtual 'Acolhe Ela', projeto pioneiro voltado ao acolhimento médico especializado de mulheres neurodivergentes (TEA, TDAH e Altas Habilidades). Especialista na modulação do Sistema Endocanabinoide Humano, atua com destaque na aplicação de fitocanabinoides para regulação sensorial, dor crônica, fibromialgia, ansiedade e insônia. Com atendimento trilíngue (português, inglês e espanhol), combina rigor técnico a uma escuta empática e acolhedora, construindo planos terapêuticos individualizados e libertadores.",
-    flags: ["🇧🇷"],
-    experience: "10 anos",
-    tags: ["Clínica Geral", "Cannabis Medicinal", "Sistema Endocanabinoide", "Dor Crônica"],
-    price: "R$ 100,00",
-    priceValue: 100,
-    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
-    whatsapp: "5511991363154",
-    rating: 5.0,
-    consults: 0,
-    avatar: "AP",
-    imageUrl: draAnaPaulaImg,
-
-    online: false,
-    crm: "36942/PR (Regular)",
-    hospital: "Planta y Raíz Ltda",
-    hospitalUrl: "https://plantayraiz.com.br",
-    services: STANDARD_DOCTOR_SERVICES,
-    slots: ["09:00", "10:30", "14:00", "15:30", "17:00"],
-    reviews: [],
   },
   {
     id: "med-adeonis-oliveira",

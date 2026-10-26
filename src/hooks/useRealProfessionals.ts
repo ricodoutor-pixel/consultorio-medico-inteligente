@@ -6,6 +6,7 @@ import { professionals as baseProfessionals } from "@/data/professionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
+import { isPublicProfessionalVisible } from "@/lib/public-professional-visibility";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 
@@ -236,6 +237,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     for (const doc of dbDoctors) {
       if (matchedDbDoctorIds.has(doc.id)) continue;
+      if (!isPublicProfessionalVisible(doc)) continue;
       // Somente aprovados pelo Dr. Edilson
       if (doc.is_approved !== true) continue;
 
@@ -361,6 +363,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     for (const p of rawList) {
       if (!p) continue;
+      if (!isPublicProfessionalVisible(p)) continue;
       const cleanCrm = (p.crm || "").replace(/\D/g, "");
       const normName = normalizeDoctorKey(p.name);
       

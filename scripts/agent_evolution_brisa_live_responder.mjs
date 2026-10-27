@@ -4,6 +4,22 @@ import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import { BRISA_CONFIG, buildLgpdOriginReply, buildKycChecklistReply } from './brisa_onboarding_config.mjs';
+import {
+  normalizeJid,
+  checkAiPause,
+  registerHumanTakeover,
+  unpauseAi,
+  isOptOutRequested as checkOptOutSecurity,
+  registerOptOut,
+  isAutoReplyBot,
+  checkConsecutiveBrisaLimit,
+  checkSemanticRepetition,
+  sanitizeDoctorName,
+  preSendGuard,
+  isDoctorKycMedia,
+  classifyDoctorDocumentType
+} from './lib/brisa_security.mjs';
 
 dotenv.config();
 
@@ -484,6 +500,38 @@ async function textToSpeechElevenLabs(text) {
   }
 }
 
+async function logMessageToSupabase(remoteJid, messageText, direction = 'out', senderName = 'Enfermeira Brisa') {
+  try {
+    const adminSupa = await getAdminSupabase();
+    if (!adminSupa) return;
+    const norm = normalizeJid(remoteJid);
+    const jid = norm.normalizedJid || remoteJid;
+
+    await Promise.allSettled([
+      adminSupa.from('whatsapp_messages').insert({
+        remote_jid: jid,
+        sender_name: senderName,
+        message_text: messageText,
+        direction: direction,
+        status: direction === 'out' ? 'sent' : 'received',
+        from_me: direction === 'out'
+      }),
+      adminSupa.from('brisa_interaction_logs').insert({
+        channel: 'whatsapp',
+        user_ref: norm.phone ? `***${norm.phone.slice(-4)}` : jid,
+        status: 'replied',
+        meta: {
+          text: (messageText || '').slice(0, 300),
+          direction,
+          via: 'evolution_api_v2'
+        }
+      })
+    ]);
+  } catch (e) {
+    // Falha em telemetria nunca interrompe a resposta
+  }
+}
+
 // Envio de texto com blindagem contra duplicatas, presença humana digitando e persistência em memória
 async function sendWhatsApp(recipient, text) {
   const targetNumber = recipient.includes('@lid') ? recipient : recipient.replace(/\D/g, '');
@@ -496,6 +544,14 @@ async function sendWhatsApp(recipient, text) {
   if (hasRecentlySent(targetNumber, text)) {
     log(`🛡️ [ANTI-DUPLICIDADE] Mensagem idêntica já enviada para ${targetNumber} nos últimos 10 min. Cancelando envio.`);
     return null;
+  }
+
+  // 🛡️ GUARDA DE PRÉ-ENVIO (Fase 2 - S2, S3 e DRY-RUN)
+  const guard = preSendGuard(targetNumber, text);
+  if (!guard.canSend) {
+    log(`🛡️ ${guard.log}`);
+    await logMessageToSupabase(targetNumber, text, 'out', 'Enfermeira Brisa [Dry-Run]');
+    return { dryRun: true, status: 'blocked', reason: guard.reason };
   }
 
   // ✍️ Simula digitação humana antes de enviar (pontinhos digitando...)
@@ -528,6 +584,7 @@ async function sendWhatsApp(recipient, text) {
   const result = await res.json();
   log(`✅ Mensagem enviada com sucesso para ${targetNumber}`);
   addMessageToMemory(recipient, 'brisa', text);
+  await logMessageToSupabase(targetNumber, text, 'out', 'Enfermeira Brisa');
   return result;
 }
 
@@ -890,6 +947,16 @@ function classifyAudience(jid, senderName, text) {
 function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
   const q = question.toLowerCase();
 
+  // 1. Origem do contato (Resposta Oficial LGPD aprovada pelo Dr. Edilson)
+  if (/(como|onde)\s+(achou|conseguiu|obteve|pegou|descobriu|encontrou)\s+(meu|o\s+meu)?\s*(contato|numero|telefone|whatsapp)|de\s+onde\s+(e|eh|vem)\s+esse\s+contato/i.test(q)) {
+    return buildLgpdOriginReply(senderName);
+  }
+
+  // 2. Prazo oficial e início de atendimentos (Diretriz Oficial: "Em até 24 a 48 horas úteis")
+  if (q.includes('quando posso atender') || q.includes('quando começo') || q.includes('quando comeco') || q.includes('quanto tempo demora') || q.includes('prazo de aprova') || q.includes('prazo para aprova') || q.includes('libera a agenda') || q.includes('quando posso começar')) {
+    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nO prazo oficial da nossa diretoria técnica para conferência dos seus documentos e ativação completa do seu consultório virtual na vitrine é de *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}*!\n\nAssim que recebemos os 4 documentos obrigatórios:\n1️⃣ Foto do documento profissional (CRM ativo)\n2️⃣ Comprovante de endereço/residência recente\n3️⃣ Cópia do Diploma de Medicina ou Certificado de Especialidade/RQE\n4️⃣ Chave PIX vinculada ao titular para liquidação instantânea\n\nNossa auditoria homologa o perfil e você já começa a receber pacientes na vitrine! Pode enviar qualquer documento pendente por aqui mesmo! 🙏✨`;
+  }
+
   // Agradecimento educado (NUNCA disparar SAMU para médicos)
   if (q.includes('obrigad') || q.includes('valeu') || q.includes('agradeco') || q.includes('agradeço') || q.includes('combinado') || q.includes('perfeito')) {
     return `Por nada, Dr(a). ${senderName}! Fico à sua total disposição para acompanhar seu credenciamento e liberar sua agenda de atendimentos. Conte comigo e com toda a diretoria técnica da Planta y Raíz! 🙏🌿🩺`;
@@ -934,9 +1001,9 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
     return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\n*O que é a Orientação Técnica (R$ 30)?*\n\n• É uma modalidade de *triagem e educação em saúde* criada pela plataforma para separar pacientes realmente interessados dos curiosos e educar o paciente sobre sua necessidade/patologia *antes da consulta real* com o médico prescritor.\n• É conduzida integralmente por uma *inteligência artificial supervisionada em tempo real* pela diretoria técnica da plataforma.\n• A IA *não prescreve nem indica medicamentos*; ela encaminha o paciente ao médico da vitrine mais indicado para o caso, com relatório estruturado.\n• Os médicos *NÃO oferecem nem cobram* Orientação Técnica: ela aparece no card apenas como porta de entrada. O senhor(a) recebe pacientes já triados e educados para a consulta (*Chat R$ 100 / Vídeo R$ 150*).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
   }
 
-  // Dúvidas sobre valores, repasse e honorários médicos
+  // Dúvidas sobre valores, repasse e honorários médicos (Política Oficial Dr. Edilson)
   if (q.includes('quanto') || q.includes('valor') || q.includes('repass') || q.includes('porcentagem') || q.includes('pix') || q.includes('honorário') || q.includes('ganho') || q.includes('plano vip')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nNossa estrutura de valores e repasses para médicos prescritores é 100% transparente:\n\n• *Plano Médico VIP (R$ 99/mês)*: Você recebe *100% do valor da consulta* (taxa zero da plataforma), com selo de verificação oficial e destaque na vitrine!\n• *Modelo Padrão Avulso*: Repasse de *93% líquido* por consulta, transferido instantaneamente via PIX ao término de cada atendimento avaliado pelo paciente!\n\nValores das modalidades:\n• *Consulta Médica por Chat*: R$ 100\n• *Teleconsulta por Vídeo HD*: R$ 150\n• *Renovação de Protocolo*: R$ 90\n\nA *Orientação Técnica (R$ 30)* não é oferecida nem cobrada pelo médico: é a porta de entrada da plataforma (IA de triagem supervisionada em tempo real) que entrega pacientes já triados e educados para a sua consulta.\n\nVocê define livremente sua própria disponibilidade de agenda.`;
+    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nNossa política comercial e modelo de monetização médica são 100% transparentes e pensados para valorizar a autonomia do prescritor:\n\n• 🎁 *Proposta de Entrada (Oferta Gancho VIP)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}\n• ⚡ *Regra Operacional Padrão*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}\n• 🛡️ *Prontuário & Prescrição*: Sistema próprio em total conformidade CFM/Anvisa com assinatura digital ICP-Brasil e gov.br.\n\nValores das modalidades de consulta:\n• *Consulta Médica por Chat*: R$ 100\n• *Teleconsulta por Vídeo HD*: R$ 150\n• *Renovação de Protocolo*: R$ 90\n\nA *Orientação Técnica (R$ 30)* é a porta de entrada da plataforma, onde nossa triagem prepara o paciente e o entrega pronto para a sua teleconsulta.\n\nVocê tem total liberdade para definir seus horários de atendimento na agenda!`;
   }
 
   // Dúvidas sobre distribuição de pacientes, escolha do paciente, modelo estilo Uber
@@ -1324,25 +1391,21 @@ async function loop() {
             const msgsData = await msgsRes.json().catch(() => ({}));
             const messages = msgsData?.messages?.records || msgsData?.records || (Array.isArray(msgsData) ? msgsData : []);
 
-            // 🛡️ DETECÇÃO DE INTERVENÇÃO HUMANA / COMANDO DE PAUSA DO OPERADOR:
+            // 🛡️ DETECÇÃO DE INTERVENÇÃO HUMANA / ASSUMIU HUMANO (Fase 2 - S2):
+            // Toda mensagem enviada pela equipe pelo celular ou WhatsApp Web (fromMe sem ser a Brisa)
+            // pausa a IA nesta conversa por 24 horas para evitar respostas concorrentes.
             let recipientClean = jid.includes('@lid') ? jid : jid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
             for (const msg of messages) {
               if (msg.key?.fromMe) {
                 const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || '').trim();
                 if (!text) continue;
 
-                // Se o Dr. Edilson enviou "pausa", "pausar", "pare", "stop", etc. dentro do próprio chat (com limite de palavra)
                 const mem = getContactMemory(jid);
-                const isBrisaSent = (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || text.includes('Enfermeira Brisa') || text.includes('Planta y Raíz');
-                const isShortOperatorCommand = text.length <= 40;
-                if (!isBrisaSent && isShortOperatorCommand && /^\s*(pausa|pausar|pare|parar|stop|silenciar|modo\s+humano)[\s.!,]*$/i.test(text)) {
-                  if (recipientClean && !humanLocked.has(recipientClean)) {
-                    humanLocked.add(recipientClean);
-                    const digits = recipientClean.replace(/\D/g, '');
-                    if (digits.length >= 8) humanLocked.add(digits);
-                    saveHumanLocked(humanLocked);
-                    log(`🛑 [PAUSA NO CHAT DETECTADA] Operador digitou "${text}" no chat ${recipientClean}. Modo Humano ativado imediatamente!`);
-                  }
+                const isBrisaSent = (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || text.includes('Enfermeira Brisa');
+                
+                if (!isBrisaSent) {
+                  registerHumanTakeover(jid, true, false);
+                  log(`🛑 [ASSUMIU HUMANO 24H] Mensagem humana enviada pela equipe no chat ${recipientClean}. IA silenciada por 24h.`);
                 }
               }
             }
@@ -1536,33 +1599,27 @@ async function loop() {
             }
 
             // 🛑 VERIFICAÇÃO 1: Contato já está na trava de atendimento humano ou na blacklist permanente?
+            const pauseCheck = checkAiPause(recipient);
             const blacklist = loadBlacklist();
-            if (humanLocked.has(recipient) || blacklist.has(recipient)) {
-              log(`🛑 [TRAVA/BLACKLIST ATIVA] Contato ${senderName} (${recipient}) está em modo humano ou blacklist. IA em silêncio absoluto.`);
+            if (pauseCheck.paused || blacklist.has(recipient)) {
+              log(`🛑 [TRAVA/BLACKLIST ATIVA] Contato ${senderName} (${recipient}) está em modo humano (${pauseCheck.reason || 'pausado'}) ou blacklist. IA em silêncio absoluto.`);
               continue;
             }
 
-            // 🛑 VERIFICAÇÃO 2: Solicitou opt-out / cancelamento / "não tenho interesse"?
-            if (isOptOutRequested(combinedText)) {
-              blacklist.add(recipient);
-              humanLocked.add(recipient);
-              const cleanRec = recipient.replace(/\D/g, '');
-              if (cleanRec.length >= 8) {
-                blacklist.add(cleanRec);
-                humanLocked.add(cleanRec);
-              }
-              saveBlacklist(blacklist);
-              saveHumanLocked(humanLocked);
-              log(`🛑 [OPT-OUT REGISTRADO] ${senderName} (${recipient}) pediu cancelamento ("não tenho interesse"). IA silenciada e contato inserido na blacklist permanente!`);
+            // 🛑 VERIFICAÇÃO 2: Solicitou opt-out / cancelamento / "não quero" (Fase 2 - S3)?
+            if (checkOptOutSecurity(combinedText)) {
+              const res = registerOptOut(recipient, combinedText);
+              log(`🛑 [OPT-OUT REGISTRADO] ${senderName} (${recipient}) pediu cancelamento ("${combinedText}"). IA silenciada e contato inserido na blacklist permanente!`);
 
               try {
-                await sendWhatsApp(recipient, `Entendido, Dr(a). Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção e desejamos muito sucesso! 🙏🌿`);
+                // Envia UMA ÚNICA confirmação e nunca mais entra em contato
+                await sendWhatsApp(recipient, res.confirmationReply);
               } catch (e) {
                 log(`Erro envio confirmação opt-out: ${e.message}`);
               }
 
               try {
-                const alertMsg = `🔔 *[Opt-Out Confirmado]*\n\nO contato *${senderName}* (${recipient}) recusou contato:\n"${combinedText}"\n\n🛑 Inserido na blacklist permanente e IA silenciada.`;
+                const alertMsg = `🔔 *[Opt-Out Confirmado]*\n\nO contato *${senderName}* (${recipient}) recusou contato:\n"${combinedText}"\n\n🛑 Inserido na blacklist permanente e IA silenciada definitivamente.`;
                 await sendWhatsApp(ADMIN_PHONE, alertMsg);
               } catch (e) {
                 log(`Aviso admin opt-out: ${e.message}`);
@@ -1622,9 +1679,17 @@ async function loop() {
               continue;
             }
 
-            // 🛑 VERIFICAÇÃO 3: Filtro de resposta automática de consultório / auto-reply
-            if (isAutoReply(combinedText)) {
-              log(`🤖 Mensagem automática identificada de ${senderName} (${recipient}). Silenciando IA para evitar loop.`);
+            // 🛑 VERIFICAÇÃO 3: Filtro de resposta automática de consultório / auto-reply (Fase 2 - S4)
+            if (isAutoReplyBot(combinedText, recipient)) {
+              log(`🤖 [ANTI-ROBÔ] Mensagem automática identificada de ${senderName} (${recipient}). Silenciando IA para evitar loop infinito.`);
+              continue;
+            }
+
+            // 🛑 VERIFICAÇÃO 3.1: Limite duro de 2 mensagens da Brisa seguidas sem resposta humana
+            const recentHistory = (getContactMemory(recipient)?.messages || []).map(m => ({ fromMe: m.role === 'brisa' }));
+            const limitCheck = checkConsecutiveBrisaLimit(recentHistory);
+            if (!limitCheck.allowed) {
+              log(`🛑 [LIMITE 2 MSGS BRISA] Contato ${senderName} (${recipient}) já recebeu ${limitCheck.count} mensagens seguidas da Brisa sem resposta de pessoa. Silenciando IA.`);
               continue;
             }
 
@@ -1639,13 +1704,9 @@ async function loop() {
                 await ingestIncomingDoc(docMsg, recipient, senderName);
               }
 
-              const cleanName = cleanDoctorName(senderName);
-              const isFemale = /\b(dra|doutora|edna|veronica|verônica|mariana|geovana|barbara|bárbara|stella|camyla|leticia|letícia|patricia|patrícia|ana|carolina|fernanda|juliana|camila|paula)\b/i.test(cleanName);
-              const prefix = isFemale ? 'Dra.' : 'Dr.';
-              const formattedName = cleanName.startsWith('Dr') ? cleanName : `${prefix} ${cleanName}`;
-
-              // Responde UMA ÚNICA VEZ confirmando o recebimento do lote
-              const docReply = `Olá, ${formattedName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nRecebemos seu(s) documento(s) com total segurança! Nosso sistema já recolheu o arquivo e anexou diretamente ao seu cadastro KYC para conferência da nossa diretoria técnica e liberação da sua agenda de teleconsultas.\n\nPode enviar qualquer outro documento faltante diretamente por aqui pelo WhatsApp que nós recolhemos e colocamos no seu cadastro! 🙏✨`;
+              const cleanName = sanitizeDoctorName(senderName);
+              // Responde UMA ÚNICA VEZ confirmando o recebimento do lote com o Checklist Oficial de 4 Documentos e prazo oficial
+              const docReply = buildKycChecklistReply(cleanName, ['crm']);
               await sendWhatsApp(recipient, docReply);
               lastRepliedAt.set(recipient, Date.now());
               continue;
@@ -1718,12 +1779,23 @@ async function loop() {
 
             // 💬 SE FOR TEXTO: PROCESSAMENTO COGNITIVO COM MEMÓRIA E ANTI-REPETIÇÃO
             if (combinedText.trim().length > 0) {
-              const audience = classifyAudience(recipient, senderName, combinedText);
-              log(`🎯 Público classificado para ${senderName} (${recipient}): [${audience.role.toUpperCase()}]`);
+              const cleanSenderName = sanitizeDoctorName(senderName);
+              const audience = classifyAudience(recipient, cleanSenderName, combinedText);
+              log(`🎯 Público classificado para ${cleanSenderName} (${recipient}): [${audience.role.toUpperCase()}]`);
 
               addMessageToMemory(recipient, 'user', combinedText, audience.role);
 
-              let reply = await askBrisaGemini(combinedText, audience.name || senderName, audience, recipient);
+              let reply = await askBrisaGemini(combinedText, audience.name || cleanSenderName, audience, recipient);
+              if (!reply) {
+                log(`ℹ️ Nenhuma resposta gerada para ${recipient}.`);
+                continue;
+              }
+
+              // 🛡️ ANTI-REPETIÇÃO (Fase 2 - S5): Compara com as últimas respostas enviadas
+              if (checkSemanticRepetition(reply, recipient)) {
+                log(`🛡️ [ANTI-REPETIÇÃO] A resposta proposta já foi enviada recentemente para ${recipient}. Silenciando envio repetido.`);
+                continue;
+              }
               
               // Se tiver ElevenLabs configurado e a resposta for concisa (< 250 chars), envia áudio, senão texto
               const audioBase64 = await textToSpeechElevenLabs(reply);

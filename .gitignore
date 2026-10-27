@@ -89,5 +89,9 @@ scripts/*.json
 scripts/*.mjs
 !scripts/agent_brevo_doctor_whatsapp_inviter.mjs
 !scripts/agent_evolution_brisa_live_responder.mjs
+!scripts/agent_doctor_kyc_compliance.mjs
+!scripts/brisa_onboarding_config.mjs
+!scripts/lib/**
+!scripts/test/**
 scripts/*.cjs
 scripts/*.sh

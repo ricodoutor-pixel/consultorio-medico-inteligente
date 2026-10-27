@@ -5,6 +5,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { BRISA_CONFIG, buildOfficialInvitationMessage } from './brisa_onboarding_config.mjs';
+import { preSendGuard, normalizeJid, sanitizeDoctorName } from './lib/brisa_security.mjs';
 
 dotenv.config();
 
@@ -200,27 +202,21 @@ function isExcludedAudience(name = '', email = '', specialty = '') {
 }
 
 function buildInvitationMessage(doctorName) {
-  const cleanName = cleanDoctorName(doctorName);
-  return `Olá, Dr(a). ${cleanName}! Tudo bem? 🌿🩺
-
-Aqui é a Enfermeira Brisa, coordenadora de credenciamento clínico da Planta y Raíz (https://www.plantayraiz.com.br).
-
-Gostaria de estender um convite especial para integrar nosso corpo de médicos prescritores parceiros de cannabis medicinal:
-
-• 💰 *Repasse Integral (Plano VIP)*: 100% do valor da sua teleconsulta (taxa zero da plataforma) e repasse instantâneo via PIX!
-• 🛡️ *Segurança Jurídica Total*: Prontuário eletrônico em conformidade com o CFM e ANVISA (RDCs 660 e 327) com assinatura ICP-Brasil / Gov.br nativa.
-• 🩺 *Demanda Ativa de Pacientes*: Pacientes direcionados por triagem clínica e perfil público na nossa vitrine.
-• 🏪 *Farmácia Digital Integrada*: Facilidade de acesso aos fitocanabinoides prescritos para os seus pacientes.
-
-Gostaria de ativar seu cadastro gratuito e liberar seu consultório digital ainda hoje?
-
-👉 *Link direto para credenciamento*: https://www.plantayraiz.com.br/cadastro-profissional
-
-Se preferir, pode me responder por aqui mesmo no WhatsApp que eu mesma oriento e auxilio o doutor(a) em cada etapa! 🙏✨`;
+  const cleanName = sanitizeDoctorName(doctorName);
+  return buildOfficialInvitationMessage(cleanName);
 }
 
 async function sendWhatsApp(recipient, text) {
-  const cleanNumber = recipient.replace(/\D/g, '');
+  const norm = normalizeJid(recipient);
+  const cleanNumber = norm.phone || recipient.replace(/\D/g, '');
+
+  // 🛡️ GUARDA DE PRÉ-ENVIO (Fase 2 - S2, S3 e DRY-RUN)
+  const guard = preSendGuard(norm.normalizedJid, text);
+  if (!guard.canSend) {
+    log(`🛡️ ${guard.log}`);
+    return { dryRun: true, status: 'blocked', reason: guard.reason };
+  }
+
   log(`Enviando convite para ${cleanNumber}...`);
   const res = await fetch(`${EVO_URL}/message/sendText/${INSTANCE}`, {
     method: 'POST',

@@ -123,11 +123,12 @@ Como você está se sentindo hoje? Se preferir, me conte um pouco sobre sua quei
 
 Somos um ecossistema completo desenvolvido para médicos e profissionais prescritores:
 🩺 *Consultório Virtual Inteligente:* Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022).
-💰 *Split Automático 93/7:* Repasse de 93% líquido direto na sua conta bancária a cada consulta via Mercado Pago.
+💰 *Política de Repasse Oficial:* 100% de repasse no primeiro mês (Plano VIP sem taxa) e 93% líquido padrão via PIX Instantâneo.
 📄 *Prescrição Eletrônica RDC 327/660:* Acesso a catálogo de produtos regulamentados com entrega em todo o Brasil.
+⏳ *Homologação Rápida:* Ativação do consultório e vitrine em até 24 a 48 horas úteis após conferência dos 4 documentos (CRM, Residência, Diploma/RQE e Chave PIX).
 🎓 *Mentoria Técnica:* Suporte clínico e discussão de casos complexos com o Dr. Edilson Bezerra.
 
-👉 Conheça nossa estrutura e faça seu credenciamento:
+👉 Conheça nossa estrutura e faça seu credenciamento gratuito:
 🔗 https://plantayraiz.com.br/cadastro-profissional
 🔗 https://plantayraiz.com.br/profissionais
 

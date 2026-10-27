@@ -7,6 +7,7 @@ import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
 import { isPublicProfessionalVisible } from "@/lib/public-professional-visibility";
+import drAmirHayelAliImg from "@/assets/dr-amir-hayel-ali.png";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 
@@ -45,6 +46,7 @@ interface DoctorRow {
 export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: string | null): string {
   const n = (name || "").toLowerCase();
   const c = (crm || "").toLowerCase();
+  if (n.includes("amir hayel") || /^(38430|57711)(?:\D|$)/.test(c)) return drAmirHayelAliImg;
 
   // 1. Prioridade ABSOLUTA para os 18 médicos oficiais com foto tratada (jaleco + esteto + fundo branco)
   if (n.includes("edilson") || c.includes("10963")) return "/avatars/dr-edilson-bezerra.jpg";

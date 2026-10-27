@@ -1,4 +1,6 @@
 import draMarianaAlvesImg from "@/assets/dra-mariana-alves.jpg";
+import drAmirHayelAliImg from "@/assets/dr-amir-hayel-ali.png";
+import cfmDrAmirHayelAli from "@/assets/cfm-dr-amir-hayel-ali.png.asset.json";
 import cfmMarianaAlves from "@/assets/cfm_prints/cfm-dra-mariana-alves.png";
 import drVictorFonsecaImg from "@/assets/dr-victor-fonseca.jpg";
 import cfmDrVictorFonseca from "@/assets/cfm_prints/cfm-dr-victor-fonseca.png";
@@ -52,7 +54,7 @@ export type Professional = {
   price: string;
   priceValue: number;
   whatsapp: string;
-  rating: number;
+  rating: number | null;
   consults: number;
   avatar: string;
   imageUrl: string;
@@ -246,6 +248,31 @@ export const STANDARD_DOCTOR_SERVICES = [
 ];
 
 export const professionals: Professional[] = [
+  {
+    id: "med-amir-hayel-ali",
+    dbId: "933411e3-75b1-4dd6-96a0-9bcb2614829d",
+    name: "Dr. Amir Hayel Ali",
+    category: "Médicos Prescritores",
+    councilLabel: "CRM",
+    bio: "Médico graduado pela Universidad Sudamericana, Facultad de Ciencias de la Salud, em 2024, com diploma revalidado pelo Centro Universitário UNIRG. Inscrições regulares no CRM 38430/SC e CRM 57711/PR, conforme consulta ao CFM apresentada. Médico sem especialidade registrada no CFM.",
+    experience: "Formado em 2024",
+    tags: ["Clínica Geral", "CRM regular", "Diploma revalidado"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "",
+    rating: null,
+    consults: 0,
+    avatar: "AA",
+    imageUrl: drAmirHayelAliImg,
+    cfmPrintUrl: cfmDrAmirHayelAli.url,
+    online: false,
+    crm: "38430/SC • 57711/PR",
+    flags: ["🇧🇷"],
+    paymentLink: "",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: [],
+    reviews: [],
+  },
   {
     id: "med-victor-fonseca",
     name: "Dr. Victor Henrique Bueno da Fonseca",

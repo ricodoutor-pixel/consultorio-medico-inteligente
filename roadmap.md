@@ -1,5 +1,12 @@
 # Roadmap
 
+## Card autorizado do Dr. Amir — 27/10/2026
+
+- [x] Preparar foto com fundo branco, jaleco e estetoscópio preservando os pixels originais do rosto
+- [x] Criar card vinculado ao cadastro real e comprovante CFM, sem alterar aprovação KYC ou presença online
+- [x] Verificar card e foto na vitrine — navegador e quatro testes passaram
+- [ ] Disponibilizar o novo card no site publicado — depende de publicação autorizada
+
 ## Retirada autorizada de dois cards — 26/10/2026
 
 - [x] Retirar Leuma e Ana Paula da vitrine e dos links SEO, preservando históricos e documentos

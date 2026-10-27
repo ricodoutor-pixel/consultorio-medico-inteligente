@@ -766,7 +766,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 0,
     avatar: "JS",
-    imageUrl: "/avatars/dr-julio-sacomori-jaleco.jpg?v=20261025",
+    imageUrl: "/avatars/dr-julio-sacomori-jaleco.jpg?v=20261027v4",
     cfmPrintUrl: "/cfm_prints/cfm-dr-julio-sacomori.png",
     online: true,
     crm: "44830/RS (Regular) RQE: 45303",

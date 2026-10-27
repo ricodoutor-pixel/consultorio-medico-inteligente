@@ -211,13 +211,13 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
         <div className="lg:col-span-1">
           <Card className="border-border sticky top-24">
             <CardContent className="p-6">
-              <div className="relative">
+              <div className="relative w-20 h-20 mb-4">
                 {pro.imageUrl ? (
                   <>
                     <img
                       src={pro.imageUrl}
                       alt={`Foto profissional - ${pro.name}`}
-                      className={`w-20 h-20 rounded-2xl object-cover ${pro.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border border-border mb-4`}
+                      className={`w-20 h-20 rounded-2xl object-cover ${pro.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border border-border`}
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
@@ -226,12 +226,12 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
                         if (fallback) fallback.style.display = 'flex';
                       }}
                     />
-                    <div style={{ display: 'none' }} className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary items-center justify-center font-black text-xl">
+                    <div style={{ display: 'none' }} className="w-20 h-20 rounded-2xl border border-border bg-primary/10 text-primary items-center justify-center font-black text-xl">
                       {pro.avatar}
                     </div>
                   </>
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary flex items-center justify-center font-black text-xl">
+                  <div className="w-20 h-20 rounded-2xl border border-border bg-primary/10 text-primary flex items-center justify-center font-black text-xl">
                     {pro.avatar}
                   </div>
                 )}

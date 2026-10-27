@@ -93,7 +93,7 @@ export const RodizioMedicos = () => {
                   <CardContent className="p-8">
                     <div className="relative w-32 h-32 mx-auto mb-6">
                       <img 
-                        src={currentDoctor.imageUrl} 
+                        src={currentDoctor.imageUrl || "/placeholder.svg"} 
                         alt={currentDoctor.name} 
                         className="w-full h-full object-cover rounded-3xl border-4 border-background shadow-xl"
                       />
@@ -142,7 +142,7 @@ export const RodizioMedicos = () => {
           <div className="mt-12 grid grid-cols-3 gap-4 opacity-50 grayscale">
             {onlineDoctors.slice(0, 3).map(doc => (
               <div key={doc.id} className="flex flex-col items-center">
-                <img src={doc.imageUrl} className="w-12 h-12 rounded-full mb-2" />
+                <img src={doc.imageUrl || "/placeholder.svg"} className="w-12 h-12 rounded-full mb-2" />
                 <p className="text-[10px] font-bold truncate w-full">{doc.name}</p>
               </div>
             ))}

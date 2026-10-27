@@ -673,7 +673,11 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                       {recommendedPros.map(pro => (
                         <div key={pro.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border">
                           <div className="flex items-center gap-3">
-                            <img src={pro.imageUrl} alt={pro.name} className="w-10 h-10 rounded-xl object-cover border border-border" />
+                            {pro.imageUrl ? (
+                              <img src={pro.imageUrl} alt={pro.name} className="w-10 h-10 rounded-xl object-cover border border-border" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-xl border border-border bg-primary/10 text-primary flex items-center justify-center font-black text-xs">{pro.avatar}</div>
+                            )}
                             <div>
                               <p className="text-sm font-bold text-foreground">{pro.name}</p>
                               <p className="text-xs text-muted-foreground">{pro.tags.join(" • ")}</p>

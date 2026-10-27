@@ -154,7 +154,11 @@ const FalarComEspecialista = () => {
             <div className="lg:col-span-1">
               <Card className="border-border sticky top-24">
                 <CardContent className="p-5">
-                  <img src={pro.imageUrl} alt={`Ilustração - ${pro.name}`} className="w-16 h-16 rounded-2xl object-cover border border-border mb-3" />
+                  {pro.imageUrl ? (
+                    <img src={pro.imageUrl} alt={`Ilustração - ${pro.name}`} className="w-16 h-16 rounded-2xl object-cover border border-border mb-3" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl border border-border bg-primary/10 text-primary flex items-center justify-center font-black mb-3">{pro.avatar}</div>
+                  )}
                   <h2 className="font-display font-black text-foreground">{pro.name}</h2>
                   <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
                   <div className="flex items-center gap-2 mb-3">

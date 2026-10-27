@@ -42,15 +42,29 @@ function loadBlacklist() {
   return new Set();
 }
 
-// 🕒 JANELA DE ENVIO: Todos os dias das 08:00 às 22:00 (Horário de Brasília)
+// 🕒 JANELA DE ENVIO: Todos os dias das 08:00 às 23:00 (Horário de Brasília) ou override via FORCE_OUTREACH_ACTIVE
 function isWithinBusinessHours() {
+  if (process.env.FORCE_OUTREACH_ACTIVE === 'true') return true;
   const now = new Date();
   const spDateStr = now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' });
   const spDate = new Date(spDateStr);
   const hour = spDate.getHours();
 
-  if (hour < 8 || hour >= 22) return false;
+  if (hour < 8 || hour >= 23) return false;
   return true;
+}
+
+async function checkInstanceStatus() {
+  try {
+    const res = await fetch(`${EVO_URL}/instance/connectionState/${INSTANCE}`, {
+      headers: { 'apikey': EVO_KEY }
+    });
+    if (!res.ok) return 'error';
+    const data = await res.json();
+    return data?.instance?.state || data?.state || 'close';
+  } catch (e) {
+    return 'network_error';
+  }
 }
 
 // ⏱️ INTERVALO DE 15 MINUTOS POR MENSAGEM (conforme solicitado pelo Dr. Edilson)
@@ -165,16 +179,16 @@ function cleanDoctorName(name) {
 function isExcludedAudience(name = '', email = '', specialty = '') {
   const combined = `${name} ${email} ${specialty}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // 1. Veterinários (M.V., CRMV, pet, cão, cao, animal, etc.)
-  if (/\b(m\.?v\.?|crmv|vet|veterinari[oa]|pet|cao|caes|gato|gatos|animal|animais)\b/i.test(combined)) {
+  // 1. Veterinários (M.V., CRMV, pet, cão, animal, etc.)
+  if (/(veterin|crmv|\bvet\b|animal|petshop|\bpet\b)/i.test(combined)) {
     return { excluded: true, reason: 'veterinario' };
   }
-  // 2. Dentistas (CRO, odonto, etc.)
-  if (/\b(cro|odonto|odontologi[oa]|dentist[ao])\b/i.test(combined)) {
+  // 2. Dentistas (CRO, odonto, ortodontista, etc.)
+  if (/(odont|dentist|\bcro\b|ortodont|implantodont)/i.test(combined)) {
     return { excluded: true, reason: 'dentista' };
   }
   // 3. Psicólogos (CRP, psicologo, etc.)
-  if (/\b(crp|psicolog[ao]|psicoterap)\b/i.test(combined)) {
+  if (/(psicolog|psicoterap|\bcrp\b)/i.test(combined)) {
     return { excluded: true, reason: 'psicologo' };
   }
   // 4. Empresas / Clínicas / Consultórios / Nomes genéricos
@@ -303,6 +317,14 @@ async function run() {
         continue;
       }
 
+      // 0.1 VERIFICAÇÃO DE CONEXÃO EVOLUTION API
+      const connState = await checkInstanceStatus();
+      if (connState !== 'open') {
+        log(`⚠️ [EVOLUTION DESCONECTADO] Status da instância '${INSTANCE}': ${connState}. Aguardando conexão aberta...`);
+        await new Promise(r => setTimeout(r, 15000));
+        continue;
+      }
+
       // 1. Pausa global pelo Admin?
       if (isGlobalPauseActive()) {
         log(`🛑 [PAUSA ATIVA] Automação pausada globalmente pelo Admin via PAUSE_AUTOMATION.flag. Aguardando 15s...`);
@@ -414,15 +436,21 @@ async function run() {
         sentSuccessfully = true;
 
       } catch (sendErr) {
-        log(`❌ Falha no envio para ${candidateFound.phone}: ${sendErr.message}`);
-        state.invitedPhones[candidateFound.phone] = {
-          name: candidateFound.name,
-          email: candidateFound.email,
-          failed: true,
-          error: sendErr.message,
-          attempted_at: new Date().toISOString()
-        };
-        saveState(state);
+        const isConnErr = sendErr.message.includes('Connection Closed') || sendErr.message.includes('500') || sendErr.message.includes('ECONNREFUSED');
+        if (isConnErr) {
+          log(`⚠️ [EVOLUTION INSTABILIDADE] Conexão caiu durante envio para ${candidateFound.phone}: ${sendErr.message}. Contato NÃO descartado. Aguardando 30s...`);
+          await new Promise(r => setTimeout(r, 30000));
+        } else {
+          log(`❌ Falha no envio para ${candidateFound.phone}: ${sendErr.message}`);
+          state.invitedPhones[candidateFound.phone] = {
+            name: candidateFound.name,
+            email: candidateFound.email,
+            failed: true,
+            error: sendErr.message,
+            attempted_at: new Date().toISOString()
+          };
+          saveState(state);
+        }
       }
 
       if (sentSuccessfully) {

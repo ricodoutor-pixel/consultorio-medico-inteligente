@@ -1,5 +1,4 @@
 import draMarianaAlvesImg from "@/assets/dra-mariana-alves.jpg";
-import drAmirHayelAliImg from "@/assets/dr-amir-hayel-ali.png";
 import cfmDrAmirHayelAli from "@/assets/cfm-dr-amir-hayel-ali.png.asset.json";
 import cfmMarianaAlves from "@/assets/cfm_prints/cfm-dra-mariana-alves.png";
 import drVictorFonsecaImg from "@/assets/dr-victor-fonseca.jpg";
@@ -263,7 +262,7 @@ export const professionals: Professional[] = [
     rating: null,
     consults: 0,
     avatar: "AA",
-    imageUrl: drAmirHayelAliImg,
+    imageUrl: "",
     cfmPrintUrl: cfmDrAmirHayelAli.url,
     online: false,
     crm: "38430/SC • 57711/PR",

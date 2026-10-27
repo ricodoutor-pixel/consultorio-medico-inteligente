@@ -14,4 +14,9 @@ describe("Dr. Amir verified public profile", () => {
     expect(doctor?.slots).toEqual([]);
     expect(doctor?.reviews).toEqual([]);
   });
+  it("stays without a portrait until the official photo is supplied", () => {
+    const doctor = professionals.find((p) => p.id === "med-amir-hayel-ali");
+    expect(doctor?.imageUrl).toBe("");
+    expect(doctor?.avatar).toBe("AA");
+  });
 });

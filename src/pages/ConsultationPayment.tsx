@@ -243,7 +243,7 @@ const ConsultationPayment = () => {
   }
 
   const proView = {
-    imageUrl: pro?.imageUrl ?? "/placeholder.svg",
+    imageUrl: pro?.imageUrl || "/placeholder.svg",
     name: pro?.name ?? "Farmácia Dispensary Planta y Raíz",
     category: pro?.category ?? "Pedido de medicamento prescrito",
     price: pro?.price ?? `R$ ${basePrice.toFixed(2).replace(".", ",")}`,

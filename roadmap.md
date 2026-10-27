@@ -1,10 +1,11 @@
 # Roadmap
 
-## Card autorizado do Dr. Amir — 27/10/2026
+## Card do Dr. Amir sem foto — 27/10/2026
 
-- [x] Preparar foto com fundo branco, jaleco e estetoscópio preservando os pixels originais do rosto
 - [x] Criar card vinculado ao cadastro real e comprovante CFM, sem alterar aprovação KYC ou presença online
-- [x] Verificar card e foto na vitrine — navegador e quatro testes passaram
+- [x] Retirar a foto gerada e deixar o card sem imagem, com as iniciais, até chegar a foto feita por outra agente
+- [x] Incluir o card nos links enviados ao Google e limpar endereços antigos (med-0, mock-olivia, mock-suelen)
+- [ ] Anexar a foto oficial quando chegar e reexibir o card com imagem
 - [ ] Disponibilizar o novo card no site publicado — depende de publicação autorizada
 
 ## Retirada autorizada de dois cards — 26/10/2026

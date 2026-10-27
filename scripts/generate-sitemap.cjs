@@ -102,19 +102,20 @@ const urls = [
   { loc: "/profissionais/med-luiz-medina", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-adeonis-oliveira", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-alexandre-stramandinoli", priority: "0.9", changefreq: "weekly" },
-  { loc: "/profissionais/med-0", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-guilherme-campos", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-gustavo-simoes", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-jose-roberto", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-angela-beatriz", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-ingrid-chiullo", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-marianna", priority: "0.9", changefreq: "weekly" },
-  { loc: "/profissionais/mock-olivia", priority: "0.9", changefreq: "weekly" },
-  { loc: "/profissionais/mock-suelen", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-arthur-barretto", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-rafaella-soletti", priority: "0.9", changefreq: "weekly" },
   { loc: "/profissionais/med-otavio-bassete", priority: "0.9", changefreq: "weekly" },
-  { loc: "/profissionais/med-eduardo-correa", priority: "0.9", changefreq: "weekly" }
+  { loc: "/profissionais/med-eduardo-correa", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-amir-hayel-ali", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-edna-marlisia", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-julio-sacomori", priority: "0.9", changefreq: "weekly" },
+  { loc: "/profissionais/med-veronica-silva", priority: "0.9", changefreq: "weekly" }
 ];
 
 const today = new Date().toISOString().split('T')[0];

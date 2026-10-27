@@ -779,7 +779,6 @@ export const professionals: Professional[] = [
     ],
   },
   {
-  {
     id: "med-amir-ali",
     dbId: "933411e3-75b1-4dd6-96a0-9bcb2614829d",
     name: "Dr. Amir Hayel Ali",

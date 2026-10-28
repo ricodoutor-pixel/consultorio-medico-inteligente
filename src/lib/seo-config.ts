@@ -22,7 +22,7 @@ export const routeSEOMap: Record<string, PageSEO> = {
     title: `Cannabis Medicinal a partir de R$30 | ${BRAND}`,
     description:
       "Comece seu tratamento com cannabis medicinal por R$30: orientação técnica via WhatsApp, telemedicina 24/7 e conformidade ANVISA, CFM e LGPD.",
-    keywords: "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA, supervisão técnica Dra. Suelen Naves Rodrigues (CRM 49354/PR)",
+    keywords: "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA",
     canonical: `${BASE}/`,
     h1: "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda",
   },

@@ -160,7 +160,35 @@ Deno.serve(async (req) => {
       });
     }
 
-    const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    // Assinaturas recorrentes (preapproval): os avisos chegam com IDs que não são de pagamento.
+    // subscription_authorized_payment → resolve o pagamento real da cobrança mensal.
+    // subscription_preapproval → apenas status da assinatura (sem valor a registrar).
+    const topic = String(body.topic || type || "");
+    let resolvedPaymentId = String(paymentId);
+    if (topic === "subscription_preapproval" || topic === "preapproval") {
+      console.log(`[preapproval] status update for ${paymentId} — sem pagamento a registrar`);
+      return new Response(JSON.stringify({ status: "received", module: "preapproval" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (topic === "subscription_authorized_payment" || topic === "authorized_payment") {
+      const apResp = await fetch(`https://api.mercadopago.com/authorized_payments/${paymentId}`, {
+        headers: { Authorization: `Bearer ${mpAccessToken}` },
+      });
+      const ap = apResp.ok ? await apResp.json() : null;
+      const realId = ap?.payment?.id;
+      if (!realId) {
+        console.log(`[authorized_payment] ${paymentId} ainda sem pagamento vinculado (status ${ap?.status ?? apResp.status})`);
+        return new Response(JSON.stringify({ status: "received", module: "authorized_payment" }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      resolvedPaymentId = String(realId);
+    }
+
+    const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${resolvedPaymentId}`, {
       headers: { Authorization: `Bearer ${mpAccessToken}` },
     });
 

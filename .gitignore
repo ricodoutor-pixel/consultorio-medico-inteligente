@@ -91,6 +91,10 @@ scripts/*.mjs
 !scripts/agent_evolution_brisa_live_responder.mjs
 !scripts/agent_doctor_kyc_compliance.mjs
 !scripts/brisa_onboarding_config.mjs
+!scripts/agent_meta_organic_growth.mjs
+!scripts/agent_brevo_multi_pipeline.mjs
+!scripts/agent_partner_meeting_scheduler.mjs
+!scripts/agent_organic_analytics_reporter.mjs
 !scripts/lib/**
 !scripts/test/**
 scripts/*.cjs

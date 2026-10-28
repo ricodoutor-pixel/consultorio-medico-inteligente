@@ -139,6 +139,62 @@ module.exports = {
       restart_delay: 10000,
       env: {
         NODE_ENV: 'production'
+      }    },
+    {
+      name: 'meta-organic-growth',
+      script: 'scripts/agent_meta_organic_growth.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 5000,
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3030
+      }
+    },
+    {
+      name: 'brevo-multi-pipeline',
+      script: 'scripts/agent_brevo_multi_pipeline.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
+      name: 'partner-meeting-scheduler',
+      script: 'scripts/agent_partner_meeting_scheduler.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
+      name: 'organic-analytics-reporter',
+      script: 'scripts/agent_organic_analytics_reporter.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '500M',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production'
       }
     }
   ]

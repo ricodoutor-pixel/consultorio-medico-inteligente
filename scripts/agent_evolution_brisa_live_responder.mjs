@@ -1675,13 +1675,13 @@ async function loop() {
               const formattedName = cleanName.startsWith('Dr') ? cleanName : `${prefix} ${cleanName}`;
 
               try {
-                await sendWhatsApp(recipient, `Com certeza, ${formattedName}! Estou transferindo o seu atendimento agora mesmo para a nossa diretoria médica e equipe humana. O Dr. Edilson Bezerra ou nossa equipe entrará em contato em instantes por aqui. Um abraço da Enfª Brisa! 🙏✨`);
+                await sendWhatsApp(recipient, `Claro! Pausei o atendimento automático e já chamei nossa equipe. Uma pessoa vai continuar a conversa com você por aqui em breve. 🙏🌿`);
               } catch (e) {
                 log(`Erro ao enviar aviso de transferência: ${e.message}`);
               }
 
               try {
-                const alertMsg = `Dr. Edilson Bezerra, o senhor tem uma mensagem importante de um médico que solicitou atendimento humano imediato!\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A IA Enfª Brisa foi pausada para esta conversa.\n(Para reativar a IA após o atendimento: responda *REATIVAR_IA ${recipient}*)`;
+                const alertMsg = `Dr. Edilson Bezerra, o senhor tem uma mensagem importante de um contato que solicitou atendimento humano imediato!\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A IA Enfª Brisa foi pausada para esta conversa.\n(Para reativar a IA após o atendimento: responda *REATIVAR_IA ${recipient}*)`;
                 await sendWhatsApp(ADMIN_PHONE, alertMsg);
               } catch (e) {
                 log(`Aviso admin: ${e.message}`);

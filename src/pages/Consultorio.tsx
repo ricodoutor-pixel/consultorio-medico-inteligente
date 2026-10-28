@@ -10,8 +10,10 @@ import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimu
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
 import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
+import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
+import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
 
-import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2, FolderUp, CalendarRange } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +34,8 @@ const Consultorio = () => {
   const [activeTab, setActiveTab] = useState("atendimentos");
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showProntuarioModal, setShowProntuarioModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -261,6 +265,22 @@ const Consultorio = () => {
             >
               <Sparkles size={15} /> 🚀 Tour 3D (93% PIX)
             </button>
+
+            <button
+              onClick={() => setShowProntuarioModal(true)}
+              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 border border-emerald-400/40"
+              title="Importar e Exportar Prontuário / Buscar Paciente por Nome ou CPF"
+            >
+              <FolderUp size={15} /> 📂 Importar / Exportar Prontuário & CPF
+            </button>
+
+            <button
+              onClick={() => setShowScheduleModal(true)}
+              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:scale-105 border border-blue-400/40"
+              title="Escolher Horários de Atendimento para Pacientes Agendados e Consulta por Vídeo"
+            >
+              <CalendarRange size={15} /> 📅 Escolher Horários & Vídeo
+            </button>
           </div>
 
           <div className="flex items-center gap-3">
@@ -385,6 +405,12 @@ const Consultorio = () => {
 
           <TabsList className="mb-6 w-full flex flex-nowrap overflow-x-auto h-auto p-1.5 bg-card/90 backdrop-blur-md border border-border/60 rounded-xl gap-2 whitespace-nowrap scrollbar-none">
             <TabsTrigger value="atendimentos" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Atendimentos</TabsTrigger>
+            <TabsTrigger value="prontuarios-pacientes" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-emerald-500/15 text-emerald-400 data-[state=active]:bg-emerald-600 data-[state=active]:text-white border border-emerald-500/30">
+              📂 Prontuário & Pacientes (Importar / Exportar / CPF)
+            </TabsTrigger>
+            <TabsTrigger value="horarios-video" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-blue-500/15 text-blue-400 data-[state=active]:bg-blue-600 data-[state=active]:text-white border border-blue-500/30">
+              📅 Horários & Consulta por Vídeo
+            </TabsTrigger>
             <TabsTrigger value="copiloto-vip" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-black border border-emerald-500/30">
               🧠 Copiloto IA (Decisão Clínica)
             </TabsTrigger>
@@ -402,6 +428,21 @@ const Consultorio = () => {
           
           <TabsContent value="atendimentos" className="mt-0 border-0 p-0">
             <MedicalDashboard />
+          </TabsContent>
+
+          <TabsContent value="prontuarios-pacientes" className="mt-0 border-0 p-0">
+            <DoctorProntuarioImportExportModal
+              inline
+              doctorId={doctor?.id}
+              doctorName={profile?.full_name}
+            />
+          </TabsContent>
+
+          <TabsContent value="horarios-video" className="mt-0 border-0 p-0">
+            <DoctorScheduleAndVideoModal
+              inline
+              doctorId={doctor?.id}
+            />
           </TabsContent>
 
           <TabsContent value="copiloto-vip" className="mt-0 border-0 p-0">
@@ -449,6 +490,17 @@ const Consultorio = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <DoctorProntuarioImportExportModal
+        open={showProntuarioModal}
+        onOpenChange={setShowProntuarioModal}
+        doctorId={doctor?.id}
+        doctorName={profile?.full_name}
+      />
+      <DoctorScheduleAndVideoModal
+        open={showScheduleModal}
+        onOpenChange={setShowScheduleModal}
+        doctorId={doctor?.id}
+      />
       <InteractiveTour3DModal initialRole="medico" autoOpen={true} />
     </div>
   );

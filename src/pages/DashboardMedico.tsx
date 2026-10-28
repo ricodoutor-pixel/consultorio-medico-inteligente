@@ -13,7 +13,7 @@ import { DrugInteractionAlertCard } from "@/components/doctor/DrugInteractionAle
 
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, ShieldCheck, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen, ArrowRight } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, ShieldCheck, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen, ArrowRight, FolderUp, CalendarRange, Search } from "lucide-react";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
@@ -27,6 +27,8 @@ import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
 import { DoctorContractModal } from "@/components/doctor/DoctorContractModal";
 import { ConsultationOfferBanner } from "@/components/doctor/ConsultationOfferBanner";
+import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
+import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
 
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
@@ -66,6 +68,8 @@ const DashboardMedico = () => {
   const [processing, setProcessing] = useState(false);
   const [hasAvailability, setHasAvailability] = useState<boolean | null>(null);
   const [contractModalOpen, setContractModalOpen] = useState(false);
+  const [prontuarioModalOpen, setProntuarioModalOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDoctorData();
@@ -450,7 +454,21 @@ const DashboardMedico = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => setProntuarioModalOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-green-700 text-white border border-emerald-400/50 rounded-full px-4 py-2 text-xs sm:text-sm font-black hover:scale-105 transition-all cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                >
+                  <FolderUp size={16} />
+                  IMPORTAR / EXPORTAR PRONTUÁRIO & CPF
+                </button>
+                <button
+                  onClick={() => setScheduleModalOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white border border-blue-400/50 rounded-full px-4 py-2 text-xs sm:text-sm font-black hover:scale-105 transition-all cursor-pointer shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                >
+                  <CalendarRange size={16} />
+                  ESCOLHER HORÁRIOS & CONSULTA VÍDEO
+                </button>
                 <Link to="/medsocio">
                   <span 
                     className="inline-flex items-center justify-center gap-1.5 bg-transparent border-2 border-emerald-500 text-emerald-400 rounded-full px-4 py-2 text-sm font-black hover:bg-emerald-500/10 transition-all transform hover:scale-105 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.2)]"
@@ -512,6 +530,67 @@ const DashboardMedico = () => {
                   <Switch checked={isOnline} onCheckedChange={toggleOnline} />
                 </div>
               </div>
+            </div>
+
+            {/* === BARRA DE AÇÃO RÁPIDA DO CONSULTÓRIO VIRTUAL: PRONTUÁRIOS (NOME/CPF) + HORÁRIOS & VÍDEO === */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <Card
+                onClick={() => setProntuarioModalOpen(true)}
+                className="border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 via-card to-card hover:border-emerald-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(16,185,129,0.12)] group"
+              >
+                <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-110 transition-transform">
+                      <FolderUp size={24} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-display font-black text-foreground text-base">
+                          Importar & Exportar Prontuário Médico
+                        </h3>
+                        <Badge className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                          Busca por Nome ou CPF
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Anexe sua lista de pacientes trazida de outras plataformas (.CSV, Planilha, .JSON), consulte por Nome ou CPF e exporte seus prontuários.
+                      </p>
+                    </div>
+                  </div>
+                  <Button className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shrink-0 w-full sm:w-auto">
+                    <Search size={15} className="mr-1.5" /> Abrir Prontuários
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card
+                onClick={() => setScheduleModalOpen(true)}
+                className="border-blue-500/40 bg-gradient-to-br from-blue-500/15 via-card to-card hover:border-blue-400 transition-all cursor-pointer shadow-[0_0_25px_rgba(59,130,246,0.12)] group"
+              >
+                <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
+                      <CalendarRange size={24} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-display font-black text-foreground text-base">
+                          Escolher Horários & Consulta por Vídeo
+                        </h3>
+                        <Badge className="bg-blue-500/20 text-blue-400 text-[10px] font-bold">
+                          Agenda & Teleconsulta HD
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Defina seus dias e horários de atendimento para pacientes agendados e inicie consultas por vídeo em 1 clique.
+                      </p>
+                    </div>
+                  </div>
+                  <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shrink-0 w-full sm:w-auto">
+                    <Video size={15} className="mr-1.5" /> Horários & Vídeo
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
 
             {!doctorData && (
@@ -1093,6 +1172,19 @@ const DashboardMedico = () => {
         onContractSigned={() => {
           fetchDoctorData();
         }}
+      />
+
+      <DoctorProntuarioImportExportModal
+        open={prontuarioModalOpen}
+        onOpenChange={setProntuarioModalOpen}
+        doctorId={doctorData?.id}
+        doctorName={profileData?.full_name}
+      />
+
+      <DoctorScheduleAndVideoModal
+        open={scheduleModalOpen}
+        onOpenChange={setScheduleModalOpen}
+        doctorId={doctorData?.id}
       />
     </div>
   );

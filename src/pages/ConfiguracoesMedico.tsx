@@ -7,11 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, ArrowLeft, Save, Upload, User, Loader2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Save, Upload, User, Loader2, FileSpreadsheet, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { DoctorAvailabilityManager } from "@/components/doctor/DoctorAvailabilityManager";
+import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
+import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
 
 export default function ConfiguracoesMedico() {
   const navigate = useNavigate();
@@ -30,6 +32,8 @@ export default function ConfiguracoesMedico() {
   const [price, setPrice] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [kycStatus, setKycStatus] = useState("pending");
+  const [prontuarioModalOpen, setProntuarioModalOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -170,16 +174,34 @@ export default function ConfiguracoesMedico() {
       <main className="flex-grow pt-24 pb-12 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto space-y-6">
           
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/dashboard-medico')}
-              className="bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Voltar ao Consultório
-            </Button>
-            <h1 className="text-3xl font-black text-white">Configuração do <span className="text-primary">Card Médico</span></h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/dashboard-medico')}
+                className="bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
+              >
+                <ArrowLeft size={16} className="mr-2" />
+                Voltar ao Consultório
+              </Button>
+              <h1 className="text-3xl font-black text-white">Configuração do <span className="text-primary">Card Médico</span></h1>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={() => setProntuarioModalOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md text-xs sm:text-sm"
+              >
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Anexar / Exportar Prontuário (Busca Nome/CPF)
+              </Button>
+              <Button
+                onClick={() => setScheduleModalOpen(true)}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-md text-xs sm:text-sm"
+              >
+                <CalendarClock className="w-4 h-4 mr-2" />
+                Horários & Consulta Vídeo
+              </Button>
+            </div>
           </div>
 
           {kycStatus !== 'approved' && (
@@ -374,6 +396,19 @@ export default function ConfiguracoesMedico() {
 
           {/* Gerenciador de Disponibilidade / Abertura de Horários */}
           <DoctorAvailabilityManager />
+
+          <DoctorProntuarioImportExportModal
+            open={prontuarioModalOpen}
+            onOpenChange={setProntuarioModalOpen}
+            doctorId={doctorData?.id}
+            doctorName={fullName || undefined}
+          />
+          <DoctorScheduleAndVideoModal
+            open={scheduleModalOpen}
+            onOpenChange={setScheduleModalOpen}
+            doctorId={doctorData?.id}
+            doctorName={fullName || undefined}
+          />
         </div>
       </main>
       
@@ -381,5 +416,3 @@ export default function ConfiguracoesMedico() {
     </div>
   );
 }
-
-

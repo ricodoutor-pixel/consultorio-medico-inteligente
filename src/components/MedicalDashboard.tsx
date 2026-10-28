@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   Video, FileText, History, User, MessageCircle, Clock, Pill,
   Stethoscope, Brain, AlertTriangle, Search, Plus, CheckCircle2,
-  Activity, ShoppingBag, Phone, Sparkles, Timer, VideoOff
+  Activity, ShoppingBag, Phone, Sparkles, Timer, VideoOff, FolderUp, CalendarRange
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +26,8 @@ import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
 import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 import { PrescriptionTypeSelector } from "@/components/prescription/PrescriptionTypeSelector";
 import { type PrescriptionType, getPrescriptionTypeMeta, generateVerificationCode } from "@/lib/prescription-types";
+import { DoctorProntuarioImportExportModal, loadDoctorPatientRecords, type ImportedPatientRecord } from "@/components/doctor/DoctorProntuarioImportExportModal";
+import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {
@@ -131,6 +133,9 @@ export function MedicalDashboard() {
   const [activeDoctor, setActiveDoctor] = useState<any>(null);
   const [prescriptionType, setPrescriptionType] = useState<PrescriptionType>("controle_especial_c1");
   const [thcPercentage, setThcPercentage] = useState<number>(0.2);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [showProntuarioModal, setShowProntuarioModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -149,13 +154,38 @@ export function MedicalDashboard() {
     });
   }, []);
 
-  // Simulated load + real-time subscription attempt
+  // Simulated load + real-time subscription attempt + sincronização com lista importada
+  const syncMergedPatients = useCallback((docId?: string | null) => {
+    const imported = loadDoctorPatientRecords(docId);
+    const importedAsWaiting: WaitingPatient[] = imported.map((rec) => ({
+      id: rec.id,
+      appointmentId: `appt-${rec.id}`,
+      name: rec.name,
+      cpf: rec.cpf,
+      age: Number(rec.age) || 40,
+      waitMinutes: 0,
+      tags: [rec.sourcePlatform || "Carteira Médica", ...(rec.diagnosisCid ? [rec.diagnosisCid.slice(0, 22)] : ["Prontuário"])],
+      urgency: "medium",
+      symptoms: rec.clinicalNotes || rec.diagnosisCid || "Paciente da carteira médica importada.",
+    }));
+
+    const seenIds = new Set(MOCK_WAITING.map((m) => m.id));
+    const combined = [
+      ...MOCK_WAITING,
+      ...importedAsWaiting.filter((i) => !seenIds.has(i.id)),
+    ];
+    setPatients(combined);
+    setActivePatient((prev) => prev || combined[0]);
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      setPatients(MOCK_WAITING);
-      setActivePatient(MOCK_WAITING[0]);
+      syncMergedPatients(doctorId);
       setLoading(false);
-    }, 800);
+    }, 600);
+
+    const onRecordsUpdated = () => syncMergedPatients(doctorId);
+    window.addEventListener("pyr_patient_records_updated", onRecordsUpdated);
 
     // Real-time channel for appointment changes — RLS on realtime.messages
     // requires a doctor-scoped channel name.
@@ -178,9 +208,10 @@ export function MedicalDashboard() {
 
     return () => {
       clearTimeout(timer);
+      window.removeEventListener("pyr_patient_records_updated", onRecordsUpdated);
       if (channel) supabase.removeChannel(channel);
     };
-  }, []);
+  }, [doctorId, syncMergedPatients]);
 
   // Auto-save notes
   useEffect(() => {
@@ -347,22 +378,82 @@ export function MedicalDashboard() {
 
   const protocol = activePatient ? getProtocolForTags(activePatient.tags) : null;
 
+  const filteredPatients = patients.filter((p) => {
+    const q = patientSearch.trim().toLowerCase();
+    if (!q) return true;
+    const qDigits = q.replace(/\D/g, "");
+    const nameMatch = p.name.toLowerCase().includes(q);
+    const cpfMatch = p.cpf.toLowerCase().includes(q) || (qDigits.length > 0 && p.cpf.replace(/\D/g, "").includes(qDigits));
+    return nameMatch || cpfMatch;
+  });
+
+  const handleSelectImportedPatient = useCallback((rec: ImportedPatientRecord) => {
+    const mapped: WaitingPatient = {
+      id: rec.id,
+      appointmentId: `appt-${rec.id}`,
+      name: rec.name,
+      cpf: rec.cpf,
+      age: Number(rec.age) || 40,
+      waitMinutes: 0,
+      tags: [rec.sourcePlatform || "Importado", ...(rec.diagnosisCid ? [rec.diagnosisCid.slice(0, 22)] : [])],
+      urgency: "medium",
+      symptoms: rec.clinicalNotes || rec.diagnosisCid || "Prontuário importado.",
+    };
+    setPatients((prev) => (prev.some((x) => x.id === mapped.id) ? prev : [mapped, ...prev]));
+    setActivePatient(mapped);
+    setNotes(rec.clinicalNotes || "");
+  }, []);
+
   return (
     <div className="flex h-[calc(100vh-4rem)] gap-3 p-3 lg:p-4">
       {/* ═══════════════════════════════════════════════════════
-          SIDEBAR ESQUERDA — FILA DE ESPERA
+          SIDEBAR ESQUERDA — FILA DE ESPERA & BUSCA NOME/CPF
           ═══════════════════════════════════════════════════════ */}
-      <aside className="w-64 xl:w-72 shrink-0 flex flex-col gap-3 hidden md:flex">
+      <aside className="w-64 xl:w-72 shrink-0 flex flex-col gap-2.5 hidden md:flex">
         <div className="flex items-center gap-2 px-1">
           <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
             <Stethoscope className="h-4 w-4 text-primary" />
           </div>
           <h2 className="text-sm font-bold tracking-wide uppercase text-muted-foreground">
-            Sala de Espera
+            Sala de Espera & Pacientes
           </h2>
           <Badge variant="secondary" className="ml-auto text-xs tabular-nums">
-            {patients.length}
+            {filteredPatients.length}
           </Badge>
+        </div>
+
+        {/* Botões Rápidos: Importar/Exportar Prontuário + Horários */}
+        <div className="grid grid-cols-2 gap-1.5">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowProntuarioModal(true)}
+            className="h-8 text-[11px] font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 px-2"
+            title="Importar / Exportar Prontuário e Lista de Pacientes"
+          >
+            <FolderUp className="h-3.5 w-3.5 mr-1 shrink-0" /> Prontuários
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowScheduleModal(true)}
+            className="h-8 text-[11px] font-bold border-blue-500/40 text-blue-400 hover:bg-blue-500/10 px-2"
+            title="Escolher Horários e Consulta por Vídeo"
+          >
+            <CalendarRange className="h-3.5 w-3.5 mr-1 shrink-0" /> Horários
+          </Button>
+        </div>
+
+        {/* Busca por Nome ou CPF */}
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            type="text"
+            value={patientSearch}
+            onChange={(e) => setPatientSearch(e.target.value)}
+            placeholder="Buscar Nome ou CPF..."
+            className="w-full h-8 pl-8 pr-2 rounded-lg bg-background/50 border border-border/50 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          />
         </div>
 
         <Separator className="bg-border/30" />
@@ -373,7 +464,7 @@ export function MedicalDashboard() {
           ) : (
             <AnimatePresence mode="popLayout">
               <div className="space-y-2 pr-2">
-                {patients.map((p) => {
+                {filteredPatients.map((p) => {
                   const isActive = activePatient?.id === p.id;
                   const isLongWait = p.waitMinutes >= 15;
 
@@ -622,10 +713,23 @@ export function MedicalDashboard() {
                   onChange={(e) => setNotes(e.target.value)}
                 />
 
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8">
-                      <FileText className="h-3 w-3" /> Prontuário
+                <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-xs h-8 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+                      onClick={() => setShowProntuarioModal(true)}
+                    >
+                      <FolderUp className="h-3 w-3" /> Importar / Exportar Prontuário & CPF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-xs h-8 border-blue-500/40 text-blue-400 hover:bg-blue-500/10"
+                      onClick={() => setShowScheduleModal(true)}
+                    >
+                      <CalendarRange className="h-3 w-3" /> Escolher Horários & Vídeo
                     </Button>
                     <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8">
                       <ShoppingBag className="h-3 w-3" /> Pedidos
@@ -769,6 +873,20 @@ export function MedicalDashboard() {
           </>
         )}
       </aside>
+
+      <DoctorProntuarioImportExportModal
+        open={showProntuarioModal}
+        onOpenChange={setShowProntuarioModal}
+        doctorId={doctorId}
+        doctorName={activeDoctor?.full_name}
+        onSelectPatientForConsultation={handleSelectImportedPatient}
+      />
+
+      <DoctorScheduleAndVideoModal
+        open={showScheduleModal}
+        onOpenChange={setShowScheduleModal}
+        doctorId={doctorId}
+      />
 
       <DrEdilsonClinicalAgent
         patientContext={activePatient

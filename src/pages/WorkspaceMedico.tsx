@@ -18,12 +18,15 @@ import { Badge } from "@/components/ui/badge";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 import { ManualMedicoModal } from "@/components/medico/ManualMedicoModal";
+import { loadDoctorPatientRecords } from "@/components/doctor/DoctorProntuarioImportExportModal";
 
 const WorkspaceMedico = () => {
   const [searchParams] = useSearchParams();
   const patientId = searchParams.get("patient");
   const appointmentId = searchParams.get("appt");
   const type = searchParams.get("type") || "video"; // "video" or "chat"
+  const paramName = searchParams.get("name");
+  const paramCpf = searchParams.get("cpf");
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -80,8 +83,18 @@ const WorkspaceMedico = () => {
         type === 'video' ? supabase.functions.invoke("create-video-room", { body: { appointmentId } }) : Promise.resolve({ data: null, error: null })
       ]);
 
+      const importedMatch = loadDoctorPatientRecords().find((r) => r.id === patientId);
+
       if (patientRes.data) {
         setPatient(patientRes.data);
+      } else if (importedMatch || paramName) {
+        setPatient({
+          id: patientId || importedMatch?.id || "paciente-importado",
+          full_name: importedMatch?.name || paramName || "Paciente Agendado",
+          cpf: importedMatch?.cpf || paramCpf || "Não informado",
+          email: importedMatch?.email || "",
+          whatsapp: importedMatch?.phone || "",
+        });
       } else {
         // Fallback robusto para paciente teste ou primeiro atendimento
         setPatient({
@@ -102,7 +115,7 @@ const WorkspaceMedico = () => {
           patient_id: patientId || "paciente-teste-id",
           type: "video",
           status: "scheduled",
-          notes: "Queixa: Insônia refratária crônica e dor neuropática há 6 meses. Buscou alternativas após reações adversas a hipnóticos convencionais.",
+          notes: importedMatch?.clinicalNotes || "Queixa: Insônia refratária crônica e dor neuropática há 6 meses. Buscou alternativas após reações adversas a hipnóticos convencionais.",
         });
       }
 
@@ -110,6 +123,10 @@ const WorkspaceMedico = () => {
         if (recordRes.data.notes) setNotes(recordRes.data.notes);
         if (recordRes.data.diagnosis) setDiagnosis(recordRes.data.diagnosis);
         if (recordRes.data.treatment_plan) setTreatmentPlan(recordRes.data.treatment_plan);
+      } else if (importedMatch) {
+        setNotes(importedMatch.clinicalNotes || "");
+        setDiagnosis(importedMatch.diagnosisCid || "");
+        setTreatmentPlan(importedMatch.treatmentPlan || "");
       } else {
         setNotes("Paciente 38 anos, histórico de insônia inicial e dor crônica moderada. Sem alergias medicamentosas relatadas.");
         setDiagnosis("F51.0 Insônia não-orgânica / G89.2 Dor crônica");

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { AlertTriangle, Brain, FileText, Activity, Clock, ShieldCheck, Download, Wind, Eye } from 'lucide-react';
+import { AlertTriangle, Brain, FileText, Activity, Clock, ShieldCheck, Download, Wind, Eye, Upload, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { DoctorProntuarioImportExportModal } from '@/components/doctor/DoctorProntuarioImportExportModal';
+import { DoctorScheduleAndVideoModal } from '@/components/doctor/DoctorScheduleAndVideoModal';
 
 interface Exam {
   id: string;
@@ -24,6 +26,8 @@ interface Exam {
 export const ProntuarioInteligente = () => {
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
+  const [prontuarioModalOpen, setProntuarioModalOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
 
   useEffect(() => {
     fetchExams();
@@ -71,11 +75,27 @@ export const ProntuarioInteligente = () => {
               <ShieldCheck className="w-8 h-8 text-primary" />
               Prontuário Médico Inteligente
             </h1>
-            <p className="text-muted-foreground mt-1 text-lg">Visão consolidada da triagem avançada por IA</p>
+            <p className="text-muted-foreground mt-1 text-lg">Visão consolidada da triagem avançada por IA e Prontuário de Pacientes</p>
           </div>
-          <Button variant="outline" className="border-2 border-primary/50 text-primary font-bold shadow-sm" onClick={fetchExams}>
-            <Clock className="w-4 h-4 mr-2" /> Atualizar Timeline
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={() => setProntuarioModalOpen(true)}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-black shadow-md"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Anexar / Exportar Prontuário & Busca (Nome/CPF)
+            </Button>
+            <Button
+              onClick={() => setScheduleModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-black shadow-md"
+            >
+              <CalendarClock className="w-4 h-4 mr-2" />
+              Horários & Consulta por Vídeo
+            </Button>
+            <Button variant="outline" className="border-2 border-primary/50 text-primary font-bold shadow-sm" onClick={fetchExams}>
+              <Clock className="w-4 h-4 mr-2" /> Atualizar Timeline
+            </Button>
+          </div>
         </div>
 
         {loading ? (
@@ -87,6 +107,25 @@ export const ProntuarioInteligente = () => {
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
               <FileText className="w-16 h-16 text-gray-300 mb-4" />
               <h3 className="text-xl font-bold text-gray-500">Nenhum exame de IA registrado ainda.</h3>
+              <p className="text-sm text-gray-500 mt-2 mb-6 max-w-md">
+                Use o botão acima para anexar o prontuário ou lista de pacientes exportada de outra plataforma e pesquisar por Nome ou CPF.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button
+                  onClick={() => setProntuarioModalOpen(true)}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-black shadow-md"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Anexar Prontuário & Buscar Paciente por Nome ou CPF
+                </Button>
+                <Button
+                  onClick={() => setScheduleModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-black shadow-md"
+                >
+                  <CalendarClock className="w-4 h-4 mr-2" />
+                  Escolher Horários & Consulta por Vídeo
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -117,7 +156,6 @@ export const ProntuarioInteligente = () => {
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="grid md:grid-cols-2 gap-6">
-                    
                     {/* Coluna 1: Diagnóstico da IA */}
                     <div className="space-y-4">
                       <div>
@@ -181,6 +219,15 @@ export const ProntuarioInteligente = () => {
             ))}
           </div>
         )}
+
+        <DoctorProntuarioImportExportModal
+          open={prontuarioModalOpen}
+          onOpenChange={setProntuarioModalOpen}
+        />
+        <DoctorScheduleAndVideoModal
+          open={scheduleModalOpen}
+          onOpenChange={setScheduleModalOpen}
+        />
       </div>
     </div>
   );

@@ -39,6 +39,29 @@ interface Counts {
   withDocs: number;
 }
 
+
+const ORIGINAL_PHOTO_BY_USER: Record<string, string> = {
+  "d41a74bc-fb23-4457-a3ce-08ecd8b6dbe6": "/avatars/dr-anderson-mikalauskas-original.jpg",
+  "ea61f0fa-d75d-47a7-9c06-b389131dbb1b": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/ea61f0fa-d75d-47a7-9c06-b389131dbb1b/1792703178352.JPG",
+  "2f72cd00-28c4-4223-ab61-7e76179f457e": "/avatars/dr-amir-ali-raw.png",
+  "39db5ea9-e02a-4f7c-99d2-10a32a1463bb": "/avatars/dra-stella-martinelli-original.jpg",
+  "1fa726ba-f80e-4d63-bc36-dc5c78adbd3c": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/1fa726ba-f80e-4d63-bc36-dc5c78adbd3c/8e5d1334-b507-4e6f-922f-c6a951094004.webp",
+  "15f2e987-4fec-437b-9423-68e96a1de861": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/15f2e987-4fec-437b-9423-68e96a1de861/14927f59-9fad-43a4-95dd-5b0c93d41f1a.jpg",
+  "25a62def-139c-4e20-af9d-709f943db3b8": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/25a62def-139c-4e20-af9d-709f943db3b8/avatar-1786188142319.png",
+  "36f95180-fafc-46d0-9591-f8b246f9f1d1": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/36f95180-fafc-46d0-9591-f8b246f9f1d1/avatar-1788869224838.jpg",
+  "478854c2-9e19-4293-9203-d912fdca517d": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/478854c2-9e19-4293-9203-d912fdca517d/avatar-1793203932296.png",
+  "7eb1d705-ec87-4379-a4ba-eca03dfcab15": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/7eb1d705-ec87-4379-a4ba-eca03dfcab15/avatar-1789040309976.jpeg",
+  "80b950b0-9c20-47ee-adf2-95e8af5dc8d2": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/80b950b0-9c20-47ee-adf2-95e8af5dc8d2.jpg",
+  "8e818411-c1ec-425d-8edf-81e2d4f21024": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/8e818411-c1ec-425d-8edf-81e2d4f21024/avatar-1791276340289.jpg",
+  "9285b761-b960-4562-839c-cab53ec54c67": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/9285b761-b960-4562-839c-cab53ec54c67.jpg?v=2",
+  "f8d363a6-41ba-493c-9a5f-9c36c218c1d9": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/f8d363a6-41ba-493c-9a5f-9c36c218c1d9.jpg",
+  "fada664c-4f05-4b35-97e5-22744285da1e": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/fada664c-4f05-4b35-97e5-22744285da1e/avatar-1789405491856.jpg",
+  "3b444885-3a74-4e21-bde1-7fba1b39ca99": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/3b444885-3a74-4e21-bde1-7fba1b39ca99.jpg",
+  "765d8ebb-525d-4964-918f-df6f4d5273f6": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/765d8ebb-525d-4964-918f-df6f4d5273f6/avatar-1785397434601.jpg",
+  "0ff25843-695f-48c8-bf64-f5561dd5e592": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/dra-olivia-zimeri.jpg",
+  "51c28fdd-ccd4-4b84-a0da-3cf604233804": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/dra-suelen-naves-rodrigues.jpg",
+};
+
 export function useDoctors() {
   const [doctors, setDoctors] = useState<DoctorRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,9 +129,22 @@ export function useDoctors() {
         // Estado vem exclusivamente do banco
         const isApproved = Boolean(d.is_approved_by_admin ?? d.is_verified ?? false);
 
-        // Monta lista de documentos KYC incluindo o print oficial do CFM
+        const originalAvatar = ORIGINAL_PHOTO_BY_USER[d.user_id] || rawProfile?.avatar_url || d.avatar_url || officialAvatar || null;
+
+        // Monta lista de documentos KYC incluindo o print oficial do CFM e a Foto Original (selfie)
         const userDocs = [...(docsMap.get(d.user_id) ?? [])];
         const cfmPrintPath = getDoctorCfmPrint(crmStr || fullName) || getDoctorCfmPrint(fullName);
+        if (originalAvatar && !userDocs.some((k) => k.document_kind === "selfie")) {
+          userDocs.push({
+            id: `selfie-orig-${d.id}`,
+            doctor_user_id: d.user_id,
+            document_kind: "selfie",
+            storage_path: originalAvatar,
+            mime_type: "image/jpeg",
+            verification_status: "approved",
+            created_at: d.created_at || new Date().toISOString(),
+          });
+        }
         if (cfmPrintPath && !userDocs.some((k) => k.document_kind === "cfm_print")) {
           userDocs.push({
             id: `cfm-print-${d.id}`,
@@ -187,7 +223,7 @@ export function useDoctors() {
             neighborhood: mergedProfile.neighborhood || "Santo Amaro",
             city: mergedProfile.city || "São Paulo",
             region: mergedProfile.region || "SP",
-            avatar_url: avatarUrl || "/avatars/dr-anderson-mikalauskas.jpg?v=20261028",
+            avatar_url: avatarUrl || "/avatars/dr-anderson-mikalauskas.jpg?v=20261028v2",
           };
           if (!userDocs.some((k) => k.document_kind === "icp_brasil")) {
             userDocs.push({
@@ -216,6 +252,7 @@ export function useDoctors() {
 
         return {
           ...d,
+          original_avatar_url: originalAvatar,
           signature_url: signatureUrl,
           is_approved_by_admin: isApproved,
           is_approved: isApproved,

@@ -76,6 +76,14 @@ export const AdminAprovacoes = () => {
         };
       }
     }
+    if (kind === "selfie" && (doc?.original_avatar_url || doc?.profile?.avatar_url || doc?.avatar_url)) {
+      return {
+        id: "kyc-selfie-orig-" + (doc.id || "doc"),
+        document_kind: "selfie",
+        storage_path: doc.original_avatar_url || doc.profile?.avatar_url || doc.avatar_url,
+        verification_status: "approved",
+      };
+    }
     if (kind === "icp_brasil" && doc?.signature_url) {
       return {
         id: "kyc-icp-sig-" + (doc.id || "doc"),
@@ -170,7 +178,7 @@ export const AdminAprovacoes = () => {
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     const isContractSigned = Boolean(doc.is_contract_signed || doc.contract_signed_at);
     return [
-      ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ 
+      ...[...KYC_REQUIRED, 'selfie', 'icp_brasil'].map((kind) => ({ 
         label: KYC_LABELS[kind], 
         ok: kind === 'icp_brasil' ? Boolean(doc.signature_url || kinds.has(kind)) : kinds.has(kind) 
       })),
@@ -629,7 +637,7 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
+                            {([...KYC_REQUIRED, 'selfie', 'icp_brasil'] as KycKind[]).map((kind) => {
                               const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url || docOf(doc, kind)) : Boolean(docOf(doc, kind));
                               return (
                                 <Button
@@ -749,11 +757,22 @@ export const AdminAprovacoes = () => {
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card border-border">
             <DialogHeader className="border-b pb-4">
               <div className="flex items-center gap-3">
-                <img 
-                  src={selectedDoctor.profile?.avatar_url || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"} 
-                  className="w-16 h-16 rounded-full object-cover border-2 border-emerald-500"
-                  alt="Avatar"
-                />
+                <div className="flex items-center gap-2 shrink-0">
+                  <img 
+                    src={selectedDoctor.profile?.avatar_url || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"} 
+                    className="w-16 h-16 rounded-full object-cover border-2 border-emerald-500"
+                    alt="Foto Tratada Vitrine"
+                    title="Foto Tratada Padrão Planta y Raíz (Vitrine)"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9 px-2.5 text-[11px] font-bold border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                    onClick={() => openDoc(selectedDoctor, "selfie")}
+                  >
+                    <FileImage size={13} className="mr-1" /> Ver Foto Original
+                  </Button>
+                </div>
                 <div>
                   <DialogTitle className="text-xl font-black text-foreground flex items-center gap-2">
                     Ficha Cadastral: {selectedDoctor.profile?.full_name || selectedDoctor.full_name}

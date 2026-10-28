@@ -24,7 +24,7 @@ export const KYC_LABELS: Record<KycKind, string> = {
   id_back: "RG / CNH / ID — Verso",
   cpf_doc: "Documento do CPF / Tax ID",
   address_proof: "Comprovante de endereço (CEP/Zip)",
-  selfie: "Selfie de conferência",
+  selfie: "Foto Original (Cadastro)",
   cfm_print: "CONF CRM / Conselho",
   icp_brasil: "Assinatura Digital (ICP-Brasil / Certificado)",
   passport_signature: "Passaporte (Foto e Assinatura)",
@@ -90,6 +90,11 @@ export async function getKycSignedUrl(
       const p = `${userId}/crm_back.${ext}`;
       if (!candidates.includes(p)) candidates.push(p);
     }
+  } else if (kind === "selfie") {
+    for (const ext of exts) {
+      const p = `${userId}/avatar.${ext}`;
+      if (!candidates.includes(p)) candidates.push(p);
+    }
   }
 
   // Tenta assinar no bucket doctor-kyc-documents
@@ -102,15 +107,18 @@ export async function getKycSignedUrl(
     } catch {}
   }
 
-  // Fallback no bucket avatars se for crm_front ou id_front
-  if (kind === "crm_front" || kind === "id_front") {
+  // Fallback no bucket avatars se for crm_front, id_front ou selfie (Foto Original)
+  if (kind === "crm_front" || kind === "id_front" || kind === "selfie") {
     try {
       const { data: avatarFiles } = await supabase.storage.from("avatars").list(userId);
-      const crmAvatar = (avatarFiles || []).find((f) => f.name.includes("crm_front"));
-      if (crmAvatar) {
+      const targetFile =
+        kind === "selfie"
+          ? (avatarFiles || []).find((f) => !f.name.includes("signature") && !f.name.endsWith(".cer") && !f.name.endsWith(".crt") && !f.name.endsWith(".pdf"))
+          : (avatarFiles || []).find((f) => f.name.includes("crm_front"));
+      if (targetFile) {
         const { data: pubData } = supabase.storage
           .from("avatars")
-          .getPublicUrl(`${userId}/${crmAvatar.name}`);
+          .getPublicUrl(`${userId}/${targetFile.name}`);
         if (pubData?.publicUrl) return pubData.publicUrl;
       }
     } catch {}

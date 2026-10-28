@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Sparkles, Download, Search, FileText, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -57,6 +58,14 @@ export default function ComunidadeConteudoIA() {
           <p className="text-muted-foreground text-lg">
             Explore nossos guias e artigos. Se você é médico parceiro, converta seus casos clínicos de sucesso em conteúdo indexável com 1 clique (powered by Brisa IA).
           </p>
+        </div>
+
+        <div className="flex justify-center -mt-6 mb-10">
+          <Link to="/club">
+            <Button className="font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+              🛍️ Club Planta y Raiz — Loja & Posts <ArrowRight size={16} className="ml-1" />
+            </Button>
+          </Link>
         </div>
 
         {/* Search */}

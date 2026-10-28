@@ -49,7 +49,7 @@ const ORIGINAL_PHOTO_BY_USER: Record<string, string> = {
   "15f2e987-4fec-437b-9423-68e96a1de861": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/15f2e987-4fec-437b-9423-68e96a1de861/14927f59-9fad-43a4-95dd-5b0c93d41f1a.jpg",
   "25a62def-139c-4e20-af9d-709f943db3b8": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/25a62def-139c-4e20-af9d-709f943db3b8/avatar-1786188142319.png",
   "36f95180-fafc-46d0-9591-f8b246f9f1d1": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/36f95180-fafc-46d0-9591-f8b246f9f1d1/avatar-1788869224838.jpg",
-  "478854c2-9e19-4293-9203-d912fdca517d": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/478854c2-9e19-4293-9203-d912fdca517d/avatar-1793203932296.png",
+  "478854c2-9e19-4293-9203-d912fdca517d": "/avatars/dr-jorge-luiz-original.png",
   "7eb1d705-ec87-4379-a4ba-eca03dfcab15": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/7eb1d705-ec87-4379-a4ba-eca03dfcab15/avatar-1789040309976.jpeg",
   "80b950b0-9c20-47ee-adf2-95e8af5dc8d2": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/80b950b0-9c20-47ee-adf2-95e8af5dc8d2.jpg",
   "8e818411-c1ec-425d-8edf-81e2d4f21024": "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/8e818411-c1ec-425d-8edf-81e2d4f21024/avatar-1791276340289.jpg",

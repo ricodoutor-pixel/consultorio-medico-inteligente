@@ -43,6 +43,8 @@ import drJoseGeraldoImg from "@/assets/dr-jose-geraldo.jpg";
 import cfmJoseGeraldo from "@/assets/cfm_prints/dr-jose-geraldo.png";
 import drAndersonMikalauskasImg from "@/assets/dr-anderson-mikalauskas.jpg";
 import cfmDrAndersonMikalauskas from "@/assets/cfm_prints/cfm-dr-anderson-mikalauskas.png";
+import drJorgeLuizImg from "@/assets/dr-jorge-luiz.jpg";
+import cfoDrJorgeLuiz from "@/assets/cfm_prints/cfo-dr-jorge-luiz.png";
 
 export type Professional = {
   id: string;
@@ -249,6 +251,34 @@ export const STANDARD_DOCTOR_SERVICES = [
 ];
 
 export const professionals: Professional[] = [
+  {
+    id: "dent-jorge-luiz",
+    dbId: "d8df4daa-5109-4794-b287-23e6c0d30528",
+    name: "Dr. Jorge Luiz de Brito Melo",
+    category: "Dentista Prescritor",
+    councilLabel: "CRO",
+    bio: "Cirurgião-Dentista graduado pela UNIESP e pós-graduado em Cannabis Medicinal pela UNIFESP, inscrito regularmente no CRO-PB 11867 (situação Ativo no CFO). Habilitado na prescrição de fitocanabinoides em Odontologia Integrativa, com atuação dedicada ao manejo clínico de dores orofaciais, disfunções temporomandibulares (DTM), bruxismo, neuralgia do trigêmeo, ansiedade odontológica e inflamações crônicas.",
+    flags: ["🇧🇷"],
+    experience: "2 anos",
+    tags: ["Odontologia Canabinoide", "Dor Orofacial & DTM", "Bruxismo", "UNIFESP", "CRO-PB 11867"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    premiumPrice: 180,
+    whatsapp: "5583999479342",
+    rating: 5.0,
+    consults: 0,
+    avatar: "JL",
+    imageUrl: drJorgeLuizImg,
+    online: true,
+    cfmPrintUrl: cfoDrJorgeLuiz,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 08:30", "Hoje 10:30", "Hoje 14:30", "Hoje 16:30"],
+    crm: "CRO-PB 11867",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente profissional! Muito atencioso e seguro no tratamento da DTM e bruxismo com cannabis medicinal." }
+    ],
+  },
   {
     id: "med-anderson-mikalauskas",
     dbId: "f803c35d-31dd-48b6-a7e8-282036ccb389",

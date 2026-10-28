@@ -59,6 +59,14 @@ export default function ComunidadeConteudoIA() {
           </p>
         </div>
 
+        <div className="flex justify-center -mt-6 mb-10">
+          <Link to="/club">
+            <Button className="font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
+              🛍️ Club Planta y Raiz — Loja & Posts <ArrowRight size={16} className="ml-1" />
+            </Button>
+          </Link>
+        </div>
+
         {/* Search */}
         <div className="max-w-xl mx-auto relative mb-12">
           <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />

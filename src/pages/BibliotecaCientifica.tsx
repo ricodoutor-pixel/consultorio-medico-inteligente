@@ -139,6 +139,11 @@ const BibliotecaCientifica = () => {
                   ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />
                 </Button>
               )}
+              <Link to="/club">
+                <Button variant="outline" className="whitespace-nowrap font-bold text-xs rounded-xl border-primary/40 text-primary">
+                  🛍️ COMUNIDADE: LOJA & POSTS <ArrowRight size={14} className="ml-1" />
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center gap-1.5 text-sm font-bold">
               <span className="text-muted-foreground">📥</span>

@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -109,8 +110,8 @@ export function useBrisaConversations(filters: {
 
   useEffect(() => {
     fetchData();
-    const t = setInterval(fetchData, POLL_MS);
-    return () => clearInterval(t);
+    const t = setVisibleInterval(fetchData, POLL_MS);
+    return () => t();
   }, [fetchData]);
 
   return { contacts, metrics, loading, error, refresh: fetchData };
@@ -140,10 +141,10 @@ export function useBrisaConversationHistory(contactId: string | null) {
       }
     };
     load();
-    const t = setInterval(load, POLL_MS);
+    const t = setVisibleInterval(load, POLL_MS);
     return () => {
       active = false;
-      clearInterval(t);
+      t();
     };
   }, [contactId]);
 

@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
@@ -186,8 +187,8 @@ const AdminMonitoramento = () => {
       fetchMetrics();
     };
     checkAuth();
-    const t = setInterval(fetchMetrics, 30000);
-    return () => clearInterval(t);
+    const t = setVisibleInterval(fetchMetrics, 30000);
+    return () => t();
   }, [navigate, fetchMetrics]);
 
   return (

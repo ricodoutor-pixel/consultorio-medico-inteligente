@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -30,8 +31,8 @@ export function useQueueOrchestrator(pollMs = 15000, country?: string) {
 
   useEffect(() => {
     refresh();
-    const id = setInterval(refresh, pollMs);
-    return () => clearInterval(id);
+    const id = setVisibleInterval(refresh, pollMs);
+    return () => id();
   }, [refresh, pollMs]);
 
   return { doctor, loading, hasDoctor: !!doctor, refresh };

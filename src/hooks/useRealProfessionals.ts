@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 // src/hooks/useRealProfessionals.ts
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -142,7 +143,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     };
 
     void fetchDoctors();
-    const poll = window.setInterval(fetchDoctors, 30_000);
+    const poll = setVisibleInterval(fetchDoctors, 30_000);
     const channel = supabase
       .channel("public:doctors-status-real")
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, fetchDoctors)
@@ -150,7 +151,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     return () => {
       active = false;
-      window.clearInterval(poll);
+      poll();
       void supabase.removeChannel(channel);
     };
   }, []);

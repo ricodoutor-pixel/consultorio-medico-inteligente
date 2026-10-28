@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,7 +63,7 @@ export default function GrowthDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); const i = setInterval(load, 30000); return () => clearInterval(i); }, []);
+  useEffect(() => { load(); const i = setVisibleInterval(load, 30000); return () => i(); }, []);
 
   const runNow = async () => {
     setRunning(true);

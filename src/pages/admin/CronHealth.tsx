@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Activity, AlertTriangle, CheckCircle2, RefreshCw, ShieldAlert, Zap } from "lucide-react";
@@ -47,8 +48,8 @@ export default function CronHealth() {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 30_000);
-    return () => clearInterval(t);
+    const t = setVisibleInterval(load, 30_000);
+    return () => t();
   }, [load]);
 
   const triggerHealthCheck = async () => {

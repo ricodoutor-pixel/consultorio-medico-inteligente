@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -30,10 +31,10 @@ export function useContingencyMode(): ContingencyState & { loading: boolean } {
       if (alive) setLoading(false);
     };
     load();
-    const interval = setInterval(load, 60_000); // re-check a cada 60s
+    const interval = setVisibleInterval(load, 60_000); // re-check a cada 60s
     return () => {
       alive = false;
-      clearInterval(interval);
+      interval();
     };
   }, []);
 

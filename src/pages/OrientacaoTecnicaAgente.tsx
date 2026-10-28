@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Fluxo real (contrato v2): explicação → triagem (Enfª Brisa) → pagamento R$ 30
 // (Mercado Pago, triagem gravada ANTES da ordem) → aguardando confirmação (lê
@@ -340,8 +341,7 @@ export default function OrientacaoTecnicaAgente() {
   // Relatórios em revisão: atualiza a cada 15s.
   useEffect(() => {
     if (phase !== "room" || !reports.some((r) => r.status === "draft")) return;
-    const t = window.setInterval(() => void loadReports(), 15000);
-    return () => window.clearInterval(t);
+    return setVisibleInterval(() => void loadReports(), 15000);
   }, [phase, reports, loadReports]);
 
   // ── Cronômetro local (sincronizado pelo status) ────────────────────────

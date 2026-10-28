@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -193,8 +194,8 @@ const AutomationsDashboard = () => {
   useEffect(() => {
     refresh();
     fetchKPIs().then(setKpis).catch(console.error);
-    const iv = setInterval(refresh, 30000);
-    return () => clearInterval(iv);
+    const iv = setVisibleInterval(refresh, 30000);
+    return () => iv();
   }, [refresh]);
 
   const onlineCount = automations.filter((a) => a.status === "online").length;

@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 // 🌿 Convite de consulta em tempo real — o profissional tem 1 minuto para aceitar.
 // Se recusar ou o tempo esgotar, a consulta passa automaticamente ao próximo
 // profissional online com KYC 100% verde (regra oficial da plataforma).
@@ -45,8 +46,8 @@ export function ConsultationOfferBanner({ doctorId }: Props) {
 
   useEffect(() => {
     void load();
-    const t = setInterval(() => void load(), 10_000);
-    return () => clearInterval(t);
+    const t = setVisibleInterval(() => void load(), 10_000);
+    return () => t();
   }, [load]);
 
   useEffect(() => {
@@ -57,8 +58,8 @@ export function ConsultationOfferBanner({ doctorId }: Props) {
       if (left === 0) setOffer(null);
     };
     tick();
-    const t = setInterval(tick, 1000);
-    return () => clearInterval(t);
+    const t = setVisibleInterval(tick, 1000);
+    return () => t();
   }, [offer]);
 
   const respond = async (reply: "yes" | "no") => {

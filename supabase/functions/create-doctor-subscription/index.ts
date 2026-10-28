@@ -77,28 +77,25 @@ Deno.serve(async (req) => {
       });
     }
 
-    const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
+    const siteUrl = "https://www.plantayraiz.com.br";
 
+    // Assinatura recorrente: o Mercado Pago cobra automaticamente todo mês (preapproval).
+    // external_reference começa com `plano_medico:` para o webhook ativar o plano a cada cobrança.
     const preference = {
-      items: [{
-        title: plan.title,
-        quantity: 1,
-        unit_price: plan.amount,
+      reason: plan.title,
+      external_reference: `plano_medico:${user.id}:${Date.now()}:${planId}`,
+      payer_email: user.email,
+      auto_recurring: {
+        frequency: 1,
+        frequency_type: "months",
+        transaction_amount: plan.amount,
         currency_id: "BRL",
-      }],
-      payer: { email: user.email || undefined },
-      back_urls: {
-        success: `${siteUrl}/dashboard-medico?subscription=success&plan=${planId}`,
-        failure: `${siteUrl}/dashboard-medico?subscription=failure`,
-        pending: `${siteUrl}/dashboard-medico?subscription=pending`,
       },
-      auto_return: "approved",
+      back_url: `${siteUrl}/dashboard-medico?subscription=success&plan=${planId}`,
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
-      external_reference: `doctor-sub-${doctorId}-${planId}-${Date.now()}`,
-      statement_descriptor: "PLANTA RAIZ MED",
     };
 
-    const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
+    const mpResponse = await fetch("https://api.mercadopago.com/preapproval", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${MP_ACCESS_TOKEN}`,

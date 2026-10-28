@@ -18,8 +18,45 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const question = body.question || "";
-    const rawRole = (body.role || body.context_role || "").toLowerCase();
-    const senderName = body.senderName || "Doutor(a)";
+    let rawRole = (body.role || body.context_role || "").toLowerCase();
+    let senderName = body.senderName || "Doutor(a)";
+    const phoneDigits = String(body.phone || "").replace(/\D/g, "");
+
+    // 🧑‍⚕️ Verificação oficial: se o telefone pertence a um médico cadastrado, NUNCA tratar como paciente
+    let verifiedDoctor = false;
+    if (phoneDigits.length >= 8) {
+      try {
+        const url = Deno.env.get("SUPABASE_URL")!;
+        const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const h = { apikey: key, Authorization: `Bearer ${key}` };
+        const last8 = phoneDigits.slice(-8);
+        const pr = await fetch(`${url}/rest/v1/profiles?select=id,full_name,phone&phone=ilike.*${last8}*&limit=5`, { headers: h });
+        const profs = pr.ok ? await pr.json() : [];
+        const ids = (profs || []).map((p: any) => p.id).filter(Boolean);
+        if (ids.length) {
+          const dr = await fetch(`${url}/rest/v1/doctors?select=user_id&user_id=in.(${ids.join(",")})&limit=1`, { headers: h });
+          const docs = dr.ok ? await dr.json() : [];
+          if (docs?.length) {
+            verifiedDoctor = true;
+            rawRole = "doctor";
+            const p = profs.find((x: any) => x.id === docs[0].user_id);
+            if (p?.full_name) senderName = String(p.full_name).replace(/^(dr\.?|dra\.?)\s+/i, "");
+          }
+        }
+      } catch (e) {
+        console.warn("[chat-brisa] verificação de médico falhou:", e);
+      }
+    }
+
+    // 🙋 Pedido de atendente humano → a IA para e sinaliza a pausa
+    const normQ = String(question).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (/(humano|atendente|pessoa real|pessoa de verdade|falar com (alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte|suporte)|quero suporte|nao quero (falar com )?(robo|bot|ia)|voce e (um )?robo)/i.test(normQ)) {
+      return new Response(JSON.stringify({
+        handoff: true,
+        role: rawRole || "unknown",
+        answer: "Claro! Vou pausar o atendimento automático e chamar nossa equipe agora. Uma pessoa vai continuar a conversa com você por aqui em breve. 🙏🌿",
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     if (!GEMINI_API_KEY) {
       throw new Error("API Key not configured")
@@ -120,6 +157,18 @@ Nenhuma consulta ou cobrança é realizada dentro do WhatsApp; o WhatsApp serve 
       ? `\nHISTÓRICO RECENTE DA CONVERSA:\n` + history.map((h: any) => `${h.role === 'brisa' ? 'Enfermeira Brisa' : senderName}: ${h.text}`).join('\n') + `\n\nREGRA VITAL: Não repita frases ou saudações já ditas no histórico recente. Demonstre que você se lembra do que foi falado e dê sequência lógica e humana ao atendimento.\n`
       : "";
 
+    // 💬 Estilo humano (vale para todos os públicos)
+    systemInstruction += `
+
+ESTILO DE RESPOSTA (OBRIGATÓRIO):
+- Escreva como uma pessoa real no WhatsApp: frases curtas, tom gentil, no máximo 3 parágrafos curtos e 1 ou 2 emojis.
+- Responda primeiro exatamente o que foi perguntado. Não despeje todas as informações de uma vez.
+- Se já se apresentou ou já cumprimentou na conversa, NÃO se apresente nem cumprimente de novo.
+- Não reenvie um link que já foi enviado no histórico, a menos que a pessoa peça.
+- Termine com no máximo uma pergunta simples para continuar a conversa.
+- Se a pessoa pedir para falar com alguém da equipe, diga que vai chamar a equipe e não insista.${verifiedDoctor ? `
+- CONFIRMADO NO CADASTRO OFICIAL: este contato é MÉDICO da plataforma. Trate sempre como colega profissional, jamais como paciente.` : ""}`;
+
     const interlocutorLabel = (rawRole === 'doctor' || rawRole.includes('medico')) 
       ? `Mensagem do(a) Dr(a). ${senderName}:` 
       : (rawRole === 'pharmacy' || rawRole.includes('farmacia')) 
@@ -132,48 +181,48 @@ Nenhuma consulta ou cobrança é realizada dentro do WhatsApp; o WhatsApp serve 
       }]
     };
 
-    const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
-
-    let answer = res.ok
-      ? (res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "")
-      : "";
-    let usedModel = res.usedModel;
-
-    // Fallback: quando a cota do Gemini direto estoura (429) usamos o Lovable AI Gateway com Gemini 3.8 sem reasoning
-    if (!answer) {
-      const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-      if (lovableKey) {
-        try {
-          const gwMessages = [
-            { role: "system", content: systemInstruction },
-            ...history.slice(-4).map((h: any) => ({
-              role: h.role === 'brisa' ? 'assistant' : 'user',
-              content: h.text || ''
-            })),
-            { role: "user", content: question }
-          ];
-
-          const gw = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Lovable-API-Key": lovableKey },
-            body: JSON.stringify({
-              model: GATEWAY_GEMINI_PRIMARY,
-              reasoning: GATEWAY_NO_REASONING,
-              messages: gwMessages,
-            }),
-          });
-          const gwData = await gw.json().catch(() => ({}));
-          if (gw.ok) {
-            answer = gwData?.choices?.[0]?.message?.content || "";
-            usedModel = GATEWAY_GEMINI_PRIMARY;
-          } else {
-            console.warn("[chat-brisa] Lovable AI fallback falhou:", gw.status, gwData?.error?.message || "");
-          }
-        } catch (gwErr) {
-          console.warn("[chat-brisa] Lovable AI fallback erro:", gwErr);
+    // 🧠 Cérebro principal: Gemini 3.8 Flash via Lovable AI Gateway (histórico completo como turnos reais)
+    let answer = "";
+    let usedModel = "";
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    if (lovableKey) {
+      try {
+        const gwMessages = [
+          { role: "system", content: systemInstruction },
+          ...history.slice(-10).map((h: any) => ({
+            role: h.role === 'brisa' ? 'assistant' : 'user',
+            content: h.text || ''
+          })),
+          { role: "user", content: question }
+        ];
+        const gw = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Lovable-API-Key": lovableKey },
+          body: JSON.stringify({
+            model: GATEWAY_GEMINI_PRIMARY,
+            reasoning: GATEWAY_NO_REASONING,
+            messages: gwMessages,
+          }),
+        });
+        const gwData = await gw.json().catch(() => ({}));
+        if (gw.ok) {
+          answer = gwData?.choices?.[0]?.message?.content || "";
+          usedModel = GATEWAY_GEMINI_PRIMARY;
+        } else {
+          console.warn("[chat-brisa] Gemini 3.8 falhou:", gw.status, gwData?.error?.message || "");
         }
+      } catch (gwErr) {
+        console.warn("[chat-brisa] Gemini 3.8 erro:", gwErr);
       }
     }
+
+    // Reserva: chave Gemini direta
+    if (!answer) {
+      const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
+      answer = res.ok ? (res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "") : "";
+      usedModel = res.usedModel;
+    }
+
 
     if (!answer) {
       // Nunca devolvemos 500 para o paciente: mensagem amigável com orientação.
@@ -187,7 +236,14 @@ Nenhuma consulta ou cobrança é realizada dentro do WhatsApp; o WhatsApp serve 
       );
     }
 
-    return new Response(JSON.stringify({ answer, model: usedModel }), {
+    // 🔁 Anti-repetição: se a resposta for igual à última enviada, não reenviar o mesmo texto
+    const lastBrisa = [...history].reverse().find((h: any) => h.role === 'brisa')?.text || body.lastAnswer || "";
+    const norm = (s: string) => String(s).toLowerCase().replace(/\s+/g, " ").trim().slice(0, 160);
+    if (lastBrisa && norm(lastBrisa) === norm(answer)) {
+      answer = "Entendi! Me conta um pouco mais do que você precisa agora, que eu te ajudo com o próximo passo. 🌿";
+    }
+
+    return new Response(JSON.stringify({ answer, model: usedModel, role: rawRole || "unknown", verifiedDoctor }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 

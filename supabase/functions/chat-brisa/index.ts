@@ -157,6 +157,18 @@ Nenhuma consulta ou cobrança é realizada dentro do WhatsApp; o WhatsApp serve 
       ? `\nHISTÓRICO RECENTE DA CONVERSA:\n` + history.map((h: any) => `${h.role === 'brisa' ? 'Enfermeira Brisa' : senderName}: ${h.text}`).join('\n') + `\n\nREGRA VITAL: Não repita frases ou saudações já ditas no histórico recente. Demonstre que você se lembra do que foi falado e dê sequência lógica e humana ao atendimento.\n`
       : "";
 
+    // 💬 Estilo humano (vale para todos os públicos)
+    systemInstruction += `
+
+ESTILO DE RESPOSTA (OBRIGATÓRIO):
+- Escreva como uma pessoa real no WhatsApp: frases curtas, tom gentil, no máximo 3 parágrafos curtos e 1 ou 2 emojis.
+- Responda primeiro exatamente o que foi perguntado. Não despeje todas as informações de uma vez.
+- Se já se apresentou ou já cumprimentou na conversa, NÃO se apresente nem cumprimente de novo.
+- Não reenvie um link que já foi enviado no histórico, a menos que a pessoa peça.
+- Termine com no máximo uma pergunta simples para continuar a conversa.
+- Se a pessoa pedir para falar com alguém da equipe, diga que vai chamar a equipe e não insista.${verifiedDoctor ? `
+- CONFIRMADO NO CADASTRO OFICIAL: este contato é MÉDICO da plataforma. Trate sempre como colega profissional, jamais como paciente.` : ""}`;
+
     const interlocutorLabel = (rawRole === 'doctor' || rawRole.includes('medico')) 
       ? `Mensagem do(a) Dr(a). ${senderName}:` 
       : (rawRole === 'pharmacy' || rawRole.includes('farmacia')) 
@@ -224,7 +236,14 @@ Nenhuma consulta ou cobrança é realizada dentro do WhatsApp; o WhatsApp serve 
       );
     }
 
-    return new Response(JSON.stringify({ answer, model: usedModel }), {
+    // 🔁 Anti-repetição: se a resposta for igual à última enviada, não reenviar o mesmo texto
+    const lastBrisa = [...history].reverse().find((h: any) => h.role === 'brisa')?.text || body.lastAnswer || "";
+    const norm = (s: string) => String(s).toLowerCase().replace(/\s+/g, " ").trim().slice(0, 160);
+    if (lastBrisa && norm(lastBrisa) === norm(answer)) {
+      answer = "Entendi! Me conta um pouco mais do que você precisa agora, que eu te ajudo com o próximo passo. 🌿";
+    }
+
+    return new Response(JSON.stringify({ answer, model: usedModel, role: rawRole || "unknown", verifiedDoctor }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 

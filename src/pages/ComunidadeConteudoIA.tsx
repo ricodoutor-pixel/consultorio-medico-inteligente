@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Sparkles, Download, Search, FileText, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";

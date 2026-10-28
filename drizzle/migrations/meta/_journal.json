@@ -8,6 +8,13 @@
       "when": 1793222563045,
       "tag": "0000_kyc_payment_proof_kind",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793222684199,
+      "tag": "0001_kyc_vip_receipt_kind",
+      "breakpoints": true
     }
   ]
 }

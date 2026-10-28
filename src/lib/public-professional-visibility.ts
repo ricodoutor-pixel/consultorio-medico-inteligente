@@ -10,6 +10,10 @@ type PublicIdentity = {
 const withdrawals = [
   { id: "med-leuma-netta", name: "leuma leao netta", number: "85182", state: "MG" },
   { id: "med-ana-paula", name: "ana paula ferreira lima", number: "36942", state: "PR" },
+  // Paused from the doctor showcase; Dr. Edilson stays only on Orientação Técnica.
+  { id: "med-0", name: "edilson bezerra", number: "", state: "" },
+  { id: "med-0", name: "edilson bezerra da silva", number: "", state: "" },
+  { id: "mock-olivia", name: "olivia zimeri", number: "", state: "" },
 ];
 
 export function isPublicProfessionalVisible(identity: PublicIdentity): boolean {
@@ -22,6 +26,6 @@ export function isPublicProfessionalVisible(identity: PublicIdentity): boolean {
   const state = (identity.crm_state || registration.match(/(?:\/|\s-\s)\s*([a-z]{2})\b/i)?.[1] || "").toUpperCase();
   return !withdrawals.some((entry) =>
     identity.id === entry.id || name === entry.name ||
-    (number === entry.number && state === entry.state),
+    (!!entry.number && number === entry.number && state === entry.state),
   );
 }

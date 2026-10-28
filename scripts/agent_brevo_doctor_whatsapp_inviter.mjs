@@ -20,7 +20,7 @@ const BLACKLIST_FILE = path.join(__dirname, 'evolution_optout_blacklist.json');
 const PAUSE_GLOBAL_FILE = path.join(__dirname, 'PAUSE_AUTOMATION.flag');
 
 // 🔒 Ativado conforme solicitação expressa do Dr. Edilson (1 msg a cada 15 min)
-const BRISA_COLD_OUTREACH_ENABLED = process.env.BRISA_COLD_OUTREACH_ENABLED !== 'false';
+const BRISA_COLD_OUTREACH_ENABLED = false; // Pausado por determinação do Dr. Edilson (foco 100% em E-mail)
 
 function isGlobalPauseActive() {
   return fs.existsSync(PAUSE_GLOBAL_FILE);

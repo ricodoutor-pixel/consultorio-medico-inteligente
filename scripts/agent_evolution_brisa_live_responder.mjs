@@ -333,8 +333,8 @@ function isOptOutRequested(text) {
 
 // Detecção rigorosa de solicitação de humano
 function isHumanRequested(text) {
-  const low = text.toLowerCase();
-  return /(falar com (um\s+)?(agente\s+)?humano|preciso falar com|agente humano|atendimento humano|pessoa real|pessoa de verdade|passar para humano|quero humano|chamar humano|humano por favor|atendente por favor|quero falar com uma pessoa|com humano|falar com um humano|quero um humano|atendente humano|equipe humana)/i.test(low);
+  const low = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com (alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|falar com (alguem|a equipe|o suporte|o edilson)|equipe humana|nao quero (falar com )?(robo|bot|ia)|voce e (um )?robo)/i.test(low);
 }
 
 // Detecção estrita de solicitação de pausa da automação / conversa
@@ -1141,13 +1141,24 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
         body: JSON.stringify({
           question,
           role,
+          phone: String(recipient || '').includes('@lid') ? '' : String(recipient || '').replace(/\D/g, ''),
           senderName: senderName || (role === 'doctor' ? 'Doutor(a)' : 'Usuário'),
-          history: mem?.turns ? mem.turns.slice(-6) : []
+          history: mem?.turns ? mem.turns.slice(-10) : [],
+          lastAnswer: mem?.lastAnswerSent || ''
         })
       });
       if (res.ok) {
         const data = await res.json();
         const apiReply = data.answer || data.reply;
+        if (data.verifiedDoctor && mem) { mem.audienceRole = 'doctor'; saveConversationMemory(); }
+        if (data.handoff) {
+          try {
+            const locked = loadHumanLocked();
+            locked.add(recipient);
+            saveHumanLocked(locked);
+            await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Brisa pausada para esta conversa.\n(Para reativar: *REATIVAR_IA ${recipient}*)`);
+          } catch (e) { log(`Aviso handoff: ${e.message}`); }
+        }
         if (apiReply && !apiReply.toLowerCase().includes('apenas monitoramento')) {
           reply = apiReply;
         }

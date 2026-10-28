@@ -15,3 +15,12 @@ describe("explicit public withdrawals", () => {
     expect(isPublicProfessionalVisible({ name: "Dra. Ana Paula Silva", crm: "36942/SP" })).toBe(true);
   });
 });
+import { describe as d2, it as i2, expect as e2 } from "vitest";
+import { isPublicProfessionalVisible as vis } from "./public-professional-visibility";
+d2("showcase pauses (28/10/2026)", () => {
+  i2("keeps Dra. Suelen visible", () => e2(vis({ id: "mock-suelen", name: "Dra. Suelen Naves Rodrigues" })).toBe(true));
+  i2("pauses Dra. Olivia and Dr. Edilson", () => {
+    e2(vis({ id: "mock-olivia", name: "Dra. Olivia Zimeri" })).toBe(false);
+    e2(vis({ name: "Dr. Edilson Bezerra da Silva" })).toBe(false);
+  });
+});

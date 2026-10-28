@@ -14,6 +14,8 @@ const withdrawals = [
   { id: "med-0", name: "edilson bezerra", number: "", state: "" },
   { id: "med-0", name: "edilson bezerra da silva", number: "", state: "" },
   { id: "mock-olivia", name: "olivia zimeri", number: "", state: "" },
+  // Technical director: discreet legal mention only, no showcase card.
+  { id: "mock-suelen", name: "suelen naves rodrigues", number: "49354", state: "PR" },
 ];
 
 export function isPublicProfessionalVisible(identity: PublicIdentity): boolean {

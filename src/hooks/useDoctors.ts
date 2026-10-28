@@ -205,6 +205,26 @@ export function useDoctors() {
           avatar_url: avatarUrl,
         };
 
+        
+        // Enriquecimento oficial do dossiê averiguado do Dr. Jorge Luiz de Brito Melo (CRO-PB 11867)
+        if (crmStr.includes("11867") || lowerName.includes("jorge luiz de brito melo")) {
+          mergedProfile = {
+            ...mergedProfile,
+            full_name: "Dr. Jorge Luiz de Brito Melo",
+            email: mergedProfile.email || "dr.jorgeluiz0@gmail.com",
+            cpf: mergedProfile.cpf || "700.362.454-02",
+            phone: mergedProfile.phone || "+5583999479342",
+            pix_key: mergedProfile.pix_key || "+5583999479342",
+            pix_type: mergedProfile.pix_type || "telefone",
+            date_of_birth: mergedProfile.date_of_birth || "1994-06-08",
+            cep: mergedProfile.cep || "58015-710",
+            address_street: mergedProfile.address_street || "Rua Frei Afonso",
+            neighborhood: mergedProfile.neighborhood || "Jaguaribe",
+            city: mergedProfile.city || "João Pessoa",
+            region: mergedProfile.region || "PB",
+          };
+        }
+
         // Enriquecimento oficial do dossiê averiguado do Dr. Anderson Mikalauskas (CRM 235755/SP • 3709/SE)
         if (crmStr.includes("235755") || lowerName.includes("anderson mikalauskas")) {
           signatureUrl = signatureUrl || "/avatars/assinatura-receituario-dr-anderson.png";

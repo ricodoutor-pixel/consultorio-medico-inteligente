@@ -407,7 +407,6 @@ export default function ConfiguracoesMedico() {
             open={scheduleModalOpen}
             onOpenChange={setScheduleModalOpen}
             doctorId={doctorData?.id}
-            doctorName={fullName || undefined}
           />
         </div>
       </main>

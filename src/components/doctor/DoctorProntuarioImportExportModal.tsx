@@ -198,7 +198,7 @@ export function DoctorProntuarioImportExportModal({
           if (patientIds.length > 0) {
             const { data: profs } = await supabase
               .from("profiles")
-              .select("id, full_name, cpf, phone, email")
+              .select("id, full_name, cpf, phone")
               .in("id", patientIds);
             for (const p of profs || []) {
               profilesMap[p.id] = p;

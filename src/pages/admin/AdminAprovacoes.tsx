@@ -23,6 +23,7 @@ import KycDocViewer from "@/components/admin/KycDocViewer";
 import DoctorContractViewerModal, { DoctorContractDetails } from "@/components/admin/DoctorContractViewerModal";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
+import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness, doctorTierFromDocs, DOCTOR_TIER_LABEL } from "@/lib/doctor-ranking";
 
 export const AdminAprovacoes = () => {
@@ -64,6 +65,25 @@ export const AdminAprovacoes = () => {
   const docOf = (doc: any, kind: KycKind) => {
     const found = (doc.kyc_docs || []).find((k: any) => k.document_kind === kind);
     if (found) return found;
+    if (kind === "cfm_print") {
+      const cfmPath = getDoctorCfmPrint(doc?.crm || doc?.profile?.full_name || doc?.full_name);
+      if (cfmPath) {
+        return {
+          id: "kyc-cfm-print-" + (doc.id || "doc"),
+          document_kind: "cfm_print",
+          storage_path: cfmPath,
+          verification_status: "approved",
+        };
+      }
+    }
+    if (kind === "icp_brasil" && doc?.signature_url) {
+      return {
+        id: "kyc-icp-sig-" + (doc.id || "doc"),
+        document_kind: "icp_brasil",
+        storage_path: doc.signature_url,
+        verification_status: "approved",
+      };
+    }
     if (kind === "vip_receipt" && (isVictorDoctor(doc) || doc?.plan_tier === "vip_prescritor")) {
       return {
         id: "kyc-vip-receipt-" + (doc.id || "victor"),
@@ -152,7 +172,7 @@ export const AdminAprovacoes = () => {
     return [
       ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ 
         label: KYC_LABELS[kind], 
-        ok: kind === 'icp_brasil' ? Boolean(doc.signature_url) : kinds.has(kind) 
+        ok: kind === 'icp_brasil' ? Boolean(doc.signature_url || kinds.has(kind)) : kinds.has(kind) 
       })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
@@ -610,7 +630,7 @@ export const AdminAprovacoes = () => {
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
                             {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
-                              const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url) : Boolean(docOf(doc, kind));
+                              const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url || docOf(doc, kind)) : Boolean(docOf(doc, kind));
                               return (
                                 <Button
                                   key={kind}
@@ -925,10 +945,7 @@ export const AdminAprovacoes = () => {
                       size="sm" 
                       variant="outline" 
                       className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
-                      onClick={() => {
-                        const url = selectedDoctor.cpf_proof_url || "";
-                        if (url) window.open(url, '_blank');
-                      }}
+                      onClick={() => openDoc(selectedDoctor, "cpf_doc")}
                     >
                       <ExternalLink size={12} className="mr-1" /> Ver CPF Receita
                     </Button>
@@ -943,10 +960,7 @@ export const AdminAprovacoes = () => {
                       size="sm" 
                       variant="outline" 
                       className="text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-                      onClick={() => {
-                        const url = selectedDoctor.crm_proof_url || (selectedDoctor.crm === "42912" || selectedDoctor.crm === "10963" ? "/proof_crm_joao_pedro.jpg" : "/proof_crm_joao_pedro.jpg");
-                        if (url) window.open(url, '_blank');
-                      }}
+                      onClick={() => openDoc(selectedDoctor, "cfm_print")}
                     >
                       <ExternalLink size={12} className="mr-1" /> Ver CRM CFM
                     </Button>

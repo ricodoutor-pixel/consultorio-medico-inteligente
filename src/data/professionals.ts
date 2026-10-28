@@ -41,6 +41,8 @@ import drDanielKobayashiImg from "@/assets/dr-daniel-kobayashi.jpg";
 import cfmDaniel from "@/assets/cfm_prints/dr-daniel.png";
 import drJoseGeraldoImg from "@/assets/dr-jose-geraldo.jpg";
 import cfmJoseGeraldo from "@/assets/cfm_prints/dr-jose-geraldo.png";
+import drAndersonMikalauskasImg from "@/assets/dr-anderson-mikalauskas.jpg";
+import cfmDrAndersonMikalauskas from "@/assets/cfm_prints/cfm-dr-anderson-mikalauskas.png";
 
 export type Professional = {
   id: string;
@@ -248,6 +250,33 @@ export const STANDARD_DOCTOR_SERVICES = [
 
 export const professionals: Professional[] = [
   {
+    id: "med-anderson-mikalauskas",
+    dbId: "f803c35d-31dd-48b6-a7e8-282036ccb389",
+    name: "Dr. Anderson Mikalauskas",
+    category: "Médicos Prescritores",
+    councilLabel: "CRM",
+    bio: "Médico graduado pela Escuela Latinoamericana de Medicina (2007), com diploma revalidado pela Universidade Federal de Mato Grosso (UFMT). Inscrito regularmente no CRM 235755/SP e CRM 3709/SE (situação Regular no CFM). Com 19 anos de experiência médica em Clínica Geral, Saúde da Família e Medicina Integrativa e Canabinoide, realiza atendimento humanizado com foco no controle de dor crônica, saúde mental, distúrbios do sono e qualidade de vida.",
+    flags: ["🇧🇷"],
+    experience: "19 anos",
+    tags: ["Clínica Geral", "Medicina Canabinoide", "Saúde Integrativa", "CRM 235755/SP • 3709/SE"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511979608870",
+    rating: 5.0,
+    consults: 0,
+    avatar: "AM",
+    imageUrl: drAndersonMikalauskasImg,
+    online: true,
+    cfmPrintUrl: cfmDrAndersonMikalauskas,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:00", "Hoje 11:00", "Hoje 14:30", "Hoje 17:00"],
+    crm: "235755/SP • 3709/SE",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Médico extremamente experiente, atencioso e cuidadoso na explicação do tratamento." }
+    ],
+  },
+  {
     id: "med-amir-hayel-ali",
     dbId: "933411e3-75b1-4dd6-96a0-9bcb2614829d",
     name: "Dr. Amir Hayel Ali",
@@ -262,9 +291,9 @@ export const professionals: Professional[] = [
     rating: null,
     consults: 0,
     avatar: "AA",
-    imageUrl: "",
-    cfmPrintUrl: cfmDrAmirHayelAli.url,
-    online: false,
+    imageUrl: "/avatars/dr-amir-ali-jaleco.jpg?v=20261027",
+    cfmPrintUrl: "/cfm_prints/cfm-dr-amir-ali.png",
+    online: true,
     crm: "38430/SC • 57711/PR",
     flags: ["🇧🇷"],
     paymentLink: "",

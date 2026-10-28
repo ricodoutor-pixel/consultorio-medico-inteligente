@@ -67,6 +67,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
   if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return "/avatars/dr-luiz-roberto-medina.jpg";
   if (n.includes("julio") || n.includes("sacomori") || c.includes("44830")) return "/avatars/dr-julio-sacomori-jaleco.jpg?v=20261027v4";
+  if (n.includes("anderson") || n.includes("mikalauskas") || c.includes("235755") || c.includes("3709")) return "/avatars/dr-anderson-mikalauskas.jpg?v=20261028";
   if (n.includes("amir") || n.includes("hayel") || c.includes("38430") || c.includes("57711")) return "/avatars/dr-amir-ali-jaleco.jpg?v=20261027";
   if (n.includes("stella") || n.includes("martinelli") || c.includes("21102111")) return "/avatars/dra-stella-martinelli.jpg?v=20261022";
   if ((n.includes("victor") && n.includes("fonseca")) || n.includes("victor henrique") || c.includes("206873")) return "/avatars/dr-victor-fonseca.jpg?v=2";

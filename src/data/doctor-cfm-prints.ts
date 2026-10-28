@@ -4,6 +4,12 @@
  * salvos em public/cfm_prints/ e src/assets/cfm_prints/
  */
 export const DOCTOR_CFM_PRINTS: Record<string, string> = {
+  "235755": "/cfm_prints/cfm-dr-anderson-mikalauskas.png",
+  "3709": "/cfm_prints/cfm-dr-anderson-mikalauskas.png",
+  "20984": "/cfm_prints/cfm-dra-veronica-silva.png",
+  "22902": "/cfm_prints/cfm-dra-veronica-silva.png",
+  "9727": "/cfm_prints/cfm-dra-edna-marlisia.png",
+  "3227": "/cfm_prints/cfm-dra-edna-marlisia.png",
   "32584": "/cfm_prints/dr-jose-geraldo.png",
   "5460": "/cfm_prints/dr-daniel.png",
   "10346": "/cfm_prints/dr-daniel.png",
@@ -59,6 +65,9 @@ export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
     if (str.includes(crmKey.toLowerCase())) return path;
   }
 
+  if (str.includes("anderson") || str.includes("mikalauskas") || str.includes("235755") || str.includes("3709")) return "/cfm_prints/cfm-dr-anderson-mikalauskas.png";
+  if (str.includes("veronica") || str.includes("verônica") || str.includes("christine") || str.includes("20984") || str.includes("22902")) return "/cfm_prints/cfm-dra-veronica-silva.png";
+  if (str.includes("edna") || str.includes("marlisia") || str.includes("9727") || str.includes("3227")) return "/cfm_prints/cfm-dra-edna-marlisia.png";
   if (str.includes("rafaella") || str.includes("soletti") || str.includes("13542")) return "/cfm_prints/cfmv-dra-rafaella-soletti.png";
   if (str.includes("breno") || str.includes("boueri") || str.includes("affonso") || str.includes("75492")) return "/cfm_prints/cfm-dr-breno-boueri.png";
   if (str.includes("milton") || str.includes("urban") || str.includes("58169")) return "/cfm_prints/cfm-dr-milton-urban.png";

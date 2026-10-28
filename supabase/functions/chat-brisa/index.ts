@@ -18,8 +18,45 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const question = body.question || "";
-    const rawRole = (body.role || body.context_role || "").toLowerCase();
-    const senderName = body.senderName || "Doutor(a)";
+    let rawRole = (body.role || body.context_role || "").toLowerCase();
+    let senderName = body.senderName || "Doutor(a)";
+    const phoneDigits = String(body.phone || "").replace(/\D/g, "");
+
+    // 🧑‍⚕️ Verificação oficial: se o telefone pertence a um médico cadastrado, NUNCA tratar como paciente
+    let verifiedDoctor = false;
+    if (phoneDigits.length >= 8) {
+      try {
+        const url = Deno.env.get("SUPABASE_URL")!;
+        const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const h = { apikey: key, Authorization: `Bearer ${key}` };
+        const last8 = phoneDigits.slice(-8);
+        const pr = await fetch(`${url}/rest/v1/profiles?select=id,full_name,phone&phone=ilike.*${last8}*&limit=5`, { headers: h });
+        const profs = pr.ok ? await pr.json() : [];
+        const ids = (profs || []).map((p: any) => p.id).filter(Boolean);
+        if (ids.length) {
+          const dr = await fetch(`${url}/rest/v1/doctors?select=user_id&user_id=in.(${ids.join(",")})&limit=1`, { headers: h });
+          const docs = dr.ok ? await dr.json() : [];
+          if (docs?.length) {
+            verifiedDoctor = true;
+            rawRole = "doctor";
+            const p = profs.find((x: any) => x.id === docs[0].user_id);
+            if (p?.full_name) senderName = String(p.full_name).replace(/^(dr\.?|dra\.?)\s+/i, "");
+          }
+        }
+      } catch (e) {
+        console.warn("[chat-brisa] verificação de médico falhou:", e);
+      }
+    }
+
+    // 🙋 Pedido de atendente humano → a IA para e sinaliza a pausa
+    const normQ = String(question).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (/(humano|atendente|pessoa real|pessoa de verdade|falar com (alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte|suporte)|quero suporte|nao quero (falar com )?(robo|bot|ia)|voce e (um )?robo)/i.test(normQ)) {
+      return new Response(JSON.stringify({
+        handoff: true,
+        role: rawRole || "unknown",
+        answer: "Claro! Vou pausar o atendimento automático e chamar nossa equipe agora. Uma pessoa vai continuar a conversa com você por aqui em breve. 🙏🌿",
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     if (!GEMINI_API_KEY) {
       throw new Error("API Key not configured")

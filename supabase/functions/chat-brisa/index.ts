@@ -181,48 +181,48 @@ ESTILO DE RESPOSTA (OBRIGATÓRIO):
       }]
     };
 
-    const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
-
-    let answer = res.ok
-      ? (res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "")
-      : "";
-    let usedModel = res.usedModel;
-
-    // Fallback: quando a cota do Gemini direto estoura (429) usamos o Lovable AI Gateway com Gemini 3.8 sem reasoning
-    if (!answer) {
-      const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-      if (lovableKey) {
-        try {
-          const gwMessages = [
-            { role: "system", content: systemInstruction },
-            ...history.slice(-4).map((h: any) => ({
-              role: h.role === 'brisa' ? 'assistant' : 'user',
-              content: h.text || ''
-            })),
-            { role: "user", content: question }
-          ];
-
-          const gw = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Lovable-API-Key": lovableKey },
-            body: JSON.stringify({
-              model: GATEWAY_GEMINI_PRIMARY,
-              reasoning: GATEWAY_NO_REASONING,
-              messages: gwMessages,
-            }),
-          });
-          const gwData = await gw.json().catch(() => ({}));
-          if (gw.ok) {
-            answer = gwData?.choices?.[0]?.message?.content || "";
-            usedModel = GATEWAY_GEMINI_PRIMARY;
-          } else {
-            console.warn("[chat-brisa] Lovable AI fallback falhou:", gw.status, gwData?.error?.message || "");
-          }
-        } catch (gwErr) {
-          console.warn("[chat-brisa] Lovable AI fallback erro:", gwErr);
+    // 🧠 Cérebro principal: Gemini 3.8 Flash via Lovable AI Gateway (histórico completo como turnos reais)
+    let answer = "";
+    let usedModel = "";
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    if (lovableKey) {
+      try {
+        const gwMessages = [
+          { role: "system", content: systemInstruction },
+          ...history.slice(-10).map((h: any) => ({
+            role: h.role === 'brisa' ? 'assistant' : 'user',
+            content: h.text || ''
+          })),
+          { role: "user", content: question }
+        ];
+        const gw = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Lovable-API-Key": lovableKey },
+          body: JSON.stringify({
+            model: GATEWAY_GEMINI_PRIMARY,
+            reasoning: GATEWAY_NO_REASONING,
+            messages: gwMessages,
+          }),
+        });
+        const gwData = await gw.json().catch(() => ({}));
+        if (gw.ok) {
+          answer = gwData?.choices?.[0]?.message?.content || "";
+          usedModel = GATEWAY_GEMINI_PRIMARY;
+        } else {
+          console.warn("[chat-brisa] Gemini 3.8 falhou:", gw.status, gwData?.error?.message || "");
         }
+      } catch (gwErr) {
+        console.warn("[chat-brisa] Gemini 3.8 erro:", gwErr);
       }
     }
+
+    // Reserva: chave Gemini direta
+    if (!answer) {
+      const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
+      answer = res.ok ? (res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "") : "";
+      usedModel = res.usedModel;
+    }
+
 
     if (!answer) {
       // Nunca devolvemos 500 para o paciente: mensagem amigável com orientação.

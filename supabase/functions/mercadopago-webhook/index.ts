@@ -160,7 +160,35 @@ Deno.serve(async (req) => {
       });
     }
 
-    const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    // Assinaturas recorrentes (preapproval): os avisos chegam com IDs que não são de pagamento.
+    // subscription_authorized_payment → resolve o pagamento real da cobrança mensal.
+    // subscription_preapproval → apenas status da assinatura (sem valor a registrar).
+    const topic = String(body.topic || type || "");
+    let resolvedPaymentId = String(paymentId);
+    if (topic === "subscription_preapproval" || topic === "preapproval") {
+      console.log(`[preapproval] status update for ${paymentId} — sem pagamento a registrar`);
+      return new Response(JSON.stringify({ status: "received", module: "preapproval" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (topic === "subscription_authorized_payment" || topic === "authorized_payment") {
+      const apResp = await fetch(`https://api.mercadopago.com/authorized_payments/${paymentId}`, {
+        headers: { Authorization: `Bearer ${mpAccessToken}` },
+      });
+      const ap = apResp.ok ? await apResp.json() : null;
+      const realId = ap?.payment?.id;
+      if (!realId) {
+        console.log(`[authorized_payment] ${paymentId} ainda sem pagamento vinculado (status ${ap?.status ?? apResp.status})`);
+        return new Response(JSON.stringify({ status: "received", module: "authorized_payment" }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      resolvedPaymentId = String(realId);
+    }
+
+    const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${resolvedPaymentId}`, {
       headers: { Authorization: `Bearer ${mpAccessToken}` },
     });
 
@@ -758,6 +786,20 @@ Deno.serve(async (req) => {
 
     if (planSku) {
       const planUserId = metadata.user_id || externalRef.split(":")[1] || null;
+
+      // Registra toda cobrança de plano (1ª e mensais) no Dashboard Financeiro do admin
+      const { error: planLogErr } = await supabase.from("payment_webhooks").insert({
+        payment_id: String(payment.id),
+        status: payment.status,
+        amount: totalAmount,
+        payer_email: payment.payer?.email || "unknown",
+        raw_data: payment,
+        action: `plan:${planSku}`,
+        platform_fee: totalAmount,
+        doctor_payout: 0,
+        split_processed: payment.status === "approved",
+      });
+      if (planLogErr) console.error("[plan] payment_webhooks insert error:", planLogErr);
       if (payment.status === "approved" && planUserId) {
         const now = new Date();
         const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -782,6 +824,32 @@ Deno.serve(async (req) => {
           updated_at: now.toISOString(),
         }, { onConflict: "stripe_subscription_id" });
         if (subErr) console.error("[plan] subscriptions upsert error:", subErr);
+
+        // Plano Médico VIP: reflete a assinatura paga no painel do médico e do admin
+        if (planSku === "plano_medico") {
+          const { data: doc } = await supabase
+            .from("doctors").select("id").eq("user_id", planUserId).maybeSingle();
+          if (doc?.id) {
+            const tier = externalRef.split(":")[3] || "premium";
+            const { data: existingMed } = await supabase
+              .from("medical_subscriptions").select("id")
+              .eq("doctor_id", doc.id).eq("plan_tier", tier).maybeSingle();
+            const medPayload = {
+              doctor_id: doc.id,
+              plan_tier: tier,
+              status: "active",
+              amount: totalAmount || 99,
+              mercadopago_subscription_id: String(payment.id),
+              started_at: now.toISOString(),
+              expires_at: periodEnd.toISOString(),
+              updated_at: now.toISOString(),
+            };
+            const { error: medErr } = existingMed?.id
+              ? await supabase.from("medical_subscriptions").update(medPayload).eq("id", existingMed.id)
+              : await supabase.from("medical_subscriptions").insert(medPayload);
+            if (medErr) console.error("[plan] medical_subscriptions error:", medErr);
+          }
+        }
 
         // Controle de cobrança recorrente automática (cron plan-renewal-engine)
         const { data: existingHealth } = await supabase

@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 // src/hooks/useDoctors.ts
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -374,7 +375,7 @@ export function useDoctors() {
     };
 
     performFetch();
-    const poll = setInterval(performFetch, 30_000);
+    const poll = setVisibleInterval(performFetch, 30_000);
 
     const channel = supabase
       .channel("public:doctors-status-hook")
@@ -387,7 +388,7 @@ export function useDoctors() {
       .subscribe();
 
     return () => {
-      clearInterval(poll);
+      poll();
       supabase.removeChannel(channel);
     };
   }, [fetchDoctors]);

@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { updateFrogIcon } from "@/lib/serviceWorkerRegistration";
@@ -136,7 +137,7 @@ export function useFrogMood() {
   useEffect(() => {
     syncMood();
     // Re-sync every 5 minutes
-    const interval = setInterval(syncMood, 5 * 60 * 1000);
+    const interval = setVisibleInterval(syncMood, 5 * 60 * 1000);
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
@@ -144,7 +145,7 @@ export function useFrogMood() {
     });
 
     return () => {
-      clearInterval(interval);
+      interval();
       subscription.unsubscribe();
     };
   }, [syncMood]);

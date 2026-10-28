@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,8 +112,8 @@ const President360 = () => {
 
   useEffect(() => {
     load();
-    const i = setInterval(load, 30_000);
-    return () => clearInterval(i);
+    const i = setVisibleInterval(load, 30_000);
+    return () => i();
   }, [load]);
 
   useAdminRealtime({

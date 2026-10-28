@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -100,10 +101,10 @@ export function useRealtimeNotifications(userId: string | undefined) {
     channelRef.current = channel;
 
     // 3) Fallback poll defensivo (rede móvel instável)
-    const interval = setInterval(() => fetchNotifications(true), FALLBACK_POLL_MS);
+    const interval = setVisibleInterval(() => fetchNotifications(true), FALLBACK_POLL_MS);
 
     return () => {
-      clearInterval(interval);
+      interval();
       supabase.removeChannel(channel);
       channelRef.current = null;
     };

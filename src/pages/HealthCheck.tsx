@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { lazy, useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,8 +64,8 @@ export default function HealthCheck() {
 
   useEffect(() => {
     fetchHealth();
-    const interval = setInterval(fetchHealth, 30000);
-    return () => clearInterval(interval);
+    const interval = setVisibleInterval(fetchHealth, 30000);
+    return () => interval();
   }, [fetchHealth]);
 
   const getStatusColor = (ok: boolean) => ok ? "text-green-500" : "text-red-500";

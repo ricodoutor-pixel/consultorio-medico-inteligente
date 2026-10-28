@@ -1,3 +1,4 @@
+import { setVisibleInterval } from "@/lib/visible-interval";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
@@ -256,8 +257,8 @@ const Admin = () => {
 
   useEffect(() => {
     loadData();
-    const i = setInterval(loadData, 15_000); // 15s para dados mais frescos
-    return () => clearInterval(i);
+    const i = setVisibleInterval(loadData, 15_000); // 15s para dados mais frescos
+    return () => i();
   }, [loadData]);
 
   const kpi = data.kpi;

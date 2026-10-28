@@ -23,7 +23,7 @@ export const useDiretoriaRealtimeData = () => {
       if (error) throw error;
       return data as RelatorioIA[];
     },
-    refetchInterval: 5000,
+    refetchInterval: 30000,
     staleTime: 0,
   });
 

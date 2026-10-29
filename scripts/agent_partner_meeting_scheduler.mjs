@@ -228,9 +228,7 @@ async function startDaemon() {
   }
 }
 
-if (process.argv[1] && process.argv[1].endsWith('agent_partner_meeting_scheduler.mjs')) {
-  startDaemon().catch(err => {
-    log(`🔥 Erro crítico: ${err.message}`);
-    process.exit(1);
-  });
-}
+startDaemon().catch(err => {
+  log(`🔥 Erro crítico: ${err.message}`);
+  process.exit(1);
+});

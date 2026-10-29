@@ -224,9 +224,7 @@ async function startDailyScheduler() {
   }
 }
 
-if (process.argv[1] && process.argv[1].endsWith('agent_organic_analytics_reporter.mjs')) {
-  startDailyScheduler().catch(err => {
-    log(`🔥 Erro crítico: ${err.message}`);
-    process.exit(1);
-  });
-}
+startDailyScheduler().catch(err => {
+  log(`🔥 Erro crítico: ${err.message}`);
+  process.exit(1);
+});

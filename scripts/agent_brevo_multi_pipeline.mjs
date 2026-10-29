@@ -397,9 +397,19 @@ export async function runMultiPipelineBatch(maxPerRun = 25) {
 }
 
 // Disparo quando executado diretamente
-if (process.argv[1] && process.argv[1].endsWith('agent_brevo_multi_pipeline.mjs')) {
-  runMultiPipelineBatch(20).catch(err => {
-    log(`🔥 Erro crítico: ${err.message}`);
-    process.exit(1);
-  });
+async function startPipelineDaemon() {
+  log('🚀 [MÓDULO 2] Agente Brevo Multi-Pipeline Ativo em Loop Contínuo');
+  while (true) {
+    try {
+      await runMultiPipelineBatch(20);
+    } catch (e) {
+      log(`⚠️ Erro no ciclo do pipeline: ${e.message}`);
+    }
+    await sleep(15 * 60 * 1000); // Aguarda 15 minutos entre lotes
+  }
 }
+
+startPipelineDaemon().catch(err => {
+  log(`🔥 Erro crítico: ${err.message}`);
+  process.exit(1);
+});

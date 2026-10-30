@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -15,7 +15,13 @@ import {
   MapPin, Phone, Mail, Store, AlertTriangle, ArrowRight, Loader2,
   Check, Sparkles, Clock, ExternalLink
 } from "lucide-react";
-import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
+import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA, PHARMACY_KYC_BUCKET, VENDOR_CATEGORY_DOCS, VENDOR_CATEGORY_LABELS, docsForCategory, normalizeVendorCategory, type VendorCategory } from "@/lib/pharmacy-kyc-docs";
+
+const CATEGORY_INFO: Record<VendorCategory, { emoji: string; desc: string }> = {
+  farmacia: { emoji: "💊", desc: "Farmácias e drogarias com AFE e farmacêutico RT" },
+  importador: { emoji: "🌎", desc: "Empresas importadoras de produtos canabinoides (RDC 660)" },
+  associacao: { emoji: "🤝", desc: "Associações de pacientes e cultivo medicinal" },
+};
 
 export default function CadastroFarmacia() {
   const { toast } = useToast();
@@ -24,6 +30,14 @@ export default function CadastroFarmacia() {
   const [submitted, setSubmitted] = useState(false);
   const [protocolNumber, setProtocolNumber] = useState("");
   const [agreedTerms, setAgreedTerms] = useState(false);
+  const [category, setCategory] = useState<VendorCategory>(() =>
+    normalizeVendorCategory(new URLSearchParams(window.location.search).get("categoria")),
+  );
+  const [authUserId, setAuthUserId] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setAuthUserId(data.user?.id ?? null));
+  }, []);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -46,15 +60,8 @@ export default function CadastroFarmacia() {
   });
 
   // Uploaded Files State
-  const [uploadedFiles, setUploadedFiles] = useState<Record<PharmacyKycKind, { file?: File; previewUrl?: string; name?: string }>>({
-    foto_fachada: {},
-    logo_empresa: {},
-    contrato_social_pdf: {},
-    cartao_cnpj: {},
-    alvara_sanitario: {},
-    crf_responsavel: {},
-    comprovante_endereco: {},
-  });
+  const [uploadedFiles, setUploadedFiles] = useState<Partial<Record<PharmacyKycKind, { file?: File; previewUrl?: string; name?: string }>>>({});
+
 
   // CEP Auto-fill
   const handleCepBlur = async () => {
@@ -106,108 +113,88 @@ export default function CadastroFarmacia() {
       return;
     }
 
+    const missing = VENDOR_CATEGORY_DOCS[category].required.filter((k) => !uploadedFiles[k]?.file);
+    if (missing.length) {
+      toast({
+        title: "Faltam documentos obrigatórios",
+        description: missing.map((k) => PHARMACY_KYC_LABELS[k]).join(" · "),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
-    const protocol = `FARMA-${Date.now().toString().slice(-6)}`;
-    setProtocolNumber(protocol);
+    const prefix = category === "farmacia" ? "FARMA" : category === "importador" ? "IMPORT" : "ASSOC";
+    const protocol = `${prefix}-${Date.now().toString().slice(-6)}`;
 
     try {
-      // 1. Obter usuário autenticado ou criar ID temporário
       const { data: { user } } = await supabase.auth.getUser();
-      const vendorId = user?.id || `vendor_${Date.now()}`;
+      if (!user) throw new Error("Entre na sua conta para enviar o cadastro.");
 
-      // 2. Gravar / Atualizar na tabela vendors do Supabase
-      try {
-        await supabase.from("vendors" as any).upsert({
-          id: user ? undefined : undefined,
-          user_id: user?.id || vendorId,
-          store_name: formData.nome_fantasia || formData.razao_social,
-          store_description: `Farmácia credenciada · RT: ${formData.farmaceutico_nome} (CRF-${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}) · AFE: ${formData.anvisa_auth}`,
-          store_logo_url: uploadedFiles.logo_empresa.previewUrl || "/logo-farmacia.jpg",
-          store_banner_url: uploadedFiles.foto_fachada.previewUrl || "/farmacia-fachada.jpg",
-          is_active: true,
-        });
-      } catch (dbErr) {
-        console.warn("vendors upsert fallback:", dbErr);
+      // 1. Enviar documentos para o armazenamento seguro
+      const kycDocuments: Record<string, string> = {};
+      for (const kind of docsForCategory(category)) {
+        const file = uploadedFiles[kind]?.file;
+        if (!file) continue;
+        const ext = (file.name.split(".").pop() || "pdf").toLowerCase();
+        const path = `${user.id}/${kind}.${ext}`;
+        const { error: upErr } = await supabase.storage.from(PHARMACY_KYC_BUCKET).upload(path, file, { upsert: true });
+        if (upErr) throw new Error(`Falha ao enviar "${PHARMACY_KYC_LABELS[kind]}": ${upErr.message}`);
+        kycDocuments[kind] = path;
       }
 
-      // 3. Atualizar tabela profiles
-      if (user) {
-        try {
-          await supabase.from("profiles" as any).update({
-            company_name: formData.razao_social,
-            trade_name: formData.nome_fantasia,
-            cnpj: formData.cnpj,
-            anvisa_auth: formData.anvisa_auth,
-            crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
-            city: formData.city,
-            state: formData.state,
-            phone: formData.phone,
-            user_type: "pharmacy",
-          }).eq("id", user.id);
-        } catch (pErr) {
-          console.warn("profiles update fallback:", pErr);
-        }
-      }
-
-      // 4. Salvar Dossiê KYC de Documentos no LocalStorage & Storage
-      const docsRecord: Record<string, string> = {};
-      const kycDocsArray: any[] = [];
-
-      for (const [k, val] of Object.entries(uploadedFiles)) {
-        const kind = k as PharmacyKycKind;
-        if (val.file) {
-          const fileUrl = val.previewUrl || "";
-          docsRecord[kind] = fileUrl;
-          kycDocsArray.push({
-            id: `doc_${kind}_${Date.now()}`,
-            document_kind: kind,
-            file_url: fileUrl,
-            is_verified: true,
-          });
-
-          // Upload real no Supabase Storage se possível
-          try {
-            const ext = val.file.name.split(".").pop();
-            const path = `${vendorId}/${kind}.${ext}`;
-            await supabase.storage.from("pharmacy-kyc-documents").upload(path, val.file, { upsert: true });
-          } catch (stErr) {
-            console.warn("Storage upload fallback:", stErr);
-          }
-        }
-      }
-
-      localStorage.setItem(`pharmacy_kyc_docs_${vendorId}`, JSON.stringify(docsRecord));
-
-      // 5. Adicionar a farmácia na lista de cadastros para sincronização com /admin/kyc-lojas
-      const newPharmacyRecord = {
-        id: vendorId,
-        user_id: vendorId,
+      const isPharmacy = category === "farmacia";
+      const responsavel = isPharmacy
+        ? `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`
+        : formData.farmaceutico_nome;
+      const payload = {
+        user_id: user.id,
+        vendor_category: category,
+        store_name: formData.nome_fantasia || formData.razao_social,
+        store_description: `${VENDOR_CATEGORY_LABELS[category]} credenciada · Responsável: ${responsavel}${formData.anvisa_auth ? ` · ANVISA: ${formData.anvisa_auth}` : ""}`,
         razao_social: formData.razao_social,
-        nome_fantasia: formData.nome_fantasia || formData.razao_social,
+        nome_fantasia: formData.nome_fantasia,
         cnpj: formData.cnpj,
-        anvisa_auth: formData.anvisa_auth || "AFE em análise ANVISA",
-        farmaceutico_crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        state: formData.state,
-        country: "BR",
-        logo_url: uploadedFiles.logo_empresa.previewUrl || "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=400&q=80",
-        is_approved: false,
-        status: "pending",
-        created_at: new Date().toISOString(),
-        kyc_docs: kycDocsArray,
+        responsavel_tecnico: responsavel,
+        crf_numero: isPharmacy ? formData.farmaceutico_crf : null,
+        crf_uf: isPharmacy ? formData.farmaceutico_crf_uf : null,
+        anvisa_afe: formData.anvisa_auth || null,
+        telefone_whatsapp: formData.phone,
+        pix_key: formData.pix_key,
+        shipping_origin_cep: formData.cep,
+        endereco_completo: {
+          cep: formData.cep, logradouro: formData.logradouro, numero: formData.numero,
+          bairro: formData.bairro, cidade: formData.city, uf: formData.state, email: formData.email,
+        },
+        kyc_documents: kycDocuments,
+        contrato_social_url: kycDocuments.contrato_social_pdf || kycDocuments.estatuto_social || null,
+        crf_doc_url: kycDocuments.crf_responsavel || null,
+        afe_doc_url: kycDocuments.alvara_sanitario || kycDocuments.afe_importacao || kycDocuments.autorizacao_judicial || null,
       };
 
-      const existingList: any[] = JSON.parse(localStorage.getItem("registered_pharmacies_list") || "[]");
-      existingList.unshift(newPharmacyRecord);
-      localStorage.setItem("registered_pharmacies_list", JSON.stringify(existingList));
+      // 2. Gravar cadastro (fica pausado até a aprovação do admin)
+      const { data: existing } = await supabase.from("vendors").select("id").eq("user_id", user.id).maybeSingle();
+      const { error: dbErr } = existing
+        ? await supabase.from("vendors").update(payload).eq("id", existing.id)
+        : await supabase.from("vendors").insert({ ...payload, is_active: false });
+      if (dbErr) throw new Error(dbErr.message);
 
+      await supabase.from("profiles").update({
+        company_name: formData.razao_social,
+        trade_name: formData.nome_fantasia,
+        cnpj: formData.cnpj,
+        city: formData.city,
+        state: formData.state,
+        phone: formData.phone,
+        user_type: "pharmacy",
+      } as any).eq("id", user.id);
+
+      setProtocolNumber(protocol);
       setIsSubmitting(false);
       setSubmitted(true);
       toast({
-        title: "✓ Cadastro de Farmácia Enviado com Sucesso!",
-        description: `Protocolo ${protocol}. O compliance regulatório analisará seus documentos.`,
+        title: `✓ Cadastro de ${VENDOR_CATEGORY_LABELS[category]} enviado!`,
+        description: `Protocolo ${protocol}. O compliance analisará seus documentos.`,
       });
     } catch (err: any) {
       console.error(err);
@@ -298,14 +285,58 @@ export default function CadastroFarmacia() {
               </div>
             </CardContent>
           </Card>
+        ) : authUserId === null ? (
+          <Card className="border-border bg-card/60 p-6 text-center">
+            <CardContent className="space-y-4 pt-6">
+              <p className="text-sm text-muted-foreground">
+                Para enviar o cadastro com segurança, entre ou crie sua conta. Depois você volta direto para este formulário.
+              </p>
+              <Button asChild size="lg" className="rounded-xl">
+                <Link to={`/login?type=farmacia&redirect=${encodeURIComponent(`/cadastro-farmacia?categoria=${category}`)}`}>
+                  Entrar / Criar conta <ArrowRight size={18} className="ml-2" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           /* FORMULÁRIO COMPLETO */
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* 0. CATEGORIA */}
+            <Card className="border-border bg-card/60">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base sm:text-lg font-black flex items-center gap-2">
+                  <Store className="text-primary w-5 h-5" /> Qual é o seu tipo de parceiro?
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Todos aparecem no Shopping. Só muda a lista de documentos pedida.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(Object.keys(VENDOR_CATEGORY_LABELS) as VendorCategory[]).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setCategory(c)}
+                      aria-pressed={category === c}
+                      className={`p-4 rounded-2xl border text-left transition-all ${
+                        category === c ? "border-primary bg-primary/10" : "border-border bg-muted/30 hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="text-2xl mb-1">{CATEGORY_INFO[c].emoji}</div>
+                      <div className="font-bold text-sm text-foreground">{VENDOR_CATEGORY_LABELS[c]}</div>
+                      <div className="text-[11px] text-muted-foreground">{CATEGORY_INFO[c].desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* 1. DADOS DA EMPRESA */}
             <Card className="border-border bg-card/60">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base sm:text-lg font-black flex items-center gap-2">
-                  <Building2 className="text-primary w-5 h-5" /> 1. Dados Cadastrais da Farmácia / Dispensário
+                  <Building2 className="text-primary w-5 h-5" /> 1. Dados Cadastrais — {VENDOR_CATEGORY_LABELS[category]}
                 </CardTitle>
                 <CardDescription className="text-xs">
                   Informações fiscais e de identificação jurídica perante a Receita Federal.
@@ -460,25 +491,30 @@ export default function CadastroFarmacia() {
             <Card className="border-border bg-card/60">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base sm:text-lg font-black flex items-center gap-2">
-                  <ShieldCheck className="text-emerald-400 w-5 h-5" /> 3. Responsabilidade Técnica & ANVISA
+                  <ShieldCheck className="text-emerald-400 w-5 h-5" /> 3. {category === "farmacia" ? "Responsabilidade Técnica & ANVISA" : category === "importador" ? "Responsável Legal & Autorização ANVISA" : "Presidente / Diretora & Autorizações"}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Dados do Farmacêutico RT responsável e autorização de funcionamento sanitário.
+                  {category === "farmacia"
+                    ? "Dados do Farmacêutico RT responsável e autorização de funcionamento sanitário."
+                    : category === "importador"
+                      ? "Responsável legal da importadora e autorização ANVISA para importação."
+                      : "Nome de quem representa a associação e, se houver, a autorização judicial ou da ANVISA."}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-1.5 sm:col-span-2">
-                    <Label className="text-xs font-bold">Nome Completo do Farmacêutico RT *</Label>
+                    <Label className="text-xs font-bold">{category === "farmacia" ? "Nome Completo do Farmacêutico RT *" : category === "importador" ? "Nome Completo do Responsável Legal *" : "Nome Completo da Presidente / Diretora *"}</Label>
                     <Input
                       required
-                      placeholder="Dra. Suelen Naves Rodrigues"
+                      placeholder="Nome completo"
                       value={formData.farmaceutico_nome}
                       onChange={(e) => setFormData({ ...formData, farmaceutico_nome: e.target.value })}
                       className="rounded-xl bg-muted/30 border-border text-sm"
                     />
                   </div>
 
+                  {category === "farmacia" && (
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold">CRF *</Label>
@@ -502,11 +538,12 @@ export default function CadastroFarmacia() {
                       />
                     </div>
                   </div>
+                  )}
 
                   <div className="space-y-1.5 sm:col-span-2">
-                    <Label className="text-xs font-bold">Autorização de Funcionamento ANVISA (AFE) *</Label>
+                    <Label className="text-xs font-bold">{category === "farmacia" ? "Autorização de Funcionamento ANVISA (AFE) *" : category === "importador" ? "Nº AFE / Autorização ANVISA de Importação *" : "Nº da Autorização Judicial / ANVISA (se houver)"}</Label>
                     <Input
-                      required
+                      required={category !== "associacao"}
                       placeholder="Ex: AFE-ANVISA 7.82941.2 / 2026"
                       value={formData.anvisa_auth}
                       onChange={(e) => setFormData({ ...formData, anvisa_auth: e.target.value })}
@@ -515,7 +552,7 @@ export default function CadastroFarmacia() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold">Chave Pix (Repasse 95%) *</Label>
+                    <Label className="text-xs font-bold">Chave Pix para Repasses *</Label>
                     <Input
                       required
                       placeholder="CNPJ, Chave Aleatória ou E-mail"
@@ -532,16 +569,17 @@ export default function CadastroFarmacia() {
             <Card className="border-border bg-card/60">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base sm:text-lg font-black flex items-center gap-2">
-                  <UploadCloud className="text-primary w-5 h-5" /> 4. Dossiê Regulatório & Upload de Documentos KYC
+                  <UploadCloud className="text-primary w-5 h-5" /> 4. Documentos — {VENDOR_CATEGORY_LABELS[category]}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Anexe os 7 documentos oficiais para análise em 1-clique pelo time de compliance.
+                  Anexe os documentos marcados como obrigatórios. Os opcionais ajudam a aprovar mais rápido. Aceita foto ou PDF.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(Object.keys(PHARMACY_KYC_LABELS) as PharmacyKycKind[]).map((kind) => {
-                    const uploaded = uploadedFiles[kind];
+                  {docsForCategory(category).map((kind) => {
+                    const uploaded = uploadedFiles[kind] || {};
+                    const isRequired = VENDOR_CATEGORY_DOCS[category].required.includes(kind);
                     const isAttached = Boolean(uploaded.name || uploaded.previewUrl);
 
                     return (
@@ -564,7 +602,7 @@ export default function CadastroFarmacia() {
                               </Badge>
                             ) : (
                               <Badge variant="outline" className="text-muted-foreground border-border text-[10px]">
-                                Obrigatório
+                                {isRequired ? "Obrigatório" : "Opcional"}
                               </Badge>
                             )}
                           </div>

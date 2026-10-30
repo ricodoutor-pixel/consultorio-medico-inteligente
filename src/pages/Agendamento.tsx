@@ -292,6 +292,107 @@ const Agendamento = () => {
     setLoading(false);
   };
 
+
+  const [paidApptId, setPaidApptId] = useState<string | null>(null);
+  const [waitExpired, setWaitExpired] = useState(false);
+
+  /** 1) Paciente escolhe a consulta e paga antes de escolher o horário. */
+  const handlePay = async () => {
+    if (!selectedDoctor) return;
+    const { data: sess } = await supabase.auth.getSession();
+    const uid = sess.session?.user?.id;
+    if (!uid) {
+      toast({ title: "Entre na sua conta para pagar", description: "Depois do login você volta para cá." });
+      window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      return;
+    }
+    setLoading(true);
+    const { data: appt, error } = await supabase.from("appointments").insert({
+      patient_id: uid,
+      doctor_id: selectedDoctor.id,
+      scheduled_at: new Date().toISOString(),
+      type: consultType,
+      notes,
+      amount: modalityPrice(consultType, selectedDoctor),
+      status: "scheduled",
+      payment_status: "pending",
+      needs_scheduling: true,
+    }).select("id").single();
+    if (error || !appt) {
+      setLoading(false);
+      toast({ title: "Não foi possível iniciar", description: error?.message || "Tente novamente.", variant: "destructive" });
+      return;
+    }
+    trackPixelEvent("InitiateCheckout", { content_name: "appointment_" + consultType, value: modalityPrice(consultType, selectedDoctor) }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
+    const { data: pay, error: payErr } = await supabase.functions.invoke("create-payment", {
+      body: {
+        appointmentId: appt.id,
+        doctorName: (selectedDoctor as any).full_name || `CRM ${selectedDoctor.crm}/${selectedDoctor.crm_state}`,
+        patientEmail: sess.session?.user?.email || "",
+        description: `Consulta ${consultTypes.find(c => c.id === consultType)?.label} — Planta y Raiz`,
+      },
+    });
+    if (payErr || !pay?.init_point) {
+      setLoading(false);
+      toast({ title: "Pagamento indisponível agora", description: "Tente de novo em instantes.", variant: "destructive" });
+      return;
+    }
+    window.location.href = pay.init_point;
+  };
+
+  /** 2) Ao voltar do Mercado Pago (?appt=), espera a aprovação do aviso oficial e abre a agenda. */
+  useEffect(() => {
+    const apptId = searchParams.get("appt");
+    if (!apptId || doctors.length === 0) return;
+    let stop = false;
+    let tries = 0;
+    preselectDone.current = true;
+    setStep(6);
+    const check = async () => {
+      if (stop) return;
+      const { data } = await supabase.from("appointments")
+        .select("id, doctor_id, type, payment_status, needs_scheduling, scheduled_at").eq("id", apptId).maybeSingle();
+      const a = data as any;
+      if (a) {
+        const doc = doctors.find((d) => d.id === a.doctor_id);
+        if (doc) setSelectedDoctor(doc);
+        setConsultType(a.type || "video");
+        if (["paid", "approved"].includes(a.payment_status)) {
+          if (!a.needs_scheduling) {
+            const when = new Date(a.scheduled_at);
+            setSelectedDate(when); setSelectedTime(format(when, "HH:mm")); setStep(5); return;
+          }
+          setPaidApptId(a.id);
+          void fetchAvailableDays(a.doctor_id);
+          setStep(3);
+          return;
+        }
+      }
+      tries++;
+      if (tries > 30) setWaitExpired(true);
+      setTimeout(check, tries > 30 ? 15000 : 4000);
+    };
+    void check();
+    return () => { stop = true; };
+  }, [doctors, searchParams]);
+
+  /** 3) Confirma o horário escolhido — só funciona para consulta já paga (validado no servidor). */
+  const handleConfirmSlot = async () => {
+    if (!paidApptId || !selectedSlotId) return;
+    setLoading(true);
+    const { data, error } = await (supabase.rpc as any)("book_paid_appointment_slot", { _appointment_id: paidApptId, _slot_id: selectedSlotId });
+    setLoading(false);
+    const res = data as any;
+    if (error || !res?.ok) {
+      const msg = res?.reason === "slot_taken" ? "Esse horário acabou de ser ocupado. Escolha outro." : res?.reason === "not_paid" ? "Pagamento ainda não aprovado." : "Não foi possível confirmar. Tente outro horário.";
+      toast({ title: "Horário não confirmado", description: msg, variant: "destructive" });
+      if (schedulingDoctorId && selectedDate) fetchSlots(schedulingDoctorId, selectedDate);
+      return;
+    }
+    void notifyRoutedDoctor(paidApptId);
+    setStep(5);
+  };
+
   const isSlotReservedByMe = (slot: SlotInfo) =>
     slot.status === "reserved" && slot.reserved_by === userId;
 
@@ -546,62 +647,6 @@ const Agendamento = () => {
               )}
 
               {/* Step 4: Confirmation */}
-              {step === 99 && (
-                <motion.div key="unused" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
-                    <CheckCircle2 size={18} className="text-primary" /> Confirme sua Consulta
-                  </h2>
-
-                  <Card className="border-primary/30 bg-primary/5">
-                    <CardContent className="p-6 space-y-4">
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs text-muted-foreground font-bold uppercase">Especialista</p>
-                          <p className="text-sm font-bold text-foreground">{selectedDoctor?.specialty}</p>
-                          <p className="text-xs text-muted-foreground">CRM {selectedDoctor?.crm}/{selectedDoctor?.crm_state}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground font-bold uppercase">Data e Hora</p>
-                          <p className="text-sm font-bold text-foreground">
-                            {selectedDate && format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{selectedTime} • {consultTypes.find(c => c.id === consultType)?.label}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground font-bold uppercase">Valor</p>
-                          <p className="text-2xl font-display font-black text-primary">R$ {modalityPrice(consultType, selectedDoctor).toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
-                          <p className="text-sm font-bold text-foreground">PIX ou cartão (Mercado Pago)</p>
-                        </div>
-                      </div>
-
-                      {notes && (
-                        <div>
-                          <p className="text-xs text-muted-foreground font-bold uppercase">Observações</p>
-                          <p className="text-sm text-foreground">{notes}</p>
-                        </div>
-                      )}
-
-                      <div className="border-t border-border pt-4">
-                        <p className="text-[10px] text-muted-foreground">
-                          ⚖️ Conforme CFM 2.314/2022 Art. 12, o paciente pode cancelar com até 24h de antecedência sem custo. 
-                          Dados protegidos pela LGPD (Lei 13.709/2018).
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setStep(3)} className="rounded-xl">← Voltar</Button>
-                    <Button onClick={handleBook} disabled={loading} className="rounded-xl flex-1">
-                      {loading ? <><Loader2 className="animate-spin mr-2" size={14} /> Agendando...</> : "✅ Confirmar Agendamento"}
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-
               {/* Step 5: Success */}
               {step === 5 && (
                 <motion.div key="step5" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>

@@ -609,3 +609,12 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   border-right-color: currentColor;
 }
 
+
+/* Mobile legibility: tiny text and oversized headings tuned for small screens */
+@media (max-width: 640px) {
+  .text-\[7px\], .text-\[8px\], .text-\[8\.5px\], .text-\[9px\] { font-size: 10.5px !important; line-height: 1.35; }
+  .text-\[10px\] { font-size: 11px !important; line-height: 1.4; }
+  h1.text-4xl, h1.text-5xl, h1.text-6xl, h2.text-4xl, h2.text-5xl { font-size: clamp(1.6rem, 7.5vw, 2.1rem) !important; line-height: 1.15 !important; }
+  h1, h2, h3 { overflow-wrap: anywhere; }
+  img, video, iframe { max-width: 100%; }
+}

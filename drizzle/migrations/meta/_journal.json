@@ -15,6 +15,13 @@
       "when": 1793222684199,
       "tag": "0001_kyc_vip_receipt_kind",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793375479901,
+      "tag": "0002_vendor_categories",
+      "breakpoints": true
     }
   ]
 }

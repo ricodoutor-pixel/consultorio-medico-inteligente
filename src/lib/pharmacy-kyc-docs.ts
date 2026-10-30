@@ -9,7 +9,13 @@ export type PharmacyKycKind =
   | "cartao_cnpj"
   | "alvara_sanitario"
   | "crf_responsavel"
-  | "comprovante_endereco";
+  | "comprovante_endereco"
+  | "afe_importacao"
+  | "habilitacao_siscomex"
+  | "responsavel_legal_doc"
+  | "estatuto_social"
+  | "ata_diretoria"
+  | "autorizacao_judicial";
 
 export const PHARMACY_KYC_LABELS: Record<PharmacyKycKind, string> = {
   foto_fachada: "Foto da Fachada / Loja Física",
@@ -19,7 +25,45 @@ export const PHARMACY_KYC_LABELS: Record<PharmacyKycKind, string> = {
   alvara_sanitario: "Alvará Sanitário / Autorização ANVISA (AFE)",
   crf_responsavel: "Certidão CRF / Farmacêutico Responsável",
   comprovante_endereco: "Comprovante de Endereço Comercial",
+  afe_importacao: "AFE / Autorização ANVISA de Importação",
+  habilitacao_siscomex: "Habilitação Radar / Siscomex",
+  responsavel_legal_doc: "RG ou CNH do Responsável Legal",
+  estatuto_social: "Estatuto Social Registrado",
+  ata_diretoria: "Ata de Eleição da Diretoria",
+  autorizacao_judicial: "Autorização Judicial / ANVISA (cultivo)",
 };
+
+export type VendorCategory = "farmacia" | "importador" | "associacao";
+
+export const VENDOR_CATEGORY_LABELS: Record<VendorCategory, string> = {
+  farmacia: "Farmácia",
+  importador: "Importador",
+  associacao: "Associação",
+};
+
+/** Documentos de cada categoria. `required` precisa ser anexado para enviar o cadastro. */
+export const VENDOR_CATEGORY_DOCS: Record<VendorCategory, { required: PharmacyKycKind[]; optional: PharmacyKycKind[] }> = {
+  farmacia: {
+    required: ["foto_fachada", "logo_empresa", "contrato_social_pdf", "cartao_cnpj", "alvara_sanitario"],
+    optional: ["crf_responsavel", "comprovante_endereco"],
+  },
+  importador: {
+    required: ["logo_empresa", "contrato_social_pdf", "cartao_cnpj", "afe_importacao", "responsavel_legal_doc"],
+    optional: ["habilitacao_siscomex", "comprovante_endereco"],
+  },
+  associacao: {
+    required: ["logo_empresa", "estatuto_social", "ata_diretoria", "cartao_cnpj", "responsavel_legal_doc"],
+    optional: ["autorizacao_judicial", "comprovante_endereco"],
+  },
+};
+
+export const docsForCategory = (c: VendorCategory): PharmacyKycKind[] => [
+  ...VENDOR_CATEGORY_DOCS[c].required,
+  ...VENDOR_CATEGORY_DOCS[c].optional,
+];
+
+export const normalizeVendorCategory = (v: unknown): VendorCategory =>
+  v === "importador" || v === "associacao" ? v : "farmacia";
 
 /** Documentos essenciais para liberar a loja no Shopping */
 export const PHARMACY_KYC_REQUIRED: PharmacyKycKind[] = [
@@ -46,6 +90,7 @@ export interface PharmacyRecord {
   logo_url?: string;
   is_approved: boolean;
   status: "pending" | "approved" | "rejected";
+  vendor_category?: VendorCategory;
   created_at: string;
   kyc_docs?: Array<{
     id: string;

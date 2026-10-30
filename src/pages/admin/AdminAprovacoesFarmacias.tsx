@@ -28,6 +28,9 @@ import {
   type PharmacyKycKind,
   type PharmacyRecord,
   TEST_PHARMACY_DATA,
+  VENDOR_CATEGORY_LABELS,
+  docsForCategory,
+  normalizeVendorCategory,
 } from "@/lib/pharmacy-kyc-docs";
 
 export const AdminAprovacoesFarmacias = () => {
@@ -110,6 +113,13 @@ export const AdminAprovacoesFarmacias = () => {
           file_url: url,
           is_verified: true,
         }));
+        const dbDocs = Object.entries((v.kyc_documents || {}) as Record<string, string>).map(([kind, path]) => ({
+          id: `db_${kind}_${v.id}`,
+          document_kind: kind as any,
+          storage_path: path,
+          is_verified: false,
+        }));
+        kycDocsArray.push(...(dbDocs as any));
 
         return {
           id: v.id,
@@ -129,6 +139,7 @@ export const AdminAprovacoesFarmacias = () => {
           status: isApproved ? "approved" : "pending",
           created_at: v.created_at || new Date().toISOString(),
           kyc_docs: kycDocsArray,
+          vendor_category: normalizeVendorCategory(v.vendor_category),
         };
       });
 
@@ -417,6 +428,9 @@ export const AdminAprovacoesFarmacias = () => {
                           <h3 className="text-lg md:text-xl font-display font-black text-foreground">
                             {pharmacy.nome_fantasia}
                           </h3>
+                          <Badge variant="outline" className="text-[10px] font-bold">
+                            {VENDOR_CATEGORY_LABELS[pharmacy.vendor_category || "farmacia"]}
+                          </Badge>
                           {pharmacy.id === TEST_PHARMACY_DATA.id && (
                             <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] font-bold">
                               OFICIAL PLANTA Y RAÍZ 🌿
@@ -480,7 +494,7 @@ export const AdminAprovacoesFarmacias = () => {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
-                      {(Object.keys(PHARMACY_KYC_LABELS) as PharmacyKycKind[]).map((kind) => {
+                      {docsForCategory(pharmacy.vendor_category || "farmacia").map((kind) => {
                         const doc = docOf(pharmacy, kind);
                         const hasDoc = Boolean(doc?.file_url || doc?.storage_path || pharmacy.id === TEST_PHARMACY_DATA.id);
 

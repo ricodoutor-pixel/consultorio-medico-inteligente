@@ -368,7 +368,7 @@ const Agendamento = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-display font-black text-primary">R$ {Number(doc.consultation_price).toFixed(2)}</p>
+                            <p className="text-lg font-display font-black text-primary">a partir de R$ {modalityPrice("chat", doc).toFixed(2)}</p>
                             {doc.is_online && <Badge className="bg-primary/10 text-primary border-primary text-[10px]">Online</Badge>}
                           </div>
                         </CardContent>
@@ -543,7 +543,7 @@ const Agendamento = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Valor</p>
-                          <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.consultation_price || 0).toFixed(2)}</p>
+                          <p className="text-2xl font-display font-black text-primary">R$ {modalityPrice(consultType, selectedDoctor).toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>

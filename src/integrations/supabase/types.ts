@@ -694,6 +694,7 @@ export type Database = {
           doctor_id: string
           duration_minutes: number
           id: string
+          needs_scheduling: boolean
           notes: string | null
           organization_id: string | null
           patient_id: string
@@ -711,6 +712,7 @@ export type Database = {
           doctor_id: string
           duration_minutes?: number
           id?: string
+          needs_scheduling?: boolean
           notes?: string | null
           organization_id?: string | null
           patient_id: string
@@ -728,6 +730,7 @@ export type Database = {
           doctor_id?: string
           duration_minutes?: number
           id?: string
+          needs_scheduling?: boolean
           notes?: string | null
           organization_id?: string | null
           patient_id?: string
@@ -9485,6 +9488,10 @@ export type Database = {
       }
       anonymize_old_ot_orders: { Args: never; Returns: undefined }
       auto_release_brisa_orientacao: { Args: never; Returns: Json }
+      book_paid_appointment_slot: {
+        Args: { _appointment_id: string; _slot_id: string }
+        Returns: Json
+      }
       calculate_doctor_performance: {
         Args: {
           _consultations: number

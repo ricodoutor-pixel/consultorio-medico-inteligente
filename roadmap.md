@@ -54,4 +54,4 @@
 - [ ] Ativar e validar o webhook de produção do n8n — bloqueado pelo acesso administrativo; POST retornou 404
 - [ ] Validar entrada e resposta real da Brisa na Hostinger — depende do fluxo n8n ativo
 
-- [ ] Agendamento: modalidade → pagamento → escolha do horário do médico após pagamento aprovado (30/10)
+- [x] Agendamento: modalidade → pagamento → escolha do horário do médico após pagamento aprovado (30/10)

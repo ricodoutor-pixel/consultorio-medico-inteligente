@@ -79,12 +79,13 @@ Deno.serve(async (req) => {
 
     let title: string = description || "Atendimento Planta y Raíz";
     let amount: number;
+    let successPath = "/dashboard?payment=success";
 
     // 1) Se for consulta agendada, recupera preço autoritativo da consulta no banco
     if (appointmentId) {
       const { data: appt, error: apptError } = await supabase
         .from("appointments")
-        .select("amount, patient_id, appointment_type, doctor_id")
+        .select("amount, patient_id, type, doctor_id, needs_scheduling")
         .eq("id", appointmentId)
         .single();
 
@@ -103,10 +104,11 @@ Deno.serve(async (req) => {
         });
       }
 
-      amount = Number(appt.amount);
-      if (!amount || isNaN(amount) || amount <= 0) {
-        // Fallback para preço padrão de consulta por vídeo se amount estiver zerado no agendamento
-        amount = 150.00;
+      // Preço oficial definido no servidor pela modalidade (nunca pelo cliente)
+      const typePrice: Record<string, number> = { chat: 100, video: 150, premium: 180, retorno: 90 };
+      amount = typePrice[String(appt.type || "video")] ?? 150;
+      if (appt.needs_scheduling) {
+        successPath = `/agendamento?appt=${appointmentId}`;
       }
       title = description || `Consulta com ${doctorName || "Especialista Prescritor"}`;
     } else {
@@ -146,7 +148,7 @@ Deno.serve(async (req) => {
         email: patientEmail || authData.user.email || "paciente@plantayraiz.com.br",
       },
       back_urls: {
-        success: `${siteUrl}/dashboard?payment=success`,
+        success: `${siteUrl}${successPath}`,
         failure: `${siteUrl}/pagamento?status=failure`,
         pending: `${siteUrl}/pagamento?status=pending`,
       },

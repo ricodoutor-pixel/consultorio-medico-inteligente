@@ -83,7 +83,6 @@ const Agendamento = () => {
     setSelectedTime("");
     setSelectedSlotId(null);
     setStep(2);
-    void fetchAvailableDays(doc.id);
   };
 
   /** Agenda usada: a do próprio médico escolhido pelo paciente. */
@@ -208,7 +207,7 @@ const Agendamento = () => {
     setSelectedSlotId(null);
     if (d && schedulingDoctorId) {
       fetchSlots(schedulingDoctorId, d);
-      setStep(3);
+      setStep(4);
     }
   };
 
@@ -309,7 +308,7 @@ const Agendamento = () => {
 
             {/* Progress */}
             <div className="flex items-center gap-2 mb-8">
-              {["Especialista", "Data", "Horário", "Confirmação"].map((label, i) => (
+              {["Médico", "Consulta e pagamento", "Data", "Horário"].map((label, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all",
@@ -378,9 +377,63 @@ const Agendamento = () => {
                 </motion.div>
               )}
 
-              {/* Step 2: Calendar Visual */}
               {step === 2 && (
-                <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <motion.div key="step2pay" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  {selectedDoctor && (
+                    <Card className="border-primary/30 bg-primary/5">
+                      <CardContent className="p-4 flex items-center justify-between gap-3">
+                        <p className="text-sm font-bold text-foreground">{(selectedDoctor as any).full_name || selectedDoctor.specialty} · CRM {selectedDoctor.crm}/{selectedDoctor.crm_state}</p>
+                        <Button variant="ghost" size="sm" onClick={() => setStep(1)}>Trocar</Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                  <div>
+                    <p className="text-sm font-bold text-foreground mb-3">Modalidade da consulta</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {consultTypes.map(ct => (
+                        <Card key={ct.id} className={cn("cursor-pointer transition-all border-border hover:border-primary/40", consultType === ct.id && "border-primary bg-primary/5")} onClick={() => setConsultType(ct.id)}>
+                          <CardContent className="p-4 text-center">
+                            <ct.icon size={24} className="text-primary mx-auto mb-2" />
+                            <p className="text-sm font-bold text-foreground">{ct.label}</p>
+                            <p className="text-[10px] text-muted-foreground">{ct.desc}</p>
+                            <p className="text-sm font-black text-primary mt-1">R$ {modalityPrice(ct.id, selectedDoctor).toFixed(2)}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-bold text-foreground mb-2">Observações (opcional)</p>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Descreva brevemente seus sintomas ou motivo da consulta..."
+                      className="w-full h-24 rounded-xl bg-card border border-border p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:border-primary focus:outline-none"
+                    />
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">Depois do pagamento aprovado você volta para esta página e escolhe o melhor horário na agenda do médico.</p>
+                  <Button onClick={handlePay} disabled={loading} className="rounded-xl w-full">
+                    {loading ? <><Loader2 className="animate-spin mr-2" size={14} /> Abrindo pagamento...</> : `Pagar R$ ${modalityPrice(consultType, selectedDoctor).toFixed(2)} (PIX ou cartão)`}
+                  </Button>
+                </motion.div>
+              )}
+
+              {step === 6 && (
+                <motion.div key="step6wait" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <Card className="border-border"><CardContent className="p-8 text-center space-y-3">
+                    <Loader2 className="animate-spin text-primary mx-auto" size={32} />
+                    <p className="font-bold text-foreground">Confirmando seu pagamento…</p>
+                    <p className="text-sm text-muted-foreground">Assim que o Mercado Pago aprovar, a agenda do médico abre aqui automaticamente.</p>
+                    {waitExpired && <p className="text-xs text-muted-foreground">Está demorando? Se você pagou por PIX, aguarde alguns minutos e recarregue a página, ou fale com a Enf. Brisa: (11) 99136-3154.</p>}
+                  </CardContent></Card>
+                </motion.div>
+              )}
+
+              {/* Step 3: Calendar Visual */}
+              {step === 3 && (
+                <motion.div key="step3cal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
                     <CalIcon size={18} className="text-primary" /> Escolha a Data
                   </h2>
@@ -419,32 +472,15 @@ const Agendamento = () => {
                       />
                     </CardContent>
                   </Card>
-                  <Button variant="outline" onClick={() => setStep(1)} className="rounded-xl">← Voltar</Button>
                 </motion.div>
               )}
 
               {/* Step 3: Time Slots from DB + Consultation Type */}
-              {step === 3 && (
-                <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+              {step === 4 && (
+                <motion.div key="step4slots" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
                     <Clock size={18} className="text-primary" /> Horário e Modalidade
                   </h2>
-
-                  <div>
-                    <p className="text-sm font-bold text-foreground mb-3">Modalidade da consulta</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {consultTypes.map(ct => (
-                        <Card key={ct.id} className={cn("cursor-pointer transition-all border-border hover:border-primary/40", consultType === ct.id && "border-primary bg-primary/5")} onClick={() => setConsultType(ct.id)}>
-                          <CardContent className="p-4 text-center">
-                            <ct.icon size={24} className="text-primary mx-auto mb-2" />
-                            <p className="text-sm font-bold text-foreground">{ct.label}</p>
-                            <p className="text-[10px] text-muted-foreground">{ct.desc}</p>
-                            <p className="text-sm font-black text-primary mt-1">R$ {modalityPrice(ct.id, selectedDoctor).toFixed(2)}</p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
 
                   <div>
                     <p className="text-sm font-bold text-foreground mb-3">
@@ -500,28 +536,18 @@ const Agendamento = () => {
                     )}
                   </div>
 
-                  <div>
-                    <p className="text-sm font-bold text-foreground mb-2">Observações (opcional)</p>
-                    <textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Descreva brevemente seus sintomas ou motivo da consulta..."
-                      className="w-full h-24 rounded-xl bg-card border border-border p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:border-primary focus:outline-none"
-                    />
-                  </div>
-
                   <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setStep(2)} className="rounded-xl">← Voltar</Button>
-                    <Button onClick={() => selectedTime && setStep(4)} disabled={!selectedTime} className="rounded-xl flex-1">
-                      Confirmar Horário <ChevronRight size={14} className="ml-1" />
+                    <Button variant="outline" onClick={() => setStep(3)} className="rounded-xl">← Outra data</Button>
+                    <Button onClick={handleConfirmSlot} disabled={!selectedSlotId || loading} className="rounded-xl flex-1">
+                      {loading ? <><Loader2 className="animate-spin mr-2" size={14} /> Confirmando...</> : "✅ Confirmar este horário"}
                     </Button>
                   </div>
                 </motion.div>
               )}
 
               {/* Step 4: Confirmation */}
-              {step === 4 && (
-                <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+              {step === 99 && (
+                <motion.div key="unused" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
                     <CheckCircle2 size={18} className="text-primary" /> Confirme sua Consulta
                   </h2>

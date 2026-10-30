@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
 
     let title: string = description || "Atendimento Planta y Raíz";
     let amount: number;
+    let successPath = "/dashboard?payment=success";
 
     // 1) Se for consulta agendada, recupera preço autoritativo da consulta no banco
     if (appointmentId) {
@@ -107,7 +108,7 @@ Deno.serve(async (req) => {
       const typePrice: Record<string, number> = { chat: 100, video: 150, premium: 180, retorno: 90 };
       amount = typePrice[String(appt.type || "video")] ?? 150;
       if (appt.needs_scheduling) {
-        (globalThis as any).__pyrSuccessPath = `/agendamento?appt=${appointmentId}`;
+        successPath = `/agendamento?appt=${appointmentId}`;
       }
       title = description || `Consulta com ${doctorName || "Especialista Prescritor"}`;
     } else {
@@ -147,7 +148,7 @@ Deno.serve(async (req) => {
         email: patientEmail || authData.user.email || "paciente@plantayraiz.com.br",
       },
       back_urls: {
-        success: `${siteUrl}${(globalThis as any).__pyrSuccessPath || "/dashboard?payment=success"}`,
+        success: `${siteUrl}${successPath}`,
         failure: `${siteUrl}/pagamento?status=failure`,
         pending: `${siteUrl}/pagamento?status=pending`,
       },

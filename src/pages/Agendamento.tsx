@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { Navbar } from "@/components/Navbar";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { Footer } from "@/components/Footer";
@@ -13,14 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { resolveRoutingDoctor, notifyRoutedDoctor, type RoutedDoctor } from "@/lib/consultation-routing";
+import { notifyRoutedDoctor } from "@/lib/consultation-routing";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 const consultTypes = [
-  { id: "video", label: "Vídeo", icon: Video, desc: "Orientação Técnica por vídeo HD" },
-  { id: "chat", label: "Chat", icon: MessageSquare, desc: "Orientação Técnica por mensagem" },
-  { id: "phone", label: "Telefone", icon: Phone, desc: "Orientação Técnica por telefone" },
+  { id: "video", label: "Vídeo", icon: Video, desc: "Consulta por vídeo HD", price: 150 },
+  { id: "chat", label: "Chat", icon: MessageSquare, desc: "Consulta por mensagem", price: 100 },
 ];
 
 type Doctor = {
@@ -64,8 +65,11 @@ const Agendamento = () => {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [reserving, setReserving] = useState(false);
   /** Profissional de plantão resolvido no servidor (cadastro mais completo). */
-  const [assigned, setAssigned] = useState<RoutedDoctor | null>(null);
-  const [resolvingAssigned, setResolvingAssigned] = useState(false);
+  const [availableDays, setAvailableDays] = useState<Set<string>>(new Set());
+  const [loadingDays, setLoadingDays] = useState(false);
+  const [searchParams] = useSearchParams();
+  const { professionals } = useRealProfessionals();
+  const preselectDone = useRef(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user?.id || null));
@@ -78,15 +82,54 @@ const Agendamento = () => {
     setSelectedDate(undefined);
     setSelectedTime("");
     setSelectedSlotId(null);
-    setResolvingAssigned(true);
-    const routed = await resolveRoutingDoctor(doc.specialty);
-    setAssigned(routed);
-    setResolvingAssigned(false);
     setStep(2);
+    void fetchAvailableDays(doc.id);
   };
 
-  /** Agenda usada de fato: o profissional de plantão. */
-  const schedulingDoctorId = assigned?.doctor_id ?? selectedDoctor?.id ?? null;
+  /** Agenda usada: a do próprio médico escolhido pelo paciente. */
+  const schedulingDoctorId = selectedDoctor?.id ?? null;
+
+  /** Dias com pelo menos um horário livre definido pelo médico (próximos 45 dias). */
+  const fetchAvailableDays = async (doctorId: string) => {
+    setLoadingDays(true);
+    const today = format(new Date(), "yyyy-MM-dd");
+    const until = format(new Date(Date.now() + 45 * 86400000), "yyyy-MM-dd");
+    const { data } = await supabase
+      .from("doctor_availability")
+      .select("slot_date, time_slot")
+      .eq("doctor_id", doctorId)
+      .eq("status", "available")
+      .gte("slot_date", today)
+      .lte("slot_date", until)
+      .limit(2000);
+    const nowHm = format(new Date(), "HH:mm");
+    const days = new Set<string>();
+    (data || []).forEach((s: any) => {
+      if (s.slot_date === today && s.time_slot <= nowHm) return;
+      days.add(s.slot_date);
+    });
+    setAvailableDays(days);
+    setLoadingDays(false);
+  };
+
+  /** Médico vindo do perfil (?pro=slug) já chega selecionado. */
+  useEffect(() => {
+    if (preselectDone.current || doctors.length === 0) return;
+    const slug = searchParams.get("pro");
+    if (!slug) return;
+    const pro = professionals.find((p) => p.id === slug);
+    const doc = doctors.find((d) => d.id === pro?.dbId);
+    if (doc) {
+      preselectDone.current = true;
+      void selectDoctor(doc);
+    }
+  }, [doctors, professionals, searchParams]);
+
+  const modalityPrice = (type: string, doc: Doctor | null) => {
+    const anyDoc = doc as any;
+    if (type === "chat") return Number(anyDoc?.price_chat_only) || 100;
+    return Number(anyDoc?.price_video_chat) || 150;
+  };
 
   const fetchDoctors = async () => {
     const { data } = await supabase.from("doctors_public").select("*");
@@ -108,7 +151,10 @@ const Agendamento = () => {
     if (!error && data && data.length > 0) {
       // Filter: show available OR reserved by current user (their own temp reservation)
       const now = new Date().toISOString();
+      const isToday = dateStr === format(new Date(), "yyyy-MM-dd");
+      const nowHm = format(new Date(), "HH:mm");
       const filtered = data.filter((s: any) => {
+        if (isToday && s.time_slot <= nowHm) return false;
         if (s.status === "available") return true;
         if (s.status === "reserved" && s.reserved_by === userId && s.reserved_until && s.reserved_until > now) return true;
         return false;
@@ -188,7 +234,7 @@ const Agendamento = () => {
       content_name: "appointment_booking",
       doctor_id: selectedDoctor.id,
       consultation_type: consultType,
-      value: selectedDoctor.consultation_price,
+      value: modalityPrice(consultType, selectedDoctor),
     }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
 
     const routedId = schedulingDoctorId ?? selectedDoctor.id;
@@ -198,7 +244,7 @@ const Agendamento = () => {
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,
       notes,
-      amount: selectedDoctor.consultation_price,
+      amount: modalityPrice(consultType, selectedDoctor),
       status: "scheduled",
       payment_status: "pending",
     }).select("id").single();
@@ -225,14 +271,14 @@ const Agendamento = () => {
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke("create-payment", {
         body: {
           appointmentId: newAppt.id,
-          doctorName: `CRM ${selectedDoctor.crm}/${selectedDoctor.crm_state}`,
+          doctorName: (selectedDoctor as any).full_name || `CRM ${selectedDoctor.crm}/${selectedDoctor.crm_state}`,
           patientEmail: session?.session?.user?.email || "",
-          description: `Orientação Técnica ${consultTypes.find(c => c.id === consultType)?.label} — Planta y Raiz`,
+          description: `Consulta ${consultTypes.find(c => c.id === consultType)?.label} — Planta y Raiz`,
         },
       });
 
       if (paymentError || !paymentData?.init_point) {
-        toast({ title: "Orientação Técnica agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
+        toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
         setStep(5);
         setLoading(false);
         return;
@@ -241,7 +287,7 @@ const Agendamento = () => {
       toast({ title: "Redirecionando para pagamento...", description: "Você será levado ao Mercado Pago." });
       window.location.href = paymentData.init_point;
     } catch {
-      toast({ title: "Orientação Técnica agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
+      toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
       setStep(5);
     }
     setLoading(false);
@@ -257,7 +303,7 @@ const Agendamento = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="text-3xl md:text-4xl font-display font-black text-foreground mb-2">
-              Agendar <span className="text-gradient-green">Orientação Técnica</span>
+              Agendar <span className="text-gradient-green">Consulta</span>
             </h1>
             <p className="text-muted-foreground mb-8">Sistema de agendamento inteligente — CFM 2.314/2022 | Suporte: (11) 99136-3154</p>
 
@@ -307,11 +353,12 @@ const Agendamento = () => {
                       <Card key={doc.id} className={cn("border-border cursor-pointer transition-all hover:border-primary/40", selectedDoctor?.id === doc.id && "border-primary bg-primary/5")} onClick={() => { void selectDoctor(doc); }}>
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-                              <Video size={20} className="text-primary" />
+                            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center overflow-hidden shrink-0">
+                              {(doc as any).avatar_url ? <img src={(doc as any).avatar_url} alt={(doc as any).full_name || doc.specialty} className="w-full h-full object-cover" loading="lazy" /> : <Video size={20} className="text-primary" />}
                             </div>
                             <div>
-                              <p className="font-bold text-foreground">{doc.specialty}</p>
+                              <p className="font-bold text-foreground">{(doc as any).full_name || doc.specialty}</p>
+                              {(doc as any).full_name && <p className="text-xs text-foreground/80">{doc.specialty}</p>}
                               <p className="text-xs text-muted-foreground">CRM {doc.crm}/{doc.crm_state} {doc.rqe ? `• RQE ${doc.rqe}` : ""}</p>
                               <div className="flex items-center gap-2 mt-1">
                                 <Star size={12} className="text-[hsl(var(--gold))]" />
@@ -321,7 +368,7 @@ const Agendamento = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-display font-black text-primary">R$ {Number(doc.consultation_price).toFixed(2)}</p>
+                            <p className="text-lg font-display font-black text-primary">a partir de R$ {modalityPrice("chat", doc).toFixed(2)}</p>
                             {doc.is_online && <Badge className="bg-primary/10 text-primary border-primary text-[10px]">Online</Badge>}
                           </div>
                         </CardContent>
@@ -337,31 +384,36 @@ const Agendamento = () => {
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
                     <CalIcon size={18} className="text-primary" /> Escolha a Data
                   </h2>
-                  {resolvingAssigned ? (
-                    <p className="text-xs text-muted-foreground flex items-center gap-2">
-                      <Loader2 size={12} className="animate-spin" /> Verificando o profissional de plantão…
-                    </p>
-                  ) : assigned ? (
+                  {selectedDoctor && (
                     <Card className="border-primary/30 bg-primary/5">
-                      <CardContent className="p-4">
-                        <p className="text-xs text-muted-foreground">
-                          Seu atendimento será conduzido pelo profissional de plantão com cadastro
-                          completo e assinatura digital ativa:
-                        </p>
-                        <p className="text-sm font-bold text-foreground mt-1">
-                          {assigned.full_name || "Profissional de plantão"}
-                          {assigned.crm ? ` · ${assigned.crm}/${assigned.crm_state ?? ""}` : ""}
-                        </p>
+                      <CardContent className="p-4 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Agenda de</p>
+                          <p className="text-sm font-bold text-foreground">
+                            {(selectedDoctor as any).full_name || selectedDoctor.specialty} · CRM {selectedDoctor.crm}/{selectedDoctor.crm_state}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">Horários escolhidos pelo próprio médico · Horário de Brasília</p>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => setStep(1)}>Trocar</Button>
                       </CardContent>
                     </Card>
-                  ) : null}
+                  )}
+                  {loadingDays ? (
+                    <p className="text-xs text-muted-foreground flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> Carregando a agenda do médico…</p>
+                  ) : availableDays.size === 0 ? (
+                    <Card className="border-border"><CardContent className="p-4 text-sm text-muted-foreground">
+                      Este médico ainda não abriu horários na agenda. Fale com a Enf. Brisa pelo WhatsApp (11) 99136-3154 ou escolha outro médico.
+                    </CardContent></Card>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Próximo dia livre: <span className="font-bold text-foreground">{format(new Date([...availableDays].sort()[0] + "T12:00:00"), "EEEE, dd/MM", { locale: ptBR })}</span></p>
+                  )}
                   <Card className="border-border overflow-hidden">
                     <CardContent className="p-6 flex justify-center">
                       <Calendar
                         mode="single"
                         selected={selectedDate}
                         onSelect={handleDateSelect}
-                        disabled={(date) => date < new Date() || date.getDay() === 0}
+                        disabled={(date) => !availableDays.has(format(date, "yyyy-MM-dd"))}
                         locale={ptBR}
                         className={cn("p-3 pointer-events-auto rounded-xl")}
                       />
@@ -379,7 +431,7 @@ const Agendamento = () => {
                   </h2>
 
                   <div>
-                    <p className="text-sm font-bold text-foreground mb-3">Tipo de Orientação Técnica</p>
+                    <p className="text-sm font-bold text-foreground mb-3">Modalidade da consulta</p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {consultTypes.map(ct => (
                         <Card key={ct.id} className={cn("cursor-pointer transition-all border-border hover:border-primary/40", consultType === ct.id && "border-primary bg-primary/5")} onClick={() => setConsultType(ct.id)}>
@@ -387,6 +439,7 @@ const Agendamento = () => {
                             <ct.icon size={24} className="text-primary mx-auto mb-2" />
                             <p className="text-sm font-bold text-foreground">{ct.label}</p>
                             <p className="text-[10px] text-muted-foreground">{ct.desc}</p>
+                            <p className="text-sm font-black text-primary mt-1">R$ {modalityPrice(ct.id, selectedDoctor).toFixed(2)}</p>
                           </CardContent>
                         </Card>
                       ))}
@@ -470,7 +523,7 @@ const Agendamento = () => {
               {step === 4 && (
                 <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
-                    <CheckCircle2 size={18} className="text-primary" /> Confirme sua Orientação Técnica
+                    <CheckCircle2 size={18} className="text-primary" /> Confirme sua Consulta
                   </h2>
 
                   <Card className="border-primary/30 bg-primary/5">
@@ -490,7 +543,7 @@ const Agendamento = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Valor</p>
-                          <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.consultation_price || 0).toFixed(2)}</p>
+                          <p className="text-2xl font-display font-black text-primary">R$ {modalityPrice(consultType, selectedDoctor).toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
@@ -529,7 +582,7 @@ const Agendamento = () => {
                   <Card className="border-primary/30 bg-primary/5">
                     <CardContent className="p-8 text-center">
                       <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
-                      <h2 className="text-2xl font-display font-black text-foreground mb-2">Orientação Técnica Agendada!</h2>
+                      <h2 className="text-2xl font-display font-black text-foreground mb-2">Consulta Agendada!</h2>
                       <p className="text-muted-foreground mb-6">
                         Sua consulta foi agendada para{" "}
                         <strong className="text-foreground">

@@ -290,14 +290,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
-              <p className="text-sm text-muted-foreground mb-3">Horários para hoje (exemplo ilustrativo)</p>
-              <div className="flex flex-wrap gap-2">
-                {(pro.slots || []).map((slot) => (
-                  <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm rounded-xl" asChild>
-                    <Link to={`/falar-com-especialista?pro=${pro.id}`}>{slot}</Link>
-                  </Button>
-                ))}
-              </div>
+              <NextRealSlots doctorId={pro.dbId ?? null} proId={pro.id} />
             </CardContent>
           </Card>
 
@@ -688,3 +681,31 @@ const Profissionais = () => {
 };
 
 export default Profissionais;
+
+function NextRealSlots({ doctorId, proId }: { doctorId: string | null; proId: string }) {
+  const [slots, setSlots] = useState<{ slot_date: string; time_slot: string }[] | null>(null);
+  useEffect(() => {
+    if (!doctorId) { setSlots([]); return; }
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const nowHm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    supabase.from("doctor_availability").select("slot_date, time_slot").eq("doctor_id", doctorId)
+      .eq("status", "available").gte("slot_date", today).order("slot_date").order("time_slot").limit(40)
+      .then(({ data }) => setSlots((data || []).filter((s) => !(s.slot_date === today && s.time_slot <= nowHm)).slice(0, 8)));
+  }, [doctorId]);
+  if (slots === null) return <p className="text-sm text-muted-foreground">Carregando agenda…</p>;
+  if (slots.length === 0) return <p className="text-sm text-muted-foreground">Este médico ainda não abriu horários na agenda. Fale com a Enf. Brisa pelo WhatsApp.</p>;
+  return (
+    <>
+      <p className="text-sm text-muted-foreground mb-3">Próximos horários livres (Horário de Brasília)</p>
+      <div className="flex flex-wrap gap-2">
+        {slots.map((s) => (
+          <Button key={s.slot_date + s.time_slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm rounded-xl" asChild>
+            <Link to={`/agendamento?pro=${proId}`}>{s.slot_date.slice(8, 10)}/{s.slot_date.slice(5, 7)} · {s.time_slot}</Link>
+          </Button>
+        ))}
+      </div>
+    </>
+  );
+}

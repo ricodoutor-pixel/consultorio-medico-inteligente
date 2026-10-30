@@ -28,6 +28,9 @@ import {
   type PharmacyKycKind,
   type PharmacyRecord,
   TEST_PHARMACY_DATA,
+  VENDOR_CATEGORY_LABELS,
+  docsForCategory,
+  normalizeVendorCategory,
 } from "@/lib/pharmacy-kyc-docs";
 
 export const AdminAprovacoesFarmacias = () => {
@@ -425,6 +428,9 @@ export const AdminAprovacoesFarmacias = () => {
                           <h3 className="text-lg md:text-xl font-display font-black text-foreground">
                             {pharmacy.nome_fantasia}
                           </h3>
+                          <Badge variant="outline" className="text-[10px] font-bold">
+                            {VENDOR_CATEGORY_LABELS[pharmacy.vendor_category || "farmacia"]}
+                          </Badge>
                           {pharmacy.id === TEST_PHARMACY_DATA.id && (
                             <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] font-bold">
                               OFICIAL PLANTA Y RAÍZ 🌿

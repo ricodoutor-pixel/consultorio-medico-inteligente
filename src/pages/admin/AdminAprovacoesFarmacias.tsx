@@ -98,7 +98,6 @@ export const AdminAprovacoesFarmacias = () => {
           status: isApproved ? "approved" : "pending",
           created_at: p.created_at || new Date().toISOString(),
           kyc_docs: kycDocsArray,
-          vendor_category: normalizeVendorCategory(v.vendor_category),
         };
       });
 
@@ -140,6 +139,7 @@ export const AdminAprovacoesFarmacias = () => {
           status: isApproved ? "approved" : "pending",
           created_at: v.created_at || new Date().toISOString(),
           kyc_docs: kycDocsArray,
+          vendor_category: normalizeVendorCategory(v.vendor_category),
         };
       });
 

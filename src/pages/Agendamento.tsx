@@ -125,9 +125,9 @@ const Agendamento = () => {
   }, [doctors, professionals, searchParams]);
 
   const modalityPrice = (type: string, doc: Doctor | null) => {
-    const anyDoc = doc as any;
-    if (type === "chat") return Number(anyDoc?.price_chat_only) || 100;
-    return Number(anyDoc?.price_video_chat) || 150;
+    // Preços oficiais (mesmos cobrados pelo servidor): Chat R$100 · Vídeo R$150
+    void doc;
+    return type === "chat" ? 100 : 150;
   };
 
   const fetchDoctors = async () => {

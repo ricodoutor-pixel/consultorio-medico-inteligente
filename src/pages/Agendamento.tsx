@@ -303,7 +303,7 @@ const Agendamento = () => {
     const uid = sess.session?.user?.id;
     if (!uid) {
       toast({ title: "Entre na sua conta para pagar", description: "Depois do login você volta para cá." });
-      window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
       return;
     }
     setLoading(true);

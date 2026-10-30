@@ -654,7 +654,7 @@ export default function CadastroFarmacia() {
                   className="mt-1"
                 />
                 <label htmlFor="terms-check" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                  Declaro que as informações e documentos enviados são autênticos e conferem com as normas da <strong>ANVISA RDC 327/2019</strong>, <strong>RDC 660/2022</strong> e Conselho Regional de Farmácia. Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da <strong>Planta y Raíz Ltda (CNPJ 58.283.475/0001-00)</strong>.
+                  Declaro que as informações e documentos enviados são autênticos e conferem com as normas da <strong>ANVISA RDC 327/2019</strong>, <strong>RDC 660/2022</strong> e órgãos competentes. Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da <strong>Planta y Raíz Ltda (CNPJ 58.283.475/0001-00)</strong>.
                 </label>
               </div>
 

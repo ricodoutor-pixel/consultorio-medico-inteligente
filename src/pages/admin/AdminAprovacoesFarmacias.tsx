@@ -95,6 +95,7 @@ export const AdminAprovacoesFarmacias = () => {
           status: isApproved ? "approved" : "pending",
           created_at: p.created_at || new Date().toISOString(),
           kyc_docs: kycDocsArray,
+          vendor_category: normalizeVendorCategory(v.vendor_category),
         };
       });
 
@@ -110,6 +111,13 @@ export const AdminAprovacoesFarmacias = () => {
           file_url: url,
           is_verified: true,
         }));
+        const dbDocs = Object.entries((v.kyc_documents || {}) as Record<string, string>).map(([kind, path]) => ({
+          id: `db_${kind}_${v.id}`,
+          document_kind: kind as any,
+          storage_path: path,
+          is_verified: false,
+        }));
+        kycDocsArray.push(...(dbDocs as any));
 
         return {
           id: v.id,
@@ -480,7 +488,7 @@ export const AdminAprovacoesFarmacias = () => {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
-                      {(Object.keys(PHARMACY_KYC_LABELS) as PharmacyKycKind[]).map((kind) => {
+                      {docsForCategory(pharmacy.vendor_category || "farmacia").map((kind) => {
                         const doc = docOf(pharmacy, kind);
                         const hasDoc = Boolean(doc?.file_url || doc?.storage_path || pharmacy.id === TEST_PHARMACY_DATA.id);
 

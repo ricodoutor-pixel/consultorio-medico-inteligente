@@ -300,7 +300,15 @@ export const professionals: Professional[] = [
     cfmPrintUrl: cfmDrAndersonMikalauskas,
     paymentLink: "https://link.mercadopago.com.br/plantayraiz",
     services: STANDARD_DOCTOR_SERVICES,
-    slots: ["Hoje 09:00", "Hoje 11:00", "Hoje 14:30", "Hoje 17:00"],
+    slots: [
+      "Seg a Sex: 13:00",
+      "Seg a Sex: 13:30",
+      "Segunda: 19:00",
+      "Segunda: 19:30",
+      "Terça e Quinta: 20:30",
+      "Terça e Quinta: 21:00",
+      "Terça e Quinta: 21:30"
+    ],
     crm: "235755/SP • 3709/SE",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Médico extremamente experiente, atencioso e cuidadoso na explicação do tratamento." }

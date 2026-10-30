@@ -123,6 +123,13 @@ function PrescriptionSkeleton() {
 // ─── Main Component ─────────────────────────────────────────
 export function MedicalDashboard() {
   const [loading, setLoading] = useState(true);
+  const [showMockPatients, setShowMockPatients] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("pyr_show_mock_patients") !== "false";
+    } catch {
+      return true;
+    }
+  });
   const [patients, setPatients] = useState<WaitingPatient[]>([]);
   const [activePatient, setActivePatient] = useState<WaitingPatient | null>(null);
   const [notes, setNotes] = useState("");
@@ -379,6 +386,7 @@ export function MedicalDashboard() {
   const protocol = activePatient ? getProtocolForTags(activePatient.tags) : null;
 
   const filteredPatients = patients.filter((p) => {
+    if (!showMockPatients && p.isMock) return false;
     const q = patientSearch.trim().toLowerCase();
     if (!q) return true;
     const qDigits = q.replace(/\D/g, "");

@@ -287,12 +287,14 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
             </CardContent>
           </Card>
 
-          <Card className="border-border">
+<Card className="border-border">
             <CardContent className="p-6">
-              <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
-              <NextRealSlots doctorId={pro.dbId ?? null} proId={pro.id} />
+              <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">
+                <Clock size={18} className="text-primary" /> Agenda Disponível (Horário de Brasília)
+              </h2>
+              <NextRealSlots doctorId={pro.dbId ?? null} proId={pro.id} proSlots={pro.slots} />
             </CardContent>
-          </Card>
+          </Card> (feat(agendamento): reformulacao completa de agendamento por medico, grade Dr Anderson e Dr Jorge Luiz)
 
           <Card className="border-border">
             <CardContent className="p-6">
@@ -593,7 +595,7 @@ const Profissionais = () => {
                         <div className="flex items-center gap-3 mt-4 bg-primary/10 rounded-xl border border-primary/20 p-4 sm:p-5 shadow-sm w-full">
                           <ShieldCheck size={30} className="text-primary shrink-0" />
                           <span className="text-[11px] sm:text-xs leading-snug text-primary font-bold tracking-tight">
-                            Perfil 100% Verificado Por IA independente banco de dados do {p.councilLabel?.startsWith("Col Med") || (p.flags && p.flags.includes("🇧🇴") && !p.flags.includes("🇧🇷")) ? "Colegio Médico da Bolívia" : "CFM"} proteção 360-24 x 7 contra fraudes e falsificação de identidade
+                            Perfil 100% Verificado Por IA independente banco de dados do {p.councilLabel?.startsWith("Col Med") || (p.flags && p.flags.includes("🇧🇴") && !p.flags.includes("🇧🇷")) ? "Colegio Médico da Bolívia" : p.councilLabel === "CRO" ? "CFO (Conselho Federal de Odontologia)" : p.councilLabel === "CRMV" ? "CFMV (Conselho Federal de Medicina Veterinária)" : "CFM (Conselho Federal de Medicina)"} proteção 360-24 x 7 contra fraudes e falsificação de identidade
                           </span>
                         </div>
                       </div>

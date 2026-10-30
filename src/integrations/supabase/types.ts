@@ -8735,6 +8735,7 @@ export type Database = {
           is_kyc_approved: boolean
           kyc_approved_at: string | null
           kyc_approved_by: string | null
+          kyc_documents: Json
           kyc_rejection_reason: string | null
           kyc_status: string
           logo_url: string | null
@@ -8755,6 +8756,7 @@ export type Database = {
           total_sales: number
           updated_at: string
           user_id: string
+          vendor_category: string
         }
         Insert: {
           afe_doc_url?: string | null
@@ -8774,6 +8776,7 @@ export type Database = {
           is_kyc_approved?: boolean
           kyc_approved_at?: string | null
           kyc_approved_by?: string | null
+          kyc_documents?: Json
           kyc_rejection_reason?: string | null
           kyc_status?: string
           logo_url?: string | null
@@ -8794,6 +8797,7 @@ export type Database = {
           total_sales?: number
           updated_at?: string
           user_id: string
+          vendor_category?: string
         }
         Update: {
           afe_doc_url?: string | null
@@ -8813,6 +8817,7 @@ export type Database = {
           is_kyc_approved?: boolean
           kyc_approved_at?: string | null
           kyc_approved_by?: string | null
+          kyc_documents?: Json
           kyc_rejection_reason?: string | null
           kyc_status?: string
           logo_url?: string | null
@@ -8833,6 +8838,7 @@ export type Database = {
           total_sales?: number
           updated_at?: string
           user_id?: string
+          vendor_category?: string
         }
         Relationships: []
       }

@@ -162,6 +162,120 @@ function saveBlacklist(set) {
 
 const PREPOSITIONS = new Set(['da', 'de', 'do', 'dos', 'das', 'e', 'del', 'd', 'von', 'van']);
 
+
+// 📋 MAPA DE MÉDICOS E ESPECIALISTAS PARA CONVERSÃO DE ANÚNCIOS
+const DOCTOR_ADS_MAP = [
+  {
+    id: 'med-anderson-mikalauskas',
+    name: 'Dr. Anderson Mikalauskas',
+    area: 'Clínica Geral e Terapia Canabinoide (CRM 235755/SP)',
+    keywords: ['anderson', 'mikalauskas', 'mikaulaskas', 'anderson mikalauskas']
+  },
+  {
+    id: 'dent-jorge-luiz',
+    name: 'Dr. Jorge Luiz de Brito Melo',
+    area: 'Cirurgião-Dentista Prescritor, DTM, Bruxismo e Dores Orofaciais (CRO-PB 11867)',
+    keywords: ['jorge', 'jorge luiz', 'brito melo', 'dentista', 'odonto', 'bruxismo', 'dtm', 'dor orofacial']
+  },
+  {
+    id: 'med-arthur-barretto',
+    name: 'Dr. Arthur Barretto',
+    area: 'Médico Veterinário Prescritor Canabinoide (CRMV-SP 52219)',
+    keywords: ['arthur', 'barretto', 'veterinario', 'veterinário', 'vet', 'pet', 'cachorro', 'gato', 'cao', 'cão']
+  },
+  {
+    id: 'med-victor-fonseca',
+    name: 'Dr. Victor Fonseca',
+    area: 'Neurologia e Medicina Integrativa (CRM 206873/SP)',
+    keywords: ['victor', 'fonseca', 'victor fonseca', 'neurologia', 'neurologista', 'epilepsia', 'parkinson']
+  },
+  {
+    id: 'med-geovana-torres',
+    name: 'Dra. Geovana Torres',
+    area: 'Dor Crônica, Fibromialgia e Cuidados Integrativos (CRM 98083/SP)',
+    keywords: ['geovana', 'torres', 'geovana torres', 'fibromialgia', 'dor cronica', 'dor crônica']
+  },
+  {
+    id: 'med-jose-abbade',
+    name: 'Dr. José Geraldo Abbade',
+    area: 'Ortopedia, Artrose e Manejo da Dor (CRM 139366/SP)',
+    keywords: ['abbade', 'jose geraldo', 'josé geraldo', 'ortopedia', 'artrose']
+  },
+  {
+    id: 'med-julio-sacomori',
+    name: 'Dr. Julio Sacomori',
+    area: 'Urologia e Saúde do Homem (CRM 188732/SP)',
+    keywords: ['julio', 'júlio', 'sacomori', 'julio sacomori', 'urologia', 'urologista']
+  },
+  {
+    id: 'med-mariana-alves',
+    name: 'Dra. Mariana Alves',
+    area: 'Ginecologia, Saúde da Mulher e Climatério (CRM 135012-9/SP)',
+    keywords: ['mariana', 'alves', 'mariana alves', 'ginecologia', 'ginecologista', 'endometriose', 'climaterio']
+  },
+  {
+    id: 'med-edna-menta',
+    name: 'Dra. Edna Menta',
+    area: 'Pediatria e Transtorno do Espectro Autista / TEA (CRM 9727/SP)',
+    keywords: ['edna', 'menta', 'edna menta', 'pediatria', 'pediatra', 'autista', 'autismo', 'tea']
+  },
+  {
+    id: 'med-veronica-urban',
+    name: 'Dra. Verônica Urban',
+    area: 'Psiquiatria, Ansiedade e Insônia (CRM 58169/PR)',
+    keywords: ['veronica', 'verônica', 'urban', 'veronica urban', 'psiquiatria', 'psiquiatra', 'ansiedade', 'depressao', 'depressão', 'insonia', 'insônia']
+  },
+  {
+    id: 'med-frederico',
+    name: 'Dr. Frederico',
+    area: 'Clínica Geral e Saúde Integrativa (CRM 54892/SP)',
+    keywords: ['frederico', 'dr frederico']
+  }
+];
+
+// 👤 SALVAMENTO E CATALOGAÇÃO DE PACIENTES NO WHATSAPP COM SUFIXO "(Paciente)"
+async function savePatientContact(recipient, senderName) {
+  try {
+    const cleanNum = recipient.includes('@lid') ? recipient : recipient.replace(/\D/g, '');
+    let patientName = (senderName || 'Paciente').trim();
+    patientName = patientName.replace(/\s*\(Paciente\)/gi, '').trim();
+    if (!patientName || patientName.toLowerCase() === 'doutor(a)' || patientName.toLowerCase() === 'usuario' || patientName.toLowerCase() === 'paciente') {
+      patientName = 'Paciente';
+    }
+    const finalName = `${patientName} (Paciente)`;
+
+    // 1. Atualiza nome na Evolution API para aparecer com sufixo (Paciente) na lista de contatos do WhatsApp
+    try {
+      await fetch(`${EVO_URL}/chat/updateContact/${INSTANCE}`, {
+        method: 'POST',
+        headers: { 'apikey': EVO_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number: cleanNum, name: finalName })
+      });
+    } catch (e) {}
+
+    // 2. Registra no banco local de pacientes captados da campanha
+    const patientContactsFile = path.join(__dirname, 'evolution_patient_contacts.json');
+    let patients = {};
+    if (fs.existsSync(patientContactsFile)) {
+      try { patients = JSON.parse(fs.readFileSync(patientContactsFile, 'utf8')); } catch (e) {}
+    }
+    if (!patients[cleanNum]) {
+      patients[cleanNum] = {
+        name: finalName,
+        rawName: senderName,
+        phone: cleanNum,
+        firstSeenAt: new Date().toISOString(),
+        status: 'aguardando_cadastro',
+        capturedFrom: 'whatsapp_anuncio_cards'
+      };
+      fs.writeFileSync(patientContactsFile, JSON.stringify(patients, null, 2));
+      log(`👤 [NOVO CONTATO PACIENTE SALVO]: ${finalName} (${cleanNum})`);
+    }
+  } catch (e) {
+    log(`Aviso ao salvar contato paciente: ${e.message}`);
+  }
+}
+
 function cleanDoctorName(name) {
   if (!name) return 'Doutor(a)';
   let n = String(name).trim();
@@ -818,7 +932,7 @@ async function ingestIncomingDoc(msg, recipient, senderName) {
   }
 }
 
-// 🔍 CLASSIFICADOR INTELIGENTE DE PÚBLICO (MÉDICO × FARMÁCIA × PACIENTE × VETERINÁRIO × CLÍNICA/SECRETÁRIA)
+// 🔍 CLASSIFICADOR INTELIGENTE DE PÚBLICO (MÉDICO × FARMÁCIA × PACIENTE COM FOCO TOTAL EM CONVERSÃO)
 function classifyAudience(jid, senderName, text) {
   const cleanPhone = (jid || '').includes('@lid') ? jid : (jid || '').replace(/\D/g, '');
   const normText = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -833,30 +947,23 @@ function classifyAudience(jid, senderName, text) {
     };
   }
 
-  // 1. FILTRO DE EXCLUSÃO ESTREITO (Veterinários, Dentistas, Psicólogos, Clínicas/Secretárias)
+  // 1. FILTRO DE EXCLUSÃO ESTREITO
   const isExplicitlyNotDoctor = /(não sou médico|nao sou medico|não sou médica|nao sou medica|não sou doutor|nao sou doutor)/i.test(normText);
   if (isExplicitlyNotDoctor) {
     return {
-      role: 'unknown',
-      name: senderName,
+      role: 'patient',
+      name: senderName || 'Paciente',
       doctor: null
     };
   }
 
-  // Verificação de Veterinário (M.V., CRMV, Pet, Cão, etc.)
-  if (/\b(m\.?v\.?|crmv|veterinari[oa]|pet|cao|caes|gato|animal|animais)\b/i.test(normName) || /\b(m\.?v\.?|crmv|veterinari[oa]|pet|cao|caes|gato|animal|animais)\b/i.test(normText)) {
+  // Verificação de Veterinário ou Dentista:
+  // Se contiver CRMV ou CRO explícito de credenciamento profissional, trata como credenciamento.
+  // Se for paciente buscando consulta para pet ou dor orofacial/bruxismo, trata como PACIENTE!
+  if (/\b(meu crmv|sou veterinari|sou dentista|meu cro|minha clinica veterinaria|credenciamento cro|credenciamento crmv)\b/i.test(normText)) {
     return {
-      role: 'veterinarian',
-      name: senderName,
-      doctor: null
-    };
-  }
-
-  // Verificação de Dentista / Psicólogo
-  if (/\b(cro|odonto|odontologi[oa]|dentist[ao])\b/i.test(normName) || /\b(crp|psicolog[ao])\b/i.test(normName) || /\b(cro|odonto|odontologi[oa]|dentist[ao])\b/i.test(normText) || /\b(crp|psicolog[ao])\b/i.test(normText)) {
-    return {
-      role: 'dental_psych',
-      name: senderName,
+      role: 'doctor',
+      name: cleanDoctorName(senderName),
       doctor: null
     };
   }
@@ -896,7 +1003,6 @@ function classifyAudience(jid, senderName, text) {
 
   if (doctorObj || invitedDoc || isDoctorKeywords || isDoctorName) {
     let cleanName = cleanDoctorName(doctorObj?.name || (invitedDoc ? invitedDoc.name : senderName));
-    // Nunca tratar o contato pelo nome do fundador Dr. Edilson Bezerra
     if (cleanName.toLowerCase().includes('edilson bezerra') && !cleanPhone.includes(ADMIN_PHONE.slice(-8))) {
       cleanName = cleanDoctorName(senderName);
     }
@@ -923,21 +1029,11 @@ function classifyAudience(jid, senderName, text) {
     };
   }
 
-  // 4. VERIFICAÇÃO DE PACIENTE (SINTOMAS, TRATAMENTO, CONSULTA PRÓPRIA)
-  const isPatientKeywords = /(dor|dores|ansiedade|insonia|sono|depressao|autismo|fibromialgia|cancer|remedio|para mim|meu pai|minha mae|meu filho|quanto custa a consulta|quero marcar|como me consultar|agendar consulta|preciso de receita|cbd para|oleo de cannabis|gotas para|sou paciente|me consultar|meu tratamento)/i.test(normText);
-
-  if (isPatientKeywords) {
-    return {
-      role: 'patient',
-      name: senderName || 'Paciente',
-      doctor: null
-    };
-  }
-
-  // 5. DESCONHECIDO OU NEUTRO
+  // 4. PADRÃO PARA TODA A DEMANDA DE ANÚNCIOS / TRÁFEGO: CLASSIFICA COMO PACIENTE
+  // Garante acolhimento humanizado e foco em cadastro imediato sem questionários robóticos!
   return {
-    role: 'unknown',
-    name: senderName,
+    role: 'patient',
+    name: senderName || 'Paciente',
     doctor: null
   };
 }
@@ -1033,70 +1129,70 @@ function getPharmacySpecializedAnswer(question, senderName) {
   return `Olá, equipe da ${senderName}! Sou a Enfermeira Brisa, coordenadora de parcerias da Planta y Raíz 🌿📦\n\nNossa plataforma conecta farmácias e drogarias a milhares de pacientes com receitas válidas pela ANVISA de médicos especialistas de todo o Brasil!\n\nVocê pode acessar o painel farmacêutico em https://www.plantayraiz.com.br/farmacia-virtual ou me dizer sua dúvida sobre dispensação, catálogo e split de vendas!`;
 }
 
-// 🌿 RESPOSTAS EXCLUSIVAS PARA PACIENTES (Tom de Acolhimento e Saúde - Links Diretos na Plataforma)
+// 🌿 RESPOSTAS EXCLUSIVAS PARA PACIENTES (Tom de Acolhimento Humano, Foco em Cadastro e Alta Conversão)
 function getPatientSpecializedAnswer(question, senderName, recipient = '') {
   const q = question.toLowerCase();
   const cleanPhone = (recipient && !recipient.includes('@lid')) ? recipient.replace(/\D/g, '') : '';
-  const encodedName = encodeURIComponent(senderName || 'Paciente');
+  let displayName = (senderName || '').replace(/\s*\(Paciente\)/gi, '').replace(/^(doutor\(a\)|usuario|paciente)$/i, '').trim();
+  const greetingName = displayName ? ` ${displayName}` : '';
+  const encodedName = encodeURIComponent(displayName || 'Paciente');
 
-  // Links personalizados oficiais na plataforma
-  const otLink = `https://plantayraiz.com.br/orientacao-tecnica?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
-  const videoLink = `https://plantayraiz.com.br/telemedicina?modalidade=video&origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
-  const chatLink = `https://plantayraiz.com.br/telemedicina?modalidade=chat&origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
-  const shoppingLink = `https://plantayraiz.com.br/shopping`;
+  // Links oficiais na plataforma
+  const cadastroLink = `https://plantayraiz.com.br/cadastro?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
+  const agendamentoLink = `https://plantayraiz.com.br/agendamento?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
   const doctorsLink = `https://plantayraiz.com.br/profissionais`;
+  const otLink = `https://plantayraiz.com.br/orientacao-tecnica?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
+  const shoppingLink = `https://plantayraiz.com.br/shopping`;
 
-  // Agradecimento do paciente (NUNCA disparar SAMU para obrigado!)
-  if (q.includes('obrigad') || q.includes('valeu') || q.includes('agradeco') || q.includes('agradeço')) {
-    return `Imagina, ${senderName}! Fico muito feliz em poder te acolher e orientar. Conte sempre comigo! Um abraço carinhoso da Enfª Brisa! 🌿✨`;
+  // Salva e cataloga o contato na agenda do WhatsApp como "[Nome] (Paciente)"
+  if (recipient) {
+    savePatientContact(recipient, displayName || 'Paciente');
   }
 
-  // Emergência médica REAL (apenas para ideação suicida, dor torácica aguda, falta de ar grave)
+  // 1. Identificação de Especialista Citado do Anúncio (ex: Dr. Anderson, Dr. Jorge Luiz, Dra. Mariana, etc.)
+  for (const doc of DOCTOR_ADS_MAP) {
+    if (doc.keywords.some(k => q.includes(k))) {
+      return `Olá${greetingName}! Tudo bem? Que prazer ter você aqui na Planta y Raíz! 🌿🩺\n\nO *${doc.name}* (${doc.area}) é um dos nossos profissionais de destaque na plataforma!\n\nDeixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*\n\nCaso ainda não tenha, é 100% gratuito e leva menos de 1 minuto por este link seguro:\n👉 *Cadastre-se aqui*: ${cadastroLink}\n\nAssim que você terminar seu cadastro, eu estarei aqui para te orientar até sua consulta com o *${doc.name}*!\n\n👉 *Agenda oficial do ${doc.name}*: https://plantayraiz.com.br/agendamento?pro=${doc.id}\n\n• *Teleconsulta por Vídeo HD*: R$ 150 (com avaliação completa, prescrição oficial ANVISA/CFM com QR Code e retorno incluso)\n• *Consulta por Chat*: R$ 100\n\nQualquer dúvida no caminho, não hesite em me perguntar! Estarei aqui para te ajudar em todas as etapas, do cadastro até a consulta e a obtenção de sua receita com tratamento iniciado!\n\nConte comigo! Enfª Brisa a seu dispor! 🌿✨`;
+    }
+  }
+
+  // 2. Agradecimento do paciente (NUNCA disparar SAMU para obrigado!)
+  if (q.includes('obrigad') || q.includes('valeu') || q.includes('agradeco') || q.includes('agradeço')) {
+    return `Imagina${greetingName}! Fico muito feliz em poder te acolher e orientar. Não se esqueça de concluir seu cadastro em ${cadastroLink} para garantir seu atendimento. Conte sempre comigo! Um abraço carinhoso da Enfª Brisa! 🌿✨`;
+  }
+
+  // 3. Emergência médica REAL (apenas ideação suicida, dor torácica aguda, falta de ar grave)
   if (q.includes('suicid') || q.includes('tirar minha vida') || q.includes('infarto') || (q.includes('dor no peito') && q.includes('forte'))) {
     return `Atenção: Se você ou alguém próximo estiver passando por uma emergência médica com risco imediato à vida, por favor ligue agora para o SAMU (192) ou dirija-se à UPA / Pronto-Socorro mais próximo! A plataforma não realiza atendimento de emergência com risco de vida.`;
   }
 
-  // 🌟 Visitante vindo do Google Ads / Pesquisa Google
-  if (q.includes('google') || q.includes('anuncio') || q.includes('anúncio') || q.includes('pesquisa') || q.includes('achei vocês') || q.includes('achei voces')) {
-    return `Olá, ${senderName}! Que alegria receber você aqui vindo pelo Google! 🌿🩺\n\nSou a Enfermeira Brisa da Planta y Raíz, a mais completa plataforma de telemedicina do Brasil.\n\nPara agilizar seu atendimento médico sem filas, veja as opções disponíveis agora:\n\n1️⃣ *Orientação Técnica em Saúde (R$ 30)*: Triagem rápida de sintomas e educação em saúde com IA supervisionada em tempo real pela diretoria técnica da plataforma, com indicação do médico especialista ideal.\n👉 *Acesse*: ${otLink}\n\n2️⃣ *Teleconsulta por Vídeo HD (R$ 150)*: Consulta médica ao vivo com médico especialista + Receita digital válida em 100% das farmácias do Brasil + Retorno incluso.\n👉 *Acesse*: ${videoLink}\n\n3️⃣ *Consulta Médica por Chat (R$ 100)*: Avaliação clínica direta e emissão de receita oficial.\n👉 *Acesse*: ${chatLink}\n\nMe conte: qual é o seu principal sintoma ou especialidade médica que você procura hoje? Estou aqui para te acolher! 🙏✨`;
+  // 4. Já tem cadastro? ("já tenho cadastro", "ja fiz o cadastro", "já me cadastrei", "ja me cadastrei", "terminei")
+  if (q.includes('ja tenho') || q.includes('já tenho') || q.includes('ja fiz') || q.includes('já fiz') || q.includes('ja me cadastrei') || q.includes('já me cadastrei') || q.includes('terminei o cadastro') || q.includes('pronto ja fiz')) {
+    return `Que maravilha${greetingName}! Parabéns por concluir seu cadastro! 🌿🩺\n\nAgora o próximo passo é escolher o melhor dia e horário para a sua consulta com o seu especialista:\n\n👉 *Escolha o horário e agende aqui*: ${agendamentoLink}\n👉 *Se preferir ver todos os médicos da vitrine*: ${doctorsLink}\n\n• *Teleconsulta Médica por Vídeo HD*: R$ 150 (ao vivo com especialista + receita digital oficial ANVISA/CFM com QR Code + retorno incluso)\n• *Consulta Médica por Chat*: R$ 100\n\nBasta selecionar o horário que melhor se adapta à sua rotina. Se tiver qualquer dúvida para confirmar a consulta, me avise por aqui! Estou com você até a sua receita estar em mãos! 🙏✨`;
   }
 
-  // 🩺 Receita Médica Digital / Validade Nacional
-  if (q.includes('receita') || q.includes('prescricao') || q.includes('prescrição') || q.includes('renovar') || q.includes('validade')) {
-    return `Olá, ${senderName}! Na Planta y Raíz, todas as receitas médicas emitidas nas consultas possuem assinatura digital oficial com QR Code e são aceitas em 100% das farmácias de todo o Brasil! 🌿📄\n\nVocê pode consultar com nossos médicos credenciados hoje mesmo:\n\n• *Teleconsulta Médica por Vídeo HD (R$ 150)*: ${videoLink}\n• *Consulta Médica por Chat (R$ 100)*: ${chatLink}\n• *Orientação Técnica Inicial (R$ 30)*: ${otLink}\n\nQual modalidade atende melhor o seu momento hoje?`;
+  // 5. Dúvidas sobre Valores, Preço e Modalidades de Atendimento
+  if (q.includes('quanto') || q.includes('valor') || q.includes('preco') || q.includes('preço') || q.includes('custa') || q.includes('tabela')) {
+    return `Olá${greetingName}! Nossos valores são 100% transparentes e pensados para garantir o seu acesso a um atendimento médico de excelência: 🌿🩺\n\n• 📹 *Teleconsulta Médica por Vídeo HD: R$ 150,00*\nAtendimento médico completo ao vivo com especialista prescritor + Receita digital oficial ANVISA/CFM com QR Code (válida em todas as farmácias do Brasil) + Retorno incluso!\n\n• 💬 *Consulta Médica por Chat: R$ 100,00*\nAvaliação clínica e prescrição digital por mensagem na plataforma.\n\n• ⭐ *Consulta Premium: R$ 180,00*\nVídeo HD + Chat integrado + envio e análise de exames em tempo real.\n\n• 🩺 *Orientação Técnica Inicial: R$ 30,00*\nTriagem e educação em saúde com IA supervisionada pela nossa diretoria técnica.\n\nDeixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*\nCaso ainda não tenha, acesse o link seguro e faça em 1 minuto:\n👉 *Cadastre-se aqui*: ${cadastroLink}\n👉 *Agenda de Consultas*: ${agendamentoLink}\n\nAssim que terminar o cadastro, estarei aqui para te orientar em tudo até sua consulta! Conte comigo! Enfª Brisa a seu dispor! 🙏✨`;
   }
 
-  // 1. Solicitação Específica de Orientação Técnica (R$ 30)
-  if (/\b(orienta[cç][aã]o|t[eé]cnica)\b/i.test(q)) {
-    return `Olá, ${senderName}! Que ótimo você procurar a nossa *Orientação Técnica*! 🌿🩺\n\nTudo acontece *100% dentro da plataforma segura*:\n\n• *O que é*: uma etapa de *triagem e educação em saúde* (30 minutos) conduzida por uma *inteligência artificial*, *supervisionada em tempo real* pela diretoria técnica da plataforma.\n• *O que ela faz*: acolhe, explica sua condição de forma educativa, orienta hábitos e próximos passos e indica o *médico prescritor da vitrine* mais adequado para o seu caso.\n• *O que ela NÃO faz*: não prescreve, não indica medicamentos ou produtos e não emite receita — isso é feito na consulta com o médico (Chat R$ 100 / Vídeo R$ 150).\n• *Relatório*: o relatório de encaminhamento só é liberado após a revisão da diretoria técnica.\n• *Como funciona*: 1️⃣ triagem rápida → 2️⃣ pagamento de R$ 30 (Pix ou Cartão) → 3️⃣ sala liberada após a confirmação do pagamento.\n\n👉 *Comece por aqui*: ${otLink}\n\nEstou aqui caso precise de qualquer apoio com o acesso! 🙏✨`;
+  // 6. Odontologia / Dentista / Bruxismo / DTM (Dr. Jorge Luiz de Brito Melo)
+  if (q.includes('dentista') || q.includes('dente') || q.includes('bruxismo') || q.includes('dtm') || q.includes('dor orofacial') || q.includes('mandibula') || q.includes('mandíbula')) {
+    return `Olá${greetingName}! Sim! Temos na plataforma o *Dr. Jorge Luiz de Brito Melo*, Cirurgião-Dentista com pós-graduação em Cannabis Medicinal pela UNIFESP e inscrição ativa no CRO-PB 11867! 🦷🌿\n\nEle é especialista no manejo de dores orofaciais, disfunção temporomandibular (DTM), bruxismo e ansiedade odontológica com fitocanabinoides.\n\nVocê já tem cadastro em nossa plataforma?\n👉 *Seu cadastro rápido em 1 minuto*: ${cadastroLink}\n👉 *Agende diretamente com o Dr. Jorge Luiz*: https://plantayraiz.com.br/agendamento?pro=dent-jorge-luiz\n\nQualquer dúvida no caminho, estarei aqui para te ajudar em todas as etapas até a sua consulta! Enfª Brisa a seu dispor! 🙏✨`;
   }
 
-  // 2. Solicitação Específica de Teleconsulta por Vídeo HD (R$ 150)
-  if (q.includes('video') || q.includes('vídeo') || q.includes('150') || q.includes('ao vivo') || q.includes('chamada de video')) {
-    return `Olá, ${senderName}! Que excelente decisão cuidar da sua saúde! 🌿🩺\n\nNossa *Teleconsulta Médica por Vídeo HD (R$ 150)* acontece diretamente em nosso consultório virtual seguro e criptografado na plataforma:\n\n• *Atendimento Médico Completo*: Consulta ao vivo com médico especialista prescritor.\n• *Receita Médica Oficial*: Emissão de prescrição digital ANVISA/CFM com QR Code válida em todo o Brasil.\n• *Retorno Incluso*: Acompanhamento e suporte da nossa equipe clínica.\n\n👉 *Inicie sua entrevista rápida e acesse o consultório*: ${videoLink}\n\nNossa esteira conecta você em instantes ao especialista! ✨`;
+  // 7. Atendimento Veterinário (Pets)
+  if (q.includes('vet') || q.includes('veterinari') || q.includes('pet') || q.includes('cachorro') || q.includes('cao') || q.includes('cão') || q.includes('gato') || q.includes('animal')) {
+    return `Olá${greetingName}! Que maravilha! Sim, a Planta y Raíz conta com Médicos Veterinários Prescritores especializados em terapia canabinoide para animais de estimação (cães, gatos e outros): 🐶🐱🌿\n\nNossos especialistas cuidam de dor crônica, convulsões/epilepsia, artrose, ansiedade e suporte oncológico em pets!\n\n👉 *Cadastre-se para atendimento do seu pet*: ${cadastroLink}\n👉 *Conheça nossos Veterinários e agende*: ${doctorsLink} (categoria Médico Veterinário Prescritor)\n👉 *Agendamento direto com o Dr. Arthur Barretto*: https://plantayraiz.com.br/agendamento?pro=med-arthur-barretto\n\nEstou aqui para te ajudar em cada etapa até a consulta do seu pet! Conte comigo! 🙏✨`;
   }
 
-  // 3. Solicitação Específica de Consulta Médica por Chat (R$ 100)
-  if (q.includes('chat') || q.includes('mensagem') || q.includes('100') || q.includes('conversa')) {
-    return `Olá, ${senderName}! Nosso atendimento clínico por *Chat Direto (R$ 100)* acontece em nossa plataforma com sigilo médico ponta a ponta:\n\n• Avaliação da sua queixa clínica e histórico por médico prescritor credenciado.\n• Prescrição médica digital oficial ANVISA/CFM com QR Code.\n• Prontuário eletrônico completo e seguro.\n\n👉 *Acesse o consultório por chat agora*: ${chatLink}\n\nSigo à sua disposição! 🌿`;
+  // 8. Receita Médica Digital / Remédio / Óleo / ANVISA
+  if (q.includes('receita') || q.includes('remedio') || q.includes('remédio') || q.includes('oleo') || q.includes('óleo') || q.includes('cbd') || q.includes('thc') || q.includes('anvisa') || q.includes('validade') || q.includes('comprar')) {
+    return `Olá${greetingName}! Na Planta y Raíz, todas as receitas médicas emitidas nas consultas possuem assinatura digital oficial com QR Code e são aceitas em 100% das farmácias e importações da ANVISA em todo o Brasil! 🌿📄\n\nPara obter sua receita e iniciar seu tratamento com a dosagem e produto correto para o seu caso:\n1️⃣ Faça seu cadastro gratuito em 1 minuto: ${cadastroLink}\n2️⃣ Escolha seu especialista e agende seu horário: ${agendamentoLink}\n\n• *Teleconsulta por Vídeo HD*: R$ 150 (com direito a retorno incluso)\n• *Consulta por Chat*: R$ 100\n\nAssim que terminar o cadastro, estarei aqui para te orientar em tudo até a emissão da sua receita e o início do seu tratamento! Conte comigo! Enfª Brisa a seu dispor! 🙏✨`;
   }
 
-  // 4. Produtos / Medicamentos / Óleos / Canabidiol / Farmácia
-  if (q.includes('remedio') || q.includes('remédio') || q.includes('oleo') || q.includes('óleo') || q.includes('cbd') || q.includes('thc') || q.includes('farmacia') || q.includes('produto') || q.includes('comprar')) {
-    return `Olá, ${senderName}! Na nossa plataforma você encontra o Shopping e Farmácia Virtual com produtos fitocanabinoides (óleos Full Spectrum, Broad Spectrum, isolados e tópicos) autorizados pela ANVISA (RDC 660 e RDC 327):\n\n👉 *Acesse o catálogo da farmácia*: ${shoppingLink}\n\nLembrando que para adquirir produtos que exigem controle especial, realizamos sua teleconsulta para emissão da receita médica oficial! 🌿🩺`;
-  }
-
-  // 5. Escolha de Especialistas / Vitrine de Médicos
-  if (q.includes('médico') || q.includes('medico') || q.includes('especialista') || q.includes('doutor') || q.includes('escolher') || q.includes('vitrine') || q.includes('profissiona')) {
-    return `Olá, ${senderName}! Você tem total liberdade para escolher seu médico especialista em nossa vitrine oficial:\n\n👉 *Conheça todos os nossos médicos e agende diretamente*: ${doctorsLink}\n\nNossos profissionais contam com verificação documental rigorosa e certificação em Medicina Canabinoide! 🌿`;
-  }
-
-  // 6. Dúvidas Gerais de Consulta / Quanto custa / Como funciona
-  if (q.includes('quanto') || q.includes('valor') || q.includes('preco') || q.includes('preço') || q.includes('consulta') || q.includes('agendar') || q.includes('marcar') || q.includes('como funciona')) {
-    return `Olá, ${senderName}! Sou a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nTodas as nossas atividades acontecem diretamente em nosso ambiente seguro na plataforma:\n\n1️⃣ *Orientação Técnica (R$ 30)*: triagem e educação com IA supervisionada em tempo real pela diretoria técnica da plataforma, que indica o médico prescritor mais adequado (não prescreve nem indica medicamentos). Ordem: triagem → pagamento → sala.\n👉 *Acesse*: ${otLink}\n\n2️⃣ *Teleconsulta por Vídeo HD (R$ 150)*: Consulta médica ao vivo com especialista prescritor + Receita oficial ANVISA/CFM + Retorno incluso.\n👉 *Acesse*: ${videoLink}\n\n3️⃣ *Consulta Médica por Chat (R$ 100)*: Atendimento ágil e prescrição médica.\n👉 *Acesse*: ${chatLink}\n\n4️⃣ *Shopping da Farmácia*: ${shoppingLink}\n\nQual modalidade atende melhor o seu momento hoje?`;
-  }
-
-  return null;
+  // 9. ROTEIRO PADRÃO DE OURO: Saudação Geral / Leads de Anúncios / Foco Absoluto em Cadastro
+  return `Olá${greetingName}! Tudo bem? Que prazer ter você aqui na Planta y Raíz! 🌿🩺 Sou a Enfermeira Brisa.\n\nDeixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*\n\nCaso ainda não tenha, por favor acesse este link seguro e gratuito (leva menos de 1 minuto):\n👉 *Cadastre-se aqui*: ${cadastroLink}\n\nAssim que você terminar seu cadastro, estarei aqui para te orientar passo a passo até a sua consulta com o médico especialista!\n\n👉 *Se já quiser ver a agenda de consultas*: ${agendamentoLink}\n👉 *Para conhecer os médicos da nossa vitrine*: ${doctorsLink}\n\nQualquer dúvida no caminho, não hesite em me perguntar! Estarei aqui para te ajudar em todas as etapas, desde o cadastro até a consulta e a obtenção de sua receita com tratamento iniciado!\n\nConte comigo! Enfª Brisa a seu dispor! 🌿✨`;
 }
 
 // ❓ SAUDAÇÃO PARA CONTATOS DESCONHECIDOS / AMBÍGUOS

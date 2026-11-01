@@ -1,15 +1,12 @@
 // 🌿 Planta y Raiz — Single Source of Truth para Modelos Gemini AI nas Edge Functions (2026)
 // CORRIGIDO: gemini-1.5-* e gemini-2.0-flash foram DESCONTINUADOS pelo Google
 // (confirmado: toda chamada a eles retorna HTTP 404). Migrado para gemini-2.5-*,
-// a geracao atual e estavel. Ver: supabase/functions/brisa-bot/index.ts para o
-// historico completo desta correcao (identificada e aplicada em brisa-bot
-// semanas antes de ser encontrada aqui tambem).
+// a geracao atual e estavel.
 
-export const GEMINI_PRIMARY_MODEL = "gemini-3.8-flash";
-export const GEMINI_FALLBACK_MODEL = "gemini-2.5-flash";
+export const GEMINI_PRIMARY_MODEL = "gemini-2.5-flash";
+export const GEMINI_FALLBACK_MODEL = "gemini-2.5-pro";
 
 export const GEMINI_MODELS_FALLBACK_CHAIN = [
-  GEMINI_PRIMARY_MODEL,
   "gemini-2.5-flash",
   "gemini-2.5-pro",
 ] as const;
@@ -56,14 +53,12 @@ export async function callGeminiApiWithFallback(
 // ── Lovable AI Gateway (melhor Gemini disponível — 2026) ─────────────────
 // Usado como cérebro primário da Enfª Brisa / Dr. Edilson On.
 // Ids validados na listagem viva do gateway (google/*).
-export const GATEWAY_GEMINI_PRIMARY = "google/gemini-3.8-flash";
-export const GATEWAY_GEMINI_FALLBACK = "google/gemini-3.1-pro-preview";
+export const GATEWAY_GEMINI_PRIMARY = "google/gemini-2.5-flash";
+export const GATEWAY_GEMINI_FALLBACK = "google/gemini-2.5-pro";
 export const GATEWAY_GEMINI_CHAIN = [
-  GATEWAY_GEMINI_PRIMARY,
-  GATEWAY_GEMINI_FALLBACK,
-  "google/gemini-3.5-flash",
+  "google/gemini-2.5-flash",
+  "google/gemini-2.5-pro",
 ] as const;
 
-// Os modelos Gemini 3.x raciocinam por padrao e consomem todo o orcamento de
-// tokens antes de escrever. Em chat/WhatsApp isso truncava a resposta.
+// Em chat/WhatsApp esforço nulo para respostas ultra-rápidas
 export const GATEWAY_NO_REASONING = { effort: "none" } as const;

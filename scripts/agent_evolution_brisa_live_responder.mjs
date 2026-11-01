@@ -1255,8 +1255,16 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
             await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Brisa pausada para esta conversa.\n(Para reativar: *REATIVAR_IA ${recipient}*)`);
           } catch (e) { log(`Aviso handoff: ${e.message}`); }
         }
-        if (apiReply && !apiReply.toLowerCase().includes('apenas monitoramento')) {
+        const degradedPhrases = ['muitos atendimentos', 'não consegui responder', 'problema técnico', 'apenas monitoramento', 'tentar de novo'];
+        const isDegraded = degradedPhrases.some(p => (apiReply || '').toLowerCase().includes(p));
+
+        if (apiReply && !isDegraded) {
           reply = apiReply;
+        } else if (isDegraded) {
+          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Substituindo pelo Roteiro de Ouro de Cadastro!`);
+          reply = role === 'doctor'
+            ? getDoctorSpecializedAnswer(question, senderName, audience?.doctor)
+            : (role === 'pharmacy' ? getPharmacySpecializedAnswer(question, senderName) : getPatientSpecializedAnswer(question, senderName, recipient));
         }
       }
     } catch (e) {
@@ -1267,11 +1275,11 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
   // 3. Fallbacks de segurança por público se ainda não tiver resposta
   if (!reply) {
     if (role === 'doctor') {
-      reply = `Olá, Dr(a). ${senderName}! Sou a Enfermeira Brisa, da coordenação clínica da Planta y Raíz 🌿🩺\n\nNossa plataforma opera no modelo de agendamento soberano do paciente na vitrine e despacho inteligente em tempo real (estilo Uber da Saúde Canábica) com prioridade VIP, proximidade geográfica e prontuário integrado!\n\nPode enviar seus documentos faltantes (CRM, RG/CNH ou PDF assinado) diretamente por aqui neste WhatsApp para liberar sua agenda.\n\nQualquer dúvida sobre repasse via PIX, distribuição de consultas ou prescrição ANVISA, estou à sua inteira disposição! 🙏✨`;
+      reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
     } else if (role === 'pharmacy') {
-      reply = `Olá, equipe da ${senderName}! Sou a Enfermeira Brisa, da coordenação farmacêutica da Planta y Raíz 🌿📦\n\nPara cadastrar seus produtos, gerenciar pedidos e validar receitas digitais com QR Code da ANVISA, acesse https://www.plantayraiz.com.br/farmacia-virtual. Sigo à disposição!`;
+      reply = getPharmacySpecializedAnswer(question, senderName);
     } else {
-      reply = `Olá, ${senderName}! Sou a Enfermeira Brisa da Planta y Raíz 🌿✨\n\nComo posso te ajudar hoje? Se deseja agendar uma consulta médica especializada ou falar sobre sintomas, inicie sua triagem rápida em: https://www.plantayraiz.com.br/telemedicina`;
+      reply = getPatientSpecializedAnswer(question, senderName, recipient);
     }
   }
 

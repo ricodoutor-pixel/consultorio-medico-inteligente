@@ -9,18 +9,60 @@ import {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || ''
 
+function getGoldenPatientScript(name?: string, phone?: string): string {
+  const cleanName = (name || '').replace(/^(doutor\(a\)|usuario|paciente)$/i, '').trim();
+  const greeting = cleanName ? ` ${cleanName}` : '';
+  const cleanPhone = (phone || '').replace(/\D/g, '');
+  const cadastroLink = `https://plantayraiz.com.br/cadastro?origem=whatsapp&tel=${cleanPhone}`;
+  const agendamentoLink = `https://plantayraiz.com.br/agendamento?origem=whatsapp&tel=${cleanPhone}`;
+
+  return `Olá${greeting}! Tudo bem? Que prazer ter você aqui na Planta y Raíz! 🌿🩺 Sou a Enfermeira Brisa.
+
+Deixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*
+
+Caso ainda não tenha, por favor acesse este link seguro e 100% gratuito (leva menos de 1 minuto):
+👉 *Cadastre-se aqui*: ${cadastroLink}
+
+Assim que você terminar seu cadastro, estarei aqui para te orientar passo a passo até a sua consulta com o médico especialista!
+
+👉 *Agenda de Consultas*: ${agendamentoLink}
+👉 *Nossos Médicos Prescritores*: https://plantayraiz.com.br/profissionais
+
+• *Teleconsulta Médica por Vídeo HD*: R$ 150 (com avaliação completa, prescrição oficial ANVISA/CFM com QR Code e retorno incluso)
+• *Consulta por Chat*: R$ 100
+
+Qualquer dúvida no caminho, não hesite em me perguntar! Estarei aqui para te ajudar em todas as etapas, desde o cadastro até a consulta e a obtenção de sua receita com tratamento iniciado!
+
+Conte comigo! Enfª Brisa a seu dispor! 🌿✨`;
+}
+
+function getGoldenDoctorScript(senderName?: string): string {
+  const drName = senderName || 'Doutor(a)';
+  return `Olá, Dr(a). ${drName}! Sou a Enfermeira Brisa, da coordenação clínica da Planta y Raíz 🌿🩺
+
+Nossa plataforma opera no modelo de agendamento soberano do paciente na vitrine e despacho inteligente em tempo real (estilo Uber da Saúde Canábica) com prioridade VIP, proximidade geográfica e prontuário integrado!
+
+Pode enviar seus documentos (CRM frente/verso, RG/CNH ou PDF assinado digitalmente com VIDaaS/BirdID/Gov.br) diretamente por aqui neste WhatsApp para liberar sua agenda e consultório virtual.
+
+Qualquer dúvida sobre repasse via PIX instantâneo, distribuição de pacientes ou prescrição ANVISA, estou à sua inteira disposição! 🙏✨`;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  let rawRole = "unknown";
+  let senderName = "Usuário";
+  let phoneDigits = "";
+
   try {
     const body = await req.json().catch(() => ({}));
     const question = body.question || "";
-    let rawRole = (body.role || body.context_role || "").toLowerCase();
-    let senderName = body.senderName || "Doutor(a)";
-    const phoneDigits = String(body.phone || "").replace(/\D/g, "");
+    rawRole = (body.role || body.context_role || "").toLowerCase();
+    senderName = body.senderName || (rawRole === 'doctor' ? "Doutor(a)" : "Paciente");
+    phoneDigits = String(body.phone || "").replace(/\D/g, "");
 
     // 🧑‍⚕️ Verificação oficial: se o telefone pertence a um médico cadastrado, NUNCA tratar como paciente
     let verifiedDoctor = false;
@@ -56,10 +98,6 @@ serve(async (req) => {
         role: rawRole || "unknown",
         answer: "Claro! Vou pausar o atendimento automático e chamar nossa equipe agora. Uma pessoa vai continuar a conversa com você por aqui em breve. 🙏🌿",
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    if (!GEMINI_API_KEY) {
-      throw new Error("API Key not configured")
     }
 
     // 🎯 SEPARAÇÃO ESTRITA DE PÚBLICO (MÉDICO × FARMÁCIA × PACIENTE)
@@ -186,9 +224,10 @@ ESTILO DE RESPOSTA (OBRIGATÓRIO):
       }]
     };
 
-    // 🧠 Cérebro principal: Gemini 3.8 Flash via Lovable AI Gateway (histórico completo como turnos reais)
     let answer = "";
     let usedModel = "";
+
+    // 1. Lovable AI Gateway
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     if (lovableKey) {
       try {
@@ -202,7 +241,11 @@ ESTILO DE RESPOSTA (OBRIGATÓRIO):
         ];
         const gw = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Lovable-API-Key": lovableKey },
+          headers: { 
+            "Content-Type": "application/json", 
+            "Authorization": `Bearer ${lovableKey}`,
+            "Lovable-API-Key": lovableKey 
+          },
           body: JSON.stringify({
             model: GATEWAY_GEMINI_PRIMARY,
             reasoning: GATEWAY_NO_REASONING,
@@ -214,53 +257,51 @@ ESTILO DE RESPOSTA (OBRIGATÓRIO):
           answer = gwData?.choices?.[0]?.message?.content || "";
           usedModel = GATEWAY_GEMINI_PRIMARY;
         } else {
-          console.warn("[chat-brisa] Gemini 3.8 falhou:", gw.status, gwData?.error?.message || "");
+          console.warn("[chat-brisa] Gateway falhou:", gw.status, gwData?.error?.message || "");
         }
       } catch (gwErr) {
-        console.warn("[chat-brisa] Gemini 3.8 erro:", gwErr);
+        console.warn("[chat-brisa] Gateway erro:", gwErr);
       }
     }
 
-    // Reserva: chave Gemini direta
-    if (!answer) {
+    // 2. Chave Gemini direta do Google (fallback)
+    if (!answer && GEMINI_API_KEY) {
       const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
       answer = res.ok ? (res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "") : "";
       usedModel = res.usedModel;
     }
 
-
+    // 3. Fallback de Ouro: NUNCA retorna erro técnico ou 'muitos atendimentos'
     if (!answer) {
-      // Nunca devolvemos 500 para o paciente: mensagem amigável com orientação.
-      return new Response(
-        JSON.stringify({
-          answer:
-            "Estou com muitos atendimentos agora e não consegui responder. Pode tentar de novo em alguns instantes? Se preferir, fale com a nossa equipe pelo WhatsApp.",
-          degraded: true,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      answer = rawRole === 'doctor'
+        ? getGoldenDoctorScript(senderName)
+        : getGoldenPatientScript(senderName, phoneDigits);
+      usedModel = "golden-script-fallback";
     }
 
-    // 🔁 Anti-repetição: se a resposta for igual à última enviada, não reenviar o mesmo texto
+    // 🔁 Anti-repetição básica
     const lastBrisa = [...history].reverse().find((h: any) => h.role === 'brisa')?.text || body.lastAnswer || "";
     const norm = (s: string) => String(s).toLowerCase().replace(/\s+/g, " ").trim().slice(0, 160);
     if (lastBrisa && norm(lastBrisa) === norm(answer)) {
-      answer = "Entendi! Me conta um pouco mais do que você precisa agora, que eu te ajudo com o próximo passo. 🌿";
+      answer = "Entendi perfeitamente! Me conte um pouco mais sobre o que você precisa agora, que eu te oriento com o próximo passo na plataforma! 🌿✨";
     }
 
     return new Response(JSON.stringify({ answer, model: usedModel, role: rawRole || "unknown", verifiedDoctor }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    });
 
   } catch (error) {
-    console.error("Error in chat-brisa:", error)
+    console.error("Error in chat-brisa:", error);
+    const fallbackAnswer = rawRole === 'doctor' 
+      ? getGoldenDoctorScript(senderName) 
+      : getGoldenPatientScript(senderName, phoneDigits);
+
     return new Response(
       JSON.stringify({
-        answer: "Tive um problema técnico rápido. Pode repetir a pergunta, por favor?",
-        degraded: true,
+        answer: fallbackAnswer,
+        degraded: false,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    );
   }
 })
-

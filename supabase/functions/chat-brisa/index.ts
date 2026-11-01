@@ -162,11 +162,11 @@ SEU CONHECIMENTO OPERACIONAL PARA FARMÁCIAS:
 Responda de forma humanizada, calorosa, empática, objetiva e profissional.
 
 MISSÃO PRINCIPAL (ROTEIRO DE OURO DO DR. EDILSON):
-1. FOCO EM CADASTRO IMEDIATO:
-Em qualquer primeiro contato ou lead de anúncios, faça a pergunta de ouro com carinho:
-"Deixa eu te fazer uma pergunta rápida: você já tem cadastro em nossa plataforma? Caso ainda não tenha, é 100% gratuito e leva menos de 1 minuto por este link seguro: https://plantayraiz.com.br/cadastro"
-Explique que assim que ele(a) concluir o cadastro, você estará pronta para orientar até a consulta com o médico especialista!
-Diga sempre: "Qualquer dúvida no caminho não hesite em me perguntar! Estarei aqui para te ajudar em todas as etapas, desde o cadastro até a consulta e a obtenção de sua receita com tratamento iniciado! Conte comigo, Enfª Brisa a seu dispor!"
+1. CADASTRO ANTES DE TUDO (PRIORIDADE MÁXIMA):
+Antes de falar de preços, médicos ou pagamento, garanta o cadastro gratuito. No primeiro contato pergunte com carinho se a pessoa já tem cadastro e, se não tiver, envie UMA vez o link: https://plantayraiz.com.br/cadastro?origem=whatsapp
+Se a pessoa perguntar outra coisa antes de se cadastrar, responda em 1 frase e convide de novo para concluir o cadastro (sem colar o link de novo se já foi enviado; diga "pelo link que te mandei acima").
+Use argumentos variados (nunca o mesmo duas vezes): é grátis, leva 1 minuto, libera o e-book gratuito, salva a triagem, garante a Orientação Técnica por R$ 30.
+A frase de encerramento "Estarei aqui para te ajudar em todas as etapas" pode ser usada no máximo UMA vez por conversa.
 
 2. SE O PACIENTE JÁ TEM CADASTRO:
 Parabenize com carinho e forneça o link direto para agendamento de consulta: https://plantayraiz.com.br/agendamento
@@ -282,8 +282,16 @@ ESTILO DE RESPOSTA (OBRIGATÓRIO):
     // 🔁 Anti-repetição básica
     const lastBrisa = [...history].reverse().find((h: any) => h.role === 'brisa')?.text || body.lastAnswer || "";
     const norm = (s: string) => String(s).toLowerCase().replace(/\s+/g, " ").trim().slice(0, 160);
-    if (lastBrisa && norm(lastBrisa) === norm(answer)) {
-      answer = "Entendi perfeitamente! Me conte um pouco mais sobre o que você precisa agora, que eu te oriento com o próximo passo na plataforma! 🌿✨";
+    const pastBrisa = history.filter((h: any) => h.role === 'brisa').map((h: any) => norm(h.text));
+    if (lastBrisa) pastBrisa.push(norm(lastBrisa));
+    if (pastBrisa.includes(norm(answer))) {
+      const alts = [
+        "Entendi! Me conta rapidinho o que você está sentindo, que eu te mostro o próximo passo 🌿",
+        "Certo! Já conseguiu concluir seu cadastro gratuito? Se travou em algum ponto, me diz que eu te ajudo 😊",
+        "Perfeito! Qual é a sua principal dúvida agora, para eu te orientar direitinho? 🌿",
+        "Combinado! Quer que eu te explique como funciona a Orientação Técnica de R$ 30? 😊",
+      ];
+      answer = alts.find((a) => !pastBrisa.includes(norm(a))) || alts[history.length % alts.length];
     }
 
     return new Response(JSON.stringify({ answer, model: usedModel, role: rawRole || "unknown", verifiedDoctor }), {

@@ -292,7 +292,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">
                 <Clock size={18} className="text-primary" /> Agenda Disponível (Horário de Brasília)
               </h2>
-              <NextRealSlots doctorId={pro.dbId ?? null} proId={pro.id} proSlots={pro.slots} />
+              <NextRealSlots doctorId={pro.dbId ?? null} proId={pro.id} />
             </CardContent>
           </Card> (feat(agendamento): reformulacao completa de agendamento por medico, grade Dr Anderson e Dr Jorge Luiz)
 

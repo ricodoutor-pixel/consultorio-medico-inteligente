@@ -13,9 +13,9 @@ describe("Doctor Schedule - Dr. Anderson Mikalauskas rules and booking", () => {
 
   beforeEach(() => {
     // Mock supabase RPC to return error immediately so tests test the sovereign fallback logic without network latency
-    vi.spyOn(supabase, "rpc").mockImplementation(() => {
-      return Promise.resolve({ data: null, error: { message: "Network disabled in unit test" } } as any);
-    });
+    vi.spyOn(supabase, "rpc").mockImplementation((() =>
+      Promise.resolve({ data: null, error: { message: "Network disabled in unit test" } })
+    ) as never);
     vi.spyOn(supabase, "from").mockImplementation(() => {
       return {
         upsert: vi.fn().mockResolvedValue({ data: null, error: null }),

@@ -55,3 +55,7 @@
 - [ ] Validar entrada e resposta real da Brisa na Hostinger — depende do fluxo n8n ativo
 
 - [x] Agendamento: modalidade → pagamento → escolha do horário do médico após pagamento aprovado (30/10)
+
+## Compra de créditos
+
+- [ ] Usuário quer comprar 20 créditos — abrir cartão de compra de créditos no chat (01/11)

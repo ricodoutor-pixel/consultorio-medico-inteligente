@@ -40,6 +40,7 @@ interface WaitingPatient {
   urgency: "low" | "medium" | "high";
   symptoms: string;
   appointmentId: string;
+  isMock?: boolean;
 }
 
 interface PrescriptionItem {

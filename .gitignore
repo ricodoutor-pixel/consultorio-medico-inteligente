@@ -95,6 +95,12 @@ scripts/*.mjs
 !scripts/agent_brevo_multi_pipeline.mjs
 !scripts/agent_partner_meeting_scheduler.mjs
 !scripts/agent_organic_analytics_reporter.mjs
+!scripts/agent_cannabis_and_young_doctors_hunter.mjs
+!scripts/apify_cleaner.mjs
+!scripts/apify_lead_harvester.mjs
+!scripts/unregistered_doctors_leads.json
+!scripts/clinicos_gerais_pos2020_leads.json
+!scripts/linkedin_prescribers_leads.json
 !scripts/lib/**
 !scripts/test/**
 scripts/*.cjs

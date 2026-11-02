@@ -195,6 +195,19 @@ module.exports = {
       restart_delay: 10000,
       env: {
         NODE_ENV: 'production'
+      }    },
+    {
+      name: 'cannabis-young-doctors-hunter',
+      script: 'scripts/agent_cannabis_and_young_doctors_hunter.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production'
       }
     }
   ]

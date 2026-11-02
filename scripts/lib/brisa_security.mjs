@@ -1,8 +1,8 @@
 /**
  * scripts/lib/brisa_security.mjs
  * 
- * Camada de Segurança e Blindagem Anti-Bloqueio (Fase 2 - S1 a S7)
- * Enfermeira Brisa v2 — Planta y Raíz Ltda
+ * Camada de Segurança, Higienização e Blindagem Anti-Repetição (Fase 2 - S1 a S8)
+ * Assistente Virtual Planta y Raíz — plantayraiz.com.br
  */
 
 import fs from 'fs';
@@ -307,8 +307,36 @@ export function checkConsecutiveBrisaLimit(recentMessages = []) {
 }
 
 // ============================================================================
-// S5. ANTI-REPETIÇÃO & AGRUPAMENTO (DEBOUNCE 8s)
+// S5. CÁLCULO DE SIMILARIDADE E ANTI-REPETIÇÃO EM 24 HORAS
 // ============================================================================
+export function calculateStringSimilarity(str1, str2) {
+  if (!str1 || !str2) return 0;
+  const s1 = String(str1).toLowerCase().replace(/\s+/g, ' ').trim();
+  const s2 = String(str2).toLowerCase().replace(/\s+/g, ' ').trim();
+  if (s1 === s2) return 1.0;
+  if (s1.length < 2 || s2.length < 2) return 0;
+
+  const getBigrams = (str) => {
+    const bigrams = new Map();
+    for (let i = 0; i < str.length - 1; i++) {
+      const bigram = str.substring(i, i + 2);
+      bigrams.set(bigram, (bigrams.get(bigram) || 0) + 1);
+    }
+    return bigrams;
+  };
+
+  const bg1 = getBigrams(s1);
+  const bg2 = getBigrams(s2);
+  let intersection = 0;
+  for (const [k, count1] of bg1.entries()) {
+    if (bg2.has(k)) {
+      intersection += Math.min(count1, bg2.get(k));
+    }
+  }
+  const total = (s1.length - 1) + (s2.length - 1);
+  return total > 0 ? (2 * intersection) / total : 0;
+}
+
 export function debounceIncomingMessage(jid, text, onFlushCallback, delayMs = 8000) {
   const norm = normalizeJid(jid);
   const key = norm.normalizedJid;
@@ -336,27 +364,42 @@ export function debounceIncomingMessage(jid, text, onFlushCallback, delayMs = 80
 }
 
 /**
- * Verifica se a resposta proposta é muito similar às últimas 3 mensagens enviadas
+ * Trava anti-repetição de 24 horas: não enviar mensagem se idêntica ou >= 80% de semelhança.
  */
-export function checkSemanticRepetition(proposedText, jid) {
+export function checkSemanticRepetition(proposedText, jid, sentHistory = []) {
   if (!proposedText) return false;
 
   const norm = normalizeJid(jid);
   const key = norm.normalizedJid;
   const history = recentRepliesMap.get(key) || [];
 
-  const normProposed = proposedText.toLowerCase().replace(/\s+/g, ' ').slice(0, 80);
+  const normProposed = proposedText.toLowerCase().replace(/\s+/g, ' ').trim();
 
+  // 1. Compara com mensagens recentes em memória da sessão
   for (const past of history) {
-    const normPast = past.toLowerCase().replace(/\s+/g, ' ').slice(0, 80);
-    if (normProposed === normPast) {
-      return true; // Repetição idêntica detectada!
+    const normPast = past.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (normProposed === normPast) return true;
+    if (calculateStringSimilarity(normProposed, normPast) >= 0.80) return true;
+  }
+
+  // 2. Compara com histórico de 24 horas persistido
+  if (Array.isArray(sentHistory)) {
+    const now = Date.now();
+    for (const item of sentHistory) {
+      if (item && item.text) {
+        const itemAge = item.sentAt ? (now - item.sentAt) : 0;
+        if (itemAge < 24 * 3600 * 1000) {
+          const pastText = String(item.text).toLowerCase().replace(/\s+/g, ' ').trim();
+          if (normProposed === pastText) return true;
+          if (calculateStringSimilarity(normProposed, pastText) >= 0.80) return true;
+        }
+      }
     }
   }
 
-  // Registra no histórico mantendo no máximo 3
+  // Registra no histórico mantendo no máximo 5
   history.push(proposedText);
-  if (history.length > 3) history.shift();
+  if (history.length > 5) history.shift();
   recentRepliesMap.set(key, history);
 
   return false;
@@ -455,6 +498,65 @@ export function sanitizeDoctorName(rawName) {
   }).join(' ');
 
   return result || 'Doutor(a)';
+}
+
+/**
+ * Sanitiza o nome informado pelo paciente:
+ * - Nunca usa nome de usuário, e-mail ou números como nome.
+ * - Não usa "Dr." ou "Dra." para pacientes.
+ * - Retorna o primeiro nome limpo ou vazio.
+ */
+export function sanitizePatientName(rawName) {
+  if (!rawName) return '';
+  let n = String(rawName).trim();
+  // Se contiver números ou @ ou caracteres típicos de username (ex.: "franciscopego263", "user_123"), descarta pois é username
+  if (/\d/.test(n) || /[@_]/.test(n)) {
+    return '';
+  }
+  // Remove títulos indevidos para paciente
+  n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|paciente|usuario|user)\s*/gi, '');
+  // Remove pontuações
+  n = n.replace(/[–—\-_/\\|@.#$%&*!?:;=]/g, ' ').trim();
+  const words = n.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '';
+  let first = words[0];
+  if (first.length < 2 || first.length > 20 || /^(paciente|usuario|cliente|doutor|doutora)$/i.test(first)) {
+    return '';
+  }
+  return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+}
+
+// ============================================================================
+// S8. CLASSIFICADORES RÁPIDOS DE INTENÇÃO E SEGURANÇA
+// ============================================================================
+
+export function isPureGreeting(text = '') {
+  if (!text) return false;
+  const clean = text.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const pattern = /^(oi|ola|bom dia|boa tarde|boa noite|opa|ei|oie|ok|qk|blz|beleza|tudo bem|td bem|salve|alo|alô)\b[\s!?.😊🌿🩺👍]*$/i;
+  return pattern.test(clean);
+}
+
+export function isPaymentOrVoucherNotice(text = '') {
+  if (!text) return false;
+  const clean = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /(paguei|comprovante|pagamento feito|pagamento realizado|ja paguei|já paguei|fiz o pix|mandei o pix|enviei o comprovante|comprovante em anexo|transferencia feita)/i.test(clean);
+}
+
+export function isUrgentMedicalEmergency(text = '') {
+  if (!text) return false;
+  const clean = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /(suicid|tirar minha vida|me matar|infarto|parada cardiaca|falta de ar|dor.*peito.*forte|dor forte.*peito|socorro urgente|samu|192)/i.test(clean);
+}
+
+export function isGeneralSpamOrUnrelated(text = '') {
+  if (!text) return false;
+  const clean = text.toLowerCase();
+  // Correntes, propaganda política, bots de venda de secretária virtual
+  const isChain = /(passe para|compartilhe com 10|abencoada semana|jesus te ama|versiculo do dia|deus abencoe|oracao de hoje)/i.test(clean);
+  const isPolitics = /(lula|bolsonaro|deputado|senador|vereador|eleicoes|voto|partido politico)/i.test(clean);
+  const isServiceOffer = /(secretaria virtual|aumente suas vendas|servico de marketing|prospeccao ativa|desenvolvimento de sites|venda de seguidores|disparador em massa)/i.test(clean);
+  return { isSpam: isChain || isPolitics || isServiceOffer, isServiceOffer };
 }
 
 // ============================================================================

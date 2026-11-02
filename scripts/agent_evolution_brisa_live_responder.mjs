@@ -15,7 +15,13 @@ import {
   isAutoReplyBot,
   checkConsecutiveBrisaLimit,
   checkSemanticRepetition,
+  calculateStringSimilarity,
   sanitizeDoctorName,
+  sanitizePatientName,
+  isPureGreeting,
+  isPaymentOrVoucherNotice,
+  isUrgentMedicalEmergency,
+  isGeneralSpamOrUnrelated,
   preSendGuard,
   isDoctorKycMedia,
   classifyDoctorDocumentType
@@ -88,6 +94,9 @@ const lastRepliedAt = new Map();
 
 // 2. Hash anti-repetição por texto e destinatário (bloqueia o mesmo texto para o mesmo número por 10 minutos)
 const recentSentHashes = new Map();
+
+// 🔒 Fila única e trava por conversa (in-flight lock) para evitar 2 ou 3 mensagens no mesmo minuto
+const inFlightChats = new Set();
 
 function hasRecentlySent(number, text) {
   if (!text) return false;
@@ -237,14 +246,10 @@ const DOCTOR_ADS_MAP = [
 async function savePatientContact(recipient, senderName) {
   try {
     const cleanNum = recipient.includes('@lid') ? recipient : recipient.replace(/\D/g, '');
-    let patientName = (senderName || 'Paciente').trim();
-    patientName = patientName.replace(/\s*\(Paciente\)/gi, '').trim();
-    if (!patientName || patientName.toLowerCase() === 'doutor(a)' || patientName.toLowerCase() === 'usuario' || patientName.toLowerCase() === 'paciente') {
-      patientName = 'Paciente';
-    }
-    const finalName = `${patientName} (Paciente)`;
+    const cleanFirstName = sanitizePatientName(senderName);
+    const finalName = cleanFirstName ? `${cleanFirstName} Paciente` : 'Paciente';
 
-    // 1. Atualiza nome na Evolution API para aparecer com sufixo (Paciente) na lista de contatos do WhatsApp
+    // 1. Atualiza nome na Evolution API para aparecer como "Nome Paciente" no WhatsApp
     try {
       await fetch(`${EVO_URL}/chat/updateContact/${INSTANCE}`, {
         method: 'POST',
@@ -253,7 +258,7 @@ async function savePatientContact(recipient, senderName) {
       });
     } catch (e) {}
 
-    // 2. Registra no banco local de pacientes captados da campanha
+    // 2. Registra no banco local de pacientes da campanha
     const patientContactsFile = path.join(__dirname, 'evolution_patient_contacts.json');
     let patients = {};
     if (fs.existsSync(patientContactsFile)) {
@@ -266,7 +271,7 @@ async function savePatientContact(recipient, senderName) {
         phone: cleanNum,
         firstSeenAt: new Date().toISOString(),
         status: 'aguardando_cadastro',
-        capturedFrom: 'whatsapp_anuncio_cards'
+        capturedFrom: 'whatsapp_anuncio'
       };
       fs.writeFileSync(patientContactsFile, JSON.stringify(patients, null, 2));
       log(`👤 [NOVO CONTATO PACIENTE SALVO]: ${finalName} (${cleanNum})`);
@@ -490,13 +495,19 @@ function getContactMemory(recipient) {
   if (!conversationMemory.has(recipient)) {
     conversationMemory.set(recipient, {
       turns: [],
+      sentHistory24h: [],
+      busyNoticeSentCount: 0,
+      paymentNoticeSent: false,
       lastGreetedAt: 0,
       lastAnswerSent: '',
       audienceRole: null,
       notes: ''
     });
   }
-  return conversationMemory.get(recipient);
+  const mem = conversationMemory.get(recipient);
+  if (!mem.sentHistory24h) mem.sentHistory24h = [];
+  if (mem.busyNoticeSentCount === undefined) mem.busyNoticeSentCount = 0;
+  return mem;
 }
 
 function addMessageToMemory(recipient, role, text, audienceRole) {
@@ -654,24 +665,38 @@ async function sendWhatsApp(recipient, text) {
     return null;
   }
 
-  // 🛡️ TRAVA RIGOROSA ANTI-DUPLICIDADE
-  if (hasRecentlySent(targetNumber, text)) {
-    log(`🛡️ [ANTI-DUPLICIDADE] Mensagem idêntica já enviada para ${targetNumber} nos últimos 10 min. Cancelando envio.`);
+  const mem = getContactMemory(recipient);
+
+  // 1. Regra Oficial: 'Estou com muitos atendimentos agora' no máximo 1x por conversa, e NUNCA 2x seguidas
+  if (text.toLowerCase().includes('muitos atendimentos')) {
+    if ((mem.busyNoticeSentCount || 0) >= 1) {
+      log(`🛑 [FILA CHEIA BARRADA] 'muitos atendimentos' já foi enviado anteriormente para ${targetNumber}. Bloqueando disparo repetido.`);
+      return null;
+    }
+    if ((mem.lastAnswerSent || '').toLowerCase().includes('muitos atendimentos')) {
+      log(`🛑 [FILA CHEIA BARRADA] 'muitos atendimentos' seria enviado 2x seguidas para ${targetNumber}. Bloqueando reenvio.`);
+      return null;
+    }
+  }
+
+  // 2. Trava anti-repetição de 24 horas (não enviar a mesma mensagem ou com >= 80% de semelhança)
+  if (checkSemanticRepetition(text, recipient, mem.sentHistory24h || [])) {
+    log(`🛡️ [ANTI-REPETIÇÃO 24H] Mensagem idêntica ou >= 80% similar já enviada para ${targetNumber} em menos de 24h. Cancelando envio.`);
     return null;
   }
 
-  // 🛡️ GUARDA DE PRÉ-ENVIO (Fase 2 - S2, S3 e DRY-RUN)
+  // 3. Guarda de pré-envio (pausa, opt-out, dry-run)
   const guard = preSendGuard(targetNumber, text);
   if (!guard.canSend) {
     log(`🛡️ ${guard.log}`);
-    await logMessageToSupabase(targetNumber, text, 'out', 'Enfermeira Brisa [Dry-Run]');
+    await logMessageToSupabase(targetNumber, text, 'out', 'Assistente Virtual Planta y Raíz [Dry-Run]');
     return { dryRun: true, status: 'blocked', reason: guard.reason };
   }
 
-  // ✍️ Simula digitação humana antes de enviar (pontinhos digitando...)
-  const typingDelay = Math.min(3500, Math.max(1200, text.length * 20));
+  // 4. Simulação de digitação humana
+  const typingDelay = Math.min(2500, Math.max(900, text.length * 15));
   await sendPresence(targetNumber, 'composing', typingDelay);
-  await new Promise(r => setTimeout(r, Math.min(2500, typingDelay)));
+  await new Promise(r => setTimeout(r, Math.min(1800, typingDelay)));
 
   log(`Enviando resposta para ${targetNumber}...`);
   const res = await fetch(`${EVO_URL}/message/sendText/${INSTANCE}`, {
@@ -683,7 +708,7 @@ async function sendWhatsApp(recipient, text) {
     body: JSON.stringify({
       number: targetNumber,
       options: {
-        delay: 1200,
+        delay: 1000,
         presence: 'composing'
       },
       text
@@ -697,8 +722,18 @@ async function sendWhatsApp(recipient, text) {
 
   const result = await res.json();
   log(`✅ Mensagem enviada com sucesso para ${targetNumber}`);
+
+  // Atualiza histórico e controle de repetição
   addMessageToMemory(recipient, 'brisa', text);
-  await logMessageToSupabase(targetNumber, text, 'out', 'Enfermeira Brisa');
+  if (!mem.sentHistory24h) mem.sentHistory24h = [];
+  mem.sentHistory24h.push({ text, sentAt: Date.now() });
+  mem.sentHistory24h = mem.sentHistory24h.filter(m => (Date.now() - m.sentAt) < 24 * 3600 * 1000);
+  if (text.toLowerCase().includes('muitos atendimentos')) {
+    mem.busyNoticeSentCount = (mem.busyNoticeSentCount || 0) + 1;
+  }
+  saveConversationMemory();
+
+  await logMessageToSupabase(targetNumber, text, 'out', 'Assistente Virtual Planta y Raíz');
   return result;
 }
 
@@ -1132,67 +1167,66 @@ function getPharmacySpecializedAnswer(question, senderName) {
 // 🌿 RESPOSTAS EXCLUSIVAS PARA PACIENTES (Tom de Acolhimento Humano, Foco em Cadastro e Alta Conversão)
 function getPatientSpecializedAnswer(question, senderName, recipient = '') {
   const q = question.toLowerCase();
-  const cleanPhone = (recipient && !recipient.includes('@lid')) ? recipient.replace(/\D/g, '') : '';
-  let displayName = (senderName || '').replace(/\s*\(Paciente\)/gi, '').replace(/^(doutor\(a\)|usuario|paciente)$/i, '').trim();
-  const greetingName = displayName ? ` ${displayName}` : '';
-  const encodedName = encodeURIComponent(displayName || 'Paciente');
+  const displayName = sanitizePatientName(senderName);
+  const greeting = displayName ? `Olá, ${displayName}!` : `Olá!`;
 
-  // Links oficiais na plataforma
-  const cadastroLink = `https://plantayraiz.com.br/cadastro?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
-  const agendamentoLink = `https://plantayraiz.com.br/agendamento?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
-  const doctorsLink = `https://plantayraiz.com.br/profissionais`;
-  const otLink = `https://plantayraiz.com.br/orientacao-tecnica?origem=whatsapp&tel=${cleanPhone}&nome=${encodedName}`;
-  const shoppingLink = `https://plantayraiz.com.br/shopping`;
-
-  // Salva e cataloga o contato na agenda do WhatsApp como "[Nome] (Paciente)"
+  // Salva e cataloga o contato na agenda do WhatsApp como "Nome Paciente"
   if (recipient) {
-    savePatientContact(recipient, displayName || 'Paciente');
+    savePatientContact(recipient, senderName);
   }
 
-  // 1. Identificação de Especialista Citado do Anúncio (ex: Dr. Anderson, Dr. Jorge Luiz, Dra. Mariana, etc.)
+  // 1. Saudação simples ("oi", "bom dia", "ok", etc.) -> SEMPRE saudação curta sem card de médico!
+  if (isPureGreeting(question)) {
+    return `${greeting} Como posso ajudar? Você já tem cadastro na plataforma?`;
+  }
+
+  // 2. Emergência médica
+  if (isUrgentMedicalEmergency(question)) {
+    return `Se você ou alguém próximo estiver passando por uma emergência médica, ligue agora para o 192 (SAMU) ou procure o pronto-socorro mais próximo.`;
+  }
+
+  // 3. Pagamento e comprovante
+  if (isPaymentOrVoucherNotice(question)) {
+    return `Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar.`;
+  }
+
+  // 4. Spams / correntes / política / serviços de terceiros
+  const spamCheck = isGeneralSpamOrUnrelated(question);
+  if (spamCheck.isServiceOffer) {
+    return null; // ignora propostas comerciais / bots de marketing
+  }
+  if (spamCheck.isSpam) {
+    return `Aqui falamos só de atendimento e cadastro na Planta y Raiz.`;
+  }
+
+  // 5. Se mencionou médico específico de anúncio (e NÃO é só saudação)
   for (const doc of DOCTOR_ADS_MAP) {
     if (doc.keywords.some(k => q.includes(k))) {
-      return `Olá${greetingName}! Tudo bem? Que prazer ter você aqui na Planta y Raíz! 🌿🩺\n\nO *${doc.name}* (${doc.area}) é um dos nossos profissionais de destaque na plataforma!\n\nDeixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*\n\nCaso ainda não tenha, é 100% gratuito e leva menos de 1 minuto por este link seguro:\n👉 *Cadastre-se aqui*: ${cadastroLink}\n\nAssim que você terminar seu cadastro, eu estarei aqui para te orientar até sua consulta com o *${doc.name}*!\n\n👉 *Agenda oficial do ${doc.name}*: https://plantayraiz.com.br/agendamento?pro=${doc.id}\n\n• *Teleconsulta por Vídeo HD*: R$ 150 (com avaliação completa, prescrição oficial ANVISA/CFM com QR Code e retorno incluso)\n• *Consulta por Chat*: R$ 100\n\nQualquer dúvida no caminho, não hesite em me perguntar! Estarei aqui para te ajudar em todas as etapas, do cadastro até a consulta e a obtenção de sua receita com tratamento iniciado!\n\nConte comigo! Enfª Brisa a seu dispor! 🌿✨`;
+      return `O ${doc.name} atende pela Planta y Raíz! O caminho para a sua consulta por videochamada é bem simples:\n1) Cadastro gratuito em plantayraiz.com.br/cadastro\n2) Pré-triagem com nossa equipe\n3) Escolha do médico e horário\n4) Consulta ao vivo por videochamada.\nVocê gostaria que eu te ajude no cadastro passo a passo?`;
     }
   }
 
-  // 2. Agradecimento do paciente (NUNCA disparar SAMU para obrigado!)
-  if (q.includes('obrigad') || q.includes('valeu') || q.includes('agradeco') || q.includes('agradeço')) {
-    return `Imagina${greetingName}! Fico muito feliz em poder te acolher e orientar. Não se esqueça de concluir seu cadastro em ${cadastroLink} para garantir seu atendimento. Conte sempre comigo! Um abraço carinhoso da Enfª Brisa! 🌿✨`;
+  // 6. Dúvidas sobre remédios, sintomas, insônia, remédio para dormir, dor, ansiedade, dose
+  if (/rem[eé]dio|dormir|ins[oô]nia|ansiedade|dor|sintoma|depress[aã]o|rem[eé]dios|canabidiol|cbd|thc|[oó]leo|gotas|dosagem|posologia/i.test(q)) {
+    return `Quem avalia isso e define a melhor conduta é o médico na consulta. O primeiro passo é o cadastro gratuito em plantayraiz.com.br/cadastro. Você já tem cadastro na plataforma?`;
   }
 
-  // 3. Emergência médica REAL (apenas ideação suicida, dor torácica aguda, falta de ar grave)
-  if (q.includes('suicid') || q.includes('tirar minha vida') || q.includes('infarto') || (q.includes('dor no peito') && q.includes('forte'))) {
-    return `Atenção: Se você ou alguém próximo estiver passando por uma emergência médica com risco imediato à vida, por favor ligue agora para o SAMU (192) ou dirija-se à UPA / Pronto-Socorro mais próximo! A plataforma não realiza atendimento de emergência com risco de vida.`;
+  // 7. Dúvidas sobre valores e preços
+  if (/quanto\s+custa|qual\s+o\s+valor|pre[cç]o|tabela|valores/i.test(q)) {
+    return `Na Planta y Raíz, a teleconsulta por vídeo ao vivo é R$ 150 e a consulta por chat é R$ 100, com receita oficial válida pela ANVISA. O primeiro passo é o cadastro gratuito em plantayraiz.com.br/cadastro. Você já tem cadastro na plataforma?`;
   }
 
-  // 4. Já tem cadastro? ("já tenho cadastro", "ja fiz o cadastro", "já me cadastrei", "ja me cadastrei", "terminei")
-  if (q.includes('ja tenho') || q.includes('já tenho') || q.includes('ja fiz') || q.includes('já fiz') || q.includes('ja me cadastrei') || q.includes('já me cadastrei') || q.includes('terminei o cadastro') || q.includes('pronto ja fiz')) {
-    return `Que maravilha${greetingName}! Parabéns por concluir seu cadastro! 🌿🩺\n\nAgora o próximo passo é escolher o melhor dia e horário para a sua consulta com o seu especialista:\n\n👉 *Escolha o horário e agende aqui*: ${agendamentoLink}\n👉 *Se preferir ver todos os médicos da vitrine*: ${doctorsLink}\n\n• *Teleconsulta Médica por Vídeo HD*: R$ 150 (ao vivo com especialista + receita digital oficial ANVISA/CFM com QR Code + retorno incluso)\n• *Consulta Médica por Chat*: R$ 100\n\nBasta selecionar o horário que melhor se adapta à sua rotina. Se tiver qualquer dúvida para confirmar a consulta, me avise por aqui! Estou com você até a sua receita estar em mãos! 🙏✨`;
+  // 8. Se já tem cadastro ("já tenho cadastro", "já fiz", "já me cadastrei")
+  if (/j[aá]\s+tenho|j[aá]\s+fiz|j[aá]\s+me\s+cadastrei|conclu[ií]\s+o\s+cadastro/i.test(q)) {
+    return `Perfeito! O próximo passo é escolher seu médico e horário para a consulta por videochamada em plantayraiz.com.br/agendamento. Quer que eu te ajude na escolha?`;
   }
 
-  // 5. Dúvidas sobre Valores, Preço e Modalidades de Atendimento
-  if (q.includes('quanto') || q.includes('valor') || q.includes('preco') || q.includes('preço') || q.includes('custa') || q.includes('tabela')) {
-    return `Olá${greetingName}! Nossos valores são 100% transparentes e pensados para garantir o seu acesso a um atendimento médico de excelência: 🌿🩺\n\n• 📹 *Teleconsulta Médica por Vídeo HD: R$ 150,00*\nAtendimento médico completo ao vivo com especialista prescritor + Receita digital oficial ANVISA/CFM com QR Code (válida em todas as farmácias do Brasil) + Retorno incluso!\n\n• 💬 *Consulta Médica por Chat: R$ 100,00*\nAvaliação clínica e prescrição digital por mensagem na plataforma.\n\n• ⭐ *Consulta Premium: R$ 180,00*\nVídeo HD + Chat integrado + envio e análise de exames em tempo real.\n\n• 🩺 *Orientação Técnica Inicial: R$ 30,00*\nTriagem e educação em saúde com IA supervisionada pela nossa diretoria técnica.\n\nDeixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*\nCaso ainda não tenha, acesse o link seguro e faça em 1 minuto:\n👉 *Cadastre-se aqui*: ${cadastroLink}\n👉 *Agenda de Consultas*: ${agendamentoLink}\n\nAssim que terminar o cadastro, estarei aqui para te orientar em tudo até sua consulta! Conte comigo! Enfª Brisa a seu dispor! 🙏✨`;
+  // 9. Agradecimento
+  if (/obrigad|valeu|agrade[cç]o/i.test(q)) {
+    return `Por nada! Qualquer dúvida sobre o seu cadastro ou agendamento em plantayraiz.com.br/cadastro, estou à inteira disposição!`;
   }
 
-  // 6. Odontologia / Dentista / Bruxismo / DTM (Dr. Jorge Luiz de Brito Melo)
-  if (q.includes('dentista') || q.includes('dente') || q.includes('bruxismo') || q.includes('dtm') || q.includes('dor orofacial') || q.includes('mandibula') || q.includes('mandíbula')) {
-    return `Olá${greetingName}! Sim! Temos na plataforma o *Dr. Jorge Luiz de Brito Melo*, Cirurgião-Dentista com pós-graduação em Cannabis Medicinal pela UNIFESP e inscrição ativa no CRO-PB 11867! 🦷🌿\n\nEle é especialista no manejo de dores orofaciais, disfunção temporomandibular (DTM), bruxismo e ansiedade odontológica com fitocanabinoides.\n\nVocê já tem cadastro em nossa plataforma?\n👉 *Seu cadastro rápido em 1 minuto*: ${cadastroLink}\n👉 *Agende diretamente com o Dr. Jorge Luiz*: https://plantayraiz.com.br/agendamento?pro=dent-jorge-luiz\n\nQualquer dúvida no caminho, estarei aqui para te ajudar em todas as etapas até a sua consulta! Enfª Brisa a seu dispor! 🙏✨`;
-  }
-
-  // 7. Atendimento Veterinário (Pets)
-  if (q.includes('vet') || q.includes('veterinari') || q.includes('pet') || q.includes('cachorro') || q.includes('cao') || q.includes('cão') || q.includes('gato') || q.includes('animal')) {
-    return `Olá${greetingName}! Que maravilha! Sim, a Planta y Raíz conta com Médicos Veterinários Prescritores especializados em terapia canabinoide para animais de estimação (cães, gatos e outros): 🐶🐱🌿\n\nNossos especialistas cuidam de dor crônica, convulsões/epilepsia, artrose, ansiedade e suporte oncológico em pets!\n\n👉 *Cadastre-se para atendimento do seu pet*: ${cadastroLink}\n👉 *Conheça nossos Veterinários e agende*: ${doctorsLink} (categoria Médico Veterinário Prescritor)\n👉 *Agendamento direto com o Dr. Arthur Barretto*: https://plantayraiz.com.br/agendamento?pro=med-arthur-barretto\n\nEstou aqui para te ajudar em cada etapa até a consulta do seu pet! Conte comigo! 🙏✨`;
-  }
-
-  // 8. Receita Médica Digital / Remédio / Óleo / ANVISA
-  if (q.includes('receita') || q.includes('remedio') || q.includes('remédio') || q.includes('oleo') || q.includes('óleo') || q.includes('cbd') || q.includes('thc') || q.includes('anvisa') || q.includes('validade') || q.includes('comprar')) {
-    return `Olá${greetingName}! Na Planta y Raíz, todas as receitas médicas emitidas nas consultas possuem assinatura digital oficial com QR Code e são aceitas em 100% das farmácias e importações da ANVISA em todo o Brasil! 🌿📄\n\nPara obter sua receita e iniciar seu tratamento com a dosagem e produto correto para o seu caso:\n1️⃣ Faça seu cadastro gratuito em 1 minuto: ${cadastroLink}\n2️⃣ Escolha seu especialista e agende seu horário: ${agendamentoLink}\n\n• *Teleconsulta por Vídeo HD*: R$ 150 (com direito a retorno incluso)\n• *Consulta por Chat*: R$ 100\n\nAssim que terminar o cadastro, estarei aqui para te orientar em tudo até a emissão da sua receita e o início do seu tratamento! Conte comigo! Enfª Brisa a seu dispor! 🙏✨`;
-  }
-
-  // 9. ROTEIRO PADRÃO DE OURO: Saudação Geral / Leads de Anúncios / Foco Absoluto em Cadastro
-  return `Olá${greetingName}! Tudo bem? Que prazer ter você aqui na Planta y Raíz! 🌿🩺 Sou a Enfermeira Brisa.\n\nDeixa eu te fazer uma pergunta rápida: *você já tem cadastro em nossa plataforma?*\n\nCaso ainda não tenha, por favor acesse este link seguro e gratuito (leva menos de 1 minuto):\n👉 *Cadastre-se aqui*: ${cadastroLink}\n\nAssim que você terminar seu cadastro, estarei aqui para te orientar passo a passo até a sua consulta com o médico especialista!\n\n👉 *Se já quiser ver a agenda de consultas*: ${agendamentoLink}\n👉 *Para conhecer os médicos da nossa vitrine*: ${doctorsLink}\n\nQualquer dúvida no caminho, não hesite em me perguntar! Estarei aqui para te ajudar em todas as etapas, desde o cadastro até a consulta e a obtenção de sua receita com tratamento iniciado!\n\nConte comigo! Enfª Brisa a seu dispor! 🌿✨`;
+  return null;
 }
 
 // ❓ SAUDAÇÃO PARA CONTATOS DESCONHECIDOS / AMBÍGUOS
@@ -1203,18 +1237,12 @@ function getUnknownAudienceGreeting(senderName) {
 async function askBrisaGemini(question, senderName, audience, recipient) {
   const role = audience?.role || 'unknown';
   const mem = recipient ? getContactMemory(recipient) : null;
-  const recentlyGreeted = mem ? (Date.now() - (mem.lastGreetedAt || 0) < (3 * 60 * 60 * 1000)) : false;
+  const patientCleanName = sanitizePatientName(senderName);
 
   // 1. Respostas locais especializadas por público
   let reply = null;
   if (role === 'opt_out') {
-    reply = `Entendido, Dr(a). Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção e desejamos muito sucesso! 🙏🌿`;
-  } else if (role === 'veterinarian') {
-    reply = `Olá! Agradecemos o contato. A Planta y Raíz foca exclusivamente em medicina integrativa e telemedicina humana regulada pelo CFM (Resolução CFM 2.314/2022). Não realizamos credenciamento nem atendimentos veterinários no momento. Desejamos muito sucesso em sua atuação! 🙏🌿`;
-  } else if (role === 'dental_psych') {
-    reply = `Olá! Agradecemos o contato. Nosso credenciamento atual é direcionado exclusivamente a médicos prescritores humanos habilitados pelo CFM. Caso sua clínica conte com médicos, ficaremos honrados em recebê-los em https://www.plantayraiz.com.br/cadastro-profissional. Desejamos muito sucesso! 🙏🌿`;
-  } else if (role === 'clinic_secretary') {
-    reply = `Olá! Sou a Enfermeira Brisa, coordenadora de credenciamento da Planta y Raíz 🌿🩺. Entramos em contato para apresentar nossa plataforma tecnológica de telemedicina e consultório digital ao corpo clínico. Poderia, por gentileza, encaminhar o convite ao Dr(a). responsável? O credenciamento é 100% gratuito em: https://www.plantayraiz.com.br/cadastro-profissional. Muito obrigada!`;
+    reply = `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`;
   } else if (role === 'doctor') {
     reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
   } else if (role === 'pharmacy') {
@@ -1222,9 +1250,8 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
   } else if (role === 'patient') {
     reply = getPatientSpecializedAnswer(question, senderName, recipient);
   } else if (role === 'unknown') {
-    const norm = question.toLowerCase();
-    if (norm.length < 15 && (norm.includes('ola') || norm.includes('olá') || norm.includes('bom dia') || norm.includes('boa tarde') || norm.includes('boa noite') || norm.includes('como funciona'))) {
-      reply = getUnknownAudienceGreeting(senderName);
+    if (isPureGreeting(question)) {
+      reply = `Olá! Como posso ajudar? Você já tem cadastro na plataforma?`;
     }
   }
 
@@ -1238,60 +1265,52 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
           question,
           role,
           phone: String(recipient || '').includes('@lid') ? '' : String(recipient || '').replace(/\D/g, ''),
-          senderName: senderName || (role === 'doctor' ? 'Doutor(a)' : 'Usuário'),
-          history: mem?.turns ? mem.turns.slice(-10) : [],
+          senderName: patientCleanName || senderName,
+          history: mem?.turns ? mem.turns.slice(-8) : [],
           lastAnswer: mem?.lastAnswerSent || ''
         })
       });
       if (res.ok) {
         const data = await res.json();
         const apiReply = data.answer || data.reply;
-        if (data.verifiedDoctor && mem) { mem.audienceRole = 'doctor'; saveConversationMemory(); }
         if (data.handoff) {
           try {
             const locked = loadHumanLocked();
-            locked.add(recipient);
+            locked.set(recipient, {
+              jid: recipient,
+              paused: true,
+              reason: 'solicitou_atendente_humano',
+              pausedAt: new Date().toISOString(),
+              pausedBy: 'ia_handoff',
+              expiresAt: Date.now() + 24 * 3600 * 1000
+            });
             saveHumanLocked(locked);
-            await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Brisa pausada para esta conversa.\n(Para reativar: *REATIVAR_IA ${recipient}*)`);
+            await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada para esta conversa.`);
           } catch (e) { log(`Aviso handoff: ${e.message}`); }
         }
-        const degradedPhrases = ['muitos atendimentos', 'não consegui responder', 'problema técnico', 'apenas monitoramento', 'tentar de novo'];
+
+        const degradedPhrases = ['muitos atendimentos', 'não consegui responder', 'problema técnico', 'apenas monitoramento'];
         const isDegraded = degradedPhrases.some(p => (apiReply || '').toLowerCase().includes(p));
 
         if (apiReply && !isDegraded) {
           reply = apiReply;
         } else if (isDegraded) {
-          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Substituindo pelo Roteiro de Ouro de Cadastro!`);
-          reply = role === 'doctor'
-            ? getDoctorSpecializedAnswer(question, senderName, audience?.doctor)
-            : (role === 'pharmacy' ? getPharmacySpecializedAnswer(question, senderName) : getPatientSpecializedAnswer(question, senderName, recipient));
+          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro padrão de cadastro.`);
+          reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
         }
       }
     } catch (e) {
-      log(`Erro ao consultar Gemini chat-brisa: ${e.message}`);
+      log(`Erro ao consultar chat-brisa: ${e.message}`);
     }
   }
 
-  // 3. Fallbacks de segurança por público se ainda não tiver resposta
+  // 3. Fallbacks de segurança se ainda não tiver resposta
   if (!reply) {
     if (role === 'doctor') {
       reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
-    } else if (role === 'pharmacy') {
-      reply = getPharmacySpecializedAnswer(question, senderName);
     } else {
-      reply = getPatientSpecializedAnswer(question, senderName, recipient);
+      reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
     }
-  }
-
-  // 4. Se a pessoa já foi saudada recentemente (últimas 3 horas), remove saudações redundantes
-  if (recentlyGreeted && reply) {
-    reply = reply.replace(/^(Olá|Oi|Boa tarde|Bom dia|Boa noite)[!,.]*(\s+Dr\(a\)\.|\s+Doutor\(a\)|\s+Doutor|\s+Doutora|\s+equipe da|\s+[\w\s]+)?[!,.]*(\s+Aqui é a Enfermeira Brisa[^\n]*\n*|\s+Sou a Enfermeira Brisa[^\n]*\n*)?/i, '').trim();
-    if (reply.length > 0) {
-      reply = reply.charAt(0).toUpperCase() + reply.slice(1);
-    }
-  } else if (mem) {
-    mem.lastGreetedAt = Date.now();
-    saveConversationMemory();
   }
 
   return cleanWhatsAppFormatting(reply);
@@ -1837,57 +1856,22 @@ async function loop() {
             }
 
             // 🎙️ SE FOR ÁUDIO: TRANSCREVER COM ELEVENLABS STT (OUVIDOS DA BRISA) E RESPONDER
-            const audioMsgs = newInbounds.filter(m => Boolean(m.message?.audioMessage));
+            // 🎙️ SE FOR ÁUDIO: Responde imediatamente a regra oficial 5
+            const audioMsgs = newInbounds.filter(m => Boolean(m.message?.audioMessage || m.message?.pttMessage));
             if (audioMsgs.length > 0) {
-              const audioMsg = audioMsgs[0];
-              const audience = classifyAudience(recipient, senderName, combinedText);
-              log(`🎙️ [OUVIDOS DA BRISA] Áudio recebido de [${audience.role.toUpperCase()}] ${senderName} (${recipient}). Baixando mídia...`);
+              log(`🎙️ [ÁUDIO RECEBIDO] Áudio recebido de ${senderName} (${recipient}). Enviando aviso oficial de texto.`);
+              const reply = "Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?";
+              await sendWhatsApp(recipient, reply);
+              lastRepliedAt.set(recipient, Date.now());
+              continue;
+            }
 
-              let transcribed = null;
-              try {
-                const mediaRes = await fetch(`${EVO_URL}/chat/getBase64FromMediaMessage/${INSTANCE}`, {
-                  method: 'POST',
-                  headers: { 'apikey': EVO_KEY, 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ message: audioMsg, convertToMp4: false })
-                });
-                if (mediaRes.ok) {
-                  const mediaData = await mediaRes.json();
-                  const base64Audio = mediaData.base64 || mediaData.data;
-                  if (base64Audio) {
-                    const audioBuffer = Buffer.from(base64Audio, 'base64');
-                    transcribed = await transcribeAudioInbound(audioBuffer, mediaData.mimetype || 'audio/ogg');
-                  }
-                }
-              } catch (e) {
-                log(`Falha ao obter mídia de áudio: ${e.message}`);
-              }
-
-              const promptText = transcribed || combinedText || 'Áudio recebido';
-              addMessageToMemory(recipient, 'user', `[Áudio]: ${promptText}`, audience.role);
-
-              let reply = null;
-              if (transcribed) {
-                log(`🎯 [TRANSCRIÇÃO DE ÁUDIO PROCESSADA]: "${transcribed}"`);
-                reply = await askBrisaGemini(transcribed, audience.name || senderName, audience, recipient);
-              } else {
-                // Fallback humanizado e específico por público quando não foi possível transcrever
-                if (audience.role === 'doctor') {
-                  reply = `Dr(a). ${senderName}, ouvi o seu áudio com muita atenção! Pode ficar tranquilo(a) que cuidamos de todo o processo de credenciamento, prontuário e repasses para o senhor(a). Se desejar enviar seus documentos por foto ou PDF (CRM, RG/CNH ou PDF assinado), pode mandar por aqui mesmo que já anexo ao seu cadastro!`;
-                } else if (audience.role === 'pharmacy') {
-                  reply = `Equipe da ${senderName}, ouvi o áudio da sua drogaria! Estamos à disposição para integrar seu catálogo de canabinoides na Farmácia Virtual e validar receitas da ANVISA. Como posso ajudar vocês hoje?`;
-                } else {
-                  reply = `${senderName}, ouvi seu áudio com todo carinho! Estou aqui para te acolher em sua jornada de tratamento. Você pode me contar um pouco mais por aqui ou iniciar sua triagem rápida em: https://www.plantayraiz.com.br/telemedicina`;
-                }
-              }
-
-              // Se tiver ElevenLabs configurado, sintetiza áudio de resposta
-              const audioBase64 = await textToSpeechElevenLabs(reply);
-              if (audioBase64) {
-                await sendWhatsAppAudio(recipient, audioBase64);
-              } else {
-                const textReply = transcribed ? `Ouvi o seu áudio com atenção!\n\n${reply}` : reply;
-                await sendWhatsApp(recipient, textReply);
-              }
+            // 📞 SE FOR LIGAÇÃO (CHAMADA PERDIDA OU REJEITADA): Regra oficial 6
+            const callMsgs = newInbounds.filter(m => Boolean(m.messageStubType === 40 || m.messageStubType === 41 || m.message?.call));
+            if (callMsgs.length > 0) {
+              log(`📞 [LIGAÇÃO RECEBIDA] Tentativa de chamada de ${senderName} (${recipient}). Enviando aviso oficial.`);
+              const reply = "Por aqui não atendemos ligações. Pode escrever sua dúvida?";
+              await sendWhatsApp(recipient, reply);
               lastRepliedAt.set(recipient, Date.now());
               continue;
             }

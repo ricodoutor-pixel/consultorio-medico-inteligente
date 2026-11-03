@@ -446,7 +446,7 @@ serve(async (req: Request): Promise<Response> => {
 
   // ── AGENTE: Enf. Brisa (triagem) ───────────────────────────────────────
   const kind = intent(text);
-  const useInstant = kind === 'boas_vindas' || kind === 'medico' || kind === 'lojista' || (!GEMINI_KEY && !LOVABLE_KEY);
+  const useInstant = kind === 'boas_vindas' || kind === 'medico' || kind === 'farmacia_lojista' || (!GEMINI_KEY && !LOVABLE_KEY);
   const instant = useInstant ? instantReply(text, name) : '';
   let sent = false;
   if (instant) {
@@ -454,7 +454,7 @@ serve(async (req: Request): Promise<Response> => {
     await log(phone, text, instant, sent ? 'brisa_instant' : 'brisa_instant_failed');
   }
 
-  if (GEMINI_KEY || LOVABLE_KEY) {
+  if (!instant && (GEMINI_KEY || LOVABLE_KEY)) {
     const bg = async () => {
       let triage = await tryGemini(text, name, phone, BRISA_TRIAGE_PERSONA);
       if (!triage || triage.length < 20) {

@@ -1,5 +1,10 @@
 # Roadmap
 
+## Auditoria WhatsApp Brisa — 03/11/2026
+- [ ] Conferir regras implantadas e registros disponíveis sem divulgar dados pessoais
+- [ ] Completar proteção de respostas, repetição, mídia e encaminhamento humano
+- [ ] Testar regras e registrar limites da validação na Hostinger
+
 ## Card do Dr. Amir sem foto — 27/10/2026
 
 - [x] Criar card vinculado ao cadastro real e comprovante CFM, sem alterar aprovação KYC ou presença online

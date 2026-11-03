@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
       }
 
       // Preço oficial definido no servidor pela modalidade (nunca pelo cliente)
-      const typePrice: Record<string, number> = { chat: 100, video: 150, premium: 180, retorno: 90 };
+      const typePrice: Record<string, number> = { chat: 100, video: 150, premium: 180, retorno: 90, renovacao: 90 };
       amount = typePrice[String(appt.type || "video")] ?? 150;
       if (appt.needs_scheduling) {
         successPath = `/agendamento?appt=${appointmentId}`;

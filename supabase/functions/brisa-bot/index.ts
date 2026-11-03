@@ -170,8 +170,8 @@ function intent(text: string): keyof typeof MSGS {
   if (/orientacao|tecnica|mentoria|edilson|bezerra|passo a passo|como funciona|atendimento/.test(t)) return 'orientacao_tecnica';
   if (/ja (tenho|fiz|possuo) cadastro|ja sou cadastrad|ja me cadastrei/.test(t)) return 'cadastrado';
   if (/cannabis|canabis|cbd|thc|canabidiol|maconha|epileps|autismo|fibromialgi|parkinson|ansiedade|insonia/.test(t)) return 'cannabis_info';
-  if (/^(ola|oi|hey|bom dia|boa tarde|boa noite|tudo bem|salve|brisa|alo|hello|hola)/.test(t.trim())) return 'boas_vindas';
-  return 'boas_vindas';
+  if (/^(ola|oi|hey|bom dia|boa tarde|boa noite|tudo bem|salve|brisa|alo|hello|hola)[\s!.,?]*$/.test(t.trim())) return 'boas_vindas';
+  return 'generica';
 }
 
 function instantReply(text: string, name: string | null): string {

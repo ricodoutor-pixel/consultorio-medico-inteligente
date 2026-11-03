@@ -76,14 +76,6 @@ export const AdminAprovacoes = () => {
         };
       }
     }
-    if (kind === "selfie" && (doc?.original_avatar_url || doc?.profile?.avatar_url || doc?.avatar_url)) {
-      return {
-        id: "kyc-selfie-orig-" + (doc.id || "doc"),
-        document_kind: "selfie",
-        storage_path: doc.original_avatar_url || doc.profile?.avatar_url || doc.avatar_url,
-        verification_status: "approved",
-      };
-    }
     if (kind === "icp_brasil" && doc?.signature_url) {
       return {
         id: "kyc-icp-sig-" + (doc.id || "doc"),

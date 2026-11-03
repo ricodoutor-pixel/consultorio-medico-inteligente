@@ -36,11 +36,11 @@ export function quickResponse({ question = '', senderName = '', role = 'patient'
   if (isCall) return { answer: 'Por aqui não atendemos ligações. Pode escrever sua dúvida?', model: 'call-response' };
   if (/paguei|comprovante|pagamento (feito|realizado)|fiz o pix|mandei o pix|enviei.*(document|anexo)|mandei.*document/.test(q)) return { answer: 'Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar.', model: 'receipt-notice' };
   if (/secretaria virtual|aumente suas vendas|servico de marketing|venda de seguidores|disparador em massa/.test(q)) return { answer: '', suppressed: true, model: 'service-offer' };
-  if (/corrente|compartilhe com 10|partido politico|bolsonaro|lula|versiculo|oracao de hoje/.test(q)) return { answer: 'Aqui falamos só de atendimento e cadastro na Planta y Raiz.', model: 'off-topic' };
+  if (/\b(corrente de oracao|compartilhe com 10|partido politico|bolsonaro|lula|versiculo|oracao de hoje)\b/.test(q)) return { answer: 'Aqui falamos só de atendimento e cadastro na Planta y Raiz.', model: 'off-topic' };
   if (/^(oi|ola|bom dia|boa tarde|boa noite|ok|qk|opa|oie|blz|tudo bem)[\s!?.\p{Emoji_Presentation}]*$/u.test(q)) {
     const name = patientName(senderName);
     return { answer: `Olá${name ? ', ' + name : ''}! Como posso ajudar? ${role === 'doctor' ? 'Em qual etapa do cadastro profissional você precisa de ajuda?' : 'Você já tem cadastro na plataforma?'}`, model: 'greeting-response' };
   }
-  if (role !== 'doctor' && /remedio|dormir|insonia|ansiedade|sintoma|dosagem|posologia|diagnostico|cura/.test(q)) return { answer: 'Quem avalia isso é o médico na consulta. O primeiro passo é o cadastro gratuito. A prescrição depende da avaliação individual.', model: 'medical-boundary' };
+  if (role !== 'doctor' && /\b(remedios?|dormir|insonia|ansiedade|sintomas?|dosagem|posologia|diagnostico|cura)\b/.test(q)) return { answer: 'Quem avalia isso é o médico na consulta. O primeiro passo é o cadastro gratuito. A prescrição depende da avaliação individual.', model: 'medical-boundary' };
   return null;
 }

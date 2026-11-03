@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Auditoria WhatsApp Brisa — 03/11/2026
+- [ ] Atualização da VPS solicitada às 05:18 UTC — acesso rechecado: porta SSH acessível, chave armazenada não carregável pelo cliente SSH e API Hostinger retorna 403; nenhum arquivo ou serviço remoto alterado. Requer correção do acesso no cofre seguro.
 - [x] Conferir regras implantadas e registros disponíveis sem divulgar dados pessoais
 - [x] Corrigir regras centrais e preparar proteção de envio, mídia e encaminhamento humano na VPS
 - [x] Testar oito regras e chamadas reais no Cloud; registrar limites em docs/AUDITORIA_BRISA_2026-11-03.md

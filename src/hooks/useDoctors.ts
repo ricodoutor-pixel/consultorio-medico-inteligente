@@ -134,7 +134,6 @@ export function useDoctors() {
         // Monta lista de documentos KYC incluindo o print oficial do CFM e a Foto Original (selfie)
         const userDocs = [...(docsMap.get(d.user_id) ?? [])];
         const cfmPrintPath = getDoctorCfmPrint(crmStr || fullName) || getDoctorCfmPrint(fullName);
-        }
         if (cfmPrintPath && !userDocs.some((k) => k.document_kind === "cfm_print")) {
           userDocs.push({
             id: `cfm-print-${d.id}`,
@@ -203,7 +202,6 @@ export function useDoctors() {
             region: mergedProfile.region || "SP",
             avatar_url: avatarUrl || "/avatars/dr-anderson-mikalauskas.jpg?v=20261028v2",
           };
-          }
         }
 
         if (signatureUrl && !userDocs.some((k) => k.document_kind === "icp_brasil")) {

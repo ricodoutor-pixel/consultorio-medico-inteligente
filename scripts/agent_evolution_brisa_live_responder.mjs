@@ -93,30 +93,6 @@ const supabase = createClient(SUPABASE_URL, ANON_KEY);
 // 1. Controle de Cooldown por Contato (mínimo 60s entre envios para o mesmo número)
 const lastRepliedAt = new Map();
 
-// 2. Hash anti-repetição por texto e destinatário (bloqueia o mesmo texto para o mesmo número por 10 minutos)
-const recentSentHashes = new Map();
-
-// 🔒 Fila única e trava por conversa (in-flight lock) para evitar 2 ou 3 mensagens no mesmo minuto
-const inFlightChats = new Set();
-
-function hasRecentlySent(number, text) {
-  if (!text) return false;
-  const cleanNum = number.includes('@lid') ? number : number.replace(/\D/g, '');
-  const norm = text.trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 80);
-  const key = `${cleanNum}_${norm}`;
-  const now = Date.now();
-  const lastTime = recentSentHashes.get(key);
-  if (lastTime && (now - lastTime) < 10 * 60 * 1000) {
-    return true;
-  }
-  recentSentHashes.set(key, now);
-  // Limpeza periódica
-  for (const [k, t] of recentSentHashes.entries()) {
-    if (now - t > 30 * 60 * 1000) recentSentHashes.delete(k);
-  }
-  return false;
-}
-
 function log(msg) {
   const ts = new Date().toISOString();
   const line = `[${ts}] [EVO-BRISA] ${msg}`;
@@ -626,7 +602,7 @@ async function textToSpeechElevenLabs(text) {
   }
 }
 
-async function logMessageToSupabase(remoteJid, messageText, direction = 'out', senderName = 'Enfermeira Brisa') {
+async function logMessageToSupabase(remoteJid, messageText, direction = 'out', senderName = 'Assistente virtual da Planta y Raiz') {
   try {
     const adminSupa = await getAdminSupabase();
     if (!adminSupa) return;
@@ -1080,11 +1056,12 @@ function classifyAudience(jid, senderName, text) {
 async function askBrisaGemini(question, senderName, audience, recipient) {
   const role = audience?.role || 'unknown';
   const mem = recipient ? getContactMemory(recipient) : null;
-  const patientCleanName = sanitizePatientName(senderName);
+  const patientCleanName = sanitizePatientName(mem?.confirmedName || '');
 
   // Shared deterministic safety policy precedes generation for every audience.
   const decision = quickResponse({ question, senderName: patientCleanName, role });
   if (decision?.suppressed) return '';
+  if (role === 'patient' && recipient) await savePatientContact(recipient, mem?.confirmedName || '');
   let reply = decision?.answer || null;
 
   // 2. Consulta à Edge Function chat-brisa com role explícito e histórico
@@ -1097,7 +1074,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
           question,
           role,
           phone: String(recipient || '').includes('@lid') ? '' : String(recipient || '').replace(/\D/g, ''),
-          senderName: patientCleanName || senderName,
+          senderName: role === 'doctor' ? senderName : patientCleanName,
           history: mem?.turns ? mem.turns.slice(-8) : [],
           lastAnswer: mem?.lastAnswerSent || '',
           sentHistory24h: mem?.sentHistory24h || []

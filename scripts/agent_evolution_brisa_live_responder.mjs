@@ -1,3 +1,4 @@
+import { quickResponse } from '../supabase/functions/_shared/brisa-response-policy.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -247,7 +248,7 @@ async function savePatientContact(recipient, senderName) {
   try {
     const cleanNum = recipient.includes('@lid') ? recipient : recipient.replace(/\D/g, '');
     const cleanFirstName = sanitizePatientName(senderName);
-    const finalName = cleanFirstName ? `${cleanFirstName} Paciente` : 'Paciente';
+    const finalName = cleanFirstName ? `${cleanFirstName} Paciente` : 'Nome Paciente';
 
     // 1. Atualiza nome na Evolution API para aparecer como "Nome Paciente" no WhatsApp
     try {
@@ -698,6 +699,7 @@ async function sendWhatsApp(recipient, text) {
   await sendPresence(targetNumber, 'composing', typingDelay);
   await new Promise(r => setTimeout(r, Math.min(1800, typingDelay)));
 
+  if (!preSendGuard(targetNumber, text).canSend) return null;
   log(`Enviando resposta para ${targetNumber}...`);
   const res = await fetch(`${EVO_URL}/message/sendText/${INSTANCE}`, {
     method: 'POST',
@@ -1239,21 +1241,10 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
   const mem = recipient ? getContactMemory(recipient) : null;
   const patientCleanName = sanitizePatientName(senderName);
 
-  // 1. Respostas locais especializadas por público
-  let reply = null;
-  if (role === 'opt_out') {
-    reply = `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`;
-  } else if (role === 'doctor') {
-    reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
-  } else if (role === 'pharmacy') {
-    reply = getPharmacySpecializedAnswer(question, senderName);
-  } else if (role === 'patient') {
-    reply = getPatientSpecializedAnswer(question, senderName, recipient);
-  } else if (role === 'unknown') {
-    if (isPureGreeting(question)) {
-      reply = `Olá! Como posso ajudar? Você já tem cadastro na plataforma?`;
-    }
-  }
+  // Shared deterministic safety policy precedes generation for every audience.
+  const decision = quickResponse({ question, senderName: patientCleanName, role });
+  if (decision?.suppressed) return '';
+  let reply = decision?.answer || null;
 
   // 2. Consulta à Edge Function chat-brisa com role explícito e histórico
   if (!reply) {
@@ -1267,15 +1258,20 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
           phone: String(recipient || '').includes('@lid') ? '' : String(recipient || '').replace(/\D/g, ''),
           senderName: patientCleanName || senderName,
           history: mem?.turns ? mem.turns.slice(-8) : [],
-          lastAnswer: mem?.lastAnswerSent || ''
+          lastAnswer: mem?.lastAnswerSent || '',
+          sentHistory24h: mem?.sentHistory24h || []
         })
       });
       if (res.ok) {
         const data = await res.json();
+        if (data.suppressed) return '';
         const apiReply = data.answer || data.reply;
         if (data.handoff) {
           try {
-            const locked = loadHumanLocked();
+            humanLocked.add(recipient);
+            saveHumanLocked(humanLocked);
+            registerHumanTakeover(recipient, true, false);
+            /* legacy record removed
             locked.set(recipient, {
               jid: recipient,
               paused: true,
@@ -1284,7 +1280,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
               pausedBy: 'ia_handoff',
               expiresAt: Date.now() + 24 * 3600 * 1000
             });
-            saveHumanLocked(locked);
+            */
             await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada para esta conversa.`);
           } catch (e) { log(`Aviso handoff: ${e.message}`); }
         }
@@ -1304,14 +1300,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     }
   }
 
-  // 3. Fallbacks de segurança se ainda não tiver resposta
-  if (!reply) {
-    if (role === 'doctor') {
-      reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
-    } else {
-      reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
-    }
-  }
+  if (!reply) reply = 'Vou confirmar com a equipe e já retorno.';
 
   return cleanWhatsAppFormatting(reply);
 }
@@ -1787,7 +1776,7 @@ async function loop() {
             }
 
             // 🛑 VERIFICAÇÃO 2.2: Solicitou atendimento humano agora?
-            if (isHumanRequested(combinedText)) {
+            if ((isHumanRequested(combinedText) || /reclamacao|absurdo|estou irritad/i.test(combinedText.normalize('NFD').replace(/[\u0300-\u036f]/g, '')))) {
               humanLocked.add(recipient);
               saveHumanLocked(humanLocked);
               log(`🔒 [TRAVA DE HUMANO ATIVADA] ${senderName} (${recipient}) pediu humano. IA silenciada imediatamente!`);
@@ -1798,7 +1787,7 @@ async function loop() {
               const formattedName = cleanName.startsWith('Dr') ? cleanName : `${prefix} ${cleanName}`;
 
               try {
-                await sendWhatsApp(recipient, `Claro! Pausei o atendimento automático e já chamei nossa equipe. Uma pessoa vai continuar a conversa com você por aqui em breve. 🙏🌿`);
+                await sendWhatsApp(recipient, `Vou passar para nossa equipe. Retornamos por aqui.`);
               } catch (e) {
                 log(`Erro ao enviar aviso de transferência: ${e.message}`);
               }
@@ -1840,7 +1829,7 @@ async function loop() {
 
               const cleanName = sanitizeDoctorName(senderName);
               // Responde UMA ÚNICA VEZ confirmando o recebimento do lote com o Checklist Oficial de 4 Documentos e prazo oficial
-              const docReply = buildKycChecklistReply(cleanName, ['crm']);
+              const docReply = 'Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar.';
               await sendWhatsApp(recipient, docReply);
               lastRepliedAt.set(recipient, Date.now());
               continue;
@@ -1890,19 +1879,7 @@ async function loop() {
                 continue;
               }
 
-              // 🛡️ ANTI-REPETIÇÃO (Fase 2 - S5): Compara com as últimas respostas enviadas
-              if (checkSemanticRepetition(reply, recipient)) {
-                log(`🛡️ [ANTI-REPETIÇÃO] A resposta proposta já foi enviada recentemente para ${recipient}. Silenciando envio repetido.`);
-                continue;
-              }
-              
-              // Se tiver ElevenLabs configurado e a resposta for concisa (< 250 chars), envia áudio, senão texto
-              const audioBase64 = await textToSpeechElevenLabs(reply);
-              if (audioBase64 && reply.length < 250) {
-                await sendWhatsAppAudio(recipient, audioBase64);
-              } else {
-                await sendWhatsApp(recipient, reply);
-              }
+              await sendWhatsApp(recipient, reply);
               lastRepliedAt.set(recipient, Date.now());
             }
           }

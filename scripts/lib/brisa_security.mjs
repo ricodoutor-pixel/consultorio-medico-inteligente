@@ -397,11 +397,6 @@ export function checkSemanticRepetition(proposedText, jid, sentHistory = []) {
     }
   }
 
-  // Registra no histórico mantendo no máximo 5
-  history.push(proposedText);
-  if (history.length > 5) history.shift();
-  recentRepliesMap.set(key, history);
-
   return false;
 }
 
@@ -546,7 +541,7 @@ export function isPaymentOrVoucherNotice(text = '') {
 export function isUrgentMedicalEmergency(text = '') {
   if (!text) return false;
   const clean = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return /(suicid|tirar minha vida|me matar|infarto|parada cardiaca|falta de ar|dor.*peito.*forte|dor forte.*peito|socorro urgente|samu|192)/i.test(clean);
+  return /(suicid|tirar minha vida|me matar|infarto|parada cardiaca|falta de ar|dor.*peito|dor forte|me machucar|socorro urgente|samu|192)/i.test(clean);
 }
 
 export function isGeneralSpamOrUnrelated(text = '') {

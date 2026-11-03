@@ -1,3 +1,4 @@
+import { patientName, quickResponse, repeatedWithinDay } from "../_shared/brisa-response-policy.mjs"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getCorsHeaders } from "../_shared/cors.ts"
 import {
@@ -9,29 +10,17 @@ import {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || ''
 
-function sanitizePatientName(rawName?: string): string {
-  if (!rawName) return '';
-  let n = String(rawName).trim();
-  n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|paciente|usuario|user)\s*/gi, '');
-  if (n.includes('@')) return '';
-  n = n.replace(/\d+/g, '').trim();
-  n = n.replace(/[–—\-_/\\|@.#$%&*!?:;=]/g, ' ').trim();
-  const words = n.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '';
-  const first = words[0];
-  if (first.length < 2 || first.length > 25) return '';
-  return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
-}
+const sanitizePatientName = patientName;
 
 function getGoldenPatientScript(name?: string, phone?: string): string {
   const cleanName = sanitizePatientName(name);
   const greeting = cleanName ? `Olá, ${cleanName}!` : `Olá!`;
-  return `${greeting} Sou a assistente virtual da Planta y Raiz. O caminho para seu atendimento é bem simples:\n1) Cadastro gratuito em plantayraiz.com.br/cadastro\n2) Pré-triagem com nossa equipe\n3) Escolha do médico e horário\n4) Consulta por videochamada.\nVocê já tem cadastro em nossa plataforma?`;
+  return `${greeting} Sou a assistente virtual da Planta y Raiz. O caminho para seu atendimento é bem simples:\n1) Cadastro gratuito em plantayraiz.com.br/cadastro\n2) Pré-triagem com nossa equipe\n3) Escolha do médico, pagamento e horário disponível\n4) Consulta por videochamada.\nVocê já tem cadastro em nossa plataforma?`;
 }
 
 function getGoldenDoctorScript(senderName?: string): string {
-  const drName = senderName || 'Doutor(a)';
-  return `Olá, Dr(a). ${drName}! Sou a assistente virtual da Planta y Raíz 🌿\n\nNossa plataforma conecta médicos prescritores a pacientes com prontuário eletrônico CFM, prescrição com QR Code ANVISA e repasse instantâneo via PIX.\n\nPode enviar seus documentos por aqui (CRM, RG/CNH ou PDF assinado) para liberação da agenda. Como posso ajudar o doutor(a) hoje?`;
+  const drName = sanitizePatientName(senderName) || 'colega';
+  return `Sou a assistente virtual da Planta y Raiz. Para dúvidas de credenciamento, acesse plantayraiz.com.br/cadastro-profissional. Posso encaminhar sua dúvida à equipe?`;
 }
 
 serve(async (req) => {
@@ -48,15 +37,16 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const question = String(body.question || "").trim();
     rawRole = (body.role || body.context_role || "").toLowerCase();
-    senderName = body.senderName || (rawRole === 'doctor' ? "Doutor(a)" : "Paciente");
+    senderName = body.confirmedName || body.senderName || "";
     phoneDigits = String(body.phone || "").replace(/\D/g, "");
 
     // 🧑‍⚕️ Verificação oficial: se o telefone pertence a um médico cadastrado, NUNCA tratar como paciente
     let verifiedDoctor = false;
     if (phoneDigits.length >= 8) {
       try {
-        const url = Deno.env.get("SUPABASE_URL")!;
-        const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const url = Deno.env.get("SUPABASE_URL");
+        const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        if (!url || !key) throw new Error("Missing service configuration");
         const h = { apikey: key, Authorization: `Bearer ${key}` };
         const last8 = phoneDigits.slice(-8);
         const pr = await fetch(`${url}/rest/v1/profiles?select=id,full_name,phone&phone=ilike.*${last8}*&limit=5`, { headers: h });
@@ -78,53 +68,15 @@ serve(async (req) => {
     }
 
     const normQ = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-    // 🙋 Pedido de atendente humano ou irritação → IA para imediatamente
-    if (/(humano|atendente|pessoa real|pessoa de verdade|falar com (alguem|uma pessoa|o suporte|suporte)|quero suporte|nao quero (falar com )?(robo|bot|ia)|voce e (um )?robo|atendente humano|reclamacao|absurdo)/i.test(normQ)) {
-      return new Response(JSON.stringify({
-        handoff: true,
-        role: rawRole || "unknown",
-        answer: "Vou passar para nossa equipe. Retornamos por aqui.",
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // 🚨 Emergência médica aguda (SAMU 192)
-    if (/(suicid|tirar minha vida|me matar|infarto|falta de ar grave|dor no peito forte|socorro urgente|samu|192)/i.test(normQ)) {
-      return new Response(JSON.stringify({
-        answer: "Se você ou alguém próximo estiver passando por uma emergência médica, ligue agora para o 192 (SAMU) ou procure o pronto-socorro mais próximo.",
-        role: rawRole || "patient",
-        model: "safety-emergency"
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // 💳 Pagamento ou documentos recebidos
-    if (/(paguei|comprovante|pagamento feito|ja paguei|fiz o pix|mandei o pix|enviei o comprovante)/i.test(normQ)) {
-      return new Response(JSON.stringify({
-        answer: "Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar.",
-        role: rawRole || "patient",
-        model: "payment-received-notice"
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // 🎙️ Áudio informado pelo usuário
-    if (body.isAudio || normQ === 'audio' || normQ === '[audio recebido]') {
-      return new Response(JSON.stringify({
-        answer: "Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?",
-        role: rawRole || "patient",
-        model: "audio-response"
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // 👋 Saudação pura (oi, bom dia, ok)
-    if (/^(oi|ola|bom dia|boa tarde|boa noite|opa|ei|oie|ok|qk|blz|beleza|tudo bem|td bem|salve|alo|alô)\b[\s!?.😊🌿🩺👍]*$/i.test(normQ)) {
-      const pName = sanitizePatientName(senderName);
-      const greeting = pName ? `Olá, ${pName}!` : `Olá!`;
-      return new Response(JSON.stringify({
-        answer: `${greeting} Como posso ajudar? Você já tem cadastro na plataforma?`,
-        role: rawRole || "patient",
-        model: "greeting-response"
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    const sentHistory = Array.isArray(body.sentHistory24h) ? body.sentHistory24h : [];
+    const respond = (data: Record<string, unknown>) => {
+      const duplicate = typeof data.answer === 'string' && repeatedWithinDay(data.answer, sentHistory);
+      return new Response(JSON.stringify(duplicate ? { ...data, answer: '', suppressed: true, reason: 'duplicate_24h' } : data), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    };
+    const quick = quickResponse({ question, senderName, role: rawRole, isAudio: Boolean(body.isAudio), isCall: Boolean(body.isCall) });
+    if (quick) return respond({ ...quick, role: rawRole || 'patient', verifiedDoctor });
 
     // 🎯 PROMPT DO SISTEMA
     let systemInstruction = "";
@@ -135,7 +87,7 @@ serve(async (req) => {
 OBJETIVO: acolher o médico e orientá-lo sobre o credenciamento gratuito, prontuário CFM, receitas ANVISA com QR Code e repasse via PIX.
 - Nunca trate o médico como paciente ou pergunte o que ele está sentindo.
 - Responda em no máximo 4 frases curtas, em português claro e profissional.
-- O médico pode enviar fotos do CRM, RG/CNH ou PDF assinado digitalmente por aqui para ativação do consultório.`;
+- Oriente o envio de documentos pelo cadastro profissional; a aprovação é humana e nunca automática. Não prometa ativação, prazo, receita, demanda ou conformidade garantida. Apresente-se apenas como assistente virtual da Planta y Raiz.`;
     } else {
       // 🌿 PACIENTES (PROMPT OFICIAL AUDITADO)
       const patientCleanName = sanitizePatientName(senderName);
@@ -158,13 +110,13 @@ COMO ATENDER:
 CAMINHO PADRÃO (sempre nesta ordem):
 1) Cadastro gratuito em plantayraiz.com.br.
 2) Pré-triagem com a equipe da Planta y Raiz.
-3) Escolha do médico e do horário.
+3) Escolha do médico e modalidade; pagamento aprovado e então escolha do horário disponível.
 4) Consulta ao vivo por videochamada, de onde a pessoa estiver.
 Ofereça ajuda no cadastro: pergunte se ela quer que você explique passo a passo.
 
 PAGAMENTO E DOCUMENTOS:
 - Se a pessoa disser que pagou ou enviou documentos, responda UMA vez: "Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar." Não prometa prazo e não cite nomes de pessoas da equipe.
-- Informe valores somente se a pessoa perguntar, e use apenas o valor oficial vigente do site (Vídeo HD R$ 150 / Chat R$ 100).
+- Informe valores somente se a pessoa perguntar, e use apenas o valor oficial vigente do site (Vídeo R$ 150 / Chat R$ 100 / Retorno R$ 90 / Orientação Técnica R$ 30, que não é consulta médica / Planos R$ 99 por mês). Não prometa receita.
 
 REGRAS DE SEGURANÇA (OBRIGATÓRIAS):
 - Nunca dê orientação médica, dose, diagnóstico, nome de remédio ou promessa de cura. Se perguntarem sobre sintomas ou remédios (como remédio para dormir, dor, ansiedade), diga: "Quem avalia isso é o médico na consulta. O primeiro passo é o cadastro."
@@ -252,9 +204,7 @@ Acolhedor, educado e objetivo. No máximo 1 emoji por mensagem. Sem textos longo
       usedModel = "golden-script-fallback";
     }
 
-    return new Response(JSON.stringify({ answer, model: usedModel, role: rawRole || "unknown", verifiedDoctor }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return respond({ answer, model: usedModel, role: rawRole || 'unknown', verifiedDoctor });
 
   } catch (error) {
     console.error("Error in chat-brisa:", error);
@@ -265,7 +215,7 @@ Acolhedor, educado e objetivo. No máximo 1 emoji por mensagem. Sem textos longo
     return new Response(
       JSON.stringify({
         answer: fallbackAnswer,
-        degraded: false,
+        degraded: true,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

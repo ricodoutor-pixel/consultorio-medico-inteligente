@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Auditoria WhatsApp Brisa — 03/11/2026
-- [ ] Conferir regras implantadas e registros disponíveis sem divulgar dados pessoais
-- [ ] Completar proteção de respostas, repetição, mídia e encaminhamento humano
-- [ ] Testar regras e registrar limites da validação na Hostinger
+- [x] Conferir regras implantadas e registros disponíveis sem divulgar dados pessoais
+- [x] Corrigir regras centrais e preparar proteção de envio, mídia e encaminhamento humano na VPS
+- [x] Testar oito regras e chamadas reais no Cloud; registrar limites em docs/AUDITORIA_BRISA_2026-11-03.md
+- [ ] Atualizar e validar envio real no WhatsApp Hostinger — bloqueado pelo acesso administrativo à VPS; proteção distribuída e recuperação transacional não comprovadas
 
 ## Card do Dr. Amir sem foto — 27/10/2026
 

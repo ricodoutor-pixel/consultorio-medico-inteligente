@@ -159,13 +159,13 @@ export function checkAiPause(jid, options = {}) {
 /**
  * Registra intervenção humana (WhatsApp Web ou app móvel) silenciando a IA por 24h
  */
-export function registerHumanTakeover(jid, fromMe, isBrisaBot = false) {
+export function registerHumanTakeover(jid, fromMe, isBrisaBot = false, options = {}) {
   if (!fromMe || isBrisaBot) return false;
 
   const norm = normalizeJid(jid);
   const locked = loadHumanLocked();
   const now = Date.now();
-  const expiresAt = now + (24 * 60 * 60 * 1000); // 24 horas
+  const expiresAt = options.permanent ? null : now + (24 * 60 * 60 * 1000); // 24 horas
 
   const record = {
     jid: norm.normalizedJid,

@@ -134,17 +134,6 @@ export function useDoctors() {
         // Monta lista de documentos KYC incluindo o print oficial do CFM e a Foto Original (selfie)
         const userDocs = [...(docsMap.get(d.user_id) ?? [])];
         const cfmPrintPath = getDoctorCfmPrint(crmStr || fullName) || getDoctorCfmPrint(fullName);
-        if (originalAvatar && !userDocs.some((k) => k.document_kind === "selfie")) {
-          userDocs.push({
-            id: `selfie-orig-${d.id}`,
-            doctor_user_id: d.user_id,
-            document_kind: "selfie",
-            storage_path: originalAvatar,
-            mime_type: "image/jpeg",
-            verification_status: "approved",
-            created_at: d.created_at || new Date().toISOString(),
-          });
-        }
         if (cfmPrintPath && !userDocs.some((k) => k.document_kind === "cfm_print")) {
           userDocs.push({
             id: `cfm-print-${d.id}`,
@@ -157,38 +146,6 @@ export function useDoctors() {
           });
         }
 
-        // Cross-link id_front <-> crm_front e id_back <-> crm_back se um dos dois estiver anexado
-        const crmFrontDoc = userDocs.find((k) => k.document_kind === "crm_front");
-        const idFrontDoc = userDocs.find((k) => k.document_kind === "id_front");
-        if (crmFrontDoc && !idFrontDoc) {
-          userDocs.push({
-            ...crmFrontDoc,
-            id: `id-front-fallback-${d.id}`,
-            document_kind: "id_front",
-          });
-        } else if (idFrontDoc && !crmFrontDoc) {
-          userDocs.push({
-            ...idFrontDoc,
-            id: `crm-front-fallback-${d.id}`,
-            document_kind: "crm_front",
-          });
-        }
-
-        const crmBackDoc = userDocs.find((k) => k.document_kind === "crm_back");
-        const idBackDoc = userDocs.find((k) => k.document_kind === "id_back");
-        if (crmBackDoc && !idBackDoc) {
-          userDocs.push({
-            ...crmBackDoc,
-            id: `id-back-fallback-${d.id}`,
-            document_kind: "id_back",
-          });
-        } else if (idBackDoc && !crmBackDoc) {
-          userDocs.push({
-            ...idBackDoc,
-            id: `crm-back-fallback-${d.id}`,
-            document_kind: "crm_back",
-          });
-        }
 
         const icpDoc = userDocs.find((k) => k.document_kind === "icp_brasil");
         let signatureUrl = d.signature_url || rawProfile?.signature_url || icpDoc?.storage_path || null;
@@ -245,17 +202,6 @@ export function useDoctors() {
             region: mergedProfile.region || "SP",
             avatar_url: avatarUrl || "/avatars/dr-anderson-mikalauskas.jpg?v=20261028v2",
           };
-          if (!userDocs.some((k) => k.document_kind === "icp_brasil")) {
-            userDocs.push({
-              id: `icp-anderson-${d.id}`,
-              doctor_user_id: d.user_id,
-              document_kind: "icp_brasil",
-              storage_path: `${d.user_id}/icp_brasil.pdf`,
-              mime_type: "application/pdf",
-              verification_status: "approved",
-              created_at: d.created_at || new Date().toISOString(),
-            });
-          }
         }
 
         if (signatureUrl && !userDocs.some((k) => k.document_kind === "icp_brasil")) {

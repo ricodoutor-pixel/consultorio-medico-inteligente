@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Pix Orientação Técnica — 04/11/2026
-- [ ] Diagnosticar validação e erro de gravação do Pix de R$30
-- [ ] Implementar pagamento primeiro, autorizado pelo usuário; triagem persistida após aprovação e sala protegida
-- [ ] Testar geração de Pix e retomada; pagamento real e relatório revisado dependem da confirmação humana
+- [x] Diagnosticar validação e erro de gravação do Pix de R$30 — WhatsApp obrigatório recusava pedidos sem número
+- [x] Implementar pagamento primeiro, autorizado pelo usuário; triagem persistida após aprovação e sala protegida
+- [ ] Testar geração de Pix com conta real — bloqueado: não há conta de teste identificada na prévia
+- [ ] Pagar, concluir 10 perguntas, entrar na sala e aprovar relatório — depende de pagamento e revisão humana
 
 ## Auditoria WhatsApp Brisa — 03/11/2026
 - [ ] Atualização da VPS solicitada às 05:18 UTC — acesso rechecado: porta SSH acessível, chave armazenada não carregável pelo cliente SSH e API Hostinger retorna 403; nenhum arquivo ou serviço remoto alterado. Requer correção do acesso no cofre seguro.

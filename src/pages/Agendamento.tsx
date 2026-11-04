@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { requireCheckoutUrl } from "@/lib/payment-checkout-result";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -341,7 +342,7 @@ const Agendamento = () => {
 
       // 4. Cria preferência de pagamento Mercado Pago
       try {
-        const { data: paymentData } = await supabase.functions.invoke("create-payment", {
+        const { data: paymentData, error: paymentError } = await supabase.functions.invoke("create-payment", {
           body: {
             appointmentId: newAppt.id,
             doctorName: selectedDoctor.name,
@@ -351,19 +352,19 @@ const Agendamento = () => {
           },
         });
 
-        if (paymentData?.init_point) {
+        const checkoutUrl = requireCheckoutUrl(paymentData, paymentError);
+        if (checkoutUrl) {
           toast({
             title: "Redirecionando para o pagamento seguro...",
             description: "Você será direcionado ao Mercado Pago (PIX ou Cartão).",
           });
-          window.location.href = paymentData.init_point;
+          window.location.href = checkoutUrl;
           return;
         }
       } catch (payErr) {
-        console.warn("[Agendamento] Pagamento online pendente, liberando tela de confirmação:", payErr);
+        throw payErr;
       }
 
-      setStep(5); // Sucesso
     } catch (err: any) {
       toast({
         title: "Erro ao agendar consulta",

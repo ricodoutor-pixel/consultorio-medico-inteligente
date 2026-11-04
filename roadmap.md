@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Pix Orientação Técnica — 04/11/2026
-- [ ] Conferir ordem de pagamento nos demais serviços solicitada às 06:59 UTC, preservando preços e bloqueios
+- [x] Conferir ordem nos demais serviços; corrigido sucesso do agendamento por falha de checkout, com testes
+- [ ] Validar benefícios pagos e entrega Shopping com conta real e pagamento — bloqueado por sessão de teste indisponível
 - [x] Diagnosticar validação e erro de gravação do Pix de R$30 — WhatsApp obrigatório recusava pedidos sem número
 - [x] Implementar pagamento primeiro, autorizado pelo usuário; triagem persistida após aprovação e sala protegida
 - [ ] Testar geração de Pix com conta real — bloqueado: não há conta de teste identificada na prévia

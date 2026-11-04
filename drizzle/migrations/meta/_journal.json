@@ -29,6 +29,13 @@
       "when": 1793377615068,
       "tag": "0003_pay_first_then_pick_slot",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793775453671,
+      "tag": "0004_orientation_payment_first_progress",
+      "breakpoints": true
     }
   ]
 }

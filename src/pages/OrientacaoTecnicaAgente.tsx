@@ -1,8 +1,7 @@
+import { RED_FLAG_OPTIONS, hasEmergency, invalidTriageFields } from "../../supabase/functions/_shared/orientation-triage";
 import { setVisibleInterval } from "@/lib/visible-interval";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
-// Fluxo real (contrato v2): explicação → triagem (Enfª Brisa) → pagamento R$ 30
-// (Mercado Pago, triagem gravada ANTES da ordem) → aguardando confirmação (lê
-// `status` a cada 5s; só o webhook aprovado libera) → sala estilo WhatsApp.
+// Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useNavigate, useSearchParams, useParams, Link } from "react-router-dom";
@@ -28,8 +27,8 @@ const TRIAGE_STORAGE_KEY = "pyr_ot_triage";
 const ATTACH_BUCKET = "ot-attachments";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
-type Phase = "loading" | "intro" | "triage" | "checkout" | "awaiting" | "room";
-type OtState = "none" | "awaiting_payment" | "ready" | "active" | "paused" | "expired";
+type Phase = "loading" | "intro" | "triage" | "checkout" | "awaiting" | "room" | "emergency";
+type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired";
 
 type OtSession = {
   id: string;
@@ -139,6 +138,9 @@ export default function OrientacaoTecnicaAgente() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
+  const [orderRef, setOrderRef] = useState<string | null>(searchParams.get("ref"));
+  const orderRefRef = useRef<string | null>(searchParams.get("ref"));
+  const [savingAnswer, setSavingAnswer] = useState(false);
   const [creatingCheckout, setCreatingCheckout] = useState(false);
   const [creatingPix, setCreatingPix] = useState(false);
   const [pixData, setPixData] = useState<{
@@ -171,7 +173,7 @@ export default function OrientacaoTecnicaAgente() {
   const fileRef = useRef<HTMLInputElement>(null);
   const initDone = useRef(false);
 
-  const emergency = EMERGENCY_ANSWERS.has(answers.red_flags || "");
+  const emergency = hasEmergency(answers);
   const triageComplete = QUESTIONS.every((item) => (answers[item.id] || "").trim());
 
   // ── Auto-preenchimento por query params (Personalização de Link) ─────────
@@ -185,12 +187,9 @@ export default function OrientacaoTecnicaAgente() {
     }
   }, [urlNome, urlTel]);
 
-  // ── Recupera triagem salva ─────────────────────────────────────────────
   useEffect(() => {
-    const saved = sessionStorage.getItem(TRIAGE_STORAGE_KEY);
-    if (saved) {
-      try { setAnswers((prev) => ({ ...JSON.parse(saved), ...prev })); } catch { /* ignora */ }
-    }
+    localStorage.removeItem(REF_STORAGE_KEY);
+    sessionStorage.removeItem(TRIAGE_STORAGE_KEY);
   }, []);
 
   // ── Sessão do usuário ──────────────────────────────────────────────────
@@ -209,7 +208,7 @@ export default function OrientacaoTecnicaAgente() {
   }, []);
 
   const callFn = useCallback(async <T,>(body: Record<string, unknown>): Promise<T> => {
-    const payload = activeSessionId ? { sessionId: activeSessionId, ...body } : body;
+    const payload = { ...(activeSessionId ? { sessionId: activeSessionId } : {}), ...(orderRefRef.current ? { external_reference: orderRefRef.current } : {}), ...body };
     const { data, error } = await supabase.functions.invoke("ot-edilson-web", { body: payload });
     if (error) throw error;
     return data as T;
@@ -230,75 +229,34 @@ export default function OrientacaoTecnicaAgente() {
   }, []);
 
   const fetchStatus = useCallback(async () => {
-    const d = await callFn<{ state?: OtState; session?: OtSession | null; minutesLeft?: number }>({ action: "status" });
-    return applyStatus(d);
+    const d = await callFn<{ state?: OtState; session?: OtSession | null; minutesLeft?: number; order?: { external_reference: string; triagem?: Record<string, string>; qr_code?: string; qr_code_base64?: string; mp_payment_id?: string } }>({ action: "status" });
+    const st = applyStatus(d);
+    if (d.order) {
+      orderRefRef.current = d.order.external_reference;
+      setOrderRef(d.order.external_reference);
+      if (d.order.triagem) {
+        setAnswers(d.order.triagem);
+        const missing = QUESTIONS.findIndex(item => !d.order?.triagem?.[item.id]?.trim());
+        setStep(missing < 0 ? QUESTIONS.length - 1 : missing);
+      }
+      if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });
+    }
+    if (LIVE_STATES.includes(st) || st === "expired") setPhase("room");
+    else if (st === "triage") setPhase(hasEmergency(d.order?.triagem || {}) ? "emergency" : "triage");
+    else if (st === "awaiting_payment") setPhase("awaiting");
+    else setPhase("intro");
+    return st;
   }, [callFn, applyStatus]);
 
-  // Decide a fase inicial a partir do servidor.
   useEffect(() => {
-    if (authed === null || initDone.current) return;
-    initDone.current = true;
-    if (!authed) {
-      const savedTriage = sessionStorage.getItem(TRIAGE_STORAGE_KEY);
-      let hasCompleteTriage = false;
-      if (savedTriage) {
-        try {
-          const parsed = JSON.parse(savedTriage);
-          hasCompleteTriage = QUESTIONS.every((item) => (parsed[item.id] || "").trim()) && !EMERGENCY_ANSWERS.has(parsed.red_flags || "");
-        } catch { /* ignora */ }
-      }
-      setPhase(returnedFromPayment ? "awaiting" : hasCompleteTriage ? "checkout" : "intro");
-      return;
-    }
-    (async () => {
-      try {
-        const st = await fetchStatus();
-        const hasPendingRef = !!localStorage.getItem(REF_STORAGE_KEY);
-        if (LIVE_STATES.includes(st)) {
-          localStorage.removeItem(REF_STORAGE_KEY);
-          setPhase("room");
-        } else if (st === "awaiting_payment" || returnedFromPayment || hasPendingRef) {
-          setAwaitingSince(Date.now());
-          setPhase("awaiting");
-        } else if (st === "expired") {
-          setPhase("room");
-        } else {
-          // Se já tem triagem completa salva na sessão, vai direto para o checkout
-          const savedTriage = sessionStorage.getItem(TRIAGE_STORAGE_KEY);
-          let hasCompleteTriage = false;
-          if (savedTriage) {
-            try {
-              const parsed = JSON.parse(savedTriage);
-              hasCompleteTriage = QUESTIONS.every((item) => (parsed[item.id] || "").trim()) && !EMERGENCY_ANSWERS.has(parsed.red_flags || "");
-            } catch { /* ignora */ }
-          }
-          setPhase(hasCompleteTriage ? "checkout" : "intro");
-        }
-      } catch (e) {
-        console.error("[ot] status", e);
-        setPhase(returnedFromPayment ? "awaiting" : "intro");
-      }
-    })();
-  }, [authed, returnedFromPayment, fetchStatus]);
+    if (authed === null) return;
+    if (!authed) { setPhase("intro"); return; }
+    void fetchStatus().catch(() => setPhase("intro"));
+  }, [authed, fetchStatus]);
 
-  // Aguardando confirmação do webhook: lê `status` a cada 5s.
   useEffect(() => {
     if (phase !== "awaiting" || !authed) return;
-    let alive = true;
-    const tick = async () => {
-      try {
-        const st = await fetchStatus();
-        if (alive && LIVE_STATES.includes(st)) {
-          localStorage.removeItem(REF_STORAGE_KEY);
-          setPhase("room");
-        }
-      } catch (e) {
-        console.warn("[ot] poll status", e);
-      }
-    };
-    void tick();
-    const t = window.setInterval(tick, 5000);
-    return () => { alive = false; window.clearInterval(t); };
+    return setVisibleInterval(() => void fetchStatus().catch(() => undefined), 5000);
   }, [phase, authed, fetchStatus]);
 
   // ── Mensagens e relatórios da sala ─────────────────────────────────────
@@ -330,12 +288,12 @@ export default function OrientacaoTecnicaAgente() {
   // Poll da sala (5s): status (pausa/expiração) + mensagens (inclui Dr. Edilson humano).
   useEffect(() => {
     if (phase !== "room" || otState === "expired") return;
-    const t = window.setInterval(() => {
+    const cleanup = setVisibleInterval(() => {
       if (streaming) return;
       void fetchStatus().catch(() => undefined);
       void loadMessages();
     }, 5000);
-    return () => window.clearInterval(t);
+    return cleanup;
   }, [phase, otState, streaming, fetchStatus, loadMessages]);
 
   // Relatórios em revisão: atualiza a cada 15s.
@@ -368,171 +326,63 @@ export default function OrientacaoTecnicaAgente() {
   // ── Triagem ───────────────────────────────────────────────────────────
   const q = QUESTIONS[step];
 
-  const saveAnswer = (value: string) => {
-    questionCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    const next = { ...answers, [q.id]: value };
-    setAnswers(next);
-    sessionStorage.setItem(TRIAGE_STORAGE_KEY, JSON.stringify(next));
-    setDraft("");
-    if (step < QUESTIONS.length - 1) setStep(step + 1);
-    else setPhase("checkout");
+  const saveAnswer = async (value: string) => {
+    if (savingAnswer || !orderRef) return;
+    const fields = invalidTriageFields({ [q.id]: value }, false);
+    if (fields.length) {
+      toast({ title: "Revise sua resposta", description: q.id === "idade" ? "Informe uma idade de 0 a 120 anos." : "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
+      return;
+    }
+    setSavingAnswer(true);
+    try {
+      const response = await callFn<{ state: string; triagem: Record<string, string> }>({ action: "save_triage", answer: { [q.id]: value } });
+      setAnswers(response.triagem);
+      setDraft("");
+      if (response.state === "emergency") setPhase("emergency");
+      else if (response.state === "ready") await fetchStatus();
+      else if (step < QUESTIONS.length - 1) setStep(step + 1);
+    } catch {
+      toast({ title: "Não foi possível salvar a resposta", description: "Sua pergunta permanece aqui. Tente novamente.", variant: "destructive" });
+    } finally { setSavingAnswer(false); }
   };
 
   const startTriage = () => {
-    const firstMissing = QUESTIONS.findIndex((item) => !(answers[item.id] || "").trim());
-    setStep(firstMissing === -1 ? 0 : firstMissing);
+    setStep(Math.max(0, QUESTIONS.findIndex(item => !answers[item.id]?.trim())));
     setPhase("triage");
   };
 
-  // ── Pagamento (mp-checkout grava a triagem antes de criar a ordem) ─────
-  const startCheckout = async () => {
-    if (!triageComplete || emergency) return;
-    setCreatingCheckout(true);
-    try {
-      let session = (await supabase.auth.getSession()).data.session;
-      if (!session) {
-        try {
-          const { data: anonData } = await supabase.auth.signInAnonymously();
-          session = anonData?.session ?? null;
-        } catch {
-          /* anonymous sign in fallback */
-        }
-      }
-      if (!session) {
-        const nextUrl = window.location.pathname + window.location.search;
-        navigate(`/login?next=${encodeURIComponent(nextUrl)}`);
-        return;
-      }
-      const returnUrl = `${window.location.origin}/orientacao-tecnica?paid=1${urlOrigem ? `&origem=${encodeURIComponent(urlOrigem)}` : ""}`;
-      const { data, error } = await supabase.functions.invoke("mp-checkout", {
-        body: { sku: "orientacao_tecnica", returnUrl, triage: answers },
-      });
-      if (error) {
-        let code = "";
-        try {
-          const ctx = (error as { context?: Response }).context;
-          if (ctx && typeof ctx.json === "function") code = String((await ctx.json())?.error || "");
-        } catch { /* corpo não-JSON */ }
-        if (code === "triage_required") {
-          toast({
-            title: "Triagem incompleta",
-            description: "Revise nome, queixa principal e tempo dos sintomas antes do pagamento.",
-            variant: "destructive",
-          });
-          setStep(0);
-          setPhase("triage");
-          return;
-        }
-        throw error;
-      }
-      const ref = (data as { external_reference?: string })?.external_reference;
-      const initPoint = (data as { init_point?: string })?.init_point;
-      if (!initPoint) throw new Error("Checkout indisponível");
-      if (ref) localStorage.setItem(REF_STORAGE_KEY, ref);
-      window.location.href = initPoint;
-    } catch (e) {
-      console.error("[ot] checkout", e);
-      toast({
-        title: "Não foi possível abrir o pagamento",
-        description: "Tente novamente em instantes.",
-        variant: "destructive",
-      });
-    } finally {
-      setCreatingCheckout(false);
+  const generateCheckout = async (method: "pix" | "card") => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
     }
-  };
-
-  // ── Pagamento Pix In-Page (sem sair do site) ──────────────────────────
-  const startPixCheckout = async () => {
-    if (!triageComplete || emergency) return;
-    setCreatingPix(true);
+    method === "pix" ? setCreatingPix(true) : setCreatingCheckout(true);
     try {
-      let session = (await supabase.auth.getSession()).data.session;
-      if (!session) {
-        try {
-          const { data: anonData } = await supabase.auth.signInAnonymously();
-          session = anonData?.session ?? null;
-        } catch {
-          /* anonymous sign in fallback */
-        }
+      const { data, error } = await supabase.functions.invoke("mp-checkout", { body: {
+        sku: "orientacao_tecnica", payment_method: method,
+        returnUrl: `${window.location.origin}/orientacao-tecnica?paid=1`,
+      } });
+      if (error || data?.error) throw error || new Error(data.error);
+      if (data.external_reference) {
+        orderRefRef.current = data.external_reference;
+        setOrderRef(data.external_reference);
+        const url = new URL(window.location.href);
+        url.searchParams.set("ref", data.external_reference);
+        window.history.replaceState(null, "", url);
       }
-      if (!session) {
-        const nextUrl = window.location.pathname + window.location.search;
-        navigate(`/login?next=${encodeURIComponent(nextUrl)}`);
-        return;
-      }
-
-      const returnUrl = `${window.location.origin}/orientacao-tecnica?paid=1${urlOrigem ? `&origem=${encodeURIComponent(urlOrigem)}` : ""}`;
-      const { data, error } = await supabase.functions.invoke("mp-checkout", {
-        body: {
-          sku: "orientacao_tecnica",
-          payment_method: "pix",
-          returnUrl,
-          triage: answers,
-        },
-      });
-
-      if (error) {
-        let code = "";
-        try {
-          const ctx = (error as { context?: Response }).context;
-          if (ctx && typeof ctx.json === "function") code = String((await ctx.json())?.error || "");
-        } catch { /* corpo não-JSON */ }
-        if (code === "triage_required") {
-          toast({
-            title: "Triagem incompleta",
-            description: "Revise nome, queixa principal e tempo dos sintomas antes do pagamento.",
-            variant: "destructive",
-          });
-          setStep(0);
-          setPhase("triage");
-          return;
-        }
-        throw error;
-      }
-
-      const res = data as {
-        success?: boolean;
-        payment_method?: string;
-        qr_code?: string;
-        qr_code_base64?: string;
-        payment_id?: string | number;
-        external_reference?: string;
-        init_point?: string;
-      };
-
-      if (res?.qr_code && res?.qr_code_base64) {
-        setPixData({
-          qr_code: res.qr_code,
-          qr_code_base64: res.qr_code_base64,
-          payment_id: res.payment_id || "",
-        });
-        if (res.external_reference) {
-          localStorage.setItem(REF_STORAGE_KEY, res.external_reference);
-        }
+      if (method === "pix" && data.qr_code && data.qr_code_base64) {
+        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id });
         setAwaitingSince(Date.now());
         setPhase("awaiting");
-        toast({
-          title: "Pix gerado com sucesso!",
-          description: "Escaneie o QR Code ou copie o código Pix abaixo para pagar sem sair da página.",
-        });
-      } else if (res?.init_point) {
-        if (res.external_reference) localStorage.setItem(REF_STORAGE_KEY, res.external_reference);
-        window.location.href = res.init_point;
-      } else {
-        throw new Error("Não foi possível gerar o Pix na tela.");
-      }
-    } catch (e) {
-      console.error("[ot] pix checkout", e);
-      toast({
-        title: "Não foi possível gerar o Pix direto",
-        description: "Você pode tentar pelo checkout tradicional do Mercado Pago.",
-        variant: "destructive",
-      });
-    } finally {
-      setCreatingPix(false);
-    }
+      } else if (data.init_point) window.location.href = data.init_point;
+      else throw new Error("Pagamento indisponível");
+    } catch {
+      toast({ title: method === "pix" ? "Não foi possível gerar o Pix agora. Tente de novo em instantes." : "Não foi possível abrir o pagamento agora. Tente de novo em instantes.", variant: "destructive" });
+    } finally { setCreatingPix(false); setCreatingCheckout(false); }
   };
+  const startCheckout = () => generateCheckout("card");
+  const startPixCheckout = () => generateCheckout("pix");
 
   const copyPixCode = async () => {
     if (!pixData?.qr_code) return;
@@ -853,13 +703,13 @@ export default function OrientacaoTecnicaAgente() {
                   </div>
 
                   <p className="text-xs text-muted-foreground">
-                    Como funciona: <strong className="text-foreground">1.</strong> triagem com a Enfª Brisa (10 perguntas) →{" "}
-                    <strong className="text-foreground">2.</strong> pagamento seguro de R$ 30 pelo Mercado Pago →{" "}
-                    <strong className="text-foreground">3.</strong> sala com o Dr. Edilson ON, liberada assim que o pagamento é confirmado.
+                    Como funciona: <strong className="text-foreground">1.</strong> pagamento seguro de R$ 30 pelo Mercado Pago →{" "}
+                    <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (10 perguntas), após confirmação →{" "}
+                    <strong className="text-foreground">3.</strong> sala com o Dr. Edilson ON, após concluir a triagem.
                   </p>
 
-                  <Button onClick={startTriage} className="w-full h-14 rounded-2xl font-black text-base">
-                    Começar triagem com a Enfª Brisa <ChevronRight size={18} className="ml-1" />
+                  <Button onClick={() => setPhase("checkout")} className="w-full h-14 rounded-2xl font-black text-base">
+                    Continuar para pagamento <ChevronRight size={18} className="ml-1" />
                   </Button>
                   {authed === false && (
                     <p className="text-[11px] text-muted-foreground text-center">
@@ -877,6 +727,15 @@ export default function OrientacaoTecnicaAgente() {
             </div>
           )}
 
+          {phase === "emergency" && (
+            <div role="alert" className="border-2 border-destructive bg-destructive/10 p-6 space-y-4">
+              <AlertTriangle className="text-destructive" size={40} />
+              <h2 className="text-2xl font-bold text-destructive">Sinal de emergência: SAMU 192</h2>
+              <p>Procure atendimento presencial agora. Ligue 192 ou vá ao pronto-socorro mais próximo. A sala não será liberada.</p>
+              <Button variant="outline" onClick={() => { setStep(9); setPhase("triage"); }}>Marquei por engano — revisar resposta</Button>
+            </div>
+          )}
+
           {/* ── TRIAGEM ── */}
           {phase === "triage" && (
             <Card ref={questionCardRef} className="border-border scroll-mt-24">
@@ -891,17 +750,12 @@ export default function OrientacaoTecnicaAgente() {
 
                 {q.type === "choice" ? (
                   <div className="space-y-3">
-                    {q.options?.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => saveAnswer(opt)}
-                        className={`w-full p-4 rounded-2xl border-2 bg-card hover:border-primary hover:bg-primary/5 transition-colors text-left flex items-center justify-between ${
-                          answers[q.id] === opt ? "border-primary" : "border-border"
-                        }`}
-                      >
-                        <span className="font-bold text-foreground">{opt}</span>
-                        <ChevronRight className="text-muted-foreground" size={18} />
-                      </button>
+                    {(q.id === "red_flags" ? RED_FLAG_OPTIONS : (q.options || []).map(label => ({ value: label, label }))).map(opt => (
+                      <Button key={opt.value} variant="outline" disabled={savingAnswer}
+                        onClick={() => void saveAnswer(opt.value)}
+                        className={`w-full h-auto p-4 text-left justify-between whitespace-normal ${answers[q.id] === opt.value || answers[q.id] === opt.label ? "border-primary bg-primary/10" : "border-border"}`}>
+                        <span>{opt.label}</span><ChevronRight size={18} />
+                      </Button>
                     ))}
                   </div>
                 ) : (
@@ -918,6 +772,8 @@ export default function OrientacaoTecnicaAgente() {
                       <Input
                         value={draft || answers[q.id] || ""}
                         onChange={(e) => setDraft(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter" && !savingAnswer) { e.preventDefault(); void saveAnswer((draft || answers[q.id] || "").trim()); } }}
+                        inputMode={q.id === "idade" ? "numeric" : "text"}
                         placeholder="Digite aqui..."
                         aria-label={q.label}
                       />
@@ -925,9 +781,9 @@ export default function OrientacaoTecnicaAgente() {
                     <Button
                       onClick={() => {
                         const v = (draft || answers[q.id] || "").trim();
-                        if (v) saveAnswer(v);
+                        if (v) void saveAnswer(v);
                       }}
-                      disabled={!(draft || answers[q.id] || "").trim()}
+                      disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
                       className="w-full h-12 rounded-2xl font-black"
                     >
                       Continuar <ChevronRight size={16} className="ml-1" />
@@ -974,23 +830,8 @@ export default function OrientacaoTecnicaAgente() {
                     <div className="flex items-center gap-2 mb-4">
                       <CheckCircle2 className="text-primary" size={20} />
                       <h2 className="font-display font-black text-foreground text-lg">
-                        Triagem concluída{firstName ? `, ${firstName}` : ""} — pagamento seguro
+                        Pagamento seguro
                       </h2>
-                    </div>
-
-                    <div className="rounded-2xl bg-card border border-border p-4 mb-6 space-y-2 text-sm">
-                      {QUESTIONS.filter((item) => answers[item.id]).map((item) => (
-                        <div key={item.id} className="flex gap-2">
-                          <span className="text-muted-foreground shrink-0">{item.label}</span>
-                          <span className="font-bold text-foreground ml-auto text-right">{answers[item.id]}</span>
-                        </div>
-                      ))}
-                      <button
-                        onClick={() => { setStep(0); setPhase("triage"); }}
-                        className="text-xs underline text-muted-foreground"
-                      >
-                        Editar respostas
-                      </button>
                     </div>
 
                     <div className="flex items-end justify-between mb-6">
@@ -1004,7 +845,7 @@ export default function OrientacaoTecnicaAgente() {
                     <div className="space-y-3">
                       <Button
                         onClick={startPixCheckout}
-                        disabled={creatingPix || creatingCheckout || !triageComplete}
+                        disabled={creatingPix || creatingCheckout}
                         className="w-full h-14 rounded-2xl font-black text-base shadow-lg hover:shadow-xl transition-all bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2"
                       >
                         {creatingPix ? (
@@ -1017,7 +858,7 @@ export default function OrientacaoTecnicaAgente() {
                       <Button
                         variant="outline"
                         onClick={startCheckout}
-                        disabled={creatingPix || creatingCheckout || !triageComplete}
+                        disabled={creatingPix || creatingCheckout}
                         className="w-full h-11 rounded-2xl font-semibold text-xs border-border text-muted-foreground hover:text-foreground"
                       >
                         {creatingCheckout ? (
@@ -1029,7 +870,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1 justify-center">
-                      <ShieldCheck size={12} className="text-primary" /> Pix instantâneo ou cartão. A sala abre automaticamente na confirmação.
+                      <ShieldCheck size={12} className="text-primary" /> Pix instantâneo ou cartão. A triagem abre após a confirmação.
                     </p>
                   </CardContent>
                 </Card>
@@ -1049,7 +890,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                      Abra o aplicativo do seu banco, escolha <strong>Pix &gt; Ler QR Code</strong> ou use a opção <strong>Pix Copia e Cola</strong>. Não é necessário sair desta página: a sala abre automaticamente logo após o pagamento!
+                      Abra o aplicativo do seu banco, escolha <strong>Pix &gt; Ler QR Code</strong> ou use a opção <strong>Pix Copia e Cola</strong>. Não é necessário sair desta página: a triagem abre automaticamente após a confirmação!
                     </p>
 
                     {/* Imagem QR Code */}
@@ -1104,9 +945,9 @@ export default function OrientacaoTecnicaAgente() {
                         variant="outline"
                         size="sm"
                         className="text-xs rounded-xl"
-                        onClick={() => setPhase(triageComplete ? "checkout" : "intro")}
+                        onClick={() => setPhase("checkout")}
                       >
-                        Voltar à triagem
+                        Voltar ao pagamento
                       </Button>
                     </div>
                   </>
@@ -1115,7 +956,7 @@ export default function OrientacaoTecnicaAgente() {
                     <Loader2 className="animate-spin text-primary mx-auto" size={32} />
                     <h2 className="font-display font-black text-foreground text-lg">Aguardando a confirmação do pagamento</h2>
                     <p className="text-sm text-muted-foreground">
-                      Assim que o Mercado Pago confirmar, sua sala com o Dr. Edilson Bezerra ON é liberada aqui
+                      Assim que o Mercado Pago confirmar, sua triagem com a Enfª Brisa é liberada aqui
                       automaticamente. Pix costuma levar poucos segundos. Pode manter esta página aberta.
                     </p>
                     {authed === false && (
@@ -1137,7 +978,7 @@ export default function OrientacaoTecnicaAgente() {
                       <Button
                         variant="outline"
                         className="rounded-2xl font-bold"
-                        onClick={() => setPhase(triageComplete ? "checkout" : "intro")}
+                        onClick={() => setPhase("checkout")}
                       >
                         Voltar ao pagamento
                       </Button>

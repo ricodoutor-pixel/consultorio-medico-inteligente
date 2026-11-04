@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Pix Orientação Técnica — 04/11/2026
+- [ ] Conferir ordem de pagamento nos demais serviços solicitada às 06:59 UTC, preservando preços e bloqueios
 - [x] Diagnosticar validação e erro de gravação do Pix de R$30 — WhatsApp obrigatório recusava pedidos sem número
 - [x] Implementar pagamento primeiro, autorizado pelo usuário; triagem persistida após aprovação e sala protegida
 - [ ] Testar geração de Pix com conta real — bloqueado: não há conta de teste identificada na prévia

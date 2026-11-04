@@ -474,7 +474,6 @@ Deno.serve(async (req) => {
         .from("orientacao_tecnica_orders")
         .update({
           status: orderStatus,
-          ...(approvedOk ? { paid_at: existingOrder?.paid_at || new Date().toISOString(), flow_status: existingOrder?.flow_status === "aguardando_pagamento" ? "pago" : (existingOrder?.flow_status || "pago") } : {}),
           mp_payment_id: String(payment.id),
           mp_preference_id: payment.preference_id ? String(payment.preference_id) : null,
           updated_at: new Date().toISOString(),
@@ -598,6 +597,7 @@ Deno.serve(async (req) => {
       const { data: updatedOrders } = await supabase
         .from("orientacao_tecnica_orders")
         .update({
+          ...(approvedOk ? { paid_at: existingOrder?.paid_at || new Date().toISOString(), flow_status: existingOrder?.flow_status === "aguardando_pagamento" ? "pago" : (existingOrder?.flow_status || "pago") } : {}),
           status: orderStatus,
           mp_payment_id: String(payment.id),
           amount: totalAmount,

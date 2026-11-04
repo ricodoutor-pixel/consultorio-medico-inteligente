@@ -3,6 +3,7 @@
 // -> Paciente clica em Iniciar ('start') -> 30 minutos de Orientação Técnica Educativa estilo WhatsApp.
 // Suporta pausa/intervenção em tempo real pelo Dr. Edilson e geração de relatório revisado.
 
+import { TRIAGE_KEYS, invalidTriageFields, hasEmergency, canEnterOrientation } from "../_shared/orientation-triage.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
@@ -86,6 +87,15 @@ Deno.serve(async (req) => {
       if (!data) return null;
       const row = data as SessionRow;
 
+      const { data: order } = await sb.from("orientacao_tecnica_orders")
+        .select("status, triagem, ai_analysis, flow_status")
+        .eq("external_reference", row.external_reference).eq("user_id", uid).maybeSingle();
+      let triage = order?.triagem || {};
+      if (!Object.keys(triage).length && order?.ai_analysis) {
+        try { triage = JSON.parse(order.ai_analysis); } catch { /* legacy */ }
+      }
+      if (!order || !canEnterOrientation(order, triage)) return null;
+
       // Se passou da validade e ainda está com status 'active', marca como expired
       if (row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() <= Date.now()) {
         await sb.from("ot_web_sessions").update({ status: "expired" }).eq("id", row.id);
@@ -118,21 +128,50 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Se não tem sessão, verifica se tem pedido pendente aguardando webhook
-      const { data: pendingOrder } = await sb
-        .from("orientacao_tecnica_orders")
-        .select("id, status, created_at")
-        .eq("user_id", uid)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      let query = sb.from("orientacao_tecnica_orders")
+        .select("id, external_reference, status, flow_status, triagem, qr_code, qr_code_base64, mp_payment_id, created_at")
+        .eq("user_id", uid).order("created_at", { ascending: false }).limit(1);
+      if (typeof body.external_reference === "string") query = query.eq("external_reference", body.external_reference);
+      const { data: order } = await query.maybeSingle();
+      if (!order) return json({ state: "none" });
+      if (order.status === "pending") return json({ state: "awaiting_payment", order });
+      if (order.status === "approved") return json({ state: "triage", order });
+      return json({ state: "none", order });
+    }
 
-      if (pendingOrder) {
-        return json({ state: "awaiting_payment" });
+    if (action === "save_triage") {
+      if (typeof body.external_reference !== "string" || !body.answer || typeof body.answer !== "object" || Array.isArray(body.answer)) return json({ error: "triage_invalid", fields: ["answer"] }, 400);
+      const answer = body.answer as Record<string, unknown>;
+      const keys = Object.keys(answer);
+      if (keys.length !== 1 || !TRIAGE_KEYS.includes(keys[0] as typeof TRIAGE_KEYS[number])) return json({ error: "triage_invalid", fields: keys }, 400);
+      const fields = invalidTriageFields(answer, false);
+      if (fields.length) return json({ error: "triage_invalid", fields }, 400);
+      const { data: order } = await sb.from("orientacao_tecnica_orders").select("*")
+        .eq("external_reference", body.external_reference).eq("user_id", uid).maybeSingle();
+      if (!order || order.status !== "approved") return json({ error: "payment_not_approved" }, 403);
+      const { data: existingSession } = await sb.from("ot_web_sessions").select("id").eq("external_reference", order.external_reference).maybeSingle();
+      if (existingSession) return json({ error: "triage_locked" }, 409);
+      const triagem = { ...(order.triagem || {}), ...answer };
+      const emergency = hasEmergency(triagem);
+      const complete = invalidTriageFields(triagem).length === 0;
+      const flowStatus = complete && !emergency ? "triagem_concluida" : "pago";
+      const { error } = await sb.from("orientacao_tecnica_orders").update({
+        triagem, flow_status: flowStatus, ai_analysis: JSON.stringify(triagem),
+        ...(complete && !emergency ? { triage_completed_at: new Date().toISOString() } : {}),
+      }).eq("id", order.id).eq("user_id", uid).eq("status", "approved");
+      if (error) {
+        console.error("[ot] triage_save_failed", { message: error.message, details: error.details, hint: error.hint, code: error.code });
+        return json({ error: "triage_save_failed" }, 500);
       }
-
-      return json({ state: "none" });
+      if (complete && !emergency) {
+        const { error: sessionError } = await sb.from("ot_web_sessions").upsert({
+          user_id: uid, external_reference: order.external_reference, mp_payment_id: order.mp_payment_id,
+          triage: triagem, status: "ready", messages_count: 0,
+        }, { onConflict: "external_reference", ignoreDuplicates: true });
+        if (sessionError) return json({ error: "session_save_failed" }, 500);
+        await sb.from("orientacao_tecnica_orders").update({ flow_status: "sala_liberada" }).eq("id", order.id);
+      }
+      return json({ state: emergency ? "emergency" : complete ? "ready" : "triage", triagem });
     }
 
     // ── 2. START (Ativa a sessão 'ready' iniciando o cronômetro de 30 min) ──

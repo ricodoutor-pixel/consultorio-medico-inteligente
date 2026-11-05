@@ -549,6 +549,25 @@ export function isUrgentMedicalEmergency(text = '') {
   return /(suicid|tirar minha vida|me matar|infarto|parada cardiaca|falta de ar|dor.*peito.*forte|dor forte.*peito|socorro urgente|samu|192)/i.test(clean);
 }
 
+export function isAngryOrDemandsHuman(text = '') {
+  if (!text) return false;
+  const clean = String(text).toLowerCase();
+
+  // 1. Emojis de raiva e descontentamento explícito
+  const angryEmojis = /[\u{1F621}\u{1F620}\u{1F92C}\u{1F624}\u{1F44E}\u{1F4A9}]/u; // 😡 😠 🤬 😤 👎 💩
+  if (angryEmojis.test(text)) return true;
+
+  // 2. Pedido explícito para falar com humano ou atendente
+  const humanKeywords = /\b(atendente|humano|pessoa|falar com alguem|falar com alguém|falar com atendente|falar com humano|atendente humano|quero um humano|quero falar com uma pessoa|chama alguem|chama alguém|passa pra alguem|passa pra alguém|quero uma pessoa|secretaria humana)\b/i;
+  if (humanKeywords.test(clean)) return true;
+
+  // 3. Reclamação grave / termos de indignação ou jurídicos
+  const complaintKeywords = /\b(absurdo|golpe|palha[cç]ada|propaganda enganosa|vou processar|procon|pol[ií]cia|processo|fraude|vergonha|incompetente|horr[ií]vel|p[eé]ssimo|me sentindo enganado|me sentindo enganada|furada)\b/i;
+  if (complaintKeywords.test(clean)) return true;
+
+  return false;
+}
+
 export function isGeneralSpamOrUnrelated(text = '') {
   if (!text) return false;
   const clean = text.toLowerCase();

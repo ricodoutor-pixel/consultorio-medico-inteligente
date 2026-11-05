@@ -22,6 +22,8 @@ import {
   isPaymentOrVoucherNotice,
   isUrgentMedicalEmergency,
   isGeneralSpamOrUnrelated,
+  isAngryOrDemandsHuman,
+  saveContactLidMapping,
   preSendGuard,
   isDoctorKycMedia,
   classifyDoctorDocumentType
@@ -89,30 +91,113 @@ const ADMIN_PHONE = process.env.ADMIN_WHATSAPP_PHONE || '5511987131241'; // Dr. 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
 // 🛡️ BLINDAGEM MÁXIMA ANTI-DUPLICIDADE
-// 1. Controle de Cooldown por Contato (mínimo 60s entre envios para o mesmo número)
+// Mapa persistente de correspondência entre LID (@lid) e Telefone real (@s.whatsapp.net)
+const LID_MAP_FILE = path.join(__dirname, 'brisa_lid_phone_map.json');
+
+function loadLidPhoneMap() {
+  try {
+    if (fs.existsSync(LID_MAP_FILE)) {
+      return JSON.parse(fs.readFileSync(LID_MAP_FILE, 'utf8'));
+    }
+  } catch (e) {}
+  return { lidToPhone: {}, phoneToLid: {} };
+}
+
+function saveLidPhoneMap(data) {
+  try {
+    fs.writeFileSync(LID_MAP_FILE, JSON.stringify(data, null, 2));
+  } catch (e) {}
+}
+
+const lidPhoneData = loadLidPhoneMap();
+
+function recordLidPhonePair(lidJid, phoneDigitsOrJid) {
+  if (!lidJid || !phoneDigitsOrJid) return;
+  const cleanLid = lidJid.includes('@lid') ? lidJid : `${lidJid}@lid`;
+  const cleanPhone = phoneDigitsOrJid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+  if (cleanPhone.length < 10) return;
+
+  let changed = false;
+  if (lidPhoneData.lidToPhone[cleanLid] !== cleanPhone) {
+    lidPhoneData.lidToPhone[cleanLid] = cleanPhone;
+    changed = true;
+  }
+  if (lidPhoneData.phoneToLid[cleanPhone] !== cleanLid) {
+    lidPhoneData.phoneToLid[cleanPhone] = cleanLid;
+    changed = true;
+  }
+  if (changed) {
+    saveLidPhoneMap(lidPhoneData);
+    saveContactLidMapping(cleanLid, cleanPhone);
+    log(`🔗 [VÍNCULO LID <-> TELEFONE] ${cleanLid} <==> ${cleanPhone}`);
+  }
+}
+
+function getCanonicalContactId(jid, altJid = '') {
+  if (!jid) return '';
+  const clean = String(jid).trim();
+
+  if (altJid && altJid.includes('@s.whatsapp.net')) {
+    const phone = altJid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+    if (phone.length >= 10) {
+      if (clean.includes('@lid')) recordLidPhonePair(clean, phone);
+      return phone;
+    }
+  }
+
+  if (clean.includes('@s.whatsapp.net')) {
+    const phone = clean.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+    if (phone.length >= 10) return phone;
+  }
+
+  if (clean.includes('@lid')) {
+    const mappedPhone = lidPhoneData.lidToPhone[clean];
+    if (mappedPhone) return mappedPhone;
+    return clean;
+  }
+
+  const digits = clean.replace(/\D/g, '');
+  if (digits.length >= 10) return digits;
+  return clean;
+}
+
+// 1. Controle de Cooldown por Contato (mínimo 20s entre respostas ao mesmo contato)
 const lastRepliedAt = new Map();
 
-// 2. Hash anti-repetição por texto e destinatário (bloqueia o mesmo texto para o mesmo número por 10 minutos)
-const recentSentHashes = new Map();
+// 2. Histórico de textos enviados nas últimas 24h para anti-repetição rígida (<80% similaridade)
+const recentSentHistory = new Map();
 
 // 🔒 Fila única e trava por conversa (in-flight lock) para evitar 2 ou 3 mensagens no mesmo minuto
 const inFlightChats = new Set();
 
-function hasRecentlySent(number, text) {
+function hasRecentlySent(target, text) {
   if (!text) return false;
-  const cleanNum = number.includes('@lid') ? number : number.replace(/\D/g, '');
-  const norm = text.trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 80);
-  const key = `${cleanNum}_${norm}`;
+  const canonical = getCanonicalContactId(target);
   const now = Date.now();
-  const lastTime = recentSentHashes.get(key);
-  if (lastTime && (now - lastTime) < 10 * 60 * 1000) {
-    return true;
+  const history = recentSentHistory.get(canonical) || [];
+
+  const normProposed = text.trim().toLowerCase().replace(/\s+/g, ' ');
+
+  for (const item of history) {
+    if ((now - item.time) < 24 * 60 * 60 * 1000) {
+      const normPast = item.text.trim().toLowerCase().replace(/\s+/g, ' ');
+      if (normProposed === normPast) return true;
+      if (calculateStringSimilarity(normProposed, normPast) >= 0.80) {
+        return true;
+      }
+    }
   }
-  recentSentHashes.set(key, now);
-  // Limpeza periódica
-  for (const [k, t] of recentSentHashes.entries()) {
-    if (now - t > 30 * 60 * 1000) recentSentHashes.delete(k);
+
+  history.push({ text, time: now });
+  const filtered = history.filter(item => (now - item.time) < 24 * 60 * 60 * 1000).slice(-20);
+  recentSentHistory.set(canonical, filtered);
+
+  if (target !== canonical) {
+    const targetHist = recentSentHistory.get(target) || [];
+    targetHist.push({ text, time: now });
+    recentSentHistory.set(target, targetHist.slice(-20));
   }
+
   return false;
 }
 
@@ -174,6 +259,12 @@ const PREPOSITIONS = new Set(['da', 'de', 'do', 'dos', 'das', 'e', 'del', 'd', '
 
 // 📋 MAPA DE MÉDICOS E ESPECIALISTAS PARA CONVERSÃO DE ANÚNCIOS
 const DOCTOR_ADS_MAP = [
+  {
+    id: 'med-ana-karoliny',
+    name: 'Dra. Ana Karoliny Martins',
+    area: 'Clínica Geral, Medicina de Família e Terapia Canabinoide (CRM 13942/RN)',
+    keywords: ['ana karoliny', 'ana karoline', 'karoliny', 'karoline', 'dra ana', 'dra ana karoliny', '13942']
+  },
   {
     id: 'med-anderson-mikalauskas',
     name: 'Dr. Anderson Mikalauskas',
@@ -1493,418 +1584,332 @@ async function loop() {
         }
         const activeChats = Array.from(activeChatsMap.values());
 
-        const humanLocked = loadHumanLocked();
+        // 🛡️ DEDUPLICAÇÃO CANÔNICA DE CHATS (LID vs TELEFONE):
+        // Garante que se o mesmo contato aparecer como @lid e @s.whatsapp.net, apenas UM deles é processado por ciclo!
+        const deduplicatedChats = [];
+        const seenInThisLoop = new Set();
 
         for (const chat of activeChats) {
+          const jid = chat.remoteJid || chat.id || '';
+          const altJid = chat.lastMessage?.key?.remoteJidAlt || chat.remoteJidAlt || '';
+          if (altJid && (jid.includes('@lid') || altJid.includes('@lid'))) {
+            recordLidPhonePair(jid.includes('@lid') ? jid : altJid, jid.includes('@s.whatsapp.net') ? jid : altJid);
+          }
+          const canonical = getCanonicalContactId(jid, altJid);
+          if (!canonical || seenInThisLoop.has(canonical)) {
+            continue;
+          }
+          seenInThisLoop.add(canonical);
+          deduplicatedChats.push(chat);
+        }
+
+        const humanLocked = loadHumanLocked();
+
+        for (const chat of deduplicatedChats) {
           const jid = chat.remoteJid || chat.id;
           if (!jid) continue;
+          const altJid = chat.lastMessage?.key?.remoteJidAlt || chat.remoteJidAlt || '';
+          const canonical = getCanonicalContactId(jid, altJid);
 
           // Se a conversa já foi respondida por nós e não há mensagens novas não lidas, ignorar
           if (chat.lastMessage?.key?.fromMe === true && (!chat.unreadCount || chat.unreadCount === 0)) {
             continue;
           }
 
-          // Buscar as últimas 8 mensagens do chat
-          const msgsRes = await fetch(`${EVO_URL}/chat/findMessages/${INSTANCE}`, {
-            method: 'POST',
-            headers: {
-              'apikey': EVO_KEY,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              where: {
-                key: {
-                  remoteJid: jid
-                }
+          // 🔒 TRAVA POR CONVERSA (IN-FLIGHT LOCK): Impede processamentos simultâneos para o mesmo número
+          if (inFlightChats.has(canonical)) {
+            log(`🔒 [LOCK ATIVO] Contato ${canonical} já possui processamento em andamento.`);
+            continue;
+          }
+
+          inFlightChats.add(canonical);
+
+          try {
+            // Buscar as últimas 8 mensagens do chat
+            const msgsRes = await fetch(`${EVO_URL}/chat/findMessages/${INSTANCE}`, {
+              method: 'POST',
+              headers: {
+                'apikey': EVO_KEY,
+                'Content-Type': 'application/json'
               },
-              limit: 8
-            })
-          });
-
-          if (msgsRes.ok) {
-            const msgsData = await msgsRes.json().catch(() => ({}));
-            const messages = msgsData?.messages?.records || msgsData?.records || (Array.isArray(msgsData) ? msgsData : []);
-
-            // 🛡️ DETECÇÃO DE INTERVENÇÃO HUMANA / ASSUMIU HUMANO (Fase 2 - S2):
-            // Toda mensagem enviada pela equipe pelo celular ou WhatsApp Web (fromMe sem ser a Brisa)
-            // pausa a IA nesta conversa por 24 horas para evitar respostas concorrentes.
-            let recipientClean = jid.includes('@lid') ? jid : jid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
-            for (const msg of messages) {
-              if (msg.key?.fromMe) {
-                const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || '').trim();
-                if (!text) continue;
-
-                const mem = getContactMemory(jid);
-                const isBrisaSent = (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || text.includes('Enfermeira Brisa');
-                
-                if (!isBrisaSent) {
-                  registerHumanTakeover(jid, true, false);
-                  log(`🛑 [ASSUMIU HUMANO 24H] Mensagem humana enviada pela equipe no chat ${recipientClean}. IA silenciada por 24h.`);
-                }
-              }
-            }
-
-            // Filtrar mensagens novas recebidas (inbound) não processadas nas últimas 24 horas
-            const newInbounds = [];
-            for (const msg of messages) {
-              const msgId = msg.key?.id;
-              const fromMe = msg.key?.fromMe;
-              if (!msgId || fromMe) continue;
-
-              const msgTimestamp = (msg.messageTimestamp || 0) * 1000;
-              const isRecent = (Date.now() - msgTimestamp) < (24 * 60 * 60 * 1000); // 24 horas
-
-              if (processed.has(msgId)) continue;
-
-              if (!isRecent) {
-                // Mensagem muito antiga (> 24h), apenas registra para não responder retroativo
-                processed.add(msgId);
-                continue;
-              }
-
-              processed.add(msgId);
-              newInbounds.push(msg);
-            }
-
-            if (newInbounds.length === 0) continue;
-
-            saveProcessed(processed);
-
-            const firstMsg = newInbounds[0];
-            const senderName = firstMsg.pushName || chat.pushName || 'Doutor(a)';
-
-            // Identificar destinatário canônico (suporta @lid e @s.whatsapp.net)
-            let recipient = jid.includes('@lid') ? jid : jid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
-            if (!recipient || recipient.length < 5) {
-              const altJid = firstMsg.key?.remoteJidAlt || chat.remoteJidAlt;
-              if (altJid) {
-                recipient = altJid.includes('@lid') ? altJid : altJid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
-              }
-            }
-
-            if (!recipient || recipient.length < 5) {
-              continue;
-            }
-
-            // Verificar texto combinado das mensagens
-            const combinedText = newInbounds.map(m => 
-              m.message?.conversation || 
-              m.message?.extendedTextMessage?.text || 
-              m.message?.imageMessage?.caption || 
-              m.message?.documentMessage?.caption || ''
-            ).filter(Boolean).join('\n');
-
-            log(`📩 [LOTE] Recebidas ${newInbounds.length} novas mensagens de ${senderName} (${recipient}): "${combinedText.slice(0, 80)}"`);
-
-            // 👑 INTERAÇÃO EXCLUSIVA COM O FUNDADOR / ADMIN (Dr. Edilson Bezerra)
-            if (recipient === ADMIN_PHONE) {
-              // 1. Comando direto para conversar com Gemini via WhatsApp ("ok gemini ...")
-              const geminiMatch = combinedText.match(/^(?:ok\s+)?gemini\b[\s,:]*(.*)$/i);
-              if (geminiMatch) {
-                const userPrompt = (geminiMatch[1] || combinedText).trim();
-                log(`👑 [ADMIN GEMINI COMMAND] Dr. Edilson enviou instrução: "${userPrompt}"`);
-
-                const instructionsFile = path.join(__dirname, 'admin_whatsapp_gemini_instructions.json');
-                let instructions = [];
-                try {
-                  if (fs.existsSync(instructionsFile)) instructions = JSON.parse(fs.readFileSync(instructionsFile, 'utf8'));
-                } catch (e) {}
-                instructions.push({
-                  id: `inst_${Date.now()}`,
-                  prompt: userPrompt,
-                  received_at: new Date().toISOString(),
-                  status: 'processed'
-                });
-                try { fs.writeFileSync(instructionsFile, JSON.stringify(instructions.slice(-100), null, 2)); } catch (e) {}
-
-                const replyToAdmin = await handleAdminGeminiCommand(userPrompt);
-                await sendWhatsApp(ADMIN_PHONE, replyToAdmin);
-                continue;
-              }
-
-              // 2. Envio de comprovante de pagamento pelo Dr. Edilson (Admin)
-              const adminDocMsgs = newInbounds.filter(m => 
-                Boolean(m.message?.documentMessage || m.message?.imageMessage || m.message?.documentWithCaptionMessage)
-              );
-              if (adminDocMsgs.length > 0) {
-                log(`🧾 [ADMIN COMPROVANTE] Dr. Edilson enviou ${adminDocMsgs.length} comprovante(s) via WhatsApp!`);
-                let targetDoctor = findDoctorByName(combinedText);
-                if (!targetDoctor) {
-                  const doctors = loadKnownDoctors();
-                  targetDoctor = doctors.find(d => 
-                    (d.name && combinedText.toLowerCase().includes(d.name.toLowerCase())) ||
-                    (d.crm && combinedText.includes(d.crm))
-                  );
-                }
-
-                for (const docMsg of adminDocMsgs) {
-                  await ingestAdminVoucher(docMsg, targetDoctor, combinedText);
-                }
-
-                if (targetDoctor) {
-                  await sendWhatsApp(ADMIN_PHONE, `✅ Dr. Edilson, comprovante conferido e anexado com sucesso aos documentos do(a) médico(a) *${targetDoctor.name}* (CRM ${targetDoctor.crm})!\n\n🔍 Disponível no painel: https://www.plantayraiz.com.br/admin/aprovacoes-medicas`);
-                } else {
-                  await sendWhatsApp(ADMIN_PHONE, `📥 Dr. Edilson, comprovante recebido e armazenado no cofre KYC!\n\n💡 Envie o nome ou CRM do médico caso queira que eu vincule automaticamente ao card dele.`);
-                }
-                continue;
-              }
-
-              // 3. Comando REATIVAR_IA
-              const reativarMatch = combinedText.match(/^REATIVAR_IA\s+\+?(\d{10,13})/i);
-              if (reativarMatch) {
-                const targetPhone = reativarMatch[1].startsWith('55') ? reativarMatch[1] : '55' + reativarMatch[1];
-                humanLocked.delete(targetPhone);
-                saveHumanLocked(humanLocked);
-                log(`🔓 [IA REATIVADA] Contato ${targetPhone} liberado pelo Admin para voltar a receber IA.`);
-                await sendWhatsApp(ADMIN_PHONE, `✅ IA reativada com sucesso para o contato ${targetPhone}.`);
-                continue;
-              }
-
-              // 4. Comando PAUSAR_AUTOMACAO / PAUSAR GERAL
-              const pauseGlobalMatch = combinedText.match(/^(?:PAUSAR_AUTOMACAO|PAUSAR\s+AUTOMACAO|PAUSAR\s+GERAL|PARAR\s+AUTOMACAO|PAUSAR\s+TUDO)/i);
-              if (pauseGlobalMatch) {
-                setGlobalPause(true);
-                log(`🛑 [ADMIN] Automação global de WhatsApp pausada pelo Dr. Edilson.`);
-                await sendWhatsApp(ADMIN_PHONE, `🛑 *[Automação Global Pausada]*\n\nDr. Edilson, todas as mensagens automáticas de WhatsApp (Enfª Brisa e Convites Brevo) foram PAUSADAS imediatamente.\n\nNenhuma mensagem automática sairá do sistema até sua autorização.\n\nPara reativar a qualquer momento, responda:\n*RETOMAR_AUTOMACAO* ou *ATIVAR_AUTOMACAO*`);
-                continue;
-              }
-
-              // 5. Comando RETOMAR_AUTOMACAO / ATIVAR_AUTOMACAO
-              const resumeGlobalMatch = combinedText.match(/^(?:RETOMAR_AUTOMACAO|RETOMAR\s+AUTOMACAO|ATIVAR_AUTOMACAO|ATIVAR\s+AUTOMACAO|DESPAUSAR)/i);
-              if (resumeGlobalMatch) {
-                setGlobalPause(false);
-                log(`🟢 [ADMIN] Automação global retomada pelo Dr. Edilson.`);
-                await sendWhatsApp(ADMIN_PHONE, `🟢 *[Automação Retomada]*\n\nDr. Edilson, as automações de WhatsApp foram reativadas com sucesso! O atendimento da Enfª Brisa e os convites voltaram a operar.`);
-                continue;
-              }
-
-              // 6. Comando PAUSAR CONVERSA / PAUSAR <numero ou nome>
-              const pauseChatMatch = combinedText.match(/^(?:PAUSAR_CONVERSA|PAUSAR\s+CONVERSA|PAUSAR)\s+(.+)/i);
-              if (pauseChatMatch) {
-                const query = pauseChatMatch[1].trim();
-                if (!/(automacao|geral|tudo)/i.test(query)) {
-                  const cleanNum = query.replace(/\D/g, '');
-                  let targetPhone = cleanNum.length >= 8 ? (cleanNum.startsWith('55') ? cleanNum : '55' + cleanNum) : null;
-                  let targetLid = null;
-                  let targetName = query;
-
-                  for (const [phoneOrLid, info] of conversationMemory.entries()) {
-                    const s = JSON.stringify(info).toLowerCase();
-                    if (s.includes(query.toLowerCase()) || phoneOrLid.includes(query.replace(/\D/g, ''))) {
-                      if (phoneOrLid.includes('@lid')) targetLid = phoneOrLid;
-                      else if (!targetPhone) targetPhone = phoneOrLid;
-                    }
+              body: JSON.stringify({
+                where: {
+                  key: {
+                    remoteJid: jid
                   }
+                },
+                limit: 8
+              })
+            });
 
-                  if (targetPhone) humanLocked.add(targetPhone);
-                  if (targetLid) humanLocked.add(targetLid);
-                  if (cleanNum.length >= 8) humanLocked.add(cleanNum);
-                  saveHumanLocked(humanLocked);
+            if (msgsRes.ok) {
+              const msgsData = await msgsRes.json().catch(() => ({}));
+              const messages = msgsData?.messages?.records || msgsData?.records || (Array.isArray(msgsData) ? msgsData : []);
 
-                  log(`🛑 [ADMIN PAUSA CONVERSA] Conversa com "${query}" pausada por ordem do Dr. Edilson.`);
-                  await sendWhatsApp(ADMIN_PHONE, `🛑 *[Conversa Pausada com Sucesso]*\n\nDr. Edilson, a conversa com *${targetName}* (${targetPhone || targetLid || query}) foi pausada!\n\nA IA está em silêncio absoluto para este contato e não enviará mensagens automáticas.\n\nPara liberar a IA novamente quando desejar, envie:\n*REATIVAR_IA ${targetPhone || targetLid || query}*`);
+              // 🛡️ DETECÇÃO DE INTERVENÇÃO HUMANA / ASSUMIU HUMANO:
+              // Toda mensagem enviada pela equipe pelo celular ou WhatsApp Web (fromMe sem ser a Brisa)
+              // pausa a IA nesta conversa por 24 horas para evitar respostas concorrentes.
+              for (const msg of messages) {
+                if (msg.key?.fromMe) {
+                  const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || '').trim();
+                  if (!text) continue;
+
+                  const mem = getContactMemory(jid);
+                  const isBrisaSent = (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || text.includes('assistente virtual');
+                  
+                  if (!isBrisaSent) {
+                    registerHumanTakeover(jid, true, false);
+                    registerHumanTakeover(canonical, true, false);
+                    humanLocked.add(jid);
+                    humanLocked.add(canonical);
+                    saveHumanLocked(humanLocked);
+                    log(`🛑 [ASSUMIU HUMANO 24H] Mensagem enviada pela equipe no chat ${canonical}. IA silenciada por 24h.`);
+                  }
+                }
+              }
+
+              // Filtrar mensagens novas recebidas (inbound) não processadas nas últimas 24 horas
+              const newInbounds = [];
+              for (const msg of messages) {
+                const msgId = msg.key?.id;
+                const fromMe = msg.key?.fromMe;
+                if (!msgId || fromMe) continue;
+
+                const msgTimestamp = (msg.messageTimestamp || 0) * 1000;
+                const isRecent = (Date.now() - msgTimestamp) < (24 * 60 * 60 * 1000); // 24 horas
+
+                if (processed.has(msgId)) continue;
+
+                if (!isRecent) {
+                  processed.add(msgId);
+                  continue;
+                }
+
+                processed.add(msgId);
+                newInbounds.push(msg);
+              }
+
+              if (newInbounds.length === 0) continue;
+
+              saveProcessed(processed);
+
+              const firstMsg = newInbounds[0];
+              const senderName = firstMsg.pushName || chat.pushName || 'Contato';
+
+              // Identificar destinatário canônico (suporta @lid e @s.whatsapp.net)
+              let recipient = jid.includes('@lid') ? jid : jid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+              if (!recipient || recipient.length < 5) {
+                const alt = firstMsg.key?.remoteJidAlt || chat.remoteJidAlt;
+                if (alt) {
+                  recipient = alt.includes('@lid') ? alt : alt.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+                }
+              }
+
+              if (!recipient || recipient.length < 5) {
+                continue;
+              }
+
+              // ⏳ DEBOUNCE INTELIGENTE (6-8s): Aguarda o paciente terminar de digitar várias mensagens curtas
+              const latestMsgTimestamp = Math.max(...newInbounds.map(m => (m.messageTimestamp || 0) * 1000));
+              const now = Date.now();
+              const elapsedSinceLastMsg = now - latestMsgTimestamp;
+              if (elapsedSinceLastMsg < 6500) {
+                const waitTime = Math.min(6500 - elapsedSinceLastMsg, 6500);
+                log(`⏳ [DEBOUNCE] Aguardando ${Math.round(waitTime/1000)}s para agrupar mensagens de ${senderName} (${canonical})...`);
+                await new Promise(r => setTimeout(r, waitTime));
+
+                // Re-busca para capturar mensagens adicionais enviadas durante os 6-8s
+                try {
+                  const refetchRes = await fetch(`${EVO_URL}/chat/findMessages/${INSTANCE}`, {
+                    method: 'POST',
+                    headers: { 'apikey': EVO_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ where: { key: { remoteJid: jid } }, limit: 8 })
+                  });
+                  if (refetchRes.ok) {
+                    const refetchData = await refetchRes.json().catch(() => ({}));
+                    const refetchMsgs = refetchData?.messages?.records || refetchData?.records || (Array.isArray(refetchData) ? refetchData : []);
+                    for (const rm of refetchMsgs) {
+                      const rmId = rm.key?.id;
+                      if (rmId && !rm.key?.fromMe && !processed.has(rmId)) {
+                        processed.add(rmId);
+                        newInbounds.push(rm);
+                      }
+                    }
+                    saveProcessed(processed);
+                  }
+                } catch (e) {}
+              }
+
+              // Verificar texto combinado de todas as mensagens do lote
+              const combinedText = newInbounds.map(m => 
+                m.message?.conversation || 
+                m.message?.extendedTextMessage?.text || 
+                m.message?.imageMessage?.caption || 
+                m.message?.documentMessage?.caption || ''
+              ).filter(Boolean).join('\n');
+
+              log(`📩 [LOTE UNIFICADO] Recebidas ${newInbounds.length} mensagem(ns) de ${senderName} (${canonical}): "${combinedText.slice(0, 80)}"`);
+
+              // 👑 INTERAÇÃO EXCLUSIVA COM O FUNDADOR / ADMIN (Dr. Edilson Bezerra)
+              if (recipient === ADMIN_PHONE || canonical === ADMIN_PHONE) {
+                const geminiMatch = combinedText.match(/^(?:ok\s+)?gemini\b[\s,:]*(.*)$/i);
+                if (geminiMatch) {
+                  const userPrompt = (geminiMatch[1] || combinedText).trim();
+                  log(`👑 [ADMIN GEMINI COMMAND] Dr. Edilson enviou instrução: "${userPrompt}"`);
+                  const replyToAdmin = await handleAdminGeminiCommand(userPrompt);
+                  await sendWhatsApp(ADMIN_PHONE, replyToAdmin);
+                  continue;
+                }
+                const adminDocMsgs = newInbounds.filter(m => 
+                  Boolean(m.message?.documentMessage || m.message?.imageMessage || m.message?.documentWithCaptionMessage)
+                );
+                if (adminDocMsgs.length > 0) {
+                  let targetDoctor = findDoctorByName(combinedText);
+                  for (const docMsg of adminDocMsgs) {
+                    await ingestAdminVoucher(docMsg, targetDoctor, combinedText);
+                  }
+                  await sendWhatsApp(ADMIN_PHONE, `✅ Dr. Edilson, comprovante(s) anexado(s) com sucesso aos documentos KYC!`);
                   continue;
                 }
               }
 
-              // 7. Comando STATUS_AUTOMACAO
-              const statusMatch = combinedText.match(/^(?:STATUS_AUTOMACAO|STATUS\s+AUTOMACAO|STATUS\s+PAUSA)/i);
-              if (statusMatch) {
-                const isPaused = isGlobalPauseActive();
-                const totalLocked = humanLocked.size;
-                await sendWhatsApp(ADMIN_PHONE, `📊 *[Status da Automação de WhatsApp]*\n\n• Automação Global: ${isPaused ? '🛑 PAUSADA' : '🟢 ATIVA / OPERANDO'}\n• Contatos com IA pausada (Modo Humano): ${totalLocked}\n• Instância Evolution: ${INSTANCE} (Online)\n\nComandos disponíveis:\n• *PAUSAR_AUTOMACAO* (Pausa tudo)\n• *RETOMAR_AUTOMACAO* (Reativa tudo)\n• *PAUSAR <número ou nome>* (Pausa contato específico)\n• *REATIVAR_IA <número>* (Reativa contato específico)`);
-                continue;
-              }
-            }
-
-            // 🛑 VERIFICAÇÃO 0: Se a automação estiver pausada globalmente pelo Admin, silencia para todos
-            if (isGlobalPauseActive()) {
-              log(`🛑 [PAUSA GLOBAL ATIVA] Mensagem de ${senderName} (${recipient}) recebida, mas a automação está pausada globalmente pelo Admin. IA em silêncio.`);
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 0.1: Contato está em Orientação Técnica ativa no n8n?
-            // Regra mútua: o brisa-live-responder cuida de médicos e documentos; o n8n, só de pacientes da orientação.
-            // Os dois nunca respondem o mesmo número.
-            triggerN8nSyncAsync();
-            if (isHandledByN8nOrientation(recipient)) {
-              log(`🔒 [N8N EXCLUSION] Contato ${senderName} (${recipient}) está em atendimento exclusivo no n8n (Orientação Técnica). Enfª Brisa em silêncio absoluto.`);
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 1: Contato já está na trava de atendimento humano ou na blacklist permanente?
-            const pauseCheck = checkAiPause(recipient);
-            const blacklist = loadBlacklist();
-            if (pauseCheck.paused || blacklist.has(recipient)) {
-              log(`🛑 [TRAVA/BLACKLIST ATIVA] Contato ${senderName} (${recipient}) está em modo humano (${pauseCheck.reason || 'pausado'}) ou blacklist. IA em silêncio absoluto.`);
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 2: Solicitou opt-out / cancelamento / "não quero" (Fase 2 - S3)?
-            if (checkOptOutSecurity(combinedText)) {
-              const res = registerOptOut(recipient, combinedText);
-              log(`🛑 [OPT-OUT REGISTRADO] ${senderName} (${recipient}) pediu cancelamento ("${combinedText}"). IA silenciada e contato inserido na blacklist permanente!`);
-
-              try {
-                // Envia UMA ÚNICA confirmação e nunca mais entra em contato
-                await sendWhatsApp(recipient, res.confirmationReply);
-              } catch (e) {
-                log(`Erro envio confirmação opt-out: ${e.message}`);
-              }
-
-              try {
-                const alertMsg = `🔔 *[Opt-Out Confirmado]*\n\nO contato *${senderName}* (${recipient}) recusou contato:\n"${combinedText}"\n\n🛑 Inserido na blacklist permanente e IA silenciada definitivamente.`;
-                await sendWhatsApp(ADMIN_PHONE, alertMsg);
-              } catch (e) {
-                log(`Aviso admin opt-out: ${e.message}`);
-              }
-
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 2.1: Solicitou pausa da conversa ou da automação?
-            if (isPauseRequested(combinedText)) {
-              humanLocked.add(recipient);
-              const cleanRec = recipient.replace(/\D/g, '');
-              if (cleanRec.length >= 8) humanLocked.add(cleanRec);
-              saveHumanLocked(humanLocked);
-              log(`🛑 [PAUSA SOLICITADA PELO CONTATO] ${senderName} (${recipient}) pediu para pausar a conversa/automação. IA silenciada imediatamente!`);
-
-              try {
-                await sendWhatsApp(recipient, `Com certeza! Pausei o envio automático de mensagens para você por aqui. Nossa equipe da Planta y Raíz está à inteira disposição caso precise de algo. Um abraço! 🙏🌿`);
-              } catch (e) {
-                log(`Erro envio confirmação pausa: ${e.message}`);
-              }
-
-              try {
-                const alertMsg = `🔔 *[Aviso: Contato Pediu Pausa]*\n\nO contato *${senderName}* (${recipient}) pediu para pausar as mensagens automáticas:\n"${combinedText}"\n\n🛑 A IA Enfª Brisa foi pausada para esta conversa e não enviará mais mensagens automáticas.\n(Para reativar a IA quando desejar: responda *REATIVAR_IA ${recipient}*)`;
-                await sendWhatsApp(ADMIN_PHONE, alertMsg);
-              } catch (e) {
-                log(`Aviso admin pausa: ${e.message}`);
-              }
-
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 2.2: Solicitou atendimento humano agora?
-            if (isHumanRequested(combinedText)) {
-              humanLocked.add(recipient);
-              saveHumanLocked(humanLocked);
-              log(`🔒 [TRAVA DE HUMANO ATIVADA] ${senderName} (${recipient}) pediu humano. IA silenciada imediatamente!`);
-
-              const cleanName = cleanDoctorName(senderName);
-              const isFemale = /\b(dra|doutora|edna|veronica|verônica|mariana|geovana|barbara|bárbara|stella|camyla|leticia|letícia|patricia|patrícia|ana|carolina|fernanda|juliana|camila|paula)\b/i.test(cleanName);
-              const prefix = isFemale ? 'Dra.' : 'Dr.';
-              const formattedName = cleanName.startsWith('Dr') ? cleanName : `${prefix} ${cleanName}`;
-
-              try {
-                await sendWhatsApp(recipient, `Claro! Pausei o atendimento automático e já chamei nossa equipe. Uma pessoa vai continuar a conversa com você por aqui em breve. 🙏🌿`);
-              } catch (e) {
-                log(`Erro ao enviar aviso de transferência: ${e.message}`);
-              }
-
-              try {
-                const alertMsg = `Dr. Edilson Bezerra, o senhor tem uma mensagem importante de um contato que solicitou atendimento humano imediato!\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A IA Enfª Brisa foi pausada para esta conversa.\n(Para reativar a IA após o atendimento: responda *REATIVAR_IA ${recipient}*)`;
-                await sendWhatsApp(ADMIN_PHONE, alertMsg);
-              } catch (e) {
-                log(`Aviso admin: ${e.message}`);
-              }
-
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 3: Filtro de resposta automática de consultório / auto-reply (Fase 2 - S4)
-            if (isAutoReplyBot(combinedText, recipient)) {
-              log(`🤖 [ANTI-ROBÔ] Mensagem automática identificada de ${senderName} (${recipient}). Silenciando IA para evitar loop infinito.`);
-              continue;
-            }
-
-            // 🛑 VERIFICAÇÃO 3.1: Limite duro de 2 mensagens da Brisa seguidas sem resposta humana
-            const recentHistory = (getContactMemory(recipient)?.messages || []).map(m => ({ fromMe: m.role === 'brisa' }));
-            const limitCheck = checkConsecutiveBrisaLimit(recentHistory);
-            if (!limitCheck.allowed) {
-              log(`🛑 [LIMITE 2 MSGS BRISA] Contato ${senderName} (${recipient}) já recebeu ${limitCheck.count} mensagens seguidas da Brisa sem resposta de pessoa. Silenciando IA.`);
-              continue;
-            }
-
-            // Processamento de mídias/documentos anexados no lote (SEMPRE tratados como KYC, NUNCA pagamento)
-            const docMsgs = newInbounds.filter(m => 
-              Boolean(m.message?.documentMessage || m.message?.imageMessage || m.message?.documentWithCaptionMessage)
-            );
-
-            if (docMsgs.length > 0) {
-              log(`📄 Lote contém ${docMsgs.length} documento(s) anexado(s) de ${senderName} (${recipient}). Processando...`);
-              for (const docMsg of docMsgs) {
-                await ingestIncomingDoc(docMsg, recipient, senderName);
-              }
-
-              const cleanName = sanitizeDoctorName(senderName);
-              // Responde UMA ÚNICA VEZ confirmando o recebimento do lote com o Checklist Oficial de 4 Documentos e prazo oficial
-              const docReply = buildKycChecklistReply(cleanName, ['crm']);
-              await sendWhatsApp(recipient, docReply);
-              lastRepliedAt.set(recipient, Date.now());
-              continue;
-            }
-
-
-            // ⏳ CONTROLE DE COOLDOWN: Mínimo 60 segundos entre respostas ao mesmo contato
-            const lastTime = lastRepliedAt.get(recipient) || 0;
-            const elapsed = Date.now() - lastTime;
-            if (elapsed < 60000) {
-              log(`⏳ Contato ${senderName} (${recipient}) recebeu resposta há ${Math.round(elapsed/1000)}s. Aguardando cooldown para não gerar mensagens duplicadas.`);
-              continue;
-            }
-
-            // 🎙️ SE FOR ÁUDIO: TRANSCREVER COM ELEVENLABS STT (OUVIDOS DA BRISA) E RESPONDER
-            // 🎙️ SE FOR ÁUDIO: Responde imediatamente a regra oficial 5
-            const audioMsgs = newInbounds.filter(m => Boolean(m.message?.audioMessage || m.message?.pttMessage));
-            if (audioMsgs.length > 0) {
-              log(`🎙️ [ÁUDIO RECEBIDO] Áudio recebido de ${senderName} (${recipient}). Enviando aviso oficial de texto.`);
-              const reply = "Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?";
-              await sendWhatsApp(recipient, reply);
-              lastRepliedAt.set(recipient, Date.now());
-              continue;
-            }
-
-            // 📞 SE FOR LIGAÇÃO (CHAMADA PERDIDA OU REJEITADA): Regra oficial 6
-            const callMsgs = newInbounds.filter(m => Boolean(m.messageStubType === 40 || m.messageStubType === 41 || m.message?.call));
-            if (callMsgs.length > 0) {
-              log(`📞 [LIGAÇÃO RECEBIDA] Tentativa de chamada de ${senderName} (${recipient}). Enviando aviso oficial.`);
-              const reply = "Por aqui não atendemos ligações. Pode escrever sua dúvida?";
-              await sendWhatsApp(recipient, reply);
-              lastRepliedAt.set(recipient, Date.now());
-              continue;
-            }
-
-            // 💬 SE FOR TEXTO: PROCESSAMENTO COGNITIVO COM MEMÓRIA E ANTI-REPETIÇÃO
-            if (combinedText.trim().length > 0) {
-              const cleanSenderName = sanitizeDoctorName(senderName);
-              const audience = classifyAudience(recipient, cleanSenderName, combinedText);
-              log(`🎯 Público classificado para ${cleanSenderName} (${recipient}): [${audience.role.toUpperCase()}]`);
-
-              addMessageToMemory(recipient, 'user', combinedText, audience.role);
-
-              let reply = await askBrisaGemini(combinedText, audience.name || cleanSenderName, audience, recipient);
-              if (!reply) {
-                log(`ℹ️ Nenhuma resposta gerada para ${recipient}.`);
+              // 🛑 VERIFICAÇÃO 1: Opt-Out / LGPD ("0", "pare", "sair", etc.)
+              if (checkOptOutSecurity(combinedText)) {
+                registerOptOut(recipient, combinedText);
+                registerOptOut(canonical, combinedText);
+                log(`🛑 [OPT-OUT LGPD] Contato ${senderName} (${canonical}) solicitou descadastro total.`);
+                await sendWhatsApp(recipient, `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`);
                 continue;
               }
 
-              // 🛡️ ANTI-REPETIÇÃO (Fase 2 - S5): Compara com as últimas respostas enviadas
-              if (checkSemanticRepetition(reply, recipient)) {
-                log(`🛡️ [ANTI-REPETIÇÃO] A resposta proposta já foi enviada recentemente para ${recipient}. Silenciando envio repetido.`);
+              // 🚨 VERIFICAÇÃO 2: Solicitação de Atendente Humano OU Emojis de Raiva / Reclamação
+              if (isAngryOrDemandsHuman(combinedText) || isHumanRequested(combinedText) || isPauseRequested(combinedText)) {
+                humanLocked.add(recipient);
+                humanLocked.add(canonical);
+                saveHumanLocked(humanLocked);
+                registerHumanTakeover(jid, true, false);
+                registerHumanTakeover(canonical, true, false);
+                log(`🚨 [HUMANO SOLICITADO / RECLAMAÇÃO] Contato ${senderName} (${canonical}) pediu humano ou expressou insatisfação. Silenciando IA por 24h.`);
+
+                const humanHandoffMsg = "Vou passar para nossa equipe e retornamos por aqui.";
+                if (!hasRecentlySent(canonical, humanHandoffMsg)) {
+                  await sendWhatsApp(recipient, humanHandoffMsg);
+                  lastRepliedAt.set(canonical, Date.now());
+                  lastRepliedAt.set(recipient, Date.now());
+                }
+
+                try {
+                  const alertMsg = `🚨 *[ALERTA: ATENDIMENTO HUMANO REQUISITADO]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A IA Enfª Brisa foi pausada por 24h para esta conversa.`;
+                  await sendWhatsApp(ADMIN_PHONE, alertMsg);
+                } catch (e) {}
+
                 continue;
               }
-              
-              // Se tiver ElevenLabs configurado e a resposta for concisa (< 250 chars), envia áudio, senão texto
-              const audioBase64 = await textToSpeechElevenLabs(reply);
-              if (audioBase64 && reply.length < 250) {
-                await sendWhatsAppAudio(recipient, audioBase64);
-              } else {
+
+              // 🛑 VERIFICAÇÃO 3: Filtro de resposta automática de consultório
+              if (isAutoReplyBot(combinedText, recipient)) {
+                log(`🤖 [ANTI-ROBÔ] Mensagem automática identificada de ${senderName} (${canonical}). Silenciando IA.`);
+                continue;
+              }
+
+              // 🛑 VERIFICAÇÃO 4: Checa se IA está pausada ou se equipe humana assumiu
+              const pauseCheck = checkAiPause(jid);
+              if (pauseCheck.paused || humanLocked.has(recipient) || humanLocked.has(canonical)) {
+                log(`🛑 [IA SILENCIADA] Conversa com ${senderName} (${canonical}) está em modo humano ou pausada. Silenciando robô.`);
+                continue;
+              }
+
+              // 🛑 VERIFICAÇÃO 5: Limite de 2 mensagens seguidas da Brisa sem resposta do contato
+              const recentHistory = (getContactMemory(recipient)?.messages || []).map(m => ({ fromMe: m.role === 'brisa' }));
+              const limitCheck = checkConsecutiveBrisaLimit(recentHistory);
+              if (!limitCheck.allowed) {
+                log(`🛑 [LIMITE 2 MSGS] Contato ${senderName} (${canonical}) já recebeu ${limitCheck.count} msgs seguidas sem retorno. Silenciando.`);
+                continue;
+              }
+
+              // 📄 Processamento de documentos/mídias KYC de médicos
+              const docMsgs = newInbounds.filter(m => 
+                Boolean(m.message?.documentMessage || m.message?.imageMessage || m.message?.documentWithCaptionMessage)
+              );
+              if (docMsgs.length > 0) {
+                log(`📄 Lote contém ${docMsgs.length} documento(s) anexado(s) de ${senderName} (${canonical}).`);
+                for (const docMsg of docMsgs) {
+                  await ingestIncomingDoc(docMsg, recipient, senderName);
+                }
+                const cleanName = sanitizeDoctorName(senderName);
+                const docReply = buildKycChecklistReply(cleanName, ['crm']);
+                if (!hasRecentlySent(canonical, docReply)) {
+                  await sendWhatsApp(recipient, docReply);
+                  lastRepliedAt.set(canonical, Date.now());
+                  lastRepliedAt.set(recipient, Date.now());
+                }
+                continue;
+              }
+
+              // 🎙️ SE FOR ÁUDIO (sem texto transcrito): Regra oficial 5
+              const audioMsgs = newInbounds.filter(m => Boolean(m.message?.audioMessage || m.message?.pttMessage));
+              if (audioMsgs.length > 0 && !combinedText.trim()) {
+                log(`🎙️ [ÁUDIO RECEBIDO] Áudio recebido de ${senderName} (${canonical}). Enviando aviso oficial.`);
+                const audioReply = "Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?";
+                if (!hasRecentlySent(canonical, audioReply)) {
+                  await sendWhatsApp(recipient, audioReply);
+                  lastRepliedAt.set(canonical, Date.now());
+                  lastRepliedAt.set(recipient, Date.now());
+                }
+                continue;
+              }
+
+              // 📞 SE FOR LIGAÇÃO (CHAMADA PERDIDA OU REJEITADA): Regra oficial 6
+              const callMsgs = newInbounds.filter(m => Boolean(m.messageStubType === 40 || m.messageStubType === 41 || m.message?.call));
+              if (callMsgs.length > 0 && !combinedText.trim()) {
+                log(`📞 [LIGAÇÃO RECEBIDA] Tentativa de chamada de ${senderName} (${canonical}). Enviando aviso oficial.`);
+                const callReply = "Por aqui não atendemos ligações. Pode escrever sua dúvida?";
+                if (!hasRecentlySent(canonical, callReply)) {
+                  await sendWhatsApp(recipient, callReply);
+                  lastRepliedAt.set(canonical, Date.now());
+                  lastRepliedAt.set(recipient, Date.now());
+                }
+                continue;
+              }
+
+              // ⏳ CONTROLE DE COOLDOWN: Mínimo 20 segundos entre respostas para o mesmo contato
+              const lastTime = Math.max(lastRepliedAt.get(canonical) || 0, lastRepliedAt.get(recipient) || 0);
+              const elapsed = Date.now() - lastTime;
+              if (elapsed < 20000) {
+                log(`⏳ Contato ${senderName} (${canonical}) recebeu resposta há ${Math.round(elapsed/1000)}s. Aguardando cooldown para não gerar mensagens duplicadas.`);
+                continue;
+              }
+
+              // 💬 SE FOR TEXTO: PROCESSAMENTO COGNITIVO COM MEMÓRIA E ANTI-REPETIÇÃO
+              if (combinedText.trim().length > 0) {
+                const cleanSenderName = sanitizePatientName(senderName) || sanitizeDoctorName(senderName);
+                const audience = classifyAudience(recipient, cleanSenderName, combinedText);
+                log(`🎯 Público classificado para ${cleanSenderName} (${canonical}): [${audience.role.toUpperCase()}]`);
+
+                addMessageToMemory(recipient, 'user', combinedText, audience.role);
+                if (canonical !== recipient) addMessageToMemory(canonical, 'user', combinedText, audience.role);
+
+                let reply = await askBrisaGemini(combinedText, audience.name || cleanSenderName, audience, recipient);
+                if (!reply) {
+                  log(`ℹ️ Nenhuma resposta gerada para ${canonical}.`);
+                  continue;
+                }
+
+                // 🛡️ ANTI-REPETIÇÃO RÍGIDA 24H: Bloqueia envio se >= 80% similar a resposta recente
+                if (hasRecentlySent(canonical, reply)) {
+                  log(`🛡️ [ANTI-REPETIÇÃO 24H] Mensagem idêntica ou similar já enviada para ${canonical} em menos de 24h. Silenciando envio repetido.`);
+                  continue;
+                }
+
                 await sendWhatsApp(recipient, reply);
+                lastRepliedAt.set(canonical, Date.now());
+                lastRepliedAt.set(recipient, Date.now());
               }
-              lastRepliedAt.set(recipient, Date.now());
             }
+          } catch (chatErr) {
+            log(`Erro ao processar conversa ${canonical}: ${chatErr.message}`);
+          } finally {
+            inFlightChats.delete(canonical);
           }
         }
       }

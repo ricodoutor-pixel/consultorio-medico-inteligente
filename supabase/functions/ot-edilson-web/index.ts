@@ -137,6 +137,30 @@ Deno.serve(async (req) => {
       if (typeof body.external_reference === "string") query = query.eq("external_reference", body.external_reference);
       const { data: order } = await query.maybeSingle();
       if (!order) return json({ state: "none" });
+      if (order.status === "pending" && order.mp_payment_id) {
+        // Reconciliação: consulta o Mercado Pago diretamente caso o webhook não tenha chegado.
+        const token = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+        if (token) {
+          try {
+            const r = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(order.mp_payment_id)}`, { headers: { Authorization: `Bearer ${token}` } });
+            if (r.ok) {
+              const p = await r.json();
+              const amt = Number(p.transaction_amount);
+              const refOk = !p.external_reference || p.external_reference === order.external_reference;
+              if (p.status === "approved" && amt === 30 && refOk) {
+                const { data: upd } = await sb.from("orientacao_tecnica_orders")
+                  .update({ status: "approved", paid_at: p.date_approved || new Date().toISOString(), flow_status: order.flow_status === "aguardando_pagamento" ? "pago" : order.flow_status })
+                  .eq("id", order.id).eq("status", "pending").select("id");
+                console.log(`[ot-reconcile] pedido ${order.id} aprovado via consulta MP (${upd?.length ?? 0})`);
+                order.status = "approved";
+              } else if (p.status === "rejected" || p.status === "cancelled") {
+                await sb.from("orientacao_tecnica_orders").update({ status: p.status === "rejected" ? "rejected" : "cancelled" }).eq("id", order.id).eq("status", "pending");
+                order.status = p.status;
+              }
+            }
+          } catch (e) { console.error("[ot-reconcile] falha", (e as Error).message); }
+        }
+      }
       if (order.status === "pending") return json({ state: "awaiting_payment", order });
       if (order.status === "approved") return json({ state: "triage", order });
       return json({ state: "none", order });

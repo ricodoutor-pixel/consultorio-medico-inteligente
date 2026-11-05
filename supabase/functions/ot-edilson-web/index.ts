@@ -153,8 +153,8 @@ Deno.serve(async (req) => {
                   .eq("id", order.id).eq("status", "pending").select("id");
                 console.log(`[ot-reconcile] pedido ${order.id} aprovado via consulta MP (${upd?.length ?? 0})`);
                 order.status = "approved";
-              } else if (p.status === "rejected" || p.status === "cancelled") {
-                await sb.from("orientacao_tecnica_orders").update({ status: p.status === "rejected" ? "rejected" : "cancelled" }).eq("id", order.id).eq("status", "pending");
+              } else if (p.status === "rejected") {
+                await sb.from("orientacao_tecnica_orders").update({ status: "rejected" }).eq("id", order.id).eq("status", "pending");
                 order.status = p.status;
               }
             }

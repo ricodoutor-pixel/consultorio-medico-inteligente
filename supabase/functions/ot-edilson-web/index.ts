@@ -94,7 +94,10 @@ Deno.serve(async (req) => {
       if (!Object.keys(triage).length && order?.ai_analysis) {
         try { triage = JSON.parse(order.ai_analysis); } catch { /* legacy */ }
       }
-      if (!order || !canEnterOrientation(order, triage)) return null;
+      // Sala já existente foi aberta por um gate anterior: não revalidar o formato
+      // de respostas antigas (ex.: "45 anos"); exigir apenas pagamento aprovado e ausência de emergência.
+      const paid = ["approved", "completed", "dispatched"].includes(order?.status ?? "");
+      if (!order || !paid || hasEmergency(triage as Record<string, unknown>)) return null;
 
       // Se passou da validade e ainda está com status 'active', marca como expired
       if (row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() <= Date.now()) {

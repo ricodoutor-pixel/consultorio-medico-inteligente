@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
+  const navbarRef = useRef<HTMLElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string; fullName?: string; avatarUrl?: string } | null>(null);
   const navigate = useNavigate();
@@ -26,6 +27,22 @@ export const Navbar = () => {
   const isMobile = useIsMobile();
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
   const showNavbarMascot = !(isDenseCatalogRoute && isMobile);
+
+  useEffect(() => {
+    const navbar = navbarRef.current;
+    const container = navbar?.parentElement;
+    if (!navbar || !container) return;
+    const measureHeader = () => {
+      container.style.setProperty("--site-header-height", `${Math.ceil(navbar.getBoundingClientRect().bottom)}px`);
+    };
+    measureHeader();
+    const observer = new ResizeObserver(measureHeader);
+    observer.observe(navbar);
+    return () => {
+      observer.disconnect();
+      container.style.removeProperty("--site-header-height");
+    };
+  }, []);
 
   useEffect(() => {
     setIsOpen(false);
@@ -147,6 +164,7 @@ export const Navbar = () => {
   return (
     <>
       <nav
+        ref={navbarRef}
         className={isDenseCatalogRoute
           ? "fixed top-0 left-0 right-0 border-b border-border z-50 will-change-transform sticky-header bg-background/95"
           : "fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform sticky-header"
@@ -185,14 +203,14 @@ export const Navbar = () => {
                 )}
               </div>
             {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
-            <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center min-w-[80px]`}>
+            <div className={`hidden ${showNavbarMascot ? "2xl:flex" : ""} flex-1 items-center justify-center min-w-[80px]`}>
               <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
                 <FrogMascot size={64} mood="happy" onClick={openChat} enableJumpToNav={true} compact={true} />
               </div>
             </div>
 
-            {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3 justify-end flex-shrink-0">
+            {/* Full navigation only when the complete row fits. */}
+            <div className="hidden 2xl:flex items-center gap-2 xl:gap-3 justify-end flex-shrink-0">
               <div className="flex items-center gap-1 xl:gap-2" role="menubar">
                 {primaryLinks.map((link) => (
                   <NavLink
@@ -256,8 +274,8 @@ export const Navbar = () => {
               </div>
             </div>
 
-            {/* Mobile Actions (até lg) */}
-            <div className="lg:hidden flex items-center gap-2">
+            {/* Compact navigation for phones, tablets and narrower desktops. */}
+            <div className="2xl:hidden flex items-center gap-2">
                <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse shadow-lg shadow-secondary/40" asChild>
                 <NavLink to="/telemedicina">CONSULTA</NavLink>
               </Button>
@@ -275,7 +293,7 @@ export const Navbar = () => {
 
       {/* MOBILE MENU OVERLAY - Embutido e Padronizado */}
       <div 
-        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl lg:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl 2xl:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
           isOpen ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"
         }`}
       >

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Sobreposição da página inicial — 05/11/2026
+- [x] Corrigir distância do título usando a altura completa do cabeçalho e da faixa superior
+- [ ] Verificar título, menu e ausência de cortes em celulares, tablets e computadores
+
 ## Pix Orientação Técnica — 04/11/2026
 - [x] Conferir ordem nos demais serviços; corrigido sucesso do agendamento por falha de checkout, com testes
 - [ ] Validar benefícios pagos e entrega Shopping com conta real e pagamento — bloqueado por sessão de teste indisponível

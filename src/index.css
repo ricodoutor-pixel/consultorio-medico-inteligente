@@ -129,6 +129,11 @@ h4 { font-size: clamp(0.95rem, 2vw + 0.25rem, 1.25rem); }
 p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
 
 /* Standardized section spacing */
+.home-hero {
+  /* Include the full promo banner and navigation, even when their height changes. */
+  padding-top: calc(var(--site-header-height, 8.5rem) + 1rem + env(safe-area-inset-top, 0px));
+}
+
 .section-padding {
   padding-top: clamp(3rem, 6vw, 8rem);
   padding-bottom: clamp(3rem, 6vw, 8rem);

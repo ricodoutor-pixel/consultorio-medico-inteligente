@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- The fixed Navbar publishes its measured occupied height to its page wrapper; the homepage uses that value for content clearance so promo-banner changes cannot cover its heading.
+
 - Brisa deterministic response safety is shared between chat-brisa and the Hostinger responder; outbound dedup checks are read-only and successful sends alone enter the 24-hour history, preventing a pre-check from blocking its own send.
 - The Hostinger responder is a single serial worker guarded by a local process lock; its shared response policy must accompany deployments, and human-request pauses remain until explicit operator release.
 

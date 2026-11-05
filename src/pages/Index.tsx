@@ -135,7 +135,7 @@ const Index = () => {
 
 
       {/* Hero Section - Otimizado para Mobile/Desktop */}
-      <section className="hero-glow min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-[calc(5.5rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32 lg:pt-36 pb-12 md:pb-24">
+      <section className="home-hero hero-glow min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pb-12 md:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-14 items-start">
             

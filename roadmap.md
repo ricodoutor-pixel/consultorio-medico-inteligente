@@ -2,7 +2,7 @@
 
 ## Sobreposição da página inicial — 05/11/2026
 - [x] Corrigir distância do título usando a altura completa do cabeçalho e da faixa superior
-- [ ] Verificar título, menu e ausência de cortes em celulares, tablets e computadores
+- [x] Verificar título e ausência de cortes em oito larguras (320–1920px); menu abre e fecha, sem erros de execução
 
 ## Pix Orientação Técnica — 04/11/2026
 - [x] Conferir ordem nos demais serviços; corrigido sucesso do agendamento por falha de checkout, com testes

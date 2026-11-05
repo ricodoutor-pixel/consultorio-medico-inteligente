@@ -228,6 +228,7 @@ export default function OrientacaoTecnicaAgente() {
     return st;
   }, []);
 
+  const startRoomRef = useRef<(() => Promise<void>) | null>(null);
   const fetchStatus = useCallback(async () => {
     const d = await callFn<{ state?: OtState; session?: OtSession | null; minutesLeft?: number; order?: { external_reference: string; triagem?: Record<string, string>; qr_code?: string; qr_code_base64?: string; mp_payment_id?: string } }>({ action: "status" });
     const st = applyStatus(d);
@@ -256,7 +257,7 @@ export default function OrientacaoTecnicaAgente() {
 
   useEffect(() => {
     if (phase !== "awaiting" || !authed) return;
-    return setVisibleInterval(() => void fetchStatus().catch(() => undefined), 5000);
+    return setVisibleInterval(() => void fetchStatus().catch(() => undefined), 3000);
   }, [phase, authed, fetchStatus]);
 
   // ── Mensagens e relatórios da sala ─────────────────────────────────────
@@ -339,8 +340,20 @@ export default function OrientacaoTecnicaAgente() {
       setAnswers(response.triagem);
       setDraft("");
       if (response.state === "emergency") setPhase("emergency");
-      else if (response.state === "ready") await fetchStatus();
+      else if (response.state === "ready") {
+        const st = await fetchStatus();
+        if (st === "ready") await startRoomRef.current?.();
+      }
       else if (step < QUESTIONS.length - 1) setStep(step + 1);
+      else {
+        // Última pergunta respondida mas alguma anterior ficou vazia/inválida: leva até ela em vez de travar.
+        const bad = invalidTriageFields(response.triagem || {});
+        const idx = QUESTIONS.findIndex(item => bad.includes(item.id));
+        if (idx >= 0) {
+          setStep(idx);
+          toast({ title: "Falta revisar uma resposta", description: "Complete esta pergunta para liberar sua Orientação." });
+        } else await fetchStatus();
+      }
     } catch {
       toast({ title: "Não foi possível salvar a resposta", description: "Sua pergunta permanece aqui. Tente novamente.", variant: "destructive" });
     } finally { setSavingAnswer(false); }
@@ -417,6 +430,7 @@ export default function OrientacaoTecnicaAgente() {
       setStarting(false);
     }
   };
+  startRoomRef.current = startRoom;
 
   // ── Anexos (PDF/imagem → bucket privado ot-attachments) ────────────────
   const onPickFile = async (file: File | undefined) => {

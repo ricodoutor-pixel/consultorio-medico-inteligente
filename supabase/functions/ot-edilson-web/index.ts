@@ -162,7 +162,23 @@ Deno.serve(async (req) => {
         }
       }
       if (order.status === "pending") return json({ state: "awaiting_payment", order });
-      if (order.status === "approved") return json({ state: "triage", order });
+      if (order.status === "approved") {
+        // Auto-cura: triagem já completa e sem emergência, mas a sala não foi criada.
+        const tri = (order.triagem || {}) as Record<string, unknown>;
+        if (invalidTriageFields(tri).length === 0 && !hasEmergency(tri)) {
+          const { data: ex } = await sb.from("ot_web_sessions").select("id").eq("external_reference", order.external_reference).maybeSingle();
+          if (!ex) {
+            await sb.from("ot_web_sessions").upsert({
+              user_id: uid, external_reference: order.external_reference, mp_payment_id: order.mp_payment_id,
+              triage: tri, status: "ready", messages_count: 0,
+            }, { onConflict: "external_reference", ignoreDuplicates: true });
+            await sb.from("orientacao_tecnica_orders").update({ flow_status: "sala_liberada" }).eq("id", order.id);
+          }
+          const s2 = await loadUserSession();
+          if (s2) return json({ state: s2.status, session: s2, minutesLeft: Math.max(0, Math.ceil(secondsLeft(s2) / 60)), secondsLeft: secondsLeft(s2) });
+        }
+        return json({ state: "triage", order });
+      }
       return json({ state: "none", order });
     }
 
@@ -177,7 +193,8 @@ Deno.serve(async (req) => {
         .eq("external_reference", body.external_reference).eq("user_id", uid).maybeSingle();
       if (!order || order.status !== "approved") return json({ error: "payment_not_approved" }, 403);
       const { data: existingSession } = await sb.from("ot_web_sessions").select("id").eq("external_reference", order.external_reference).maybeSingle();
-      if (existingSession) return json({ error: "triage_locked" }, 409);
+      // Sala já criada: não trava o paciente, apenas devolve para a sala.
+      if (existingSession) return json({ state: "ready", triagem: order.triagem || {} });
       const triagem = { ...(order.triagem || {}), ...answer };
       const emergency = hasEmergency(triagem);
       const complete = invalidTriageFields(triagem).length === 0;

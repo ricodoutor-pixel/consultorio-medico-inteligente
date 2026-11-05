@@ -1,9 +1,12 @@
 # Project architecture rules
 
+- Brisa deterministic response safety is shared between chat-brisa and the Hostinger responder; outbound dedup checks are read-only and successful sends alone enter the 24-hour history, preventing a pre-check from blocking its own send.
+- The Hostinger responder is a single serial worker guarded by a local process lock; its shared response policy must accompany deployments, and human-request pauses remain until explicit operator release.
+
 - Agents must read `docs/ORIENTACAO_ATUAL_AGENTES.md` before operational work and treat historical audits as dated evidence, not current configuration; this prevents conflicting backend and deployment instructions.
 - The managed Lovable Cloud project is the sole operational data source; outages never authorize switching to a legacy backend or editing generated connection files, because that splits clinical and payment records.
 
-- The Orientation flow stores the completed triage before creating its Mercado Pago order, and unlocks service only from an approved webhook status; this prevents unpaid or context-free clinical sessions.
+- The Orientation flow creates a payment-first order in the existing orientation ledger, persists post-payment question progress there, and unlocks sessions only after webhook approval and valid non-emergency triage; this preserves administrative history without duplicate order stores.
 - Public medical listings maintain base professional profiles from src/data/professionals.ts as the baseline and enrich with real-time status from approved backend records, ensuring vitrine doctors never disappear during network or backend desyncs.
 - Explicitly withdrawn public professionals are filtered by the shared visibility predicate across merged listings, without deleting clinical records; this prevents backend enrichment from republishing withdrawn cards.
 - Appointment routing uses the real server-returned doctor or the selected public record, and availability uses persisted slots only; synthetic identifiers cannot satisfy appointment foreign keys.

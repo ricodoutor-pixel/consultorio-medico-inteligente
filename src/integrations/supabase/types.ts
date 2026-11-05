@@ -5430,10 +5430,12 @@ export type Database = {
           doctor_payout: number
           document_id: string | null
           external_reference: string
+          flow_status: string
           google_review_requested_at: string | null
           id: string
           mp_payment_id: string | null
           mp_preference_id: string | null
+          paid_at: string | null
           patient_email: string | null
           patient_name: string
           patient_whatsapp: string
@@ -5449,6 +5451,8 @@ export type Database = {
           stripe_session_id: string | null
           ticket_url: string | null
           topic: string
+          triage_completed_at: string | null
+          triagem: Json
           updated_at: string
           user_id: string | null
         }
@@ -5465,10 +5469,12 @@ export type Database = {
           doctor_payout?: number
           document_id?: string | null
           external_reference: string
+          flow_status?: string
           google_review_requested_at?: string | null
           id?: string
           mp_payment_id?: string | null
           mp_preference_id?: string | null
+          paid_at?: string | null
           patient_email?: string | null
           patient_name: string
           patient_whatsapp: string
@@ -5484,6 +5490,8 @@ export type Database = {
           stripe_session_id?: string | null
           ticket_url?: string | null
           topic?: string
+          triage_completed_at?: string | null
+          triagem?: Json
           updated_at?: string
           user_id?: string | null
         }
@@ -5500,10 +5508,12 @@ export type Database = {
           doctor_payout?: number
           document_id?: string | null
           external_reference?: string
+          flow_status?: string
           google_review_requested_at?: string | null
           id?: string
           mp_payment_id?: string | null
           mp_preference_id?: string | null
+          paid_at?: string | null
           patient_email?: string | null
           patient_name?: string
           patient_whatsapp?: string
@@ -5519,6 +5529,8 @@ export type Database = {
           stripe_session_id?: string | null
           ticket_url?: string | null
           topic?: string
+          triage_completed_at?: string | null
+          triagem?: Json
           updated_at?: string
           user_id?: string | null
         }

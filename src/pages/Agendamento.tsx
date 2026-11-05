@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { requireCheckoutUrl } from "@/lib/payment-checkout-result";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -113,8 +114,9 @@ const Agendamento = () => {
 
   // Modalidades disponíveis para o médico selecionado
   const modalities: ModalityOption[] = useMemo(() => {
-    const basePrice = selectedDoctor?.priceValue || 150;
-    const premiumPrice = selectedDoctor?.premiumPrice || 180;
+    // Preços oficiais cobrados pelo servidor (create-payment)
+    const basePrice = 150;
+    const premiumPrice = 180;
 
     return [
       {
@@ -258,6 +260,17 @@ const Agendamento = () => {
     setStep(4); // Avança para o Passo 4 (Confirmação)
   };
 
+  // Resolve o UUID real do médico (appointments.doctor_id referencia doctors.id)
+  const resolveDoctorDbId = async (doc: Professional): Promise<string | null> => {
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const direct = (doc as any).dbId || doc.id;
+    if (uuidRe.test(direct)) return direct;
+    const crmNum = String((doc as any).crm || "").match(/\d{3,}/)?.[0];
+    if (!crmNum) return null;
+    const { data } = await supabase.from("doctors_public").select("id, crm").ilike("crm", `%${crmNum}%`).limit(1);
+    return (data?.[0]?.id as string) || null;
+  };
+
   // Confirmação final e Checkout Mercado Pago
   const handleConfirmAndPay = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTime) return;
@@ -265,20 +278,29 @@ const Agendamento = () => {
     setBookingLoading(true);
     try {
       const { data: freshSession } = await supabase.auth.getSession();
-      const authUid = freshSession.session?.user?.id ?? userId;
+      const authUid = freshSession.session?.user?.id;
+      if (!authUid) {
+        toast({ title: "Faça login primeiro", description: "Entre na sua conta para confirmar e pagar a consulta." });
+        navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+        return;
+      }
 
       const scheduledAt = new Date(selectedDate);
       const [h, m] = selectedTime.split(":").map(Number);
       scheduledAt.setHours(h, m, 0, 0);
 
-      const docId = selectedDoctor.dbId || selectedDoctor.id;
+      const docId = await resolveDoctorDbId(selectedDoctor);
+      if (!docId) {
+        toast({ title: "Agenda indisponível", description: "Este profissional ainda não tem agenda online ativa. Escolha outro médico ou fale com a Enfª Brisa.", variant: "destructive" });
+        return;
+      }
       const consultationPrice = currentModalityObj.price;
 
       // 1. Cria agendamento oficial
       const { data: newAppt, error: apptError } = await supabase
         .from("appointments")
         .insert({
-          patient_id: authUid || "00000000-0000-0000-0000-000000000000",
+          patient_id: authUid,
           doctor_id: docId,
           scheduled_at: scheduledAt.toISOString(),
           type: selectedModality,
@@ -301,7 +323,7 @@ const Agendamento = () => {
         await supabase.from("video_rooms").insert({
           consultation_id: newAppt.id,
           doctor_id: docId,
-          patient_id: authUid || "00000000-0000-0000-0000-000000000000",
+          patient_id: authUid,
           room_name: roomName,
           status: "scheduled"
         });
@@ -320,7 +342,7 @@ const Agendamento = () => {
 
       // 4. Cria preferência de pagamento Mercado Pago
       try {
-        const { data: paymentData } = await supabase.functions.invoke("create-payment", {
+        const { data: paymentData, error: paymentError } = await supabase.functions.invoke("create-payment", {
           body: {
             appointmentId: newAppt.id,
             doctorName: selectedDoctor.name,
@@ -330,19 +352,19 @@ const Agendamento = () => {
           },
         });
 
-        if (paymentData?.init_point) {
+        const checkoutUrl = requireCheckoutUrl(paymentData, paymentError);
+        if (checkoutUrl) {
           toast({
             title: "Redirecionando para o pagamento seguro...",
             description: "Você será direcionado ao Mercado Pago (PIX ou Cartão).",
           });
-          window.location.href = paymentData.init_point;
+          window.location.href = checkoutUrl;
           return;
         }
       } catch (payErr) {
-        console.warn("[Agendamento] Pagamento online pendente, liberando tela de confirmação:", payErr);
+        throw payErr;
       }
 
-      setStep(5); // Sucesso
     } catch (err: any) {
       toast({
         title: "Erro ao agendar consulta",

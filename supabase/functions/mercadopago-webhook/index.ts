@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { canEnterOrientation } from "../_shared/orientation-triage.ts";
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {
@@ -572,7 +573,7 @@ Deno.serve(async (req) => {
       const platformFee = round2(totalAmount * 0.07);
       const doctorPayout = round2(totalAmount - platformFee);
       // Preço autoritativo da Orientação Técnica: R$ 30. Valor menor nunca libera a sala.
-      const amountOk = Number(totalAmount) >= 30;
+      const amountOk = Number(totalAmount) === 30;
       const approvedOk = payment.status === "approved" && amountOk;
       if (payment.status === "approved" && !amountOk) {
         console.error(`[orientacao-tecnica] valor inválido R$ ${totalAmount} para ${externalRef} — sala NÃO liberada`);
@@ -584,7 +585,7 @@ Deno.serve(async (req) => {
           : payment.status === "rejected" ? "rejected" : "pending";
       const { data: existingOrder } = await supabase
         .from("orientacao_tecnica_orders")
-        .select("id, user_id, ai_analysis, patient_name")
+        .select("id, user_id, ai_analysis, patient_name, triagem, flow_status, paid_at")
         .eq("external_reference", externalRef)
         .maybeSingle();
       const refUserId = externalRef.includes(":") ? externalRef.split(":")[1] : null;
@@ -596,6 +597,7 @@ Deno.serve(async (req) => {
       const { data: updatedOrders } = await supabase
         .from("orientacao_tecnica_orders")
         .update({
+          ...(approvedOk ? { paid_at: existingOrder?.paid_at || new Date().toISOString(), flow_status: existingOrder?.flow_status === "aguardando_pagamento" ? "pago" : (existingOrder?.flow_status || "pago") } : {}),
           status: orderStatus,
           mp_payment_id: String(payment.id),
           amount: totalAmount,
@@ -657,11 +659,11 @@ Deno.serve(async (req) => {
         updated_at: new Date().toISOString(),
       }, { onConflict: "payment_id" });
 
-      if (payment.status === "approved") {
+      if (approvedOk) {
         // 4. Libera a sessão da Orientação Técnica no banco com status 'ready' (AGENTS.md)
-        if (orientacaoUserId) {
-          let triageObj: Record<string, unknown> = {};
-          if ((existingOrder as any)?.ai_analysis) {
+        if (orientacaoUserId && existingOrder?.flow_status !== "aguardando_pagamento" && canEnterOrientation({ status: orderStatus }, existingOrder?.triagem || {})) {
+          let triageObj: Record<string, unknown> = existingOrder?.triagem || {};
+          if (!Object.keys(triageObj).length && (existingOrder as any)?.ai_analysis) {
             try { triageObj = JSON.parse((existingOrder as any).ai_analysis); } catch { /* ignore */ }
           }
           await supabase.from("ot_web_sessions").upsert({

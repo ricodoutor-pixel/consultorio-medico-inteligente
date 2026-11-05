@@ -1,5 +1,20 @@
 # Roadmap
 
+## Pix Orientação Técnica — 04/11/2026
+- [x] Conferir ordem nos demais serviços; corrigido sucesso do agendamento por falha de checkout, com testes
+- [ ] Validar benefícios pagos e entrega Shopping com conta real e pagamento — bloqueado por sessão de teste indisponível
+- [x] Diagnosticar validação e erro de gravação do Pix de R$30 — WhatsApp obrigatório recusava pedidos sem número
+- [x] Implementar pagamento primeiro, autorizado pelo usuário; triagem persistida após aprovação e sala protegida
+- [ ] Testar geração de Pix com conta real — bloqueado: não há conta de teste identificada na prévia
+- [ ] Pagar, concluir 10 perguntas, entrar na sala e aprovar relatório — depende de pagamento e revisão humana
+
+## Auditoria WhatsApp Brisa — 03/11/2026
+- [ ] Atualização da VPS solicitada às 05:18 UTC — acesso rechecado: porta SSH acessível, chave armazenada não carregável pelo cliente SSH e API Hostinger retorna 403; nenhum arquivo ou serviço remoto alterado. Requer correção do acesso no cofre seguro.
+- [x] Conferir regras implantadas e registros disponíveis sem divulgar dados pessoais
+- [x] Corrigir regras centrais e preparar proteção de envio, mídia e encaminhamento humano na VPS
+- [x] Testar oito regras e chamadas reais no Cloud; registrar limites em docs/AUDITORIA_BRISA_2026-11-03.md
+- [ ] Atualizar e validar envio real no WhatsApp Hostinger — bloqueado pelo acesso administrativo à VPS; proteção distribuída e recuperação transacional não comprovadas
+
 ## Card do Dr. Amir sem foto — 27/10/2026
 
 - [x] Criar card vinculado ao cadastro real e comprovante CFM, sem alterar aprovação KYC ou presença online

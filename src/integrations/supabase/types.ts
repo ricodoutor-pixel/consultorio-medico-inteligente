@@ -5716,13 +5716,16 @@ export type Database = {
         Row: {
           closed_at: string | null
           created_at: string
-          expires_at: string
+          expires_at: string | null
           external_reference: string
           id: string
           last_message_at: string | null
           messages_count: number
           mp_payment_id: string | null
-          started_at: string
+          paused: boolean
+          paused_at: string | null
+          paused_by: string | null
+          started_at: string | null
           status: string
           triage: Json
           user_id: string
@@ -5730,13 +5733,16 @@ export type Database = {
         Insert: {
           closed_at?: string | null
           created_at?: string
-          expires_at: string
+          expires_at?: string | null
           external_reference: string
           id?: string
           last_message_at?: string | null
           messages_count?: number
           mp_payment_id?: string | null
-          started_at?: string
+          paused?: boolean
+          paused_at?: string | null
+          paused_by?: string | null
+          started_at?: string | null
           status?: string
           triage?: Json
           user_id: string
@@ -5744,13 +5750,16 @@ export type Database = {
         Update: {
           closed_at?: string | null
           created_at?: string
-          expires_at?: string
+          expires_at?: string | null
           external_reference?: string
           id?: string
           last_message_at?: string | null
           messages_count?: number
           mp_payment_id?: string | null
-          started_at?: string
+          paused?: boolean
+          paused_at?: string | null
+          paused_by?: string | null
+          started_at?: string | null
           status?: string
           triage?: Json
           user_id?: string

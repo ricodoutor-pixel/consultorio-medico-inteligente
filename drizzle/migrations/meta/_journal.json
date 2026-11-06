@@ -36,6 +36,13 @@
       "when": 1793775453671,
       "tag": "0004_orientation_payment_first_progress",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793982629094,
+      "tag": "0005_fix_ot_web_sessions_nullable_and_pause_columns",
+      "breakpoints": true
     }
   ]
 }

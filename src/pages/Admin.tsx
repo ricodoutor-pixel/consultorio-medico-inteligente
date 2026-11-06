@@ -1,3 +1,4 @@
+import { useAccount } from "@/contexts/AccountContext";
 import { setVisibleInterval } from "@/lib/visible-interval";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -103,6 +104,7 @@ const PIE_COLORS = ["hsl(142,76%,36%)", "hsl(45,76%,52%)", "hsl(199,89%,48%)", "
 
 // ---------- Component ----------
 const Admin = () => {
+  const { logout } = useAccount();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData>(EMPTY);
   const [loading, setLoading] = useState(true);
@@ -408,7 +410,7 @@ const Admin = () => {
               <Button onClick={() => setChatOpen(!chatOpen)} className="bg-primary text-primary-foreground font-bold rounded-xl">
                 <Bot size={16} className="mr-1.5" /> Manus CEO
               </Button>
-              <Button variant="outline" size="sm" className="rounded-xl text-destructive border-destructive/30" onClick={async () => { await supabase.auth.signOut(); navigate("/admin-login"); }}>
+              <Button variant="outline" size="sm" className="rounded-xl text-destructive border-destructive/30" onClick={() => void logout()}>
                 <LogOut size={14} />
               </Button>
             </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { isMasterAdminEmail } from "@/lib/admin-auth";
+import { useAccount } from "@/contexts/AccountContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -16,30 +16,12 @@ import {
 } from "lucide-react";
 
 export function MasterPortalSwitcher() {
-  const [isMaster, setIsMaster] = useState(false);
+  const { isAdmin, user } = useAccount();
   const [minimized, setMinimized] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user && isMasterAdminEmail(user.email)) {
-        setIsMaster(true);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user && isMasterAdminEmail(session.user.email)) {
-        setIsMaster(true);
-      } else {
-        setIsMaster(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (!isMaster) return null;
+  if (import.meta.env.PROD || !user || !isAdmin || !location.pathname.startsWith("/admin")) return null;
 
   const currentPath = location.pathname;
   if (currentPath === "/orientacao-tecnica") return null;

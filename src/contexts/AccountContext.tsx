@@ -30,7 +30,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let alive = true; let generation = 0;
-    const refresh = async () => {
+    const refresh = async (auditLogin = false) => {
       const current = ++generation;
       const { data: { user: verified } } = await supabase.auth.getUser();
       if (!alive || current !== generation) return;
@@ -43,12 +43,16 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       if (!alive || current !== generation) return;
       setIsAdmin(admin); setFullName(profile.data?.full_name || verified.email?.split("@")[0] || "Minha conta");
       setAvatarUrl(profile.data?.avatar_url || undefined); setLoading(false);
+      if (admin && auditLogin) {
+        const { error } = await supabase.from("audit_log").insert({ user_id: verified.id, record_id: verified.id, table_name: "auth_sessions", action: "admin_login", new_data: { device: navigator.userAgent, logged_in_at: new Date().toISOString() } });
+        if (error) toast.warning("Não foi possível registrar a entrada na auditoria.");
+      }
     };
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         generation++; setUser(null); setIsAdmin(false); setFullName(""); setAvatarUrl(undefined); setWarning(false); setLoading(false);
         void queryClient.cancelQueries(); queryClient.clear();
-      } else { window.setTimeout(() => { if (alive) void refresh(); }, 0); }
+      } else { window.setTimeout(() => { if (alive) void refresh(event === "SIGNED_IN"); }, 0); }
     });
     void refresh();
     const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) void refresh(); };

@@ -328,7 +328,17 @@ export default function OrientacaoTecnicaAgente() {
   const q = QUESTIONS[step];
 
   const saveAnswer = async (value: string) => {
-    if (savingAnswer || !orderRef) return;
+    if (savingAnswer) return;
+    if (!orderRef) {
+      // Sem pedido pago vinculado, a resposta não tem onde ser gravada: explica em vez de falhar em silêncio.
+      toast({
+        title: "Pagamento ainda não vinculado",
+        description: "Conclua o pagamento de R$ 30 para gravarmos suas respostas e liberarmos a orientação.",
+        variant: "destructive",
+      });
+      setPhase("checkout");
+      return;
+    }
     const fields = invalidTriageFields({ [q.id]: value }, false);
     if (fields.length) {
       toast({ title: "Revise sua resposta", description: q.id === "idade" ? "Informe uma idade de 0 a 120 anos." : "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });

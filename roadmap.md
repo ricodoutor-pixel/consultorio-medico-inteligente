@@ -1,5 +1,10 @@
 # Roadmap
 
+## Saída segura das contas — 06/11/2026
+- [ ] Unificar logout, menus de conta e limpeza de sessão sem apagar registros
+- [ ] Restringir Chave Mestra, proteger painéis e adicionar saída global e aviso de inatividade administrativa
+- [ ] Testar regras e navegação em celular/computador; informar limites de testes autenticados e entre aparelhos
+
 ## Sobreposição da página inicial — 05/11/2026
 - [x] Corrigir distância do título usando a altura completa do cabeçalho e da faixa superior
 - [x] Verificar título e ausência de cortes em oito larguras (320–1920px); menu abre e fecha, sem erros de execução

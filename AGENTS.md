@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- AccountProvider centralizes verified identity, server roles, logout and administrator inactivity; all account menus and route guards consume it so stale page-local state cannot restore access after signout.
+
 - The fixed Navbar publishes its measured occupied height to its page wrapper; the homepage uses that value for content clearance so promo-banner changes cannot cover its heading.
 
 - Brisa deterministic response safety is shared between chat-brisa and the Hostinger responder; outbound dedup checks are read-only and successful sends alone enter the 24-hour history, preventing a pre-check from blocking its own send.

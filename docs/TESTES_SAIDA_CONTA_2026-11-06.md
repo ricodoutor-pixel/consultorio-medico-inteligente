@@ -11,9 +11,9 @@
 ## Testes solicitados
 1. Celular: menu de conta e saída real verificados com conta autorizada, sem erro de execução; nome desaparece após saída. Papel admin **não verificado**: a conta disponível não tem `admin` no servidor.
 2. Computador: mesmo resultado da saída real. Papel admin não verificado.
-3. Após sair, `/dashboard` redireciona ao login. Saída pelo botão interno do painel: verificação adicional necessária.
+3. Após sair, `/dashboard` redireciona ao login. Saída pelo botão interno do painel: verificada, retorna à página inicial.
 4. Perfil móvel abre menu e mantém a página atual: verificado.
-5. Recarregar após sair e acessar painel: verificado sem restauração da conta. Botão Voltar: verificação adicional necessária.
+5. Recarregar após sair e acessar painel: verificado sem restauração da conta. Botão Voltar: verificado sem restauração do painel autenticado.
 6. Chave Mestra não aparece na página inicial da conta disponível; condições exigem admin, página administrativa e ambiente não produtivo. Visitante verificado; conta de paciente distinta não disponível.
 7. Saída global implementada com confirmação; revogação entre dois aparelhos reais ainda não testada, sem conta administrativa autorizada disponível.
 8. Limites de 29/30 minutos verificados por testes unitários; espera real em conta administrativa ainda não executada.

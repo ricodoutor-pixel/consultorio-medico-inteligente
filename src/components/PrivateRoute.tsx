@@ -1,23 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccount } from "@/contexts/AccountContext";
 
 export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const [loading, setLoading] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
+  const { loading, user } = useAccount();
   const location = useLocation();
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuthenticated(!!session);
-      setLoading(false);
-    });
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setAuthenticated(!!user);
-      setLoading(false);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
 
   if (loading) {
     return (
@@ -27,7 +16,7 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!authenticated) {
+  if (!user) {
     const redirectPath = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/login?redirect=${redirectPath}`} replace />;
   }

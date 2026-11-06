@@ -32,6 +32,7 @@ import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
+import { AccountProvider } from "@/contexts/AccountContext";
 import { MasterPortalSwitcher } from "@/components/MasterPortalSwitcher";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
@@ -300,6 +301,7 @@ const App = () => (
           <Sonner />
           <OfflineAlert />
           <BrowserRouter>
+            <AccountProvider>
             <OpenGraphHead />
             <SearchEngineOptimization />
             <DynamicSEOHead />
@@ -390,8 +392,8 @@ const App = () => (
                 <Route path="/consultation-monitor/:appointmentId" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/consultation-monitor" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/comunidade" element={<ComunidadeConteudoIA />} />
-                <Route path="/dashboard" element={<DashboardPaciente />} />
-                <Route path="/dashboard-paciente" element={<DashboardPaciente />} />
+                <Route path="/dashboard" element={<PrivateRoute><DashboardPaciente /></PrivateRoute>} />
+                <Route path="/dashboard-paciente" element={<PrivateRoute><DashboardPaciente /></PrivateRoute>} />
                 <Route path="/telemedicina-assincrona" element={<PrivateRoute><TelemedicinaAssincrona /></PrivateRoute>} />
                 <Route path="/medico/prontuario" element={<PrivateRoute><ProntuarioInteligente /></PrivateRoute>} />
               <Route path="/relatorio-paciente" element={<PrivateRoute><RelatorioPaciente /></PrivateRoute>} />
@@ -556,6 +558,7 @@ const App = () => (
             <MobileBottomNav />
             <CookieConsentBanner />
           </Suspense>
+            </AccountProvider>
         </BrowserRouter>
       </TooltipProvider>
     </CurrencyProvider>

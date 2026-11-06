@@ -1,5 +1,7 @@
 import { Home, Search, ShoppingBag, Calendar, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AccountMenu } from "@/components/AccountMenu";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -20,14 +22,15 @@ export const MobileBottomNav = () => {
   if (isPlansRoute || hiddenPaths.some((p) => location.pathname.startsWith(p))) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom,0px)] xl:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom,0px)] xl:hidden">
 
 
       <div className="flex items-center justify-around h-16 px-2">
         {NAV_ITEMS.map(({ icon: Icon, label, path }) => {
           const isActive = location.pathname === path;
+          if (label === "Perfil") return <div key={path} className="h-full flex-1 min-w-0"><AccountMenu bottom /></div>;
           return (
-            <button
+            <Button variant="ghost"
               key={path}
               onClick={() => navigate(path)}
               className={cn(
@@ -42,7 +45,7 @@ export const MobileBottomNav = () => {
               {isActive && (
                 <span className="absolute top-0 w-8 h-0.5 rounded-full bg-primary" />
               )}
-            </button>
+            </Button>
           );
         })}
       </div>

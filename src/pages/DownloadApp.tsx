@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useToast } from "@/hooks/use-toast";
+import { AppInstallQR } from "@/components/AppInstallQR";
 
 // URLs oficiais das lojas (atualizar quando publicado nas stores)
 const APP_STORE_URL = "https://apps.apple.com/br/app/planta-y-raiz/id0000000000";
@@ -150,6 +151,10 @@ const DownloadApp = () => {
                     Baixar Atalho Direto (.url)
                   </Button>
                 )}
+              </motion.div>
+
+              <motion.div variants={fadeUp}>
+                <AppInstallQR />
               </motion.div>
 
               <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-4">

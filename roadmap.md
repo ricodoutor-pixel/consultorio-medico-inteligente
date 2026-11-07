@@ -120,5 +120,5 @@
 
 - [x] Corrigir 3 erros de compilação (MedicalDashboard isMock, doctor-schedule.test.ts mock, Profissionais proSlots) — build OK (01/11)
 
-- [ ] Resolver aviso de qualidade pendente no monitoramento (explicar causa e correção)
-- [ ] QR Code para instalar o app em qualquer aparelho + opção de baixar
+- [x] Resolver aviso de qualidade pendente no monitoramento (explicar causa e correção)
+- [x] QR Code para instalar o app em qualquer aparelho + opção de baixar

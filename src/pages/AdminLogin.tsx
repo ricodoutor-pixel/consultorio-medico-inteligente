@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAccount } from "@/contexts/AccountContext";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -18,6 +19,12 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const account = useAccount();
+
+  // An already-verified admin never stays stuck on the login screen.
+  useEffect(() => {
+    if (!account.loading && account.user && account.isAdmin) navigate("/admin", { replace: true });
+  }, [account.loading, account.user, account.isAdmin, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +65,7 @@ const AdminLogin = () => {
 
       if (isAdmin) {
         toast({ title: "Acesso autorizado", description: "Bem-vindo ao painel administrativo." });
-        navigate("/admin");
+        // The account context finishes its own verification and the effect above navigates.
       } else {
         toast({ title: "Acesso negado", description: "Você não tem permissão de administrador.", variant: "destructive" });
         await supabase.auth.signOut();

@@ -437,8 +437,8 @@ Deno.serve(async (req) => {
       const { data: claim, error: claimError } = await sb.from("ot_web_sessions")
         .update({ report_generation_started_at: new Date(started).toISOString() })
         .eq("id", sess.id).is("report_generation_started_at", null).select("id").maybeSingle();
-      if (claimError) return json({ error: "Impossible de préparer le rapport." }, 500);
-      if (!claim) return json({ error: "La génération est déjà en cours. Actualisez vos rapports ou appelez l'équipe sans refaire un paiement." }, 409);
+      if (claimError) return json({ error: "Não foi possível preparar o relatório." }, 500);
+      if (!claim) return json({ error: "A geração já está em andamento. Consulte seus relatórios ou chame a equipe sem pagar novamente." }, 409);
 
       const conversationText = (msgs || [])
         .map((m: any) => `${m.role.toUpperCase()}: ${m.content}`)

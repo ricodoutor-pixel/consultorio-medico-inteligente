@@ -176,6 +176,17 @@ Deno.serve(async (req) => {
                   .eq("id", order.id).eq("status", "pending").select("id");
                 console.log(`[ot-reconcile] pedido ${order.id} aprovado via consulta MP (${upd?.length ?? 0})`);
                 order.status = "approved";
+                if (upd?.length) {
+                  // Webhook não chegou: o aviso de pagamento ao Dr. Edilson sai por aqui, uma única vez.
+                  const { data: prof } = await sb.from("profiles").select("full_name").eq("id", uid).maybeSingle();
+                  EdgeRuntime.waitUntil(notifyPaymentConfirmedOnce(sb, {
+                    externalReference: order.external_reference,
+                    patientName: (prof as any)?.full_name || "Paciente",
+                    amountBrl: amt,
+                    service: "Orientação Técnica",
+                    paymentId: order.mp_payment_id,
+                  }));
+                }
               } else if (p.status === "rejected") {
                 await sb.from("orientacao_tecnica_orders").update({ status: "rejected" }).eq("id", order.id).eq("status", "pending");
                 order.status = p.status;

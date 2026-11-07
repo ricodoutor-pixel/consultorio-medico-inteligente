@@ -686,6 +686,7 @@ Deno.serve(async (req) => {
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
+      fireClosedNotice(sess, rating);
       return json({ success: true, state: "completed", alreadyRated: !!existing });
     }
 
@@ -697,6 +698,7 @@ Deno.serve(async (req) => {
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
+      fireClosedNotice(sess, null);
       return json({ success: true, state: "completed", rating: null });
     }
 

@@ -68,29 +68,20 @@ type TriageQuestion = {
   id: string;
   label: string;
   hint: string;
-  type: "text" | "long" | "choice";
+  type: "text" | "long" | "choice" | "combo" | "scale";
   options?: string[];
+  optional?: boolean;
+  allowNone?: boolean;
 };
 
+// Triagem curta v3: 5 telas. Nome e idade vêm do cadastro (não perguntar).
 const QUESTIONS: TriageQuestion[] = [
-  { id: "nome", label: "Como você se chama?", hint: "Nome que a equipe clínica vai usar no atendimento.", type: "text" },
-  { id: "idade", label: "Qual a sua idade?", hint: "Idade em anos.", type: "text" },
-  { id: "queixa", label: "Qual a sua queixa principal?", hint: "Descreva o que mais te incomoda hoje.", type: "long" },
-  { id: "tempo", label: "Há quanto tempo você sente isso?", hint: "Selecione a opção mais próxima.", type: "choice", options: ["Menos de 1 mês", "1 a 6 meses", "6 meses a 2 anos", "Mais de 2 anos"] },
-  { id: "intensidade", label: "De 0 a 10, qual a intensidade dos sintomas?", hint: "0 = nenhum sintoma, 10 = insuportável.", type: "choice", options: ["0 a 3 (leve)", "4 a 6 (moderado)", "7 a 8 (forte)", "9 a 10 (insuportável)"] },
-  { id: "medicamentos", label: "Quais medicamentos ou tratamentos você usa hoje?", hint: "Liste nomes e doses, se souber. Escreva 'nenhum' se não usar.", type: "long" },
-  { id: "canabinoides", label: "Já usou canabinoides (CBD/THC)?", hint: "Sua experiência prévia ajuda a contextualizar a orientação.", type: "choice", options: ["Nunca usei", "Já usei por conta própria", "Uso com receita médica", "Usei e parei"] },
-  { id: "comorbidades", label: "Tem outras condições de saúde relevantes?", hint: "Fígado, coração, rins, gestação, psiquiátricas... Escreva 'nenhuma' se não houver.", type: "long" },
-  { id: "objetivo", label: "Qual o seu principal objetivo?", hint: "O que você espera alcançar.", type: "choice", options: ["Aliviar dor", "Dormir melhor", "Reduzir ansiedade", "Reduzir medicamentos pesados", "Controlar crises/convulsões", "Qualidade de vida geral"] },
-  { id: "red_flags", label: "Está sentindo algum destes sinais agora?", hint: "Se houver sinal de emergência, procure o SAMU 192 imediatamente.", type: "choice", options: ["Nenhum desses", "Dor no peito / falta de ar", "Desmaio ou confusão", "Sangramento ativo", "Pensamentos de me machucar"] },
+  { id: "red_flags", label: "Está com algum sinal de emergência agora?", hint: "Ex.: dor no peito, falta de ar, desmaio, sangramento ativo ou pensamentos de se machucar.", type: "choice" },
+  { id: "queixa", label: "Qual o principal problema e há quanto tempo?", hint: "Descreva com suas palavras e escolha o tempo mais próximo.", type: "combo", options: ["Menos de 1 mês", "1 a 6 meses", "Mais de 6 meses"] },
+  { id: "intensidade", label: "De 0 a 10, qual a intensidade dos sintomas?", hint: "0 = nenhum sintoma · 10 = insuportável.", type: "scale" },
+  { id: "medicamentos", label: "Medicamentos, alergias e outras condições de saúde", hint: "Inclua gravidez ou amamentação, se for o caso. Toque em “Nenhum” se não houver.", type: "long", allowNone: true },
+  { id: "objetivo", label: "O que você espera do atendimento?", hint: "Opcional — pode pular se preferir.", type: "choice", optional: true, options: ["Dormir melhor", "Aliviar dor", "Reduzir ansiedade", "Outro"] },
 ];
-
-const EMERGENCY_ANSWERS = new Set([
-  "Dor no peito / falta de ar",
-  "Desmaio ou confusão",
-  "Sangramento ativo",
-  "Pensamentos de me machucar",
-]);
 
 const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired", "completed"];
 const LIVE_STATES: OtState[] = ["ready", "active", "paused"];

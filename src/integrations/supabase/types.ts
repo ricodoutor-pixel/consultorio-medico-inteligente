@@ -5733,9 +5733,13 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          content_hash: string | null
           content_md: string
           created_at: string
+          educational_released_at: string | null
+          generation_ms: number | null
           id: string
+          rejection_reason: string | null
           session_id: string
           status: string
           user_id: string
@@ -5744,9 +5748,13 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          content_hash?: string | null
           content_md: string
           created_at?: string
+          educational_released_at?: string | null
+          generation_ms?: number | null
           id?: string
+          rejection_reason?: string | null
           session_id: string
           status?: string
           user_id: string
@@ -5755,9 +5763,13 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          content_hash?: string | null
           content_md?: string
           created_at?: string
+          educational_released_at?: string | null
+          generation_ms?: number | null
           id?: string
+          rejection_reason?: string | null
           session_id?: string
           status?: string
           user_id?: string
@@ -5810,6 +5822,7 @@ export type Database = {
           paused: boolean
           paused_at: string | null
           paused_by: string | null
+          report_generation_started_at: string | null
           started_at: string | null
           status: string
           triage: Json
@@ -5827,6 +5840,7 @@ export type Database = {
           paused?: boolean
           paused_at?: string | null
           paused_by?: string | null
+          report_generation_started_at?: string | null
           started_at?: string | null
           status?: string
           triage?: Json
@@ -5844,6 +5858,7 @@ export type Database = {
           paused?: boolean
           paused_at?: string | null
           paused_by?: string | null
+          report_generation_started_at?: string | null
           started_at?: string | null
           status?: string
           triage?: Json

@@ -3,7 +3,7 @@
 - PageScrollReset centrally resets document scroll on navigation inside the route Suspense boundary and disables browser scroll restoration; this starts lazy-loaded pages at the top without interrupting in-page chat scrolling.
 
 - AccountProvider centralizes verified identity, server roles, logout and administrator inactivity; all account menus and route guards consume it so stale page-local state cannot restore access after signout.
-- Orientation messages and reports use the existing session-bound stores with server-only writes and approved-only patient report reads; streamed response persistence retains partial chunks and runs under EdgeRuntime.waitUntil to survive response delivery.
+- Orientation messages and reports use existing session-bound stores with server-only writes; owners may read approved reports or explicitly released educational drafts, never rejected reports. Educational release does not imply medical approval; streamed persistence runs under EdgeRuntime.waitUntil.
 
 - The fixed Navbar publishes its measured occupied height to its page wrapper; the homepage uses that value for content clearance so promo-banner changes cannot cover its heading.
 

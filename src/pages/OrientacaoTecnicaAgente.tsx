@@ -176,6 +176,8 @@ export default function OrientacaoTecnicaAgente() {
   const [fullRoom, setFullRoom] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [reportWait, setReportWait] = useState(0);
+  const [refCode, setRefCode] = useState<string | null>(null);
+  const [copiedRef, setCopiedRef] = useState(false);
   useEffect(() => {
     if (!generatingReport) { setReportWait(0); return; }
     const started = Date.now();
@@ -768,6 +770,40 @@ export default function OrientacaoTecnicaAgente() {
     if (pendingPatient) list.push(pendingPatient);
     return list;
   }, [messages, pendingPatient]);
+
+  const downloadableReport = useMemo(
+    () => reports.find((r) => canDownloadOtReport(r.status, !!r.educational_released_at)),
+    [reports],
+  );
+
+  // Link de indicação da própria conta logada (mostrado na tela de encerramento).
+  useEffect(() => {
+    if (otState !== "completed" || !ratingDone || !userId || refCode) return;
+    let alive = true;
+    void (async () => {
+      const { data: profile } = await supabase.from("profiles").select("referral_code").eq("id", userId).maybeSingle();
+      let code = (profile as { referral_code?: string | null } | null)?.referral_code || null;
+      if (!code) {
+        code = `PRZ-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+        const { data: updated } = await supabase.from("profiles").update({ referral_code: code }).eq("id", userId).select("referral_code").maybeSingle();
+        code = (updated as { referral_code?: string } | null)?.referral_code || code;
+      }
+      if (alive) setRefCode(code);
+    })();
+    return () => { alive = false; };
+  }, [otState, ratingDone, userId, refCode]);
+
+  const copyRefLink = async () => {
+    if (!refCode) return;
+    try {
+      await navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro?ref=${refCode}`);
+      setCopiedRef(true);
+      toast({ title: "Link de indicação copiado!" });
+      setTimeout(() => setCopiedRef(false), 4000);
+    } catch {
+      toast({ title: "Erro ao copiar", description: "Selecione o link e copie manualmente.", variant: "destructive" });
+    }
+  };
 
   const firstName = (answers.nome || "").split(" ")[0];
   const awaitingLong = Date.now() - awaitingSince > 3 * 60 * 1000;

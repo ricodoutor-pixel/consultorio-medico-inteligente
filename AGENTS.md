@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- QR installation links use the dedicated installation view within `/download`, reusing `usePWAInstall` and requiring browser consent; do not substitute mobile installation with a desktop shortcut download.
+
 - PageScrollReset centrally resets document scroll on navigation inside the route Suspense boundary and disables browser scroll restoration; this starts lazy-loaded pages at the top without interrupting in-page chat scrolling.
 
 - AccountProvider centralizes verified identity, server roles, logout and administrator inactivity; all account menus and route guards consume it so stale page-local state cannot restore access after signout.

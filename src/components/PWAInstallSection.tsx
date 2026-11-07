@@ -56,7 +56,7 @@ function MiniInstallQR() {
       <p className="text-[11px] font-semibold text-muted-foreground text-center leading-tight">
         Aponte a câmera do celular
         <br />
-        para baixar em 1 clique
+        para instalar o app
       </p>
     </div>
   );

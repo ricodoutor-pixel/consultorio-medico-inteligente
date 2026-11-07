@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Smartphone, Shield, Wifi, Users, Star, Zap, Heart, Globe, ArrowRight, Monitor, FolderDown } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useToast } from "@/hooks/use-toast";
 import { AppInstallQR } from "@/components/AppInstallQR";
+import { DirectAppInstall } from "@/components/DirectAppInstall";
 
 // URLs oficiais das lojas (atualizar quando publicado nas stores)
 const APP_STORE_URL = "https://apps.apple.com/br/app/planta-y-raiz/id0000000000";
@@ -20,6 +21,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 const DownloadApp = () => {
   const { canInstall, isInstalled, isIOS, isDesktop, promptInstall, downloadDesktopShortcut } = usePWAInstall();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
 
   const handleInstallPWA = async () => {
     if (isInstalled) {
@@ -81,6 +83,10 @@ const DownloadApp = () => {
       : canInstall
         ? "Instalar agora (PWA)"
         : "Instalar como App (PWA)";
+
+  if (searchParams.get("origem") === "qrcode" || searchParams.get("instalar") === "1") {
+    return <DirectAppInstall />;
+  }
 
   return (
     <div className="min-h-dvh bg-background">

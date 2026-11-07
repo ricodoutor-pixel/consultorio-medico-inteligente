@@ -1282,13 +1282,13 @@ export default function OrientacaoTecnicaAgente() {
           {phase === "room" && (
             <div className="space-y-4">
               <div className={`ot-room ${fullRoom ? "ot-room-full" : "border border-border"} ${largeText ? "ot-room-large" : ""}`} role={fullRoom ? "dialog" : undefined} aria-modal={fullRoom ? true : undefined} aria-label="Conversa de Orientação Técnica">
-                {/* Header verde */}
-                <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-2.5">
-                  <div className="flex items-center gap-3 min-w-0">
+                {/* Header verde (compacto) */}
+                <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-1.5">
+                  <div className="flex items-center gap-2 min-w-0">
                     <img
                       src={DrEdilsonPhoto}
                       alt="Dr. Edilson Bezerra"
-                      className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-white/30"
+                      className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-white/30"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
@@ -1432,6 +1432,32 @@ export default function OrientacaoTecnicaAgente() {
 
                 {/* Rodapé / input */}
                 <div className="ot-room-compose px-2 py-2">
+                  {/* Relatório dentro da sala: visível, com estado "Gerando… Ns" e depois "Baixar PDF" */}
+                  {(otState === "active" || otState === "paused") && messages.some((m) => m.role === "patient") && (
+                    <div className="flex justify-center pb-2">
+                      {downloadableReport ? (
+                        <Button size="sm" asChild className="ot-quick shrink-0 font-bold">
+                          <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
+                            <FileText size={14} className="mr-1" /> Baixar PDF do relatório
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="ot-quick shrink-0 font-bold"
+                          onClick={() => void generateReport()}
+                          disabled={generatingReport || streaming || reports.some((r) => r.status === "draft")}
+                        >
+                          {generatingReport ? (
+                            <><Loader2 size={14} className="animate-spin mr-1" /> Gerando… {reportWait}s</>
+                          ) : (
+                            <><FileText size={14} className="mr-1" /> Gerar relatório</>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  )}
                   {otState === "active" && <div className="flex gap-2 overflow-x-auto pb-2"><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Acordo de madrugada")}>Acordo de madrugada</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Tenho dúvidas sobre tratamento")}>Dúvidas sobre tratamento</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" asChild><a href={`https://wa.me/${BRISA_WHATSAPP}`} target="_blank" rel="noopener noreferrer">Falar com a equipe</a></Button></div>}
                   {chatError && (
                     <div role="alert" className="mb-3 p-3 bg-destructive/10 text-destructive text-sm space-y-2">

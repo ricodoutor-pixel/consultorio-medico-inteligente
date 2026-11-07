@@ -16,6 +16,7 @@ export const RED_FLAG_OPTIONS = [
 export function hasEmergency(triage: Record<string, unknown>): boolean {
   if (triage.emergency === true) return true;
   const normalize = (v: unknown) => String(v ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase().replace(/[\s_]+/g, "");
+
   const none = (v: unknown) => /^(nenhum.*|nao.*|no|none|false|0|-|\[\])?$/.test(normalize(v));
   const value = triage.red_flags;
   return Array.isArray(value) ? value.some(v => !none(v)) : value === true || (typeof value === "string" && !none(value));

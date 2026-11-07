@@ -152,6 +152,17 @@ Deno.serve(async (req) => {
             secondsLeft: 0,
           });
         }
+        if (sess.status === "completed") {
+          const { data: ratingRow } = await sb.from("avaliacoes_orientacao")
+            .select("rating").eq("session_id", sess.id).maybeSingle();
+          return json({
+            state: "completed",
+            session: sess,
+            minutesLeft: 0,
+            secondsLeft: 0,
+            rating: ratingRow?.rating ?? null,
+          });
+        }
       }
 
       let query = sb.from("orientacao_tecnica_orders")

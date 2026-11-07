@@ -432,11 +432,15 @@ Deno.serve(async (req) => {
       const sess = await loadUserSession();
       if (!sess) return json({ error: "Sessão não encontrada" }, 404);
 
-      const { data: msgs } = await sb
+      const { data: msgs, error: historyError } = await sb
         .from("ot_messages")
         .select("role, content")
         .eq("session_id", sess.id)
         .order("created_at", { ascending: true });
+      if (historyError) return json({ error: "Não foi possível carregar a conversa para o relatório." }, 500);
+      if (!msgs?.some(m => m.role === "patient")) return json({ error: "Converse com a assistente antes de gerar seu relatório." }, 409);
+      const { data: existingDraft } = await sb.from("ot_reports").select("id").eq("session_id", sess.id).eq("status", "draft").limit(1).maybeSingle();
+      if (existingDraft) return json({ success: true, report_id: existingDraft.id, status: "draft" });
 
       const conversationText = (msgs || [])
         .map((m: any) => `${m.role.toUpperCase()}: ${m.content}`)
@@ -471,8 +475,10 @@ Deno.serve(async (req) => {
         }),
       });
 
+      if (!repRes.ok) return json({ error: "A geração do relatório falhou. Tente novamente mais tarde." }, 502);
       const repData = await repRes.json();
-      const reportContent = repData.choices?.[0]?.message?.content || "Relatório em elaboração.";
+      const reportContent = repData.choices?.[0]?.message?.content;
+      if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
@@ -605,12 +611,13 @@ Deno.serve(async (req) => {
         };
         if (contentMd) updatePayload.content_md = contentMd;
 
-        const { data: approved } = await sb
+        const { data: approved, error: approvalError } = await sb
           .from("ot_reports")
           .update(updatePayload)
           .eq("id", reportId)
           .select()
           .single();
+        if (approvalError || !approved) return json({ error: "Não foi possível aprovar o relatório." }, 500);
 
         return json({ success: true, report: approved });
       }

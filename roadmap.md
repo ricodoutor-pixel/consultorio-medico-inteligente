@@ -1,5 +1,9 @@
 # Roadmap
 
+## Revisão do teste e autorização condicionada da Fase 2 — 07/11/2026
+- [x] Conferir pagamento, tentativa de WhatsApp, relatório, avaliações, fontes científicas e destino atual do site; entregar relatório técnico e prompt sem executar cobrança, mensagens ou repasses
+- Teste real de vídeo não autorizado para execução nesta auditoria: depende de correção dos bloqueios, médico participante identificado e confirmação do Dr. Edilson.
+
 ## Prompt para novo teste integral — 07/11/2026
 - [x] Entregar prompt do agente: novo pagamento, notificações, triagem, Orientação/consulta, três carinhas, encerramento, indicação, agenda e auditoria; divergências atuais documentadas, sem executar pagamento ou alterar plataforma
 - Implementação e comprovação destes novos requisitos serão tarefas do agente executor; não considerar funcionalidades aprovadas apenas por constarem no roteiro.

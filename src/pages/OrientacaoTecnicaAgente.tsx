@@ -1,5 +1,7 @@
 import { RED_FLAG_OPTIONS, hasEmergency, invalidTriageFields } from "../../supabase/functions/_shared/orientation-triage";
 import { setVisibleInterval } from "@/lib/visible-interval";
+import { createOtStreamParser } from "../../supabase/functions/_shared/ot-stream";
+import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
@@ -161,6 +163,8 @@ export default function OrientacaoTecnicaAgente() {
   const [streamText, setStreamText] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [reportError, setReportError] = useState<string | null>(null);
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -211,6 +215,7 @@ export default function OrientacaoTecnicaAgente() {
     const payload = { ...(activeSessionId ? { sessionId: activeSessionId } : {}), ...(orderRefRef.current ? { external_reference: orderRefRef.current } : {}), ...body };
     const { data, error } = await supabase.functions.invoke("ot-edilson-web", { body: payload });
     if (error) throw error;
+    if (data?.error) throw new Error(data.error);
     return data as T;
   }, [activeSessionId]);
 
@@ -225,6 +230,7 @@ export default function OrientacaoTecnicaAgente() {
     } else if (typeof d?.minutesLeft === "number") {
       setSecondsLeft(Math.max(0, Math.floor(d.minutesLeft * 60)));
     }
+    if (sess && "triage" in sess && sess.triage && typeof sess.triage === "object") setAnswers(sess.triage as Record<string, string>);
     return st;
   }, []);
 
@@ -268,6 +274,7 @@ export default function OrientacaoTecnicaAgente() {
       setMessages(list);
     } catch (e) {
       console.warn("[ot] messages", e);
+      setChatError("Não foi possível carregar a conversa. Tente novamente ou chame a equipe.");
     }
   }, [callFn]);
 
@@ -277,6 +284,7 @@ export default function OrientacaoTecnicaAgente() {
       setReports(Array.isArray(d) ? d : d?.reports ?? []);
     } catch (e) {
       console.warn("[ot] reports", e);
+      setReportError("Não foi possível carregar seus relatórios. Tente novamente.");
     }
   }, [callFn]);
 
@@ -319,6 +327,10 @@ export default function OrientacaoTecnicaAgente() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streamText, pendingPatient]);
+
+  useEffect(() => {
+    if (phase === "checkout" || phase === "triage" || phase === "awaiting") window.scrollTo({ top: 0, behavior: "instant" });
+  }, [phase]);
 
   useEffect(() => {
     if (phase === "room" && otState === "active" && !streaming) inputRef.current?.focus();
@@ -499,11 +511,12 @@ export default function OrientacaoTecnicaAgente() {
     setInput("");
     setAttachment(null);
     setStreaming(true);
+    setChatError(null);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ot-edilson-web`,
+        `${supabase.supabaseUrl}/functions/v1/ot-edilson-web`,
         {
           method: "POST",
           headers: {
@@ -515,7 +528,8 @@ export default function OrientacaoTecnicaAgente() {
             action: "chat",
             message: text,
             ...(att ? { attachment: att } : {}),
-            ...(activeSessionId ? { sessionId: activeSessionId } : {}),
+            ...(otSession?.id ? { sessionId: otSession.id } : {}),
+            ...(orderRefRef.current ? { external_reference: orderRefRef.current } : {}),
           }),
         },
       );
@@ -530,43 +544,38 @@ export default function OrientacaoTecnicaAgente() {
         setOtState("expired");
         return;
       }
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok || !res.body) {
+        const failure = await res.json().catch(() => null);
+        throw new Error(failure?.error || "Não foi possível receber a resposta agora.");
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = "";
+      const parse = createOtStreamParser();
       let acc = "";
       setStreamText("");
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const payload = line.slice(6).trim();
-          if (payload === "[DONE]") continue;
-          try {
-            const delta = JSON.parse(payload)?.choices?.[0]?.delta?.content;
-            if (typeof delta === "string" && delta) {
-              acc += delta;
-              setStreamText(acc);
-            }
-          } catch { /* keep-alive ou fragmento */ }
-        }
+        acc += parse(decoder.decode(value, { stream: true }));
+        setStreamText(acc);
       }
+      acc += parse(decoder.decode() + "\n");
       if (!acc) throw new Error("resposta vazia");
+      setMessages(prev => [...prev, { id: `reply-${Date.now()}`, role: "agent", content: acc, created_at: new Date().toISOString() }]);
     } catch (e) {
       console.error("[ot] chat", e);
+      setInput(text);
+      setAttachment(att);
+      setChatError(e instanceof Error ? e.message : "A resposta falhou. Sua mensagem foi preservada.");
       toast({
         title: "Falha momentânea de conexão",
         description: "Sua mensagem pode não ter sido entregue. Reenvie, por favor.",
         variant: "destructive",
       });
     } finally {
-      await loadMessages();
+      if (pendingPatient) setMessages(prev => [...prev, pendingPatient]);
       setPendingPatient(null);
       setStreamText(null);
       setStreaming(false);
@@ -575,8 +584,10 @@ export default function OrientacaoTecnicaAgente() {
 
   const generateReport = async () => {
     setGeneratingReport(true);
+    setReportError(null);
     try {
-      await callFn({ action: "generate_report" });
+      const result = await callFn<{ success?: boolean; report_id?: string }>({ action: "generate_report", sessionId: otSession?.id });
+      if (!result.success || !result.report_id) throw new Error("O relatório não foi gravado. Tente novamente.");
       toast({
         title: "Relatório enviado para revisão",
         description: "O Dr. Edilson Bezerra revisa e aprova antes de liberar o PDF para você.",
@@ -584,6 +595,7 @@ export default function OrientacaoTecnicaAgente() {
       await loadReports();
     } catch (e) {
       console.error("[ot] report", e);
+      setReportError("Não foi possível gerar o relatório. Tente novamente ou chame a equipe.");
       toast({ title: "Não foi possível gerar o relatório agora", description: "Tente novamente em instantes.", variant: "destructive" });
     } finally {
       setGeneratingReport(false);
@@ -611,7 +623,7 @@ export default function OrientacaoTecnicaAgente() {
     <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
 
-      <main className="flex-1 pt-24 pb-12 md:pt-28">
+      <main className="flex-1 pt-[calc(var(--site-header-height,96px)+16px)] pb-12">
         <div className="container mx-auto px-4 max-w-3xl">
           {/* Cabeçalho */}
           {phase !== "room" && (
@@ -894,7 +906,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1 justify-center">
-                      <ShieldCheck size={12} className="text-primary" /> Pix instantâneo ou cartão. A triagem abre após a confirmação.
+                      <ShieldCheck size={12} className="text-primary" /> Pix ou cartão. A triagem abre após a confirmação do pagamento.
                     </p>
                   </CardContent>
                 </Card>
@@ -1149,6 +1161,15 @@ export default function OrientacaoTecnicaAgente() {
 
                 {/* Rodapé / input */}
                 <div className="bg-[#F0F0F0] px-2 py-2">
+                  {chatError && (
+                    <div role="alert" className="mb-3 p-3 bg-destructive/10 text-destructive text-sm space-y-2">
+                      <p>{chatError}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" onClick={() => { setChatError(null); void loadMessages(); }}>Tentar de novo</Button>
+                        <Button variant="outline" size="sm" asChild><a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent("Preciso falar com a equipe sobre minha Orientação Técnica paga.")}`} target="_blank" rel="noopener noreferrer">Chamar a equipe</a></Button>
+                      </div>
+                    </div>
+                  )}
                   {otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
                     <div className="text-center space-y-3 py-2">
                       <p className="text-sm font-bold text-neutral-800">Sessão de 30 minutos encerrada.</p>
@@ -1229,7 +1250,7 @@ export default function OrientacaoTecnicaAgente() {
               {otState !== "ready" && (
                 <Card className="border-border">
                   <CardContent className="p-5 space-y-3">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="font-display font-black text-foreground text-sm">Relatório individual</p>
                         <p className="text-[11px] text-muted-foreground">
@@ -1239,13 +1260,14 @@ export default function OrientacaoTecnicaAgente() {
                       <Button
                         size="sm"
                         onClick={() => void generateReport()}
-                        disabled={generatingReport || timeline.length === 0 || reports.some((r) => r.status === "draft")}
+                        disabled={generatingReport || streaming || !messages.some(m => m.role === "patient") || reports.some((r) => r.status === "draft")}
                         className="rounded-xl font-bold shrink-0"
                       >
                         {generatingReport ? <Loader2 size={14} className="animate-spin mr-1" /> : <FileText size={14} className="mr-1" />}
-                        Gerar relatório
+                        {generatingReport ? "Gerando seu relatório…" : "Gerar relatório"}
                       </Button>
                     </div>
+                    {reportError && <p role="alert" className="text-sm text-destructive">{reportError}</p>}
 
                     {reports.length > 0 && (
                       <ul className="divide-y divide-border">

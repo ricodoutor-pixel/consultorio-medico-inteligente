@@ -554,6 +554,57 @@ Deno.serve(async (req) => {
       return json({ reports: reports || [] });
     }
 
+    // ── 7. CLOSE SESSION (despedida: servidor marca a sala como encerrada) ──
+    if (action === "close_session") {
+      const sess = await loadUserSession();
+      if (!sess) return json({ error: "Sessão não encontrada" }, 404);
+      if (sess.status === "completed") return json({ success: true, state: "completed" });
+      if (sess.status === "ready") return json({ error: "A sessão ainda não foi iniciada." }, 409);
+      await sb.from("ot_web_sessions").update({
+        status: "completed",
+        closed_at: new Date().toISOString(),
+      }).eq("id", sess.id).neq("status", "completed");
+      return json({ success: true, state: "completed" });
+    }
+
+    // ── 8. SUBMIT RATING (avaliação por três carinhas; uma por atendimento) ──
+    if (action === "submit_rating") {
+      const sess = await loadUserSession();
+      if (!sess) return json({ error: "Sessão não encontrada" }, 404);
+      const rating = Number(body?.rating);
+      if (![1, 2, 3].includes(rating)) return json({ error: "rating_invalid" }, 400);
+      const comment = sanitize(body?.comment, 1000) || null;
+
+      const { data: existing } = await sb.from("avaliacoes_orientacao")
+        .select("id").eq("session_id", sess.id).maybeSingle();
+      if (!existing) {
+        const { error: rErr } = await sb.from("avaliacoes_orientacao").insert({
+          session_id: sess.id,
+          user_id: uid,
+          rating,
+          comment,
+        });
+        if (rErr) return json({ error: "rating_save_failed" }, 500);
+      }
+      // Encerramento no servidor: sala vira somente leitura.
+      await sb.from("ot_web_sessions").update({
+        status: "completed",
+        closed_at: new Date().toISOString(),
+      }).eq("id", sess.id).neq("status", "completed");
+      return json({ success: true, state: "completed", alreadyRated: !!existing });
+    }
+
+    // ── 9. SKIP RATING (paciente pulou: registra encerramento sem avaliação) ──
+    if (action === "skip_rating") {
+      const sess = await loadUserSession();
+      if (!sess) return json({ error: "Sessão não encontrada" }, 404);
+      await sb.from("ot_web_sessions").update({
+        status: "completed",
+        closed_at: new Date().toISOString(),
+      }).eq("id", sess.id).neq("status", "completed");
+      return json({ success: true, state: "completed", rating: null });
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
     // AÇÕES ADMINISTRATIVAS (Dr. Edilson Bezerra / Admin)
     // ══════════════════════════════════════════════════════════════════════════

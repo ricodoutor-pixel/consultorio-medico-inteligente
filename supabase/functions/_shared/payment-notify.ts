@@ -110,11 +110,12 @@ async function deliver(sb: Sb, logId: string, text: string, logKey: string, trig
 export async function notifyPaymentConfirmedOnce(sb: Sb, input: NotifyInput, trigger = "auto"): Promise<boolean> {
   try {
     const c = evolutionConfig();
+    const text = buildPaymentMessage(input);
     const { data: claim } = await sb.from("payment_notify_log").insert({
       external_reference: input.externalReference, recipient: c.phone, channel: "whatsapp",
       status: "pending", payment_id: input.paymentId ?? null, amount_brl: input.amountBrl, service: input.service,
     }).select("id, attempts").maybeSingle();
-    if (claim) return await deliver(sb, claim.id, input, trigger, 0);
+    if (claim) return await deliver(sb, claim.id, text, input.externalReference, trigger, 0);
 
     // Já existe: só retoma se a última rodada falhou (claim atômico failed -> pending).
     const { data: retry } = await sb.from("payment_notify_log")
@@ -122,9 +123,54 @@ export async function notifyPaymentConfirmedOnce(sb: Sb, input: NotifyInput, tri
       .eq("external_reference", input.externalReference).eq("status", "failed")
       .select("id, attempts").maybeSingle();
     if (!retry) return false; // já enviado ou em envio
-    return await deliver(sb, retry.id, input, trigger, retry.attempts ?? 0);
+    return await deliver(sb, retry.id, text, input.externalReference, trigger, retry.attempts ?? 0);
   } catch (e) {
     console.error("[payment-notify] erro", (e as Error).message);
+    return false;
+  }
+}
+
+/** Texto do aviso de início/fim da Orientação Técnica (sem sintomas nem dados de saúde). */
+export function buildOrientationEventMessage(input: OrientationEventInput): string {
+  const { data, hora } = saoPauloNow();
+  if (input.event === "inicio") {
+    return `Planta y Raiz — Orientação Técnica em andamento.\n` +
+      `Paciente: ${input.patientName}\n` +
+      `Início: ${hora} de ${data} (São Paulo)\n` +
+      `Pedido: ${input.externalReference}`;
+  }
+  const nota = input.rating ? `${input.rating}/3` : "não avaliou";
+  const dur = input.durationMin != null ? `${input.durationMin} min` : "—";
+  return `Planta y Raiz — Orientação Técnica encerrada.\n` +
+    `Paciente: ${input.patientName}\n` +
+    `Fim: ${hora} de ${data} (São Paulo)\n` +
+    `Duração: ${dur} · Avaliação: ${nota}\n` +
+    `Pedido: ${input.externalReference}`;
+}
+
+/**
+ * Aviso de início ou encerramento da Orientação, uma única vez por evento
+ * (dedup por "<external_reference>:<evento>"). Falhas são retomadas na próxima chamada.
+ */
+export async function notifyOrientationEvent(sb: Sb, input: OrientationEventInput, trigger = "auto"): Promise<boolean> {
+  const logKey = `${input.externalReference}:${input.event}`;
+  try {
+    const c = evolutionConfig();
+    const text = buildOrientationEventMessage(input);
+    const { data: claim } = await sb.from("payment_notify_log").insert({
+      external_reference: logKey, recipient: c.phone, channel: "whatsapp",
+      status: "pending", service: `Orientação Técnica (${input.event})`,
+    }).select("id, attempts").maybeSingle();
+    if (claim) return await deliver(sb, claim.id, text, logKey, trigger, 0);
+
+    const { data: retry } = await sb.from("payment_notify_log")
+      .update({ status: "pending" })
+      .eq("external_reference", logKey).eq("status", "failed")
+      .select("id, attempts").maybeSingle();
+    if (!retry) return false;
+    return await deliver(sb, retry.id, text, logKey, trigger, retry.attempts ?? 0);
+  } catch (e) {
+    console.error("[payment-notify] evento erro", (e as Error).message);
     return false;
   }
 }

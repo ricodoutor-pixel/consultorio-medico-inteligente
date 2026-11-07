@@ -11,6 +11,15 @@ interface NotifyInput {
   paymentId?: string | null;
 }
 
+/** Avisos de início/encerramento da Orientação Técnica (sem dados de saúde). */
+export interface OrientationEventInput {
+  externalReference: string;
+  patientName: string;
+  event: "inicio" | "fim";
+  rating?: number | null;
+  durationMin?: number | null;
+}
+
 type Sb = { from: (t: string) => any };
 
 const MAX_ATTEMPTS = 3;

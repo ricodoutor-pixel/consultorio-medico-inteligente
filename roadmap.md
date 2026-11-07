@@ -1,5 +1,10 @@
 # Roadmap
 
+## Relatório do teste de Orientação — 07/11/2026
+- [ ] Diagnosticar e corrigir persistência do chat e geração de relatório sem alterar pagamento primeiro
+- [ ] Mostrar falhas e estados de geração na própria sala; ajustar rolagem e interferência do balão
+- [ ] Validar mensagens reais e relatório com sessão paga autorizada; PDF permanece sujeito à revisão humana
+
 ## Saída segura das contas — 06/11/2026
 - [x] Unificar logout, menus de conta e limpeza de sessão sem apagar registros
 - [x] Restringir Chave Mestra, proteger painéis e adicionar saída global e aviso de inatividade administrativa

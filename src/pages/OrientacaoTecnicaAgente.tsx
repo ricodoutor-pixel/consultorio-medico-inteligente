@@ -24,6 +24,7 @@ import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight, AlertTriangle,
   CheckCircle2, Sparkles, BookOpen, FileText, ArrowRight, Paperclip, X, PauseCircle,
   UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check, Maximize2, Minimize2, Type, CheckCheck,
+  Frown, Meh, Smile, Gift,
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "pyr_ot_external_reference";
@@ -1256,7 +1257,84 @@ export default function OrientacaoTecnicaAgente() {
                       </div>
                     </div>
                   )}
-                  {otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
+                  {otState === "completed" ? (
+                    !ratingDone ? (
+                      <div className="text-center space-y-4 py-3" role="group" aria-label="Avaliação da orientação">
+                        <p className="text-base font-black text-neutral-800">Como foi sua orientação?</p>
+                        <div className="flex items-start justify-center gap-4">
+                          {([
+                            { value: 1 as const, label: "Insatisfeito", Icon: Frown, active: "text-red-500 border-red-400 bg-red-50" },
+                            { value: 2 as const, label: "Neutro", Icon: Meh, active: "text-amber-500 border-amber-400 bg-amber-50" },
+                            { value: 3 as const, label: "Satisfeito", Icon: Smile, active: "text-green-600 border-green-500 bg-green-50" },
+                          ]).map(({ value, label, Icon, active }) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => setRating(value)}
+                              aria-pressed={rating === value}
+                              className={`flex flex-col items-center gap-1 p-3 rounded-2xl border-2 min-w-[84px] transition-colors ${
+                                rating === value ? active : "border-neutral-200 text-neutral-500 bg-white hover:border-neutral-300"
+                              }`}
+                            >
+                              <Icon size={40} strokeWidth={1.6} />
+                              <span className="text-xs font-bold">{label}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <Textarea
+                          value={ratingComment}
+                          onChange={(e) => setRatingComment(e.target.value)}
+                          rows={2}
+                          placeholder="Quer contar o que podemos melhorar? (opcional)"
+                          aria-label="Comentário opcional sobre a orientação"
+                          className="max-w-md mx-auto resize-none rounded-xl bg-white"
+                        />
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            onClick={() => void submitRating(rating)}
+                            disabled={!rating || submittingRating}
+                            className="rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white"
+                          >
+                            {submittingRating ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
+                            Enviar avaliação
+                          </Button>
+                          <Button variant="ghost" onClick={() => void submitRating(null)} disabled={submittingRating} className="rounded-xl font-bold text-neutral-600">
+                            Pular
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center space-y-4 py-3">
+                        <p className="text-base font-black text-neutral-800">Orientação encerrada. Obrigado! 🌿</p>
+                        {otSession?.closed_at ? null : null}
+                        <p className="text-xs text-neutral-600">Seu histórico e seu relatório continuam disponíveis nesta página.</p>
+                        <div className="flex flex-col items-center gap-2 max-w-sm mx-auto">
+                          {reports.some((r) => canDownloadOtReport(r.status, !!r.educational_released_at)) && (
+                            <Button asChild className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white">
+                              <Link to={`/orientacao-tecnica/relatorio/${reports.find((r) => canDownloadOtReport(r.status, !!r.educational_released_at))!.id}`}>
+                                <FileText size={14} className="mr-1" /> Baixar relatório
+                              </Link>
+                            </Button>
+                          )}
+                          <Button onClick={() => navigate("/profissionais")} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
+                            Falar com um médico agora (Chat R$ 100 · Vídeo R$ 150) <ArrowRight size={14} className="ml-1" />
+                          </Button>
+                          <Button onClick={resetForNew} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
+                            Fazer nova orientação (R$ 30)
+                          </Button>
+                          <div className="w-full rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 p-3 text-left space-y-2">
+                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique e participe do programa de ganhos</p>
+                            <p className="text-[11px] text-neutral-700 leading-snug">
+                              50% do valor líquido distribuídos na rede, em três níveis (25%, 15% e 10%). Obtenha seu link personalizado e acompanhe seus ganhos.
+                            </p>
+                            <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                              Obter meu link de indicação
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  ) : otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
                     <div className="text-center space-y-3 py-2">
                       <p className="text-sm font-bold text-neutral-800">Sessão de 30 minutos encerrada.</p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-2">

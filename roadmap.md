@@ -1,5 +1,9 @@
 # Roadmap
 
+## Instalação direta pelo QR Code — 07/11/2026
+- [x] Abrir a opção de instalar diretamente ao escanear, com confirmação do navegador e instruções específicas para iPhone, sem baixar atalho de computador no celular
+- [ ] Conferir entrada de instalação no celular e computador; instalação física depende de confirmação no dispositivo publicado
+
 ## Revisão do teste e autorização condicionada da Fase 2 — 07/11/2026
 - [x] Conferir pagamento, tentativa de WhatsApp, relatório, avaliações, fontes científicas e destino atual do site; entregar relatório técnico e prompt sem executar cobrança, mensagens ou repasses
 - Teste real de vídeo não autorizado para execução nesta auditoria: depende de correção dos bloqueios, médico participante identificado e confirmação do Dr. Edilson.

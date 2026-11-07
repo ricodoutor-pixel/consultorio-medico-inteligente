@@ -3,8 +3,8 @@ import QRCode from "qrcode";
 import { QrCode, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Link oficial: ao ler com a câmera, o aparelho abre a página de instalação do app.
-export const APP_INSTALL_URL = "https://www.plantayraiz.com.br/download?origem=qrcode";
+// Entrada direta de instalação, sem a página promocional; requer confirmação do navegador.
+export const APP_INSTALL_URL = "https://www.plantayraiz.com.br/download?origem=qrcode&instalar=1";
 
 export function AppInstallQR() {
   const [dataUrl, setDataUrl] = useState("");
@@ -39,7 +39,7 @@ export function AppInstallQR() {
           <QrCode size={18} /> Aponte a câmera do celular
         </p>
         <p className="text-sm text-muted-foreground mb-3">
-          Funciona em iPhone, Android, tablet e computador. O app abre na hora, sem loja.
+          Escaneie para instalar em iPhone, Android, tablet ou computador, com confirmação no aparelho.
         </p>
         <Button type="button" variant="outline" size="sm" onClick={save} disabled={!dataUrl} className="gap-2">
           <Download size={16} /> Baixar QR Code

@@ -1,13 +1,16 @@
 # Roadmap
 
 ## Correções finais do teste 18:12–18:22 — 07/11/2026
-- [ ] 1. Despedida clara independente da pergunta anterior, sem fechar mensagens com nova dúvida
-- [ ] 2. Avaliação imediatamente visível, confirmação por leitura e erro com retentativa
-- [ ] 3. Código único do atendimento em relatório, PDF e avisos, sem reescrever históricos
-- [ ] 4. Código fixo de indicação compartilhado com painel e vínculos preservados
-- [ ] 5. Busca bilíngue CBD/ansiedade e auditoria de DOI/PMID validados
-- [ ] 6. Avisos de pagamento/início/fim no painel com tentativas e entrega separada de aceitação
-- [ ] Relatório técnico com testes e bloqueios; publicação após informar prontidão
+- [x] 1. Despedida independente da pergunta anterior; nova dúvida impede fechamento (testes)
+- [x] 2. Avaliação com rolagem imediata, confirmação da nota lida no servidor e erro com retentativa; nota real 3/3 exibida
+- [x] 3. Código do pedido persistido nos novos relatórios/avisos; código original do corpo usado no PDF histórico, sem reescrita
+- [x] 4. Código oficial referral_links reutilizado: três recarregamentos e painel iguais, sem perda de vínculos
+- [x] 5. Busca bilíngue CBD/ansiedade, DOI normalizado e PMID validado; 5.337 PMIDs existentes, 11 não encontrados (DOIs destes ainda não auditados)
+- [x] 6. Histórico administrativo com tentativas, identificação e aceitação separada de entrega; consulta de recibos somente para admin
+- [x] Relatório técnico em docs/CORRECOES_ORIENTACAO_2026-11-07.md; 25 testes passam, build OK, funções implantadas
+- [ ] Novo Pix/teste de despedida ativa e avaliação nova — depende do pagamento pelo dono; sessão atual já encerrada, sem reabrir artificialmente
+- [ ] Confirmar três entregas no celular em até 1 minuto — avisos antigos sem ID do provedor; novos recibos dependem de evento real e acesso admin
+- [ ] Publicar frontend — aguarda autorização após entrega; funções já implantadas
 
 ## Melhorias do relatório final da Orientação — 07/11/2026
 - [x] Encerramento automático: despedida após "posso ajudar em mais algo?" fecha a sala no servidor e mostra as três carinhas; fim dos 30 min também encerra com aviso; 14 testes passam

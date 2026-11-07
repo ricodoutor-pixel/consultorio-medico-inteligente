@@ -12,7 +12,7 @@ import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
 import { notifyPaymentConfirmedOnce, notifyOrientationEvent } from "../_shared/payment-notify.ts";
 import { shouldAutoClose, FAREWELL_MESSAGE } from "../_shared/orientation-farewell.ts";
-import { orientationCode, enforceAttendanceCode } from "../_shared/orientation-code.ts";
+import { orientationCode, enforceAttendanceCode, reportAttendanceCode } from "../_shared/orientation-code.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -802,7 +802,9 @@ Deno.serve(async (req) => {
       if (action === "admin_approve_report") {
         const reportId = sanitize(body?.report_id, 100);
         const contentMd = typeof body?.content_md === "string" ? body.content_md : undefined;
-        const verificationCode = `PYR-OT-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+        const { data: original } = await sb.from("ot_reports").select("content_md, verification_code, session_id").eq("id", reportId).single();
+        if (!original) return json({ error: "Relatório não encontrado." }, 404);
+        const verificationCode = reportAttendanceCode(original);
 
         const updatePayload: Record<string, unknown> = {
           status: "approved",

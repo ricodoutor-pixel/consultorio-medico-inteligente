@@ -6,7 +6,7 @@
 const PT_EN: Array<[RegExp, string]> = [
   [/epileps|convuls|crise convulsiva/i, "epilepsy seizures"],
   [/autis|tea\b/i, "autism spectrum disorder"],
-  [/ansiedade|panico|pânico/i, "anxiety"],
+  [/ansiedade|anxiety|panico|pânico/i, "anxiety"],
   [/insonia|insônia|dormir|sono/i, "insomnia sleep"],
   [/dor cronica|dor crônica|fibromialgi/i, "chronic pain fibromyalgia"],
   [/parkinson/i, "parkinson disease"],
@@ -37,6 +37,11 @@ export interface ScientificEvidence {
   doiVerified: boolean;
   abstract: string;
 }
+
+const serverEnv = (name: string): string => {
+  const runtime = globalThis as typeof globalThis & { Deno?: { env: { get(key: string): string | undefined } } };
+  return runtime.Deno?.env.get(name) || "";
+};
 
 export function normalizeDoi(doi: string): string {
   return doi.trim().replace(/^doi\s*:\s*/i, "").replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
@@ -98,8 +103,8 @@ export async function fetchScientificEvidence(
   text: string,
   limit = 3,
 ): Promise<ScientificEvidence[]> {
-  const url = Deno.env.get("SUPABASE_URL") || "";
-  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const url = serverEnv("SUPABASE_URL");
+  const key = serverEnv("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key || !text) return [];
 
   const query = buildSearchQuery(text);
@@ -144,8 +149,8 @@ export async function fetchScientificEvidence(
 
 /** Lê a contagem real de estudos da base (fonte única para qualquer número citado). */
 export async function fetchScientificCount(): Promise<number | null> {
-  const url = Deno.env.get("SUPABASE_URL") || "";
-  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const url = serverEnv("SUPABASE_URL");
+  const key = serverEnv("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) return null;
   try {
     const r = await fetch(`${url}/rest/v1/scientific_articles?select=id`, {

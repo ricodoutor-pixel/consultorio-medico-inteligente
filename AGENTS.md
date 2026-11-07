@@ -1,5 +1,9 @@
 # Project architecture rules
 
+- Orientation codes derive from the persisted payment-order identifier and are persisted in new reports; historical report codes come from their original content to avoid silently rewriting documents.
+- All referral screens consume the ownership-checked, transaction-locked ensure_referral_code function and referral_links as the canonical store; browser-generated fallback codes are never shareable.
+- Orientation completion exposes rating immediately and returns the server-read rating; notice acceptance is stored separately from delivery receipts, preventing false delivery claims.
+
 - QR installation links use the dedicated installation view within `/download`, reusing `usePWAInstall` and requiring browser consent; do not substitute mobile installation with a desktop shortcut download.
 
 - PageScrollReset centrally resets document scroll on navigation inside the route Suspense boundary and disables browser scroll restoration; this starts lazy-loaded pages at the top without interrupting in-page chat scrolling.

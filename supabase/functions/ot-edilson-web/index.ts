@@ -462,13 +462,24 @@ Deno.serve(async (req) => {
         ? `\n\n=== DADOS DA TRIAGEM DO PACIENTE ===\n${sanitize(JSON.stringify(sess.triage), 2000)}`
         : "";
 
+      // Continuidade real: o agente só pode mencionar atendimentos anteriores se existirem.
+      const { count: priorCount } = await sb
+        .from("ot_web_sessions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", uid)
+        .in("status", ["completed", "expired"])
+        .neq("id", sess.id);
+      const continuityBlock = (priorCount ?? 0) > 0
+        ? `\n\n=== CONTINUIDADE ===\nEste paciente já teve ${priorCount} atendimento(s) anterior(es) registrado(s) na plataforma. Você pode mencionar continuidade se fizer sentido.`
+        : `\n\n=== CONTINUIDADE ===\nEsta é a PRIMEIRA conversa registrada com este paciente. NUNCA diga "desde nossa última conversa", "como conversamos antes" ou qualquer frase que sugira atendimento anterior.`;
+
       const completionStream = await streamChatCompletion({
           model: "google/gemini-3.8-flash",
           reasoning: GATEWAY_NO_REASONING,
           messages: [
             {
               role: "system",
-              content: drEdilsonPersona(minutes) + triageBlock + evidence + doctorsReferralBlock,
+              content: drEdilsonPersona(minutes) + triageBlock + continuityBlock + evidence + doctorsReferralBlock,
             },
             ...cleanHistory,
           ],

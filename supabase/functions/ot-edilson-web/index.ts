@@ -10,6 +10,7 @@ import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
+import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -21,7 +22,7 @@ type SessionRow = {
   triage: Record<string, unknown> | null;
   started_at: string | null;
   expires_at: string | null;
-  status: "ready" | "active" | "paused" | "expired";
+  status: "ready" | "active" | "paused" | "expired" | "completed";
   paused: boolean;
   paused_by?: string | null;
   paused_at?: string | null;
@@ -151,6 +152,17 @@ Deno.serve(async (req) => {
             secondsLeft: 0,
           });
         }
+        if (sess.status === "completed") {
+          const { data: ratingRow } = await sb.from("avaliacoes_orientacao")
+            .select("rating").eq("session_id", sess.id).maybeSingle();
+          return json({
+            state: "completed",
+            session: sess,
+            minutesLeft: 0,
+            secondsLeft: 0,
+            rating: ratingRow?.rating ?? null,
+          });
+        }
       }
 
       let query = sb.from("orientacao_tecnica_orders")
@@ -175,6 +187,17 @@ Deno.serve(async (req) => {
                   .eq("id", order.id).eq("status", "pending").select("id");
                 console.log(`[ot-reconcile] pedido ${order.id} aprovado via consulta MP (${upd?.length ?? 0})`);
                 order.status = "approved";
+                if (upd?.length) {
+                  // Webhook não chegou: o aviso de pagamento ao Dr. Edilson sai por aqui, uma única vez.
+                  const { data: prof } = await sb.from("profiles").select("full_name").eq("id", uid).maybeSingle();
+                  EdgeRuntime.waitUntil(notifyPaymentConfirmedOnce(sb, {
+                    externalReference: order.external_reference,
+                    patientName: (prof as any)?.full_name || "Paciente",
+                    amountBrl: amt,
+                    service: "Orientação Técnica",
+                    paymentId: order.mp_payment_id,
+                  }));
+                }
               } else if (p.status === "rejected") {
                 await sb.from("orientacao_tecnica_orders").update({ status: "rejected" }).eq("id", order.id).eq("status", "pending");
                 order.status = p.status;
@@ -529,6 +552,57 @@ Deno.serve(async (req) => {
 
       if (reportsError) return json({ error: "Não foi possível carregar seus relatórios. Tente novamente." }, 500);
       return json({ reports: reports || [] });
+    }
+
+    // ── 7. CLOSE SESSION (despedida: servidor marca a sala como encerrada) ──
+    if (action === "close_session") {
+      const sess = await loadUserSession();
+      if (!sess) return json({ error: "Sessão não encontrada" }, 404);
+      if (sess.status === "completed") return json({ success: true, state: "completed" });
+      if (sess.status === "ready") return json({ error: "A sessão ainda não foi iniciada." }, 409);
+      await sb.from("ot_web_sessions").update({
+        status: "completed",
+        closed_at: new Date().toISOString(),
+      }).eq("id", sess.id).neq("status", "completed");
+      return json({ success: true, state: "completed" });
+    }
+
+    // ── 8. SUBMIT RATING (avaliação por três carinhas; uma por atendimento) ──
+    if (action === "submit_rating") {
+      const sess = await loadUserSession();
+      if (!sess) return json({ error: "Sessão não encontrada" }, 404);
+      const rating = Number(body?.rating);
+      if (![1, 2, 3].includes(rating)) return json({ error: "rating_invalid" }, 400);
+      const comment = sanitize(body?.comment, 1000) || null;
+
+      const { data: existing } = await sb.from("avaliacoes_orientacao")
+        .select("id").eq("session_id", sess.id).maybeSingle();
+      if (!existing) {
+        const { error: rErr } = await sb.from("avaliacoes_orientacao").insert({
+          session_id: sess.id,
+          user_id: uid,
+          rating,
+          comment,
+        });
+        if (rErr) return json({ error: "rating_save_failed" }, 500);
+      }
+      // Encerramento no servidor: sala vira somente leitura.
+      await sb.from("ot_web_sessions").update({
+        status: "completed",
+        closed_at: new Date().toISOString(),
+      }).eq("id", sess.id).neq("status", "completed");
+      return json({ success: true, state: "completed", alreadyRated: !!existing });
+    }
+
+    // ── 9. SKIP RATING (paciente pulou: registra encerramento sem avaliação) ──
+    if (action === "skip_rating") {
+      const sess = await loadUserSession();
+      if (!sess) return json({ error: "Sessão não encontrada" }, 404);
+      await sb.from("ot_web_sessions").update({
+        status: "completed",
+        closed_at: new Date().toISOString(),
+      }).eq("id", sess.id).neq("status", "completed");
+      return json({ success: true, state: "completed", rating: null });
     }
 
     // ══════════════════════════════════════════════════════════════════════════

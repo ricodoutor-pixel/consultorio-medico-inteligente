@@ -841,6 +841,41 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes_orientacao: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_orientacao_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "ot_web_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author: string
@@ -6111,6 +6146,39 @@ export type Database = {
           pix_key_type?: string
           updated_at?: string
           whatsapp_proof_number?: string
+        }
+        Relationships: []
+      }
+      payment_notify_log: {
+        Row: {
+          channel: string
+          created_at: string
+          error: string | null
+          external_reference: string
+          id: string
+          recipient: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          error?: string | null
+          external_reference: string
+          id?: string
+          recipient: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          error?: string | null
+          external_reference?: string
+          id?: string
+          recipient?: string
+          sent_at?: string | null
+          status?: string
         }
         Relationships: []
       }

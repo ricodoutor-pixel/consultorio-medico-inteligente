@@ -24,6 +24,7 @@ import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight, AlertTriangle,
   CheckCircle2, Sparkles, BookOpen, FileText, ArrowRight, Paperclip, X, PauseCircle,
   UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check, Maximize2, Minimize2, Type, CheckCheck,
+  Frown, Meh, Smile, Gift,
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "pyr_ot_external_reference";
@@ -32,7 +33,7 @@ const ATTACH_BUCKET = "ot-attachments";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 type Phase = "loading" | "intro" | "triage" | "checkout" | "awaiting" | "room" | "emergency";
-type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired";
+type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired" | "completed";
 
 type OtSession = {
   id: string;
@@ -67,31 +68,22 @@ type TriageQuestion = {
   id: string;
   label: string;
   hint: string;
-  type: "text" | "long" | "choice";
+  type: "text" | "long" | "choice" | "combo" | "scale";
   options?: string[];
+  optional?: boolean;
+  allowNone?: boolean;
 };
 
+// Triagem curta v3: 5 telas. Nome e idade vêm do cadastro (não perguntar).
 const QUESTIONS: TriageQuestion[] = [
-  { id: "nome", label: "Como você se chama?", hint: "Nome que a equipe clínica vai usar no atendimento.", type: "text" },
-  { id: "idade", label: "Qual a sua idade?", hint: "Idade em anos.", type: "text" },
-  { id: "queixa", label: "Qual a sua queixa principal?", hint: "Descreva o que mais te incomoda hoje.", type: "long" },
-  { id: "tempo", label: "Há quanto tempo você sente isso?", hint: "Selecione a opção mais próxima.", type: "choice", options: ["Menos de 1 mês", "1 a 6 meses", "6 meses a 2 anos", "Mais de 2 anos"] },
-  { id: "intensidade", label: "De 0 a 10, qual a intensidade dos sintomas?", hint: "0 = nenhum sintoma, 10 = insuportável.", type: "choice", options: ["0 a 3 (leve)", "4 a 6 (moderado)", "7 a 8 (forte)", "9 a 10 (insuportável)"] },
-  { id: "medicamentos", label: "Quais medicamentos ou tratamentos você usa hoje?", hint: "Liste nomes e doses, se souber. Escreva 'nenhum' se não usar.", type: "long" },
-  { id: "canabinoides", label: "Já usou canabinoides (CBD/THC)?", hint: "Sua experiência prévia ajuda a contextualizar a orientação.", type: "choice", options: ["Nunca usei", "Já usei por conta própria", "Uso com receita médica", "Usei e parei"] },
-  { id: "comorbidades", label: "Tem outras condições de saúde relevantes?", hint: "Fígado, coração, rins, gestação, psiquiátricas... Escreva 'nenhuma' se não houver.", type: "long" },
-  { id: "objetivo", label: "Qual o seu principal objetivo?", hint: "O que você espera alcançar.", type: "choice", options: ["Aliviar dor", "Dormir melhor", "Reduzir ansiedade", "Reduzir medicamentos pesados", "Controlar crises/convulsões", "Qualidade de vida geral"] },
-  { id: "red_flags", label: "Está sentindo algum destes sinais agora?", hint: "Se houver sinal de emergência, procure o SAMU 192 imediatamente.", type: "choice", options: ["Nenhum desses", "Dor no peito / falta de ar", "Desmaio ou confusão", "Sangramento ativo", "Pensamentos de me machucar"] },
+  { id: "red_flags", label: "Está com algum sinal de emergência agora?", hint: "Ex.: dor no peito, falta de ar, desmaio, sangramento ativo ou pensamentos de se machucar.", type: "choice" },
+  { id: "queixa", label: "Qual o principal problema e há quanto tempo?", hint: "Descreva com suas palavras e escolha o tempo mais próximo.", type: "combo", options: ["Menos de 1 mês", "1 a 6 meses", "Mais de 6 meses"] },
+  { id: "intensidade", label: "De 0 a 10, qual a intensidade dos sintomas?", hint: "0 = nenhum sintoma · 10 = insuportável.", type: "scale" },
+  { id: "medicamentos", label: "Medicamentos, alergias e outras condições de saúde", hint: "Inclua gravidez ou amamentação, se for o caso. Toque em “Nenhum” se não houver.", type: "long", allowNone: true },
+  { id: "objetivo", label: "O que você espera do atendimento?", hint: "Opcional — pode pular se preferir.", type: "choice", optional: true, options: ["Dormir melhor", "Aliviar dor", "Reduzir ansiedade", "Outro"] },
 ];
 
-const EMERGENCY_ANSWERS = new Set([
-  "Dor no peito / falta de ar",
-  "Desmaio ou confusão",
-  "Sangramento ativo",
-  "Pensamentos de me machucar",
-]);
-
-const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired"];
+const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired", "completed"];
 const LIVE_STATES: OtState[] = ["ready", "active", "paused"];
 
 const fmtClock = (s: number) => {
@@ -142,6 +134,9 @@ export default function OrientacaoTecnicaAgente() {
   const [draft, setDraft] = useState("");
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string>("");
+  const [profileAge, setProfileAge] = useState<number | null>(null);
+  const [comboTempo, setComboTempo] = useState("");
 
   const [orderRef, setOrderRef] = useState<string | null>(searchParams.get("ref"));
   const orderRefRef = useRef<string | null>(searchParams.get("ref"));
@@ -173,6 +168,11 @@ export default function OrientacaoTecnicaAgente() {
 
   const [reports, setReports] = useState<OtReport[]>([]);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [rating, setRating] = useState<1 | 2 | 3 | null>(null);
+  const [ratingDone, setRatingDone] = useState(false);
+  const [ratingComment, setRatingComment] = useState("");
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [fullRoom, setFullRoom] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [reportWait, setReportWait] = useState(0);
@@ -198,7 +198,10 @@ export default function OrientacaoTecnicaAgente() {
   const initDone = useRef(false);
 
   const emergency = hasEmergency(answers);
-  const triageComplete = QUESTIONS.every((item) => (answers[item.id] || "").trim());
+  const triageComplete = QUESTIONS.every((item) =>
+    item.optional ? true
+      : item.id === "queixa" ? !!(answers.queixa?.trim() && answers.tempo?.trim())
+        : !!(answers[item.id] || "").trim());
 
   // ── Auto-preenchimento por query params (Personalização de Link) ─────────
   useEffect(() => {
@@ -223,6 +226,25 @@ export default function OrientacaoTecnicaAgente() {
       if (!alive) return;
       setAuthed(!!data.session);
       setUserId(data.session?.user?.id ?? null);
+      const uid = data.session?.user?.id;
+      if (uid) {
+        // Nome e idade vêm do cadastro — a triagem não pergunta de novo.
+        void supabase.from("profiles").select("full_name, date_of_birth").eq("id", uid).maybeSingle()
+          .then(({ data: p }) => {
+            if (!alive || !p) return;
+            if (p.full_name) setProfileName(p.full_name);
+            if (p.date_of_birth) {
+              const birth = new Date(p.date_of_birth);
+              if (!Number.isNaN(birth.getTime())) {
+                const now = new Date();
+                let age = now.getFullYear() - birth.getFullYear();
+                const m = now.getMonth() - birth.getMonth();
+                if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age -= 1;
+                if (age >= 0 && age <= 120) setProfileAge(age);
+              }
+            }
+          });
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session);
@@ -240,11 +262,12 @@ export default function OrientacaoTecnicaAgente() {
   }, [activeSessionId]);
 
   // ── Status (fonte única para liberar a sala) ───────────────────────────
-  const applyStatus = useCallback((d: { state?: OtState; session?: OtSession | null; minutesLeft?: number } | null) => {
+  const applyStatus = useCallback((d: { state?: OtState; session?: OtSession | null; minutesLeft?: number; rating?: number | null } | null) => {
     const st: OtState = (d?.state as OtState) || "none";
     const sess = d?.session ?? null;
     setOtState(st);
     setOtSession(sess);
+    if (st === "completed" && typeof d?.rating === "number") { setRating(d.rating as 1 | 2 | 3); setRatingDone(true); }
     if (sess?.expires_at) {
       setSecondsLeft(Math.max(0, Math.floor((Date.parse(sess.expires_at) - Date.now()) / 1000)));
     } else if (typeof d?.minutesLeft === "number") {
@@ -263,12 +286,16 @@ export default function OrientacaoTecnicaAgente() {
       setOrderRef(d.order.external_reference);
       if (d.order.triagem) {
         setAnswers(d.order.triagem);
-        const missing = QUESTIONS.findIndex(item => !d.order?.triagem?.[item.id]?.trim());
+        const t = d.order.triagem;
+        const missing = QUESTIONS.findIndex((item) =>
+          item.optional ? false
+            : item.id === "queixa" ? !(t.queixa?.trim() && t.tempo?.trim())
+              : !t[item.id]?.trim());
         setStep(missing < 0 ? QUESTIONS.length - 1 : missing);
       }
       if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });
     }
-    if (LIVE_STATES.includes(st) || st === "expired") setPhase("room");
+    if (LIVE_STATES.includes(st) || st === "expired" || st === "completed") setPhase("room");
     else if (st === "triage") setPhase(hasEmergency(d.order?.triagem || {}) ? "emergency" : "triage");
     else if (st === "awaiting_payment") setPhase("awaiting");
     else setPhase("intro");
@@ -314,9 +341,42 @@ export default function OrientacaoTecnicaAgente() {
     void loadReports();
   }, [phase, loadMessages, loadReports]);
 
+  // ── Encerramento e avaliação (três carinhas) ─────────────────────────
+  const closeSession = useCallback(async () => {
+    if (closing) return;
+    setClosing(true);
+    try {
+      await callFn({ action: "close_session" });
+      setOtState("completed");
+    } catch {
+      toast({ title: "Não foi possível encerrar agora. Tente de novo.", variant: "destructive" });
+    } finally {
+      setClosing(false);
+    }
+  }, [callFn, closing, toast]);
+
+  const submitRating = useCallback(async (value: 1 | 2 | 3 | null) => {
+    if (submittingRating) return;
+    setSubmittingRating(true);
+    try {
+      if (value) {
+        await callFn({ action: "submit_rating", rating: value, comment: ratingComment.trim() || undefined });
+        setRating(value);
+      } else {
+        await callFn({ action: "skip_rating" });
+      }
+      setRatingDone(true);
+      setOtState("completed");
+    } catch {
+      toast({ title: "Não foi possível registrar sua avaliação. Tente de novo.", variant: "destructive" });
+    } finally {
+      setSubmittingRating(false);
+    }
+  }, [callFn, ratingComment, submittingRating, toast]);
+
   // Poll da sala (5s): status (pausa/expiração) + mensagens (inclui Dr. Edilson humano).
   useEffect(() => {
-    if (phase !== "room" || otState === "expired") return;
+    if (phase !== "room" || otState === "expired" || otState === "completed") return;
     const cleanup = setVisibleInterval(() => {
       if (streaming) return;
       void fetchStatus().catch(() => undefined);
@@ -373,7 +433,7 @@ export default function OrientacaoTecnicaAgente() {
     }
     const fields = invalidTriageFields({ [q.id]: value }, false);
     if (fields.length) {
-      toast({ title: "Revise sua resposta", description: q.id === "idade" ? "Informe uma idade de 0 a 120 anos." : "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
+      toast({ title: "Revise sua resposta", description: "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
       return;
     }
     setSavingAnswer(true);
@@ -401,8 +461,55 @@ export default function OrientacaoTecnicaAgente() {
     } finally { setSavingAnswer(false); }
   };
 
+  // Tela 2 (combo): grava queixa + tempo em sequência e avança uma única vez.
+  const saveComboAnswers = async () => {
+    const queixa = (draft || answers.queixa || "").trim();
+    const tempo = comboTempo || answers.tempo || "";
+    if (!queixa || queixa.length < 3) {
+      toast({ title: "Descreva o problema", description: "Escreva pelo menos 3 caracteres sobre o que você está sentindo.", variant: "destructive" });
+      return;
+    }
+    if (!tempo) {
+      toast({ title: "Selecione o tempo", description: "Escolha há quanto tempo você sente isso.", variant: "destructive" });
+      return;
+    }
+    if (!orderRef) {
+      toast({ title: "Pagamento ainda não vinculado", description: "Conclua o pagamento de R$ 30 para gravarmos suas respostas.", variant: "destructive" });
+      setPhase("checkout");
+      return;
+    }
+    setSavingAnswer(true);
+    try {
+      await callFn({ action: "save_triage", answer: { queixa } });
+      const response = await callFn<{ state: string; triagem: Record<string, string> }>({ action: "save_triage", answer: { tempo } });
+      setAnswers(response.triagem);
+      setDraft("");
+      setComboTempo("");
+      if (step < QUESTIONS.length - 1) setStep(step + 1);
+      else await fetchStatus();
+    } catch {
+      toast({ title: "Não foi possível salvar a resposta", description: "Sua pergunta permanece aqui. Tente novamente.", variant: "destructive" });
+    } finally { setSavingAnswer(false); }
+  };
+
+  // Pergunta opcional (expectativa): pular sem gravar.
+  const skipOptional = async () => {
+    if (step < QUESTIONS.length - 1) { setStep(step + 1); return; }
+    try {
+      const st = await fetchStatus();
+      if (st === "ready") await startRoomRef.current?.();
+    } catch { /* status já tratado */ }
+  };
+
+  const isQuestionAnswered = (item: TriageQuestion) =>
+    item.id === "queixa"
+      ? !!(answers.queixa?.trim() && answers.tempo?.trim())
+      : item.optional
+        ? true
+        : !!answers[item.id]?.trim();
+
   const startTriage = () => {
-    setStep(Math.max(0, QUESTIONS.findIndex(item => !answers[item.id]?.trim())));
+    setStep(Math.max(0, QUESTIONS.findIndex((item) => !isQuestionAnswered(item))));
     setPhase("triage");
   };
 
@@ -768,7 +875,7 @@ export default function OrientacaoTecnicaAgente() {
 
                   <p className="text-xs text-muted-foreground">
                     Como funciona: <strong className="text-foreground">1.</strong> pagamento seguro de R$ 30 pelo Mercado Pago →{" "}
-                    <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (10 perguntas), após confirmação →{" "}
+                    <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (5 perguntas), após confirmação →{" "}
                     <strong className="text-foreground">3.</strong> sala com o Dr. Edilson ON, após concluir a triagem.
                   </p>
 
@@ -794,9 +901,10 @@ export default function OrientacaoTecnicaAgente() {
           {phase === "emergency" && (
             <div role="alert" className="border-2 border-destructive bg-destructive/10 p-6 space-y-4">
               <AlertTriangle className="text-destructive" size={40} />
-              <h2 className="text-2xl font-bold text-destructive">Sinal de emergência: SAMU 192</h2>
-              <p>Procure atendimento presencial agora. Ligue 192 ou vá ao pronto-socorro mais próximo. A sala não será liberada.</p>
-              <Button variant="outline" onClick={() => { setStep(9); setPhase("triage"); }}>Marquei por engano — revisar resposta</Button>
+              <h2 className="text-2xl font-bold text-destructive">Você não está sozinho(a) — procure ajuda agora</h2>
+              <p>Pelo que você relatou, o mais seguro é atendimento presencial imediato: ligue <strong>SAMU 192</strong> ou vá ao pronto-socorro mais próximo. Se estiver passando por uma crise emocional, o <strong>CVV 188</strong> atende 24h, de graça.</p>
+              <p className="text-sm text-muted-foreground">Seu pagamento continua válido e guardado — quando estiver em segurança, você pode voltar e corrigir sua resposta sem pagar de novo.</p>
+              <Button variant="outline" onClick={() => { setStep(0); setPhase("triage"); }}>Voltar e corrigir minha resposta</Button>
             </div>
           )}
 
@@ -808,6 +916,13 @@ export default function OrientacaoTecnicaAgente() {
                 <p className="text-xs text-muted-foreground font-bold text-right mb-6">
                   Enfª Brisa · Pergunta {step + 1} de {QUESTIONS.length}
                 </p>
+
+                {(profileName || profileAge !== null) && (
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Atendendo: <strong className="text-foreground">{profileName || "paciente cadastrado"}</strong>
+                    {profileAge !== null ? ` · ${profileAge} anos` : ""} (dados do seu cadastro)
+                  </p>
+                )}
 
                 <h2 className="text-xl md:text-2xl font-display font-black text-foreground mb-1">{q.label}</h2>
                 <p className="text-sm text-muted-foreground mb-6">{q.hint}</p>
@@ -821,6 +936,54 @@ export default function OrientacaoTecnicaAgente() {
                         <span>{opt.label}</span><ChevronRight size={18} />
                       </Button>
                     ))}
+                    {q.optional && (
+                      <button type="button" onClick={() => void skipOptional()} disabled={savingAnswer}
+                        className="w-full text-center text-xs text-muted-foreground hover:text-foreground underline pt-1">
+                        Pular esta pergunta
+                      </button>
+                    )}
+                  </div>
+                ) : q.type === "scale" ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-6 gap-2" role="group" aria-label="Escala de intensidade de 0 a 10">
+                      {Array.from({ length: 11 }, (_, n) => (
+                        <Button key={n} variant="outline" disabled={savingAnswer}
+                          onClick={() => void saveAnswer(String(n))}
+                          className={`h-12 font-black ${answers[q.id] === String(n) ? "border-primary bg-primary/10" : "border-border"}`}>
+                          {n}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[11px] text-muted-foreground px-1">
+                      <span>Nenhum sintoma</span><span>Insuportável</span>
+                    </div>
+                  </div>
+                ) : q.type === "combo" ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      value={draft || answers.queixa || ""}
+                      onChange={(e) => setDraft(e.target.value)}
+                      rows={4}
+                      placeholder="Descreva o principal problema com suas palavras..."
+                      aria-label="Qual o principal problema?"
+                    />
+                    <div className="flex flex-wrap gap-2" role="group" aria-label="Há quanto tempo?">
+                      {(q.options || []).map((label) => (
+                        <Button key={label} size="sm" variant="outline" disabled={savingAnswer}
+                          onClick={() => setComboTempo(label)}
+                          className={`rounded-full ${(comboTempo || answers.tempo) === label ? "border-primary bg-primary/10" : "border-border"}`}>
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => void saveComboAnswers()}
+                      disabled={savingAnswer || !(draft || answers.queixa || "").trim() || !(comboTempo || answers.tempo)}
+                      className="w-full h-12 rounded-2xl font-black"
+                    >
+                      {savingAnswer ? <Loader2 size={16} className="animate-spin mr-1" /> : null}
+                      Continuar <ChevronRight size={16} className="ml-1" />
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -837,21 +1000,28 @@ export default function OrientacaoTecnicaAgente() {
                         value={draft || answers[q.id] || ""}
                         onChange={(e) => setDraft(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter" && !savingAnswer) { e.preventDefault(); void saveAnswer((draft || answers[q.id] || "").trim()); } }}
-                        inputMode={q.id === "idade" ? "numeric" : "text"}
                         placeholder="Digite aqui..."
                         aria-label={q.label}
                       />
                     )}
-                    <Button
-                      onClick={() => {
-                        const v = (draft || answers[q.id] || "").trim();
-                        if (v) void saveAnswer(v);
-                      }}
-                      disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
-                      className="w-full h-12 rounded-2xl font-black"
-                    >
-                      Continuar <ChevronRight size={16} className="ml-1" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          const v = (draft || answers[q.id] || "").trim();
+                          if (v) void saveAnswer(v);
+                        }}
+                        disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
+                        className="flex-1 h-12 rounded-2xl font-black"
+                      >
+                        Continuar <ChevronRight size={16} className="ml-1" />
+                      </Button>
+                      {q.allowNone && (
+                        <Button variant="outline" onClick={() => void saveAnswer("Nenhum")} disabled={savingAnswer}
+                          className="h-12 rounded-2xl font-bold">
+                          Nenhum
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -877,14 +1047,14 @@ export default function OrientacaoTecnicaAgente() {
                     <p className="font-black text-red-500 mb-1">Sinal de emergência identificado</p>
                     <p className="text-muted-foreground">
                       Pelo que você relatou, procure atendimento presencial agora: ligue <strong>SAMU 192</strong> ou
-                      vá ao pronto-socorro mais próximo. A Orientação Técnica não substitui urgência médica, por isso o
-                      pagamento não está disponível neste momento.
+                      vá ao pronto-socorro mais próximo. Em crise emocional, o <strong>CVV 188</strong> atende 24h.
+                      A Orientação Técnica não substitui urgência médica, por isso o pagamento não está disponível neste momento.
                     </p>
                     <button
-                      onClick={() => { setStep(QUESTIONS.length - 1); setPhase("triage"); }}
+                      onClick={() => { setStep(0); setPhase("triage"); }}
                       className="mt-3 text-xs underline text-muted-foreground"
                     >
-                      Marquei por engano — revisar resposta
+                      Voltar e corrigir minha resposta
                     </button>
                   </div>
                 </div>
@@ -1067,7 +1237,7 @@ export default function OrientacaoTecnicaAgente() {
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
-                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" ? "encerrado" : otState}</p>
+                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -1083,6 +1253,18 @@ export default function OrientacaoTecnicaAgente() {
                     >
                       <Clock size={12} /> {fmtClock(secondsLeft)}
                     </div>
+                  )}
+                  {otState === "active" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ot-tool h-9 px-2 text-xs font-bold"
+                      onClick={() => void closeSession()}
+                      disabled={closing}
+                      aria-label="Encerrar orientação"
+                    >
+                      {closing ? <Loader2 size={14} className="animate-spin" /> : "Encerrar"}
+                    </Button>
                   )}
                   </div>
                 </div>
@@ -1205,7 +1387,83 @@ export default function OrientacaoTecnicaAgente() {
                       </div>
                     </div>
                   )}
-                  {otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
+                  {otState === "completed" ? (
+                    !ratingDone ? (
+                      <div className="text-center space-y-4 py-3" role="group" aria-label="Avaliação da orientação">
+                        <p className="text-base font-black text-neutral-800">Como foi sua orientação?</p>
+                        <div className="flex items-start justify-center gap-4">
+                          {([
+                            { value: 1 as const, label: "Insatisfeito", Icon: Frown, active: "text-red-500 border-red-400 bg-red-50" },
+                            { value: 2 as const, label: "Neutro", Icon: Meh, active: "text-amber-500 border-amber-400 bg-amber-50" },
+                            { value: 3 as const, label: "Satisfeito", Icon: Smile, active: "text-green-600 border-green-500 bg-green-50" },
+                          ]).map(({ value, label, Icon, active }) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => setRating(value)}
+                              aria-pressed={rating === value}
+                              className={`flex flex-col items-center gap-1 p-3 rounded-2xl border-2 min-w-[84px] transition-colors ${
+                                rating === value ? active : "border-neutral-200 text-neutral-500 bg-white hover:border-neutral-300"
+                              }`}
+                            >
+                              <Icon size={40} strokeWidth={1.6} />
+                              <span className="text-xs font-bold">{label}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <Textarea
+                          value={ratingComment}
+                          onChange={(e) => setRatingComment(e.target.value)}
+                          rows={2}
+                          placeholder="Quer contar o que podemos melhorar? (opcional)"
+                          aria-label="Comentário opcional sobre a orientação"
+                          className="max-w-md mx-auto resize-none rounded-xl bg-white"
+                        />
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            onClick={() => void submitRating(rating)}
+                            disabled={!rating || submittingRating}
+                            className="rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white"
+                          >
+                            {submittingRating ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
+                            Enviar avaliação
+                          </Button>
+                          <Button variant="ghost" onClick={() => void submitRating(null)} disabled={submittingRating} className="rounded-xl font-bold text-neutral-600">
+                            Pular
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center space-y-4 py-3">
+                        <p className="text-base font-black text-neutral-800">Orientação encerrada. Obrigado! 🌿</p>
+                        <p className="text-xs text-neutral-600">Seu histórico e seu relatório continuam disponíveis nesta página.</p>
+                        <div className="flex flex-col items-center gap-2 max-w-sm mx-auto">
+                          {reports.some((r) => canDownloadOtReport(r.status, !!r.educational_released_at)) && (
+                            <Button asChild className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white">
+                              <Link to={`/orientacao-tecnica/relatorio/${reports.find((r) => canDownloadOtReport(r.status, !!r.educational_released_at))!.id}`}>
+                                <FileText size={14} className="mr-1" /> Baixar relatório
+                              </Link>
+                            </Button>
+                          )}
+                          <Button onClick={() => navigate("/profissionais")} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
+                            Falar com um médico agora (Chat R$ 100 · Vídeo R$ 150) <ArrowRight size={14} className="ml-1" />
+                          </Button>
+                          <Button onClick={resetForNew} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
+                            Fazer nova orientação (R$ 30)
+                          </Button>
+                          <div className="w-full rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 p-3 text-left space-y-2">
+                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique e participe do programa de ganhos</p>
+                            <p className="text-[11px] text-neutral-700 leading-snug">
+                              50% do valor líquido distribuídos na rede, em três níveis (25%, 15% e 10%). Obtenha seu link personalizado e acompanhe seus ganhos.
+                            </p>
+                            <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                              Obter meu link de indicação
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  ) : otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
                     <div className="text-center space-y-3 py-2">
                       <p className="text-sm font-bold text-neutral-800">Sessão de 30 minutos encerrada.</p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-2">

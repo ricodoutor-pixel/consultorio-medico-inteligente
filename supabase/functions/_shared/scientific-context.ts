@@ -95,22 +95,57 @@ export async function fetchScientificEvidence(
   }
 }
 
+/** Lê a contagem real de estudos da base (fonte única para qualquer número citado). */
+export async function fetchScientificCount(): Promise<number | null> {
+  const url = Deno.env.get("SUPABASE_URL") || "";
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  if (!url || !key) return null;
+  try {
+    const r = await fetch(`${url}/rest/v1/scientific_articles?select=id`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact", Range: "0-0" },
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!r.ok) return null;
+    const range = r.headers.get("content-range") || "";
+    const total = Number(range.split("/")[1]);
+    return Number.isFinite(total) ? total : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Bloco de texto pronto para injetar no system prompt do agente. */
 export async function buildScientificContextBlock(text: string, limit = 3): Promise<string> {
-  const evidence = await fetchScientificEvidence(text, limit);
-  if (evidence.length === 0) return "";
+  const [evidence, count] = await Promise.all([
+    fetchScientificEvidence(text, limit),
+    fetchScientificCount(),
+  ]);
+  const countLine = count !== null
+    ? `A biblioteca científica da Planta y Raiz tem exatamente ${count.toLocaleString("pt-BR")} estudos neste momento. Se perguntarem quantos estudos existem, responda exatamente este número. NUNCA afirme outro número (ex.: "centenas", "40 mil").`
+    : `Não foi possível medir o tamanho da biblioteca agora. Se perguntarem quantos estudos existem, diga que não tem o número exato neste momento — nunca invente.`;
+
+  if (evidence.length === 0) {
+    return `
+
+=== BASE CIENTÍFICA INTERNA ===
+${countLine}
+A busca para esta pergunta NÃO retornou estudos. Diga com honestidade: "Não encontrei estudo na nossa base sobre isso." Nunca cite estudo, DOI, revista ou ano que não esteja listado aqui.
+=== FIM DA BASE CIENTÍFICA ===`;
+  }
+
   const list = evidence
     .map(
       (e, i) =>
-        `[${i + 1}] ${e.title}${e.year ? ` (${e.year})` : ""}${e.doi ? ` — DOI ${e.doi}` : ""}\n${e.abstract}`,
+        `[${i + 1}] ${e.title}${e.year ? ` (${e.year})` : ""}${e.doi ? ` — DOI ${e.doi}` : ""}${e.url ? ` — ${e.url}` : ""}\n${e.abstract}`,
     )
     .join("\n\n");
   return `
 
 === BASE CIENTÍFICA INTERNA (uso obrigatório quando pertinente) ===
-Estes são estudos reais da biblioteca científica da Planta y Raiz.
-Cite-os de forma simples ("estudos recentes indicam..."), sem prometer cura,
-sem diagnosticar e sem prescrever. Nunca invente referências.
+${countLine}
+Estes são estudos reais da biblioteca científica da Planta y Raiz, recuperados por busca nesta pergunta.
+Cite SOMENTE o que está listado aqui, com título e ano; ao mencionar no relatório, inclua o link/DOI listado.
+Nunca invente referências, DOI, revistas ou anos. Sem prometer cura, sem diagnosticar e sem prescrever.
 
 ${list}
 === FIM DA BASE CIENTÍFICA ===`;

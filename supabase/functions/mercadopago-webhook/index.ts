@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { canEnterOrientation } from "../_shared/orientation-triage.ts";
+import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {
@@ -688,29 +689,18 @@ Deno.serve(async (req) => {
           status: "completed",
         });
 
-        // 5. Notificação WhatsApp ao Dr. Edilson Bezerra (Admin)
-        const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
-        const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
-        const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
-        const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
-
-        if (evolutionUrl && evolutionKey) {
-          const drMsg =
-            `💰 *PAGAMENTO CONFIRMADO — ORIENTAÇÃO TÉCNICA (TESTE REAL)* 🩺\n\n` +
-            `• *Valor Bruto:* R$ ${totalAmount.toFixed(2)}\n` +
-            `• *Taxa da Plataforma (7%):* R$ ${platformFee.toFixed(2)}\n` +
-            `• *Repasse Médico (93%):* R$ ${doctorPayout.toFixed(2)}\n` +
-            `• *Status:* APROVADO ✅\n` +
-            `• *Ref:* \`${externalRef}\`\n` +
-            `• *ID Mercado Pago:* \`${payment.id}\`\n` +
-            `• *Pagador:* ${payment.payer?.email || "—"}\n\n` +
-            `Todos os dados financeiros já foram armazenados no banco e estão visíveis no Painel Admin:\nhttps://www.plantayraiz.com.br/admin`;
-          await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", apikey: evolutionKey },
-            body: JSON.stringify({ number: adminPhone, text: drMsg }),
-          }).catch((err) => console.error("[orientacao-tecnica] dr notify:", err));
-        }
+        // 5. Notificação WhatsApp ao Dr. Edilson Bezerra (Admin) — uma única vez por pedido,
+        // com registro de tentativa/entrega em payment_notify_log.
+        const { data: otPatientProfile } = orientacaoUserId
+          ? await supabase.from("profiles").select("full_name").eq("id", orientacaoUserId).maybeSingle()
+          : { data: null };
+        await notifyPaymentConfirmedOnce(supabase, {
+          externalReference: externalRef,
+          patientName: (otPatientProfile as any)?.full_name || metadata.name || payment.payer?.first_name || "Paciente",
+          amountBrl: totalAmount,
+          service: "Orientação Técnica",
+          paymentId: String(payment.id),
+        });
 
         // 6. Notificação in-app aos administradores
         const { data: adminRoles } = await supabase

@@ -1,24 +1,41 @@
 import { describe, expect, it } from "vitest";
 import { hasEmergency, invalidTriageFields, canEnterOrientation } from "../../supabase/functions/_shared/orientation-triage";
-const complete = { nome: "Paciente Teste", idade: "30", queixa: "Dificuldade de sono", tempo: "1 mes", intensidade: "leve", medicamentos: "nenhum", canabinoides: "nunca", comorbidades: "nenhuma", objetivo: "sono", red_flags: "nenhum" };
-describe("Orientação pagamento primeiro", () => {
-  it("aceita Nenhum desses e variantes sem alerta", () => {
-    for (const value of ["Nenhum desses", "nenhum_desses", "[]", "Não", [], "nenhum"]) expect(hasEmergency({ red_flags: value })).toBe(false);
+
+// Triagem curta v3: 5 telas, 6 chaves (objetivo opcional). Nome/idade vêm do cadastro.
+const complete = {
+  red_flags: "nenhum",
+  queixa: "Dificuldade de sono",
+  tempo: "1 a 6 meses",
+  intensidade: "5",
+  medicamentos: "Nenhum",
+  objetivo: "Dormir melhor",
+};
+
+describe("Orientação pagamento primeiro — triagem de 5 perguntas", () => {
+  it("aceita 'Não, nenhum destes sinais' e variantes sem alerta", () => {
+    for (const value of ["Não, nenhum destes sinais", "Nenhum desses", "nenhum_desses", "[]", "Não", [], "nenhum"]) {
+      expect(hasEmergency({ red_flags: value })).toBe(false);
+    }
   });
-  it("valida idade de 0 a 120", () => {
-    expect(invalidTriageFields({ idade: "0" }, false)).toEqual([]);
-    expect(invalidTriageFields({ idade: "120" }, false)).toEqual([]);
-    expect(invalidTriageFields({ idade: "121" }, false)).toEqual(["idade"]);
-    expect(invalidTriageFields({ idade: "-1" }, false)).toEqual(["idade"]);
+  it("marca emergência quando o paciente confirma um sinal", () => {
+    expect(hasEmergency({ red_flags: "sim_emergencia" })).toBe(true);
+    expect(hasEmergency({ red_flags: "dor_peito_falta_ar" })).toBe(true);
   });
   it("exige queixa com 3 caracteres", () => {
     expect(invalidTriageFields({ queixa: "ab" }, false)).toEqual(["queixa"]);
     expect(invalidTriageFields({ queixa: "dor" }, false)).toEqual([]);
   });
+  it("objetivo é opcional: falta dele não bloqueia", () => {
+    const { objetivo: _omit, ...semObjetivo } = complete;
+    expect(invalidTriageFields(semObjetivo)).toEqual([]);
+  });
+  it("exige as 5 respostas obrigatórias", () => {
+    expect(invalidTriageFields({})).toEqual(["red_flags", "queixa", "tempo", "intensidade", "medicamentos"]);
+  });
   it("bloqueia sala sem pagamento aprovado", () => expect(canEnterOrientation({ status: "pending" }, complete)).toBe(false));
-  it("bloqueia sala sem as 10 respostas", () => expect(canEnterOrientation({ status: "approved" }, {})).toBe(false));
-  it("emergências nunca liberam sala", () => {
-    for (const red_flags of ["dor_peito_falta_ar", "desmaio_confusao", "sangramento_ativo", "autoagressao"]) expect(canEnterOrientation({ status: "approved" }, { ...complete, red_flags })).toBe(false);
+  it("bloqueia sala sem as respostas obrigatórias", () => expect(canEnterOrientation({ status: "approved" }, {})).toBe(false));
+  it("emergência nunca libera sala", () => {
+    expect(canEnterOrientation({ status: "approved" }, { ...complete, red_flags: "sim_emergencia" })).toBe(false);
   });
   it("aprovação e triagem válida liberam sala", () => expect(canEnterOrientation({ status: "approved" }, complete)).toBe(true));
 });

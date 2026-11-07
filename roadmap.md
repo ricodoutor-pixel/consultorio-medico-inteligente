@@ -1,5 +1,19 @@
 # Roadmap
 
+## Melhorias do relatório final da Orientação — 07/11/2026
+- [x] Encerramento automático: despedida após "posso ajudar em mais algo?" fecha a sala no servidor e mostra as três carinhas; fim dos 30 min também encerra com aviso; 14 testes passam
+- [x] Citações verdadeiras: DOI validado no Crossref antes de virar link; sem link confirmado o agente diz "não consegui confirmar o link"; contagem sem "exatamente"; DOI 10.1177/15347354241292978 confirmado inexistente (Crossref 404, ausente da base)
+- [x] Sem continuidade falsa: bloco de continuidade conta atendimentos anteriores reais; primeira conversa proíbe "desde nossa última conversa"
+- [x] Despedida curta sem nova pergunta (mensagem fixa no encerramento automático + regra no prompt)
+- [x] Relatório com nome do paciente, código OT-XXXXXXXX e data/hora; "você" no lugar de "senhor(a)" (prompt + saneador); PDF com código no nome do arquivo
+- [x] Triagem: sala não inicia mais após a 4ª resposta — a pergunta opcional aparece antes
+- [x] Persona/CRM: texto centralizado em `agents.ts`/`clinic-info.ts`; texto do CRM NÃO alterado — decisão do dono/jurídico pendente
+- [x] Indicação: texto sem promessa de ganho garantido (25/15/10 do líquido); link da conta logada mostrado na tela com botão copiar
+- [x] Avisos WhatsApp de início e encerramento (com nota e duração), dedup por pedido+evento, registro de tentativa — entrega real no celular não verificada
+- [x] Layout: cabeçalho da sala compacto; botão "Gerar relatório" dentro da sala com "Gerando… Ns" e "Baixar PDF"
+- [ ] Conta de paciente de teste separada + acesso QA somente leitura — bloqueado: criação de usuário de autenticação exige ação do dono no cadastro
+- [ ] Teste integral com pagamento real das novas regras + publicar
+
 ## Instalação direta pelo QR Code — 07/11/2026
 - [x] Abrir a opção de instalar diretamente ao escanear, com confirmação do navegador e instruções específicas para iPhone, sem baixar atalho de computador no celular
 - [x] Conferir entrada direta em Android, iPhone e computador; botão exercitado com evento de instalação simulado, instruções iPhone e ausência de transbordamento verificadas

@@ -176,6 +176,8 @@ export default function OrientacaoTecnicaAgente() {
   const [fullRoom, setFullRoom] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [reportWait, setReportWait] = useState(0);
+  const [refCode, setRefCode] = useState<string | null>(null);
+  const [copiedRef, setCopiedRef] = useState(false);
   useEffect(() => {
     if (!generatingReport) { setReportWait(0); return; }
     const started = Date.now();
@@ -443,8 +445,14 @@ export default function OrientacaoTecnicaAgente() {
       setDraft("");
       if (response.state === "emergency") setPhase("emergency");
       else if (response.state === "ready") {
-        const st = await fetchStatus();
-        if (st === "ready") await startRoomRef.current?.();
+        // A última resposta obrigatória já libera a sala no servidor, mas a
+        // pergunta opcional (objetivo) ainda não apareceu: mostra antes de iniciar.
+        const objetivoPendente = step < QUESTIONS.length - 1 && !(response.triagem?.objetivo || "").trim();
+        if (objetivoPendente) setStep(QUESTIONS.length - 1);
+        else {
+          const st = await fetchStatus();
+          if (st === "ready") await startRoomRef.current?.();
+        }
       }
       else if (step < QUESTIONS.length - 1) setStep(step + 1);
       else {
@@ -676,6 +684,19 @@ export default function OrientacaoTecnicaAgente() {
         throw new Error(failure?.error || "Não foi possível receber a resposta agora.");
       }
 
+      // Encerramento automático: o servidor responde JSON (não SSE) quando o
+      // paciente se despediu — mostra a despedida e abre a avaliação.
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await res.json().catch(() => null);
+        if (data?.closed && data?.farewell) {
+          setMessages(prev => [...prev, { id: `farewell-${Date.now()}`, role: "agent", content: data.farewell, created_at: new Date().toISOString() }]);
+          setOtState("completed");
+          return;
+        }
+        throw new Error(data?.error || "Não foi possível receber a resposta agora.");
+      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       const parse = createOtStreamParser();
@@ -749,6 +770,40 @@ export default function OrientacaoTecnicaAgente() {
     if (pendingPatient) list.push(pendingPatient);
     return list;
   }, [messages, pendingPatient]);
+
+  const downloadableReport = useMemo(
+    () => reports.find((r) => canDownloadOtReport(r.status, !!r.educational_released_at)),
+    [reports],
+  );
+
+  // Link de indicação da própria conta logada (mostrado na tela de encerramento).
+  useEffect(() => {
+    if (otState !== "completed" || !ratingDone || !userId || refCode) return;
+    let alive = true;
+    void (async () => {
+      const { data: profile } = await (supabase as any).from("profiles").select("referral_code").eq("id", userId).maybeSingle();
+      let code = (profile as { referral_code?: string | null } | null)?.referral_code || null;
+      if (!code) {
+        code = `PRZ-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+        const { data: updated } = await (supabase as any).from("profiles").update({ referral_code: code }).eq("id", userId).select("referral_code").maybeSingle();
+        code = (updated as { referral_code?: string } | null)?.referral_code || code;
+      }
+      if (alive) setRefCode(code);
+    })();
+    return () => { alive = false; };
+  }, [otState, ratingDone, userId, refCode]);
+
+  const copyRefLink = async () => {
+    if (!refCode) return;
+    try {
+      await navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro?ref=${refCode}`);
+      setCopiedRef(true);
+      toast({ title: "Link de indicação copiado!" });
+      setTimeout(() => setCopiedRef(false), 4000);
+    } catch {
+      toast({ title: "Erro ao copiar", description: "Selecione o link e copie manualmente.", variant: "destructive" });
+    }
+  };
 
   const firstName = (answers.nome || "").split(" ")[0];
   const awaitingLong = Date.now() - awaitingSince > 3 * 60 * 1000;
@@ -1227,13 +1282,13 @@ export default function OrientacaoTecnicaAgente() {
           {phase === "room" && (
             <div className="space-y-4">
               <div className={`ot-room ${fullRoom ? "ot-room-full" : "border border-border"} ${largeText ? "ot-room-large" : ""}`} role={fullRoom ? "dialog" : undefined} aria-modal={fullRoom ? true : undefined} aria-label="Conversa de Orientação Técnica">
-                {/* Header verde */}
-                <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-2.5">
-                  <div className="flex items-center gap-3 min-w-0">
+                {/* Header verde (compacto) */}
+                <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-1.5">
+                  <div className="flex items-center gap-2 min-w-0">
                     <img
                       src={DrEdilsonPhoto}
                       alt="Dr. Edilson Bezerra"
-                      className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-white/30"
+                      className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-white/30"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
@@ -1377,6 +1432,32 @@ export default function OrientacaoTecnicaAgente() {
 
                 {/* Rodapé / input */}
                 <div className="ot-room-compose px-2 py-2">
+                  {/* Relatório dentro da sala: visível, com estado "Gerando… Ns" e depois "Baixar PDF" */}
+                  {(otState === "active" || otState === "paused") && messages.some((m) => m.role === "patient") && (
+                    <div className="flex justify-center pb-2">
+                      {downloadableReport ? (
+                        <Button size="sm" asChild className="ot-quick shrink-0 font-bold">
+                          <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
+                            <FileText size={14} className="mr-1" /> Baixar PDF do relatório
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="ot-quick shrink-0 font-bold"
+                          onClick={() => void generateReport()}
+                          disabled={generatingReport || streaming || reports.some((r) => r.status === "draft")}
+                        >
+                          {generatingReport ? (
+                            <><Loader2 size={14} className="animate-spin mr-1" /> Gerando… {reportWait}s</>
+                          ) : (
+                            <><FileText size={14} className="mr-1" /> Gerar relatório</>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  )}
                   {otState === "active" && <div className="flex gap-2 overflow-x-auto pb-2"><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Acordo de madrugada")}>Acordo de madrugada</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Tenho dúvidas sobre tratamento")}>Dúvidas sobre tratamento</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" asChild><a href={`https://wa.me/${BRISA_WHATSAPP}`} target="_blank" rel="noopener noreferrer">Falar com a equipe</a></Button></div>}
                   {chatError && (
                     <div role="alert" className="mb-3 p-3 bg-destructive/10 text-destructive text-sm space-y-2">
@@ -1452,13 +1533,27 @@ export default function OrientacaoTecnicaAgente() {
                             Fazer nova orientação (R$ 30)
                           </Button>
                           <div className="w-full rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 p-3 text-left space-y-2">
-                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique e participe do programa de ganhos</p>
+                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique a Planta y Raiz</p>
                             <p className="text-[11px] text-neutral-700 leading-snug">
-                              50% do valor líquido distribuídos na rede, em três níveis (25%, 15% e 10%). Obtenha seu link personalizado e acompanhe seus ganhos.
+                              Quando alguém indicado por você contrata um serviço, 50% do valor líquido é distribuído na rede em três níveis (25%, 15% e 10%). Os ganhos dependem de indicações que realmente contratem — não há ganho garantido.
                             </p>
-                            <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
-                              Obter meu link de indicação
-                            </Button>
+                            {refCode ? (
+                              <div className="space-y-2">
+                                <div className="p-2 bg-white rounded-lg border border-[#25D366]/40 text-[11px] font-mono break-all select-all text-neutral-700">
+                                  https://plantayraiz.com.br/cadastro?ref={refCode}
+                                </div>
+                                <Button onClick={() => void copyRefLink()} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                                  {copiedRef ? <><Check size={14} className="mr-1" /> Link copiado!</> : "Copiar meu link de indicação"}
+                                </Button>
+                                <Button onClick={() => navigate("/afiliados")} size="sm" variant="ghost" className="w-full rounded-lg font-bold text-neutral-600 text-xs">
+                                  Ver meu painel de indicações
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                                Obter meu link de indicação
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -10,7 +10,8 @@ import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
-import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
+import { notifyPaymentConfirmedOnce, notifyOrientationEvent } from "../_shared/payment-notify.ts";
+import { shouldAutoClose, FAREWELL_MESSAGE } from "../_shared/orientation-farewell.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -95,6 +96,27 @@ Deno.serve(async (req) => {
 
     const targetSessionId = (typeof body?.sessionId === "string" ? body.sessionId : (typeof body?.session_id === "string" ? body.session_id : null));
 
+    const patientName = async (userId: string): Promise<string> => {
+      const { data: prof } = await sb.from("profiles").select("full_name").eq("id", userId).maybeSingle();
+      return (prof as { full_name?: string } | null)?.full_name || "Paciente";
+    };
+
+    /** Aviso de encerramento ao Dr. Edilson (dedup por pedido; sem dados de saúde). */
+    const fireClosedNotice = (sess: SessionRow, rating: number | null) => {
+      const durationMin = sess.started_at
+        ? Math.max(1, Math.round((Date.now() - new Date(sess.started_at).getTime()) / 60000))
+        : null;
+      EdgeRuntime.waitUntil((async () => {
+        await notifyOrientationEvent(sb, {
+          externalReference: sess.external_reference,
+          patientName: await patientName(sess.user_id),
+          event: "fim",
+          rating,
+          durationMin,
+        });
+      })());
+    };
+
     // Carrega a sessão do usuário (específica por ID ou a mais recente)
     const loadUserSession = async (): Promise<SessionRow | null> => {
       let q = sb.from("ot_web_sessions").select("*").eq("user_id", uid);
@@ -122,10 +144,16 @@ Deno.serve(async (req) => {
       const paid = ["approved", "completed", "dispatched"].includes(order?.status ?? "");
       if (!order || !paid || hasEmergency(triage as Record<string, unknown>)) return null;
 
-      // Se passou da validade e ainda está com status 'active', marca como expired
+      // Fim dos 30 min: encerra no servidor (sala vira somente leitura e a avaliação aparece).
       if (row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() <= Date.now()) {
-        await sb.from("ot_web_sessions").update({ status: "expired" }).eq("id", row.id);
-        row.status = "expired";
+        await sb.from("ot_web_sessions").update({ status: "completed", closed_at: new Date().toISOString() }).eq("id", row.id);
+        await sb.from("ot_messages").insert({
+          session_id: row.id,
+          role: "system",
+          content: `⏱️ Os ${ORIENTACAO_MINUTES} minutos da Orientação Técnica chegaram ao fim. A sala foi encerrada — avalie o atendimento abaixo e baixe seu relatório.`,
+        });
+        row.status = "completed";
+        fireClosedNotice(row, null);
       }
 
       return row;
@@ -299,6 +327,15 @@ Deno.serve(async (req) => {
           content: welcomeText,
         });
 
+        // Aviso de início da Orientação ao Dr. Edilson (uma única vez por pedido).
+        EdgeRuntime.waitUntil((async () => {
+          await notifyOrientationEvent(sb, {
+            externalReference: sess.external_reference,
+            patientName: await patientName(uid),
+            event: "inicio",
+          });
+        })());
+
         return json({
           state: "active",
           session: updated,
@@ -362,6 +399,32 @@ Deno.serve(async (req) => {
       }).select().single();
       if (messageError) return json({ error: "Não foi possível gravar sua mensagem. Tente novamente." }, 500);
 
+      // Encerramento automático: o agente perguntou "posso ajudar em mais alguma coisa?"
+      // e o paciente confirmou que não precisa de mais nada → despedida curta, sem nova
+      // pergunta, sala encerrada no servidor (a avaliação aparece sem exigir botão).
+      const { data: lastAgent } = await sb
+        .from("ot_messages")
+        .select("content")
+        .eq("session_id", sess.id)
+        .eq("role", "agent")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (shouldAutoClose(userText, lastAgent?.content ?? null)) {
+        await sb.from("ot_messages").insert({
+          session_id: sess.id,
+          role: "agent",
+          content: FAREWELL_MESSAGE,
+        });
+        await sb.from("ot_web_sessions").update({
+          status: "completed",
+          closed_at: new Date().toISOString(),
+        }).eq("id", sess.id).neq("status", "completed");
+        fireClosedNotice(sess, null);
+        return json({ closed: true, state: "completed", farewell: FAREWELL_MESSAGE });
+      }
+
       // Busca contexto científico
       const evidence = await buildScientificContextBlock(userText, 3).catch(() => "");
 
@@ -399,13 +462,24 @@ Deno.serve(async (req) => {
         ? `\n\n=== DADOS DA TRIAGEM DO PACIENTE ===\n${sanitize(JSON.stringify(sess.triage), 2000)}`
         : "";
 
+      // Continuidade real: o agente só pode mencionar atendimentos anteriores se existirem.
+      const { count: priorCount } = await sb
+        .from("ot_web_sessions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", uid)
+        .in("status", ["completed", "expired"])
+        .neq("id", sess.id);
+      const continuityBlock = (priorCount ?? 0) > 0
+        ? `\n\n=== CONTINUIDADE ===\nEste paciente já teve ${priorCount} atendimento(s) anterior(es) registrado(s) na plataforma. Você pode mencionar continuidade se fizer sentido.`
+        : `\n\n=== CONTINUIDADE ===\nEsta é a PRIMEIRA conversa registrada com este paciente. NUNCA diga "desde nossa última conversa", "como conversamos antes" ou qualquer frase que sugira atendimento anterior.`;
+
       const completionStream = await streamChatCompletion({
           model: "google/gemini-3.8-flash",
           reasoning: GATEWAY_NO_REASONING,
           messages: [
             {
               role: "system",
-              content: drEdilsonPersona(minutes) + triageBlock + evidence + doctorsReferralBlock,
+              content: drEdilsonPersona(minutes) + triageBlock + continuityBlock + evidence + doctorsReferralBlock,
             },
             ...cleanHistory,
           ],
@@ -485,8 +559,21 @@ Deno.serve(async (req) => {
 
       const triageStr = JSON.stringify(sess.triage || {});
 
+      // Identificação estruturada do atendimento (não depende da redação da IA).
+      const attendanceCode = `OT-${sess.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+      const name = await patientName(uid);
+      const quando = new Intl.DateTimeFormat("pt-BR", {
+        timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit", hour12: false,
+      }).format(new Date());
+
       const prompt =
         `Você é o Dr. Edilson Bezerra ON. Crie um Relatório de Orientação Técnica e Acolhimento Individual para o paciente com base na triagem e conversa abaixo.\n\n` +
+        `IDENTIFICAÇÃO OBRIGATÓRIA (use exatamente estes dados na seção 1):\n` +
+        `- Paciente: ${name}\n` +
+        `- Código do atendimento: ${attendanceCode}\n` +
+        `- Data e hora: ${quando} (São Paulo)\n\n` +
+        `REDACÃO: use sempre "você" para se dirigir ao paciente. NUNCA use "senhor(a)", "senhor" ou "senhora".\n\n` +
         `DIRETRIZES LEGAIS RIGOROSAS:\n` +
         `- NÃO diagnostique, NÃO prescreva medicamentos, NÃO indique marcas comerciais nem doses/posologias.\n` +
         `- Estruture o relatório em markdown elegante:\n` +
@@ -516,11 +603,17 @@ Deno.serve(async (req) => {
       const reportContent = repData.choices?.[0]?.message?.content;
       if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
-      const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(reportContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
+      // Garante o tratamento neutro mesmo se a IA desobedecer ao prompt.
+      const neutralContent = reportContent
+        .replace(/senhor\(a\)/gi, "você")
+        .replace(/\b[Ss]enhora\b/g, "você")
+        .replace(/\b[Ss]enhor\b/g, "você");
+
+      const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(neutralContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
         user_id: uid,
-        content_md: sanitizeOutboundLinks(reportContent),
+        content_md: sanitizeOutboundLinks(neutralContent),
         status: "draft",
         educational_released_at: new Date().toISOString(),
         generation_ms: Date.now() - started,
@@ -535,6 +628,7 @@ Deno.serve(async (req) => {
         success: true,
         report_id: newReport.id,
         status: "draft",
+        code: attendanceCode,
         message: "Relatório educativo disponível para baixar. Gerado por IA; revisão médica pendente.",
       });
     }
@@ -564,6 +658,7 @@ Deno.serve(async (req) => {
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
+      fireClosedNotice(sess, null);
       return json({ success: true, state: "completed" });
     }
 
@@ -591,6 +686,7 @@ Deno.serve(async (req) => {
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
+      fireClosedNotice(sess, rating);
       return json({ success: true, state: "completed", alreadyRated: !!existing });
     }
 
@@ -602,6 +698,7 @@ Deno.serve(async (req) => {
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
+      fireClosedNotice(sess, null);
       return json({ success: true, state: "completed", rating: null });
     }
 

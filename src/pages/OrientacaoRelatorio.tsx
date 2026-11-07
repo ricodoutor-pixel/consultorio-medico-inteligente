@@ -27,6 +27,7 @@ export default function OrientacaoRelatorio() {
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<ReportData | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [patientName, setPatientName] = useState<string>("");
 
   useEffect(() => {
     if (!id) return;
@@ -50,6 +51,13 @@ export default function OrientacaoRelatorio() {
         }
 
         setReport(data as ReportData);
+        // Nome do paciente vem do cadastro (para o cabeçalho e o PDF).
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", data.user_id)
+          .maybeSingle();
+        if (prof?.full_name) setPatientName(prof.full_name);
       } catch (e: any) {
         console.error("Erro ao buscar relatório", e);
         toast.error("Não foi possível carregar o relatório.");
@@ -63,6 +71,12 @@ export default function OrientacaoRelatorio() {
     window.print();
   };
 
+  // Código curto do atendimento: usa o código de verificação quando existe;
+  // caso contrário deriva do identificador do relatório (determinístico).
+  const attendanceCode = report
+    ? report.verification_code || `OT-${report.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`
+    : "";
+
   const downloadPdf = async () => {
     if (!report || !canDownloadOtReport(report.status, !!report.educational_released_at)) return;
     setDownloading(true);
@@ -71,7 +85,18 @@ export default function OrientacaoRelatorio() {
       const pdf = new jsPDF();
       pdf.setFont("helvetica");
       pdf.setFontSize(11);
-      const text = ["Planta y Raiz — Relatório de Orientação Técnica", report.status === "approved" ? `Revisado pelo Dr. Edilson em: ${report.approved_at || ""}` : "Orientação educativa gerada por assistente de IA. Revisão médica pendente. Não há aprovação ou assinatura médica nesta versão.", report.content_md.replace(/[#*_`]/g, ""), `Identificador: ${report.id}`, `Hash SHA-256 de integridade (não é assinatura digital): ${report.content_hash || "não disponível nesta versão"}`, "Conteúdo educativo. Não é receita nem substitui consulta médica."].join("\n\n");
+      const emitidoEm = new Date(report.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+      const text = [
+        "Planta y Raiz — Relatório de Orientação Técnica",
+        `Código do atendimento: ${attendanceCode}`,
+        patientName ? `Paciente: ${patientName}` : null,
+        `Emitido em: ${emitidoEm}`,
+        report.status === "approved" ? `Revisado pelo Dr. Edilson em: ${report.approved_at || ""}` : "Orientação educativa gerada por assistente de IA. Revisão médica pendente. Não há aprovação ou assinatura médica nesta versão.",
+        report.content_md.replace(/[#*_`]/g, ""),
+        `Identificador: ${report.id}`,
+        `Hash SHA-256 de integridade (não é assinatura digital): ${report.content_hash || "não disponível nesta versão"}`,
+        "Conteúdo educativo. Não é receita nem substitui consulta médica.",
+      ].filter(Boolean).join("\n\n");
       const lines: string[] = pdf.splitTextToSize(text, 174);
       let y = 20;
       for (const line of lines) {
@@ -79,7 +104,7 @@ export default function OrientacaoRelatorio() {
         pdf.text(line, 18, y);
         y += 6;
       }
-      pdf.save(`orientacao-${report.id}.pdf`);
+      pdf.save(`orientacao-${attendanceCode}.pdf`);
     } catch {
       toast.error("Não foi possível baixar o PDF. Tente novamente ou use Imprimir.");
     } finally { setDownloading(false); }
@@ -153,8 +178,9 @@ export default function OrientacaoRelatorio() {
                 <ShieldCheck size={14} />
                 {isApproved ? "Aprovado pelo Dr. Edilson" : "Em Revisão"}
               </span>
-              {report.verification_code && (
-                <p className="text-[10px] text-slate-400 font-mono mt-1">Cód: {report.verification_code}</p>
+              <p className="text-[10px] text-slate-400 font-mono mt-1">Cód: {attendanceCode}</p>
+              {patientName && (
+                <p className="text-[10px] text-slate-500 mt-0.5">Paciente: {patientName}</p>
               )}
             </div>
           </div>

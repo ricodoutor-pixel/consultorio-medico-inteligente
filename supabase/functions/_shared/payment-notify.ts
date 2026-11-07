@@ -2,6 +2,7 @@
 // Regras: dispara SOMENTE em pagamento confirmado; sem sintomas/diagnóstico/CPF;
 // uma linha por external_reference em payment_notify_log; cada tentativa fica em
 // payment_notify_attempts com status, código HTTP, erro e duração.
+import { orientationCode } from "./orientation-code.ts";
 
 interface NotifyInput {
   externalReference: string;
@@ -9,6 +10,7 @@ interface NotifyInput {
   amountBrl: number;
   service: string;
   paymentId?: string | null;
+  attendanceCode?: string | null;
 }
 
 /** Avisos de início/encerramento da Orientação Técnica (sem dados de saúde). */
@@ -18,6 +20,7 @@ export interface OrientationEventInput {
   event: "inicio" | "fim";
   rating?: number | null;
   durationMin?: number | null;
+  attendanceCode?: string | null;
 }
 
 type Sb = { from: (t: string) => any };
@@ -53,10 +56,10 @@ export function buildPaymentMessage(input: NotifyInput): string {
     `Data: ${data}\n` +
     `Hora: ${hora} (São Paulo)\n` +
     `Serviço: ${input.service}\n` +
-    `Pedido: ${input.externalReference}`;
+    `Pedido: ${input.externalReference}` + (input.attendanceCode ? `\nCódigo: ${input.attendanceCode}` : "");
 }
 
-async function sendOnce(text: string): Promise<{ ok: boolean; http: number | null; error: string | null; ms: number }> {
+async function sendOnce(text: string): Promise<{ ok: boolean; http: number | null; error: string | null; ms: number; messageId?: string | null }> {
   const c = evolutionConfig();
   const t0 = Date.now();
   if (!c.url || !c.key) {
@@ -72,7 +75,9 @@ async function sendOnce(text: string): Promise<{ ok: boolean; http: number | nul
       signal: ctrl.signal,
     });
     const body = await res.text().catch(() => "");
-    return { ok: res.ok, http: res.status, error: res.ok ? null : body.slice(0, 300), ms: Date.now() - t0 };
+    let messageId: string | null = null;
+    try { const payload = JSON.parse(body); messageId = typeof payload?.key?.id === "string" ? payload.key.id : null; } catch { /* no provider id */ }
+    return { ok: res.ok, http: res.status, error: res.ok ? null : `provider_http_${res.status}`, ms: Date.now() - t0, messageId };
   } catch (e) {
     return { ok: false, http: null, error: (e as Error).message.slice(0, 300), ms: Date.now() - t0 };
   } finally {
@@ -89,11 +94,14 @@ async function deliver(sb: Sb, logId: string, text: string, logKey: string, trig
     await sb.from("payment_notify_attempts").insert({
       log_id: logId, external_reference: logKey, attempt_no: n, trigger,
       status: r.ok ? "sent" : "failed", http_status: r.http, error: r.error, duration_ms: r.ms,
+      provider_message_id: r.messageId ?? null,
     });
     await sb.from("payment_notify_log").update({
       status: r.ok ? "sent" : "failed", error: r.error, http_status: r.http,
       attempts: n, last_attempt_at: new Date().toISOString(),
       sent_at: r.ok ? new Date().toISOString() : null,
+      provider_message_id: r.messageId ?? null,
+      delivery_status: r.ok ? "accepted" : "failed",
     }).eq("id", logId);
     if (r.ok) return true;
     if (r.error?.startsWith("evolution_not_configured")) return false; // não adianta repetir
@@ -110,6 +118,10 @@ async function deliver(sb: Sb, logId: string, text: string, logKey: string, trig
 export async function notifyPaymentConfirmedOnce(sb: Sb, input: NotifyInput, trigger = "auto"): Promise<boolean> {
   try {
     const c = evolutionConfig();
+    if (!input.attendanceCode && input.externalReference.startsWith("orientacao_tecnica:")) {
+      const { data: order } = await sb.from("orientacao_tecnica_orders").select("id").eq("external_reference", input.externalReference).maybeSingle();
+      if (order?.id) input.attendanceCode = orientationCode(order.id);
+    }
     const text = buildPaymentMessage(input);
     const { data: claim } = await sb.from("payment_notify_log").insert({
       external_reference: input.externalReference, recipient: c.phone, channel: "whatsapp",
@@ -137,7 +149,7 @@ export function buildOrientationEventMessage(input: OrientationEventInput): stri
     return `Planta y Raiz — Orientação Técnica em andamento.\n` +
       `Paciente: ${input.patientName}\n` +
       `Início: ${hora} de ${data} (São Paulo)\n` +
-      `Pedido: ${input.externalReference}`;
+      `Pedido: ${input.externalReference}` + (input.attendanceCode ? `\nCódigo: ${input.attendanceCode}` : "");
   }
   const nota = input.rating ? `${input.rating}/3` : "não avaliou";
   const dur = input.durationMin != null ? `${input.durationMin} min` : "—";
@@ -145,7 +157,7 @@ export function buildOrientationEventMessage(input: OrientationEventInput): stri
     `Paciente: ${input.patientName}\n` +
     `Fim: ${hora} de ${data} (São Paulo)\n` +
     `Duração: ${dur} · Avaliação: ${nota}\n` +
-    `Pedido: ${input.externalReference}`;
+    `Pedido: ${input.externalReference}` + (input.attendanceCode ? `\nCódigo: ${input.attendanceCode}` : "");
 }
 
 /**

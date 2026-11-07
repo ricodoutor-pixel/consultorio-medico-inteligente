@@ -144,10 +144,16 @@ Deno.serve(async (req) => {
       const paid = ["approved", "completed", "dispatched"].includes(order?.status ?? "");
       if (!order || !paid || hasEmergency(triage as Record<string, unknown>)) return null;
 
-      // Se passou da validade e ainda está com status 'active', marca como expired
+      // Fim dos 30 min: encerra no servidor (sala vira somente leitura e a avaliação aparece).
       if (row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() <= Date.now()) {
-        await sb.from("ot_web_sessions").update({ status: "expired" }).eq("id", row.id);
-        row.status = "expired";
+        await sb.from("ot_web_sessions").update({ status: "completed", closed_at: new Date().toISOString() }).eq("id", row.id);
+        await sb.from("ot_messages").insert({
+          session_id: row.id,
+          role: "system",
+          content: `⏱️ Os ${ORIENTACAO_MINUTES} minutos da Orientação Técnica chegaram ao fim. A sala foi encerrada — avalie o atendimento abaixo e baixe seu relatório.`,
+        });
+        row.status = "completed";
+        fireClosedNotice(row, null);
       }
 
       return row;
@@ -320,6 +326,15 @@ Deno.serve(async (req) => {
           role: "agent",
           content: welcomeText,
         });
+
+        // Aviso de início da Orientação ao Dr. Edilson (uma única vez por pedido).
+        EdgeRuntime.waitUntil((async () => {
+          await notifyOrientationEvent(sb, {
+            externalReference: sess.external_reference,
+            patientName: await patientName(uid),
+            event: "inicio",
+          });
+        })());
 
         return json({
           state: "active",

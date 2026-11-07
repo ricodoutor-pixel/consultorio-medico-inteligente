@@ -119,3 +119,6 @@
 - [ ] Usuário quer comprar 20 créditos — abrir cartão de compra de créditos no chat (01/11)
 
 - [x] Corrigir 3 erros de compilação (MedicalDashboard isMock, doctor-schedule.test.ts mock, Profissionais proSlots) — build OK (01/11)
+
+- [ ] Resolver aviso de qualidade pendente no monitoramento (explicar causa e correção)
+- [ ] QR Code para instalar o app em qualquer aparelho + opção de baixar

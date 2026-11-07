@@ -6149,35 +6149,100 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_notify_attempts: {
+        Row: {
+          attempt_no: number
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          external_reference: string
+          http_status: number | null
+          id: string
+          log_id: string
+          status: string
+          trigger: string
+        }
+        Insert: {
+          attempt_no: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          external_reference: string
+          http_status?: number | null
+          id?: string
+          log_id: string
+          status: string
+          trigger?: string
+        }
+        Update: {
+          attempt_no?: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          external_reference?: string
+          http_status?: number | null
+          id?: string
+          log_id?: string
+          status?: string
+          trigger?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_notify_attempts_log_id_fkey"
+            columns: ["log_id"]
+            isOneToOne: false
+            referencedRelation: "payment_notify_log"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_notify_log: {
         Row: {
+          amount_brl: number | null
+          attempts: number
           channel: string
           created_at: string
           error: string | null
           external_reference: string
+          http_status: number | null
           id: string
+          last_attempt_at: string | null
+          payment_id: string | null
           recipient: string
           sent_at: string | null
+          service: string | null
           status: string
         }
         Insert: {
+          amount_brl?: number | null
+          attempts?: number
           channel?: string
           created_at?: string
           error?: string | null
           external_reference: string
+          http_status?: number | null
           id?: string
+          last_attempt_at?: string | null
+          payment_id?: string | null
           recipient: string
           sent_at?: string | null
+          service?: string | null
           status?: string
         }
         Update: {
+          amount_brl?: number | null
+          attempts?: number
           channel?: string
           created_at?: string
           error?: string | null
           external_reference?: string
+          http_status?: number | null
           id?: string
+          last_attempt_at?: string | null
+          payment_id?: string | null
           recipient?: string
           sent_at?: string | null
+          service?: string | null
           status?: string
         }
         Relationships: []

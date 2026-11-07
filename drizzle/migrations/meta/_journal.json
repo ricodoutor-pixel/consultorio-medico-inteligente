@@ -64,6 +64,13 @@
       "when": 1794073884173,
       "tag": "0008_orientation_rating_and_payment_notify",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794079762318,
+      "tag": "0009_payment_notify_attempts",
+      "breakpoints": true
     }
   ]
 }

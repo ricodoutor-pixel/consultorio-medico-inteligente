@@ -916,6 +916,13 @@ export default function OrientacaoTecnicaAgente() {
                   Enfª Brisa · Pergunta {step + 1} de {QUESTIONS.length}
                 </p>
 
+                {(profileName || profileAge !== null) && (
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Atendendo: <strong className="text-foreground">{profileName || "paciente cadastrado"}</strong>
+                    {profileAge !== null ? ` · ${profileAge} anos` : ""} (dados do seu cadastro)
+                  </p>
+                )}
+
                 <h2 className="text-xl md:text-2xl font-display font-black text-foreground mb-1">{q.label}</h2>
                 <p className="text-sm text-muted-foreground mb-6">{q.hint}</p>
 
@@ -928,6 +935,54 @@ export default function OrientacaoTecnicaAgente() {
                         <span>{opt.label}</span><ChevronRight size={18} />
                       </Button>
                     ))}
+                    {q.optional && (
+                      <button type="button" onClick={() => void skipOptional()} disabled={savingAnswer}
+                        className="w-full text-center text-xs text-muted-foreground hover:text-foreground underline pt-1">
+                        Pular esta pergunta
+                      </button>
+                    )}
+                  </div>
+                ) : q.type === "scale" ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-6 gap-2" role="group" aria-label="Escala de intensidade de 0 a 10">
+                      {Array.from({ length: 11 }, (_, n) => (
+                        <Button key={n} variant="outline" disabled={savingAnswer}
+                          onClick={() => void saveAnswer(String(n))}
+                          className={`h-12 font-black ${answers[q.id] === String(n) ? "border-primary bg-primary/10" : "border-border"}`}>
+                          {n}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[11px] text-muted-foreground px-1">
+                      <span>Nenhum sintoma</span><span>Insuportável</span>
+                    </div>
+                  </div>
+                ) : q.type === "combo" ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      value={draft || answers.queixa || ""}
+                      onChange={(e) => setDraft(e.target.value)}
+                      rows={4}
+                      placeholder="Descreva o principal problema com suas palavras..."
+                      aria-label="Qual o principal problema?"
+                    />
+                    <div className="flex flex-wrap gap-2" role="group" aria-label="Há quanto tempo?">
+                      {(q.options || []).map((label) => (
+                        <Button key={label} size="sm" variant="outline" disabled={savingAnswer}
+                          onClick={() => setComboTempo(label)}
+                          className={`rounded-full ${(comboTempo || answers.tempo) === label ? "border-primary bg-primary/10" : "border-border"}`}>
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => void saveComboAnswers()}
+                      disabled={savingAnswer || !(draft || answers.queixa || "").trim() || !(comboTempo || answers.tempo)}
+                      className="w-full h-12 rounded-2xl font-black"
+                    >
+                      {savingAnswer ? <Loader2 size={16} className="animate-spin mr-1" /> : null}
+                      Continuar <ChevronRight size={16} className="ml-1" />
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -944,21 +999,28 @@ export default function OrientacaoTecnicaAgente() {
                         value={draft || answers[q.id] || ""}
                         onChange={(e) => setDraft(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter" && !savingAnswer) { e.preventDefault(); void saveAnswer((draft || answers[q.id] || "").trim()); } }}
-                        inputMode={q.id === "idade" ? "numeric" : "text"}
                         placeholder="Digite aqui..."
                         aria-label={q.label}
                       />
                     )}
-                    <Button
-                      onClick={() => {
-                        const v = (draft || answers[q.id] || "").trim();
-                        if (v) void saveAnswer(v);
-                      }}
-                      disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
-                      className="w-full h-12 rounded-2xl font-black"
-                    >
-                      Continuar <ChevronRight size={16} className="ml-1" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          const v = (draft || answers[q.id] || "").trim();
+                          if (v) void saveAnswer(v);
+                        }}
+                        disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
+                        className="flex-1 h-12 rounded-2xl font-black"
+                      >
+                        Continuar <ChevronRight size={16} className="ml-1" />
+                      </Button>
+                      {q.allowNone && (
+                        <Button variant="outline" onClick={() => void saveAnswer("Nenhum")} disabled={savingAnswer}
+                          className="h-12 rounded-2xl font-bold">
+                          Nenhum
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
 

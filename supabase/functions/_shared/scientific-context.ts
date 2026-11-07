@@ -99,13 +99,21 @@ export async function fetchScientificEvidence(
     if (!r.ok) return [];
     const rows = (await r.json()) as Array<Record<string, unknown>>;
     if (!Array.isArray(rows)) return [];
-    return rows.map((a) => ({
+    const mapped = rows.map((a) => ({
       title: String(a.title ?? "").slice(0, 220),
       year: a.year ? Number(a.year) : null,
       url: a.url ? String(a.url) : null,
       doi: a.doi ? String(a.doi) : null,
+      doiVerified: false,
       abstract: String(a.abstract ?? "").slice(0, 400),
     }));
+    // Valida cada DOI no Crossref em paralelo: só DOI confirmado vira link ao paciente.
+    await Promise.all(
+      mapped.map(async (e) => {
+        if (e.doi) e.doiVerified = await validateDoi(e.doi);
+      }),
+    );
+    return mapped;
   } catch {
     return [];
   }
@@ -137,8 +145,12 @@ export async function buildScientificContextBlock(text: string, limit = 3): Prom
     fetchScientificCount(),
   ]);
   const countLine = count !== null
-    ? `A biblioteca científica da Planta y Raiz tem exatamente ${count.toLocaleString("pt-BR")} estudos neste momento. Se perguntarem quantos estudos existem, responda exatamente este número. NUNCA afirme outro número (ex.: "centenas", "40 mil").`
-    : `Não foi possível medir o tamanho da biblioteca agora. Se perguntarem quantos estudos existem, diga que não tem o número exato neste momento — nunca invente.`;
+    ? `A biblioteca científica da Planta y Raiz tem ${count.toLocaleString("pt-BR")} registros neste momento. Se perguntarem o tamanho da base, responda com a frase "registros na nossa biblioteca" usando este número, SEM a palavra "exatamente" e sem afirmar que são todos estudos únicos. NUNCA afirme outro número (ex.: "centenas", "40 mil").`
+    : `Não foi possível medir o tamanho da biblioteca agora. Se perguntarem quantos registros existem, diga que não tem o número neste momento — nunca invente.`;
+
+  const linkRules = `REGRAS DE LINK (obrigatórias):
+- Se o paciente pedir "o link" de um estudo, entregue SOMENTE um link marcado abaixo como "link confirmado" (https://doi.org/... ou a URL listada), clicável e completo.
+- Se o estudo não tiver link confirmado, diga com honestidade: "não consegui confirmar o link deste estudo" — NUNCA entregue um DOI solto como se fosse link nem monte um link por conta própria.`;
 
   if (evidence.length === 0) {
     return `
@@ -146,22 +158,30 @@ export async function buildScientificContextBlock(text: string, limit = 3): Prom
 === BASE CIENTÍFICA INTERNA ===
 ${countLine}
 A busca para esta pergunta NÃO retornou estudos. Diga com honestidade: "Não encontrei estudo na nossa base sobre isso." Nunca cite estudo, DOI, revista ou ano que não esteja listado aqui.
+${linkRules}
 === FIM DA BASE CIENTÍFICA ===`;
   }
 
   const list = evidence
-    .map(
-      (e, i) =>
-        `[${i + 1}] ${e.title}${e.year ? ` (${e.year})` : ""}${e.doi ? ` — DOI ${e.doi}` : ""}${e.url ? ` — ${e.url}` : ""}\n${e.abstract}`,
-    )
+    .map((e, i) => {
+      const link = e.doiVerified && e.doi
+        ? ` — link confirmado: https://doi.org/${e.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "")}`
+        : e.url
+          ? ` — link confirmado: ${e.url}`
+          : e.doi
+            ? ` — DOI ${e.doi} (link NÃO confirmado: não entregue ao paciente)`
+            : " — sem link confirmado (não entregue link ao paciente)";
+      return `[${i + 1}] ${e.title}${e.year ? ` (${e.year})` : ""}${link}\n${e.abstract}`;
+    })
     .join("\n\n");
   return `
 
 === BASE CIENTÍFICA INTERNA (uso obrigatório quando pertinente) ===
 ${countLine}
 Estes são estudos reais da biblioteca científica da Planta y Raiz, recuperados por busca nesta pergunta.
-Cite SOMENTE o que está listado aqui, com título e ano; ao mencionar no relatório, inclua o link/DOI listado.
+Cite SOMENTE o que está listado aqui, com título e ano; ao mencionar no relatório, inclua apenas link confirmado.
 Nunca invente referências, DOI, revistas ou anos. Sem prometer cura, sem diagnosticar e sem prescrever.
+${linkRules}
 
 ${list}
 === FIM DA BASE CIENTÍFICA ===`;

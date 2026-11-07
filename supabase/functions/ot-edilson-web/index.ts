@@ -10,6 +10,7 @@ import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
+import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -21,7 +22,7 @@ type SessionRow = {
   triage: Record<string, unknown> | null;
   started_at: string | null;
   expires_at: string | null;
-  status: "ready" | "active" | "paused" | "expired";
+  status: "ready" | "active" | "paused" | "expired" | "completed";
   paused: boolean;
   paused_by?: string | null;
   paused_at?: string | null;

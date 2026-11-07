@@ -4,6 +4,7 @@ import { createOtStreamParser } from "../../supabase/functions/_shared/ot-stream
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import "@/styles/orientation-room.css";
 import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
+import { loadPermanentReferralCode } from "@/lib/referral-code";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
@@ -170,6 +171,7 @@ export default function OrientacaoTecnicaAgente() {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [rating, setRating] = useState<1 | 2 | 3 | null>(null);
   const [ratingDone, setRatingDone] = useState(false);
+  const [ratingError, setRatingError] = useState<string | null>(null);
   const [ratingComment, setRatingComment] = useState("");
   const [submittingRating, setSubmittingRating] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -195,6 +197,7 @@ export default function OrientacaoTecnicaAgente() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const questionCardRef = useRef<HTMLDivElement>(null);
+  const ratingPanelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const initDone = useRef(false);
@@ -269,7 +272,12 @@ export default function OrientacaoTecnicaAgente() {
     const sess = d?.session ?? null;
     setOtState(st);
     setOtSession(sess);
-    if (st === "completed" && typeof d?.rating === "number") { setRating(d.rating as 1 | 2 | 3); setRatingDone(true); }
+    if (st === "completed") {
+      const saved = d?.rating;
+      setRating(typeof saved === "number" ? saved as 1 | 2 | 3 : null);
+      setRatingDone(typeof saved === "number");
+      setSecondsLeft(0);
+    }
     if (sess?.expires_at) {
       setSecondsLeft(Math.max(0, Math.floor((Date.parse(sess.expires_at) - Date.now()) / 1000)));
     } else if (typeof d?.minutesLeft === "number") {
@@ -349,6 +357,8 @@ export default function OrientacaoTecnicaAgente() {
     setClosing(true);
     try {
       await callFn({ action: "close_session" });
+      setRatingDone(false);
+      setSecondsLeft(0);
       setOtState("completed");
     } catch {
       toast({ title: "Não foi possível encerrar agora. Tente de novo.", variant: "destructive" });
@@ -360,21 +370,30 @@ export default function OrientacaoTecnicaAgente() {
   const submitRating = useCallback(async (value: 1 | 2 | 3 | null) => {
     if (submittingRating) return;
     setSubmittingRating(true);
+    setRatingError(null);
     try {
       if (value) {
-        await callFn({ action: "submit_rating", rating: value, comment: ratingComment.trim() || undefined });
-        setRating(value);
+        const result = await callFn<{ rating: 1 | 2 | 3; comment: string | null }>({ action: "submit_rating", rating: value, comment: ratingComment.trim() || undefined });
+        if (![1, 2, 3].includes(result.rating)) throw new Error("rating_not_confirmed");
+        setRating(result.rating);
+        setRatingComment(result.comment || "");
       } else {
         await callFn({ action: "skip_rating" });
       }
       setRatingDone(true);
       setOtState("completed");
     } catch {
+      setRatingError("Não foi possível confirmar sua avaliação. Tente de novo.");
       toast({ title: "Não foi possível registrar sua avaliação. Tente de novo.", variant: "destructive" });
     } finally {
       setSubmittingRating(false);
     }
   }, [callFn, ratingComment, submittingRating, toast]);
+
+  useEffect(() => {
+    if (otState !== "completed") return;
+    ratingPanelRef.current?.scrollIntoView({ block: "center", behavior: "instant" });
+  }, [otState, ratingDone]);
 
   // Poll da sala (5s): status (pausa/expiração) + mensagens (inclui Dr. Edilson humano).
   useEffect(() => {
@@ -691,6 +710,8 @@ export default function OrientacaoTecnicaAgente() {
         const data = await res.json().catch(() => null);
         if (data?.closed && data?.farewell) {
           setMessages(prev => [...prev, { id: `farewell-${Date.now()}`, role: "agent", content: data.farewell, created_at: new Date().toISOString() }]);
+          setRatingDone(false);
+          setSecondsLeft(0);
           setOtState("completed");
           return;
         }
@@ -758,6 +779,10 @@ export default function OrientacaoTecnicaAgente() {
     setAnswers({});
     setPixData(null);
     setFullRoom(false);
+    setRatingDone(false);
+    setRating(null);
+    setRatingComment("");
+    setRatingError(null);
     navigate("/orientacao-tecnica?new=1", { replace: true });
     setMessages([]);
     setReports([]);
@@ -781,15 +806,9 @@ export default function OrientacaoTecnicaAgente() {
     if (otState !== "completed" || !ratingDone || !userId || refCode) return;
     let alive = true;
     void (async () => {
-      const { data: profile } = await (supabase as any).from("profiles").select("referral_code").eq("id", userId).maybeSingle();
-      let code = (profile as { referral_code?: string | null } | null)?.referral_code || null;
-      if (!code) {
-        code = `PRZ-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
-        const { data: updated } = await (supabase as any).from("profiles").update({ referral_code: code }).eq("id", userId).select("referral_code").maybeSingle();
-        code = (updated as { referral_code?: string } | null)?.referral_code || code;
-      }
+      const code = await loadPermanentReferralCode(userId);
       if (alive) setRefCode(code);
-    })();
+    })().catch(() => { /* No unpersisted fallback link. The panel offers retry. */ });
     return () => { alive = false; };
   }, [otState, ratingDone, userId, refCode]);
 
@@ -1470,7 +1489,7 @@ export default function OrientacaoTecnicaAgente() {
                   )}
                   {otState === "completed" ? (
                     !ratingDone ? (
-                      <div className="text-center space-y-4 py-3" role="group" aria-label="Avaliação da orientação">
+                      <div ref={ratingPanelRef} className="text-center space-y-4 py-3" role="group" aria-label="Avaliação da orientação">
                         <p className="text-base font-black text-neutral-800">Como foi sua orientação?</p>
                         <div className="flex items-start justify-center gap-4">
                           {([
@@ -1501,13 +1520,14 @@ export default function OrientacaoTecnicaAgente() {
                           className="max-w-md mx-auto resize-none rounded-xl bg-white"
                         />
                         <div className="flex items-center justify-center gap-2">
+                          {ratingError && <p role="alert" className="text-sm text-destructive">{ratingError}</p>}
                           <Button
                             onClick={() => void submitRating(rating)}
                             disabled={!rating || submittingRating}
                             className="rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white"
                           >
                             {submittingRating ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
-                            Enviar avaliação
+                            {ratingError ? "Tentar de novo" : "Enviar avaliação"}
                           </Button>
                           <Button variant="ghost" onClick={() => void submitRating(null)} disabled={submittingRating} className="rounded-xl font-bold text-neutral-600">
                             Pular
@@ -1515,13 +1535,14 @@ export default function OrientacaoTecnicaAgente() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center space-y-4 py-3">
+                      <div ref={ratingPanelRef} className="text-center space-y-4 py-3">
                         <p className="text-base font-black text-neutral-800">Orientação encerrada. Obrigado! 🌿</p>
+                        {rating && <p role="status" className="text-sm text-primary">Obrigado pela avaliação! {rating === 3 ? "Satisfeito" : rating === 2 ? "Neutro" : "Insatisfeito"} ({rating}/3)</p>}
                         <p className="text-xs text-neutral-600">Seu histórico e seu relatório continuam disponíveis nesta página.</p>
                         <div className="flex flex-col items-center gap-2 max-w-sm mx-auto">
-                          {reports.some((r) => canDownloadOtReport(r.status, !!r.educational_released_at)) && (
+                          {downloadableReport && (
                             <Button asChild className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white">
-                              <Link to={`/orientacao-tecnica/relatorio/${reports.find((r) => canDownloadOtReport(r.status, !!r.educational_released_at))!.id}`}>
+                              <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
                                 <FileText size={14} className="mr-1" /> Baixar relatório
                               </Link>
                             </Button>
@@ -1545,12 +1566,12 @@ export default function OrientacaoTecnicaAgente() {
                                 <Button onClick={() => void copyRefLink()} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
                                   {copiedRef ? <><Check size={14} className="mr-1" /> Link copiado!</> : "Copiar meu link de indicação"}
                                 </Button>
-                                <Button onClick={() => navigate("/afiliados")} size="sm" variant="ghost" className="w-full rounded-lg font-bold text-neutral-600 text-xs">
+                                <Button onClick={() => navigate("/afiliados/dashboard")} size="sm" variant="ghost" className="w-full rounded-lg font-bold text-neutral-600 text-xs">
                                   Ver meu painel de indicações
                                 </Button>
                               </div>
                             ) : (
-                              <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                              <Button onClick={() => navigate("/afiliados/dashboard")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
                                 Obter meu link de indicação
                               </Button>
                             )}

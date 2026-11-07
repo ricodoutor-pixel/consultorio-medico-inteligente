@@ -1306,7 +1306,6 @@ export default function OrientacaoTecnicaAgente() {
                     ) : (
                       <div className="text-center space-y-4 py-3">
                         <p className="text-base font-black text-neutral-800">Orientação encerrada. Obrigado! 🌿</p>
-                        {otSession?.closed_at ? null : null}
                         <p className="text-xs text-neutral-600">Seu histórico e seu relatório continuam disponíveis nesta página.</p>
                         <div className="flex flex-col items-center gap-2 max-w-sm mx-auto">
                           {reports.some((r) => canDownloadOtReport(r.status, !!r.educational_released_at)) && (

@@ -23,14 +23,14 @@ const PT_EN: Array<[RegExp, string]> = [
   [/apetite|caquexi/i, "appetite cachexia"],
   [/avc|derrame/i, "stroke"],
   [/diabet/i, "diabetes"],
-  [/cbd|canabidiol/i, "cannabidiol"],
+  [/\bcbd\b|canabidiol|cannabidiol/i, "cannabidiol"],
   [/thc|tetrahidro/i, "thc tetrahydrocannabinol"],
   [/cbg/i, "cannabigerol"],
-  [/dose|posologi|titula/i, "cannabidiol dosing titration"],
 ];
 
 export interface ScientificEvidence {
   title: string;
+  authors: string;
   year: number | null;
   url: string | null;
   doi: string | null;
@@ -38,9 +38,29 @@ export interface ScientificEvidence {
   abstract: string;
 }
 
+export function normalizeDoi(doi: string): string {
+  return doi.trim().replace(/^doi\s*:\s*/i, "").replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+}
+
+export function pubmedId(url: string | null): string | null {
+  return url?.match(/^https:\/\/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)\/?$/i)?.[1] || null;
+}
+
+/** PMID is checked against NCBI; arbitrary stored URLs are never called verified. */
+export async function validatePubmed(url: string | null): Promise<boolean> {
+  const id = pubmedId(url);
+  if (!id) return false;
+  try {
+    const response = await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${id}&retmode=json`, { signal: AbortSignal.timeout(5_000) });
+    if (!response.ok) return false;
+    const data = await response.json();
+    return data.result?.[id]?.uid === id && !!data.result[id].title;
+  } catch { return false; }
+}
+
 /** Valida um DOI no Crossref antes de liberá-lo como link ao paciente. */
 export async function validateDoi(doi: string): Promise<boolean> {
-  const clean = doi.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+  const clean = normalizeDoi(doi);
   if (!/^10\.\d{4,9}\/\S+$/.test(clean)) return false;
   try {
     const r = await fetch(`https://api.crossref.org/works/${encodeURIComponent(clean)}`, {
@@ -101,18 +121,21 @@ export async function fetchScientificEvidence(
     if (!Array.isArray(rows)) return [];
     const mapped = rows.map((a) => ({
       title: String(a.title ?? "").slice(0, 220),
+      authors: String(a.authors ?? "").slice(0, 350),
       year: a.year ? Number(a.year) : null,
       url: a.url ? String(a.url) : null,
-      doi: a.doi ? String(a.doi) : null,
+      doi: a.doi ? normalizeDoi(String(a.doi)) : null,
       doiVerified: false,
       abstract: String(a.abstract ?? "").slice(0, 400),
     }));
     // Valida cada DOI no Crossref em paralelo: só DOI confirmado vira link ao paciente.
-    await Promise.all(
-      mapped.map(async (e) => {
-        if (e.doi) e.doiVerified = await validateDoi(e.doi);
-      }),
-    );
+    // Sequential PMID calls respect NCBI's public rate limit; DOI checks do not
+    // reject valid PubMed-only articles. All selected links are independently checked.
+    for (const e of mapped) {
+      e.doiVerified = e.doi ? await validateDoi(e.doi) : false;
+      const pmidValid = await validatePubmed(e.url);
+      e.url = pmidValid ? e.url : null;
+    }
     return mapped;
   } catch {
     return [];
@@ -171,7 +194,7 @@ ${linkRules}
           : e.doi
             ? ` — DOI ${e.doi} (link NÃO confirmado: não entregue ao paciente)`
             : " — sem link confirmado (não entregue link ao paciente)";
-      return `[${i + 1}] ${e.title}${e.year ? ` (${e.year})` : ""}${link}\n${e.abstract}`;
+      return `[${i + 1}] ${e.title}${e.year ? ` (${e.year})` : ""}\nAutores: ${e.authors || "não informados no registro"}${link}\n${e.abstract}`;
     })
     .join("\n\n");
   return `
@@ -179,7 +202,7 @@ ${linkRules}
 === BASE CIENTÍFICA INTERNA (uso obrigatório quando pertinente) ===
 ${countLine}
 Estes são estudos reais da biblioteca científica da Planta y Raiz, recuperados por busca nesta pergunta.
-Cite SOMENTE o que está listado aqui, com título e ano; ao mencionar no relatório, inclua apenas link confirmado.
+Cite SOMENTE o que está listado aqui, com título, autores e ano; ao mencionar no relatório, inclua apenas link confirmado. Quando houver link confirmado pertinente, entregue-o ao paciente; não diga que nenhum link foi confirmado.
 Nunca invente referências, DOI, revistas ou anos. Sem prometer cura, sem diagnosticar e sem prescrever.
 ${linkRules}
 

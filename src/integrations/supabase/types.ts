@@ -6159,6 +6159,7 @@ export type Database = {
           http_status: number | null
           id: string
           log_id: string
+          provider_message_id: string | null
           status: string
           trigger: string
         }
@@ -6171,6 +6172,7 @@ export type Database = {
           http_status?: number | null
           id?: string
           log_id: string
+          provider_message_id?: string | null
           status: string
           trigger?: string
         }
@@ -6183,6 +6185,7 @@ export type Database = {
           http_status?: number | null
           id?: string
           log_id?: string
+          provider_message_id?: string | null
           status?: string
           trigger?: string
         }
@@ -6202,12 +6205,16 @@ export type Database = {
           attempts: number
           channel: string
           created_at: string
+          delivered_at: string | null
+          delivery_status: string | null
           error: string | null
           external_reference: string
           http_status: number | null
           id: string
           last_attempt_at: string | null
           payment_id: string | null
+          provider_message_id: string | null
+          receipt_checked_at: string | null
           recipient: string
           sent_at: string | null
           service: string | null
@@ -6218,12 +6225,16 @@ export type Database = {
           attempts?: number
           channel?: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_status?: string | null
           error?: string | null
           external_reference: string
           http_status?: number | null
           id?: string
           last_attempt_at?: string | null
           payment_id?: string | null
+          provider_message_id?: string | null
+          receipt_checked_at?: string | null
           recipient: string
           sent_at?: string | null
           service?: string | null
@@ -6234,12 +6245,16 @@ export type Database = {
           attempts?: number
           channel?: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_status?: string | null
           error?: string | null
           external_reference?: string
           http_status?: number | null
           id?: string
           last_attempt_at?: string | null
           payment_id?: string | null
+          provider_message_id?: string | null
+          receipt_checked_at?: string | null
           recipient?: string
           sent_at?: string | null
           service?: string | null

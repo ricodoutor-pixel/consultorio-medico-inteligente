@@ -245,11 +245,12 @@ export default function OrientacaoTecnicaAgente() {
   }, [activeSessionId]);
 
   // ── Status (fonte única para liberar a sala) ───────────────────────────
-  const applyStatus = useCallback((d: { state?: OtState; session?: OtSession | null; minutesLeft?: number } | null) => {
+  const applyStatus = useCallback((d: { state?: OtState; session?: OtSession | null; minutesLeft?: number; rating?: number | null } | null) => {
     const st: OtState = (d?.state as OtState) || "none";
     const sess = d?.session ?? null;
     setOtState(st);
     setOtSession(sess);
+    if (st === "completed" && typeof d?.rating === "number") { setRating(d.rating as 1 | 2 | 3); setRatingDone(true); }
     if (sess?.expires_at) {
       setSecondsLeft(Math.max(0, Math.floor((Date.parse(sess.expires_at) - Date.now()) / 1000)));
     } else if (typeof d?.minutesLeft === "number") {
@@ -273,7 +274,7 @@ export default function OrientacaoTecnicaAgente() {
       }
       if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });
     }
-    if (LIVE_STATES.includes(st) || st === "expired") setPhase("room");
+    if (LIVE_STATES.includes(st) || st === "expired" || st === "completed") setPhase("room");
     else if (st === "triage") setPhase(hasEmergency(d.order?.triagem || {}) ? "emergency" : "triage");
     else if (st === "awaiting_payment") setPhase("awaiting");
     else setPhase("intro");
@@ -321,7 +322,7 @@ export default function OrientacaoTecnicaAgente() {
 
   // Poll da sala (5s): status (pausa/expiração) + mensagens (inclui Dr. Edilson humano).
   useEffect(() => {
-    if (phase !== "room" || otState === "expired") return;
+    if (phase !== "room" || otState === "expired" || otState === "completed") return;
     const cleanup = setVisibleInterval(() => {
       if (streaming) return;
       void fetchStatus().catch(() => undefined);

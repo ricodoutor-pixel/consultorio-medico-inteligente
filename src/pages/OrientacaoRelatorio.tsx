@@ -27,6 +27,7 @@ export default function OrientacaoRelatorio() {
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<ReportData | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [patientName, setPatientName] = useState<string>("");
 
   useEffect(() => {
     if (!id) return;
@@ -50,6 +51,13 @@ export default function OrientacaoRelatorio() {
         }
 
         setReport(data as ReportData);
+        // Nome do paciente vem do cadastro (para o cabeçalho e o PDF).
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", data.user_id)
+          .maybeSingle();
+        if (prof?.full_name) setPatientName(prof.full_name);
       } catch (e: any) {
         console.error("Erro ao buscar relatório", e);
         toast.error("Não foi possível carregar o relatório.");

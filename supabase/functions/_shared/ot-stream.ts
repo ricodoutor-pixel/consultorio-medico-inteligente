@@ -23,6 +23,6 @@ export function createOtStreamParser() {
   };
 }
 
-export function canDownloadOtReport(status: string) {
-  return status === "approved";
+export function canDownloadOtReport(status: string, educationalReleased = false) {
+  return status === "approved" || (status === "draft" && educationalReleased);
 }

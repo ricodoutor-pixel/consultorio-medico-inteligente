@@ -13,8 +13,10 @@ describe("orientation conversation persistence", () => {
 });
 
 describe("report review", () => {
-  it("does not release a draft PDF before human approval", () => {
+  it("requires approval or explicit educational release for PDF", () => {
     expect(canDownloadOtReport("draft")).toBe(false);
+    expect(canDownloadOtReport("draft", true)).toBe(true);
+    expect(canDownloadOtReport("rejected", true)).toBe(false);
     expect(canDownloadOtReport("rejected")).toBe(false);
     expect(canDownloadOtReport("approved")).toBe(true);
   });

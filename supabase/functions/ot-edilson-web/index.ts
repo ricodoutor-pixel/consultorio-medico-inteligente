@@ -10,6 +10,8 @@ import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
+import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
+import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
 type SessionRow = {
   id: string;
@@ -358,19 +360,9 @@ Deno.serve(async (req) => {
         ? `\n\n=== DADOS DA TRIAGEM DO PACIENTE ===\n${sanitize(JSON.stringify(sess.triage), 2000)}`
         : "";
 
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-      if (!LOVABLE_API_KEY) return json({ error: "AI gateway não configurada" }, 500);
-
-      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: GATEWAY_GEMINI_PRIMARY,
+      const completionStream = await streamChatCompletion({
+          model: "google/gemini-3.8-flash",
           reasoning: GATEWAY_NO_REASONING,
-          stream: true,
           messages: [
             {
               role: "system",
@@ -378,11 +370,9 @@ Deno.serve(async (req) => {
             },
             ...cleanHistory,
           ],
-        }),
       });
-
-      if (aiRes.status === 429) return json({ error: "Muitas requisições. Tente em instantes." }, 429);
-      if (!aiRes.ok || !aiRes.body) {
+      const aiRes = completionStream.toResponse();
+      if (!aiRes.body) {
         return json({ error: "Erro no serviço de inteligência clínica" }, 502);
       }
 
@@ -439,14 +429,21 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: true });
       if (historyError) return json({ error: "Não foi possível carregar a conversa para o relatório." }, 500);
       if (!msgs?.some(m => m.role === "patient")) return json({ error: "Converse com a assistente antes de gerar seu relatório." }, 409);
-      const { data: existingDraft } = await sb.from("ot_reports").select("id").eq("session_id", sess.id).eq("status", "draft").limit(1).maybeSingle();
+      const { data: existingDraft } = await sb.from("ot_reports").select("id").eq("session_id", sess.id).in("status", ["draft", "approved"]).limit(1).maybeSingle();
       if (existingDraft) return json({ success: true, report_id: existingDraft.id, status: "draft" });
+
+      // Durable per-session claim: concurrent clicks must not bill twice.
+      const started = Date.now();
+      const { data: claim, error: claimError } = await sb.from("ot_web_sessions")
+        .update({ report_generation_started_at: new Date(started).toISOString() })
+        .eq("id", sess.id).is("report_generation_started_at", null).select("id").maybeSingle();
+      if (claimError) return json({ error: "Impossible de préparer le rapport." }, 500);
+      if (!claim) return json({ error: "La génération est déjà en cours. Actualisez vos rapports ou appelez l'équipe sans refaire un paiement." }, 409);
 
       const conversationText = (msgs || [])
         .map((m: any) => `${m.role.toUpperCase()}: ${m.content}`)
         .join("\n\n");
 
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       const triageStr = JSON.stringify(sess.triage || {});
 
       const prompt =
@@ -460,31 +457,35 @@ Deno.serve(async (req) => {
         `  ## 3. Aspectos Educativos sobre o Sistema Endocanabinoide e Hábitos Integrativos\n` +
         `  ## 4. Orientações Gerais e Cuidados de Saúde\n` +
         `  ## 5. Encaminhamento Sugerido para Médico Prescritor Credenciado\n` +
-        `  ## 6. Parecer Técnico Educativo\n\n` +
-        `Triagem: ${triageStr}\n\nConversa:\n${conversationText.slice(0, 6000)}`;
+        `  ## 6. Perguntas para levar ao médico\n` +
+        `  ## 7. Aviso: orientação educativa gerada por IA; revisão médica pendente. Não é receita nem assinatura médica.\n` +
+        `Não invente estudos, DOI, referências, dados pessoais, formação ou validação médica. Não cite referências de memória.\n\n` +
+        `Triagem: ${triageStr}\n\nConversa:\n${conversationText.slice(-16000)}`;
 
-      const repRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: GATEWAY_GEMINI_PRIMARY,
+      let repData;
+      try {
+        repData = await generateChatCompletion({
+          model: "google/gemini-3.8-flash",
           messages: [{ role: "user", content: prompt }],
-        }),
-      });
-
-      if (!repRes.ok) return json({ error: "A geração do relatório falhou. Tente novamente mais tarde." }, 502);
-      const repData = await repRes.json();
+        }, { metadata: { orientation_session_id: sess.id } });
+      } catch (error) {
+        console.error("[ot-report] generation_failed", error instanceof GatewayError ? error.toJSON() : "application_error");
+        // Unknown inference outcome is not automatically replayed.
+        if (error instanceof GatewayError && error.outcome === "not_started") await sb.from("ot_web_sessions").update({ report_generation_started_at: null }).eq("id", sess.id);
+        return json({ error: "Não foi possível finalizar o relatório. Chame a equipe; não precisa pagar novamente." }, 502);
+      }
       const reportContent = repData.choices?.[0]?.message?.content;
       if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
+      const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(reportContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
         user_id: uid,
         content_md: reportContent,
         status: "draft",
+        educational_released_at: new Date().toISOString(),
+        generation_ms: Date.now() - started,
+        content_hash: contentHash,
       }).select().single();
 
       if (repErr) {
@@ -495,7 +496,7 @@ Deno.serve(async (req) => {
         success: true,
         report_id: newReport.id,
         status: "draft",
-        message: "Rascunho gerado. Aguardando revisão e aprovação do Dr. Edilson Bezerra.",
+        message: "Relatório educativo disponível para baixar. Gerado por IA; revisão médica pendente.",
       });
     }
 
@@ -506,7 +507,7 @@ Deno.serve(async (req) => {
 
       const { data: reports, error: reportsError } = await sb
         .from("ot_reports")
-        .select("id, status, created_at, approved_at, verification_code")
+        .select("id, status, created_at, approved_at, verification_code, educational_released_at")
         .eq("session_id", sess.id)
         .order("created_at", { ascending: false });
 

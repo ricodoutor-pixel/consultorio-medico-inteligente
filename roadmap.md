@@ -1,17 +1,18 @@
 # Roadmap
 
 ## Melhorias do relatório final da Orientação — 07/11/2026
-- [ ] Encerramento automático: despedida do paciente após "posso ajudar em mais algo?" fecha a sala no servidor e mostra as três carinhas; encerrar também ao fim dos 30 min; avaliação lida de volta com erro + "Tentar de novo"
-- [ ] Citações verdadeiras: só estudos da base com DOI validado (Crossref); link clicável ou "não consegui confirmar o link"; contagem sem "exatamente" ("registros na nossa biblioteca"); DOI 10.1177/15347354241292978 confirmado inexistente (Crossref 404, ausente da base)
-- [ ] Sem continuidade falsa: agente só menciona conversas anteriores se existirem no banco
-- [ ] Despedida curta sem nova pergunta quando o paciente confirma que não precisa de mais nada
-- [ ] Relatório com nome do paciente, código curto do atendimento e data/hora; "você" em vez de "senhor(a)"; PDF com código no nome do arquivo
-- [ ] Triagem: corrigir contagem — sala auto-iniciava após a 4ª resposta e pulava a pergunta opcional
-- [ ] Persona/CRM: texto já centralizado em `agents.ts`/`clinic-info.ts`; NÃO alterar texto do CRM — decisão do dono/jurídico pendente
-- [ ] Indicação: texto sem promessa de ganho garantido (25/15/10 do líquido); botão mostra o link da conta logada na tela
-- [ ] Avisos WhatsApp de início e encerramento (com nota da avaliação), com registro de tentativa e status, sem dados de saúde
-- [ ] Layout: cabeçalho da sala compacto; botão "Gerar relatório" dentro da sala com "Gerando… Ns" e depois "Baixar PDF"
+- [x] Encerramento automático: despedida após "posso ajudar em mais algo?" fecha a sala no servidor e mostra as três carinhas; fim dos 30 min também encerra com aviso; 14 testes passam
+- [x] Citações verdadeiras: DOI validado no Crossref antes de virar link; sem link confirmado o agente diz "não consegui confirmar o link"; contagem sem "exatamente"; DOI 10.1177/15347354241292978 confirmado inexistente (Crossref 404, ausente da base)
+- [x] Sem continuidade falsa: bloco de continuidade conta atendimentos anteriores reais; primeira conversa proíbe "desde nossa última conversa"
+- [x] Despedida curta sem nova pergunta (mensagem fixa no encerramento automático + regra no prompt)
+- [x] Relatório com nome do paciente, código OT-XXXXXXXX e data/hora; "você" no lugar de "senhor(a)" (prompt + saneador); PDF com código no nome do arquivo
+- [x] Triagem: sala não inicia mais após a 4ª resposta — a pergunta opcional aparece antes
+- [x] Persona/CRM: texto centralizado em `agents.ts`/`clinic-info.ts`; texto do CRM NÃO alterado — decisão do dono/jurídico pendente
+- [x] Indicação: texto sem promessa de ganho garantido (25/15/10 do líquido); link da conta logada mostrado na tela com botão copiar
+- [x] Avisos WhatsApp de início e encerramento (com nota e duração), dedup por pedido+evento, registro de tentativa — entrega real no celular não verificada
+- [x] Layout: cabeçalho da sala compacto; botão "Gerar relatório" dentro da sala com "Gerando… Ns" e "Baixar PDF"
 - [ ] Conta de paciente de teste separada + acesso QA somente leitura — bloqueado: criação de usuário de autenticação exige ação do dono no cadastro
+- [ ] Teste integral com pagamento real das novas regras + publicar
 
 ## Instalação direta pelo QR Code — 07/11/2026
 - [x] Abrir a opção de instalar diretamente ao escanear, com confirmação do navegador e instruções específicas para iPhone, sem baixar atalho de computador no celular

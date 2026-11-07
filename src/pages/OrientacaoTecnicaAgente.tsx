@@ -32,7 +32,7 @@ const ATTACH_BUCKET = "ot-attachments";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 type Phase = "loading" | "intro" | "triage" | "checkout" | "awaiting" | "room" | "emergency";
-type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired";
+type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired" | "completed";
 
 type OtSession = {
   id: string;
@@ -91,7 +91,7 @@ const EMERGENCY_ANSWERS = new Set([
   "Pensamentos de me machucar",
 ]);
 
-const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired"];
+const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired", "completed"];
 const LIVE_STATES: OtState[] = ["ready", "active", "paused"];
 
 const fmtClock = (s: number) => {
@@ -173,6 +173,11 @@ export default function OrientacaoTecnicaAgente() {
 
   const [reports, setReports] = useState<OtReport[]>([]);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [rating, setRating] = useState<1 | 2 | 3 | null>(null);
+  const [ratingDone, setRatingDone] = useState(false);
+  const [ratingComment, setRatingComment] = useState("");
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [fullRoom, setFullRoom] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [reportWait, setReportWait] = useState(0);

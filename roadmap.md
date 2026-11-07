@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Orientação Técnica v3 — 07/11/2026
+- [ ] Prioridade atual: liberar PDF educativo sem revisão obrigatória e adicionar ampliar/minimizar sala WhatsApp em celular/computador
 - [ ] Diagnosticar tempo do agente, bloqueio do relatório e base científica real
 - [ ] Confirmar mudança da entrega revisada para relatório educativo imediato sem alterar prescrição ou assinatura
 - [ ] Ajustar tempo, relatório com saída em 60s e revisão administrativa

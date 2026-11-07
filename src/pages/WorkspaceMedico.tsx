@@ -218,7 +218,7 @@ const WorkspaceMedico = () => {
           action,
           patientInfo: patient?.full_name,
           notes: notes,
-          triageSummary: "Paciente relata dores crônicas. (Dado simulado da triagem)",
+          triageSummary: typeof appointment?.notes === "string" ? appointment.notes : "",
         }
       });
       if (error) throw error;

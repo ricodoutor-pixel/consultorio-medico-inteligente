@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Relatório do teste de Orientação — 07/11/2026
-- [ ] Diagnosticar e corrigir persistência do chat e geração de relatório sem alterar pagamento primeiro
-- [ ] Mostrar falhas e estados de geração na própria sala; ajustar rolagem e interferência do balão
-- [ ] Validar mensagens reais e relatório com sessão paga autorizada; PDF permanece sujeito à revisão humana
+- [x] Confirmar ausência de ot_messages/ot_reports no banco e aplicar criação protegida; corrigir persistência fragmentada e erros ocultos sem alterar pagamento primeiro
+- [x] Mostrar falhas e estados de geração na sala, ajustar rolagem e ocultar balão na Orientação; adicionar download PDF aprovado
+- [x] Executar 10 testes de triagem/stream/revisão; compilação aprovada e introdução no celular sem transbordamento ou erros de execução
+- [ ] Validar envio real de mensagem e geração/revisão/PDF — sessão autorizada abre introdução, sem sala ativa; não prolongar sessão nem aprovar relatório automaticamente
 
 ## Saída segura das contas — 06/11/2026
 - [x] Unificar logout, menus de conta e limpeza de sessão sem apagar registros

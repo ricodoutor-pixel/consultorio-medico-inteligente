@@ -9,6 +9,7 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
+import { createOtStreamParser } from "../_shared/ot-stream.ts";
 
 type SessionRow = {
   id: string;
@@ -49,9 +50,10 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization") || "";
     if (!authHeader.startsWith("Bearer ")) return json({ error: "Unauthorized" }, 401);
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !anonKey || !serviceKey) return json({ error: "Serviço indisponível" }, 500);
 
     const authed = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
@@ -79,6 +81,8 @@ Deno.serve(async (req) => {
       let q = sb.from("ot_web_sessions").select("*").eq("user_id", uid);
       if (targetSessionId) {
         q = q.eq("id", targetSessionId);
+      } else if (typeof body.external_reference === "string") {
+        q = q.eq("external_reference", body.external_reference);
       } else {
         q = q.order("created_at", { ascending: false }).limit(1);
       }
@@ -275,12 +279,13 @@ Deno.serve(async (req) => {
       const sess = await loadUserSession();
       if (!sess) return json({ messages: [] });
 
-      const { data: msgs } = await sb
+      const { data: msgs, error: messagesError } = await sb
         .from("ot_messages")
         .select("*")
         .eq("session_id", sess.id)
         .order("created_at", { ascending: true });
 
+      if (messagesError) return json({ error: "Não foi possível carregar a conversa. Tente novamente." }, 500);
       return json({ messages: msgs || [] });
     }
 
@@ -296,6 +301,7 @@ Deno.serve(async (req) => {
       if (sess.status === "expired") {
         return json({ error: "O tempo da sua sessão encerrou." }, 402);
       }
+      if (sess.status !== "active") return json({ error: "Inicie a orientação antes de enviar mensagens." }, 409);
 
       const userText = sanitize(body?.message, 4000);
       const attachment = body?.attachment && typeof body.attachment === "object" ? body.attachment : null;
@@ -305,7 +311,7 @@ Deno.serve(async (req) => {
       }
 
       // Persiste mensagem do paciente
-      const { data: insertedMsg } = await sb.from("ot_messages").insert({
+      const { error: messageError } = await sb.from("ot_messages").insert({
         session_id: sess.id,
         role: "patient",
         content: userText || (attachment ? `[Arquivo enviado: ${attachment.name}]` : ""),
@@ -313,6 +319,7 @@ Deno.serve(async (req) => {
         attachment_name: attachment?.name || null,
         attachment_mime: attachment?.mime || null,
       }).select().single();
+      if (messageError) return json({ error: "Não foi possível gravar sua mensagem. Tente novamente." }, 500);
 
       // Busca contexto científico
       const evidence = await buildScientificContextBlock(userText, 3).catch(() => "");
@@ -383,35 +390,27 @@ Deno.serve(async (req) => {
       const [clientStream, dbStream] = aiRes.body.tee();
 
       // Gravação assíncrona do texto completo da IA
-      (async () => {
+      const persistResponse = (async () => {
         try {
           const reader = dbStream.getReader();
           const decoder = new TextDecoder();
+          const parse = createOtStreamParser();
           let fullText = "";
 
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n");
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
-                try {
-                  const parsed = JSON.parse(trimmed.slice(6));
-                  const delta = parsed.choices?.[0]?.delta?.content || "";
-                  fullText += delta;
-                } catch { /* chunk parcial */ }
-              }
-            }
+            fullText += parse(decoder.decode(value, { stream: true }));
           }
+          fullText += parse(decoder.decode() + "\n");
 
           if (fullText.trim()) {
-            await sb.from("ot_messages").insert({
+            const { error: replyError } = await sb.from("ot_messages").insert({
               session_id: sess.id,
               role: "agent",
               content: fullText.trim(),
             });
+            if (replyError) throw new Error("reply_save_failed");
             await sb.from("ot_web_sessions").update({
               messages_count: (sess.messages_count ?? 0) + 2,
               last_message_at: new Date().toISOString(),
@@ -421,6 +420,7 @@ Deno.serve(async (req) => {
           console.error("[ot-edilson-web] stream db error", e);
         }
       })();
+      EdgeRuntime.waitUntil(persistResponse);
 
       return new Response(clientStream, {
         headers: { ...cors, "Content-Type": "text/event-stream" },
@@ -432,11 +432,15 @@ Deno.serve(async (req) => {
       const sess = await loadUserSession();
       if (!sess) return json({ error: "Sessão não encontrada" }, 404);
 
-      const { data: msgs } = await sb
+      const { data: msgs, error: historyError } = await sb
         .from("ot_messages")
         .select("role, content")
         .eq("session_id", sess.id)
         .order("created_at", { ascending: true });
+      if (historyError) return json({ error: "Não foi possível carregar a conversa para o relatório." }, 500);
+      if (!msgs?.some(m => m.role === "patient")) return json({ error: "Converse com a assistente antes de gerar seu relatório." }, 409);
+      const { data: existingDraft } = await sb.from("ot_reports").select("id").eq("session_id", sess.id).eq("status", "draft").limit(1).maybeSingle();
+      if (existingDraft) return json({ success: true, report_id: existingDraft.id, status: "draft" });
 
       const conversationText = (msgs || [])
         .map((m: any) => `${m.role.toUpperCase()}: ${m.content}`)
@@ -471,8 +475,10 @@ Deno.serve(async (req) => {
         }),
       });
 
+      if (!repRes.ok) return json({ error: "A geração do relatório falhou. Tente novamente mais tarde." }, 502);
       const repData = await repRes.json();
-      const reportContent = repData.choices?.[0]?.message?.content || "Relatório em elaboração.";
+      const reportContent = repData.choices?.[0]?.message?.content;
+      if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
@@ -498,12 +504,13 @@ Deno.serve(async (req) => {
       const sess = await loadUserSession();
       if (!sess) return json({ reports: [] });
 
-      const { data: reports } = await sb
+      const { data: reports, error: reportsError } = await sb
         .from("ot_reports")
         .select("id, status, created_at, approved_at, verification_code")
         .eq("session_id", sess.id)
         .order("created_at", { ascending: false });
 
+      if (reportsError) return json({ error: "Não foi possível carregar seus relatórios. Tente novamente." }, 500);
       return json({ reports: reports || [] });
     }
 
@@ -604,12 +611,13 @@ Deno.serve(async (req) => {
         };
         if (contentMd) updatePayload.content_md = contentMd;
 
-        const { data: approved } = await sb
+        const { data: approved, error: approvalError } = await sb
           .from("ot_reports")
           .update(updatePayload)
           .eq("id", reportId)
           .select()
           .single();
+        if (approvalError || !approved) return json({ error: "Não foi possível aprovar o relatório." }, 500);
 
         return json({ success: true, report: approved });
       }

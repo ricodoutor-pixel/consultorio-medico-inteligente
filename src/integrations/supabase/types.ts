@@ -5688,6 +5688,91 @@ export type Database = {
           },
         ]
       }
+      ot_messages: {
+        Row: {
+          attachment_mime: string | null
+          attachment_name: string | null
+          attachment_path: string | null
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+        }
+        Insert: {
+          attachment_mime?: string | null
+          attachment_name?: string | null
+          attachment_path?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+        }
+        Update: {
+          attachment_mime?: string | null
+          attachment_name?: string | null
+          attachment_path?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ot_web_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ot_reports: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          content_md: string
+          created_at: string
+          id: string
+          session_id: string
+          status: string
+          user_id: string
+          verification_code: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          content_md: string
+          created_at?: string
+          id?: string
+          session_id: string
+          status?: string
+          user_id: string
+          verification_code?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          content_md?: string
+          created_at?: string
+          id?: string
+          session_id?: string
+          status?: string
+          user_id?: string
+          verification_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ot_web_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ot_token_access_log: {
         Row: {
           accessed_at: string

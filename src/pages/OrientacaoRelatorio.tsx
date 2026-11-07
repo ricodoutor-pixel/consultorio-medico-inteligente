@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Printer, ArrowLeft, ArrowRight, ShieldCheck, FileText, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
 
 interface ReportData {
   id: string;
@@ -23,13 +24,14 @@ export default function OrientacaoRelatorio() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<ReportData | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
       setLoading(true);
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("ot_reports")
           .select("*")
           .eq("id", id)
@@ -57,6 +59,28 @@ export default function OrientacaoRelatorio() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const downloadPdf = async () => {
+    if (!report || !canDownloadOtReport(report.status)) return;
+    setDownloading(true);
+    try {
+      const { jsPDF } = await import("jspdf");
+      const pdf = new jsPDF();
+      pdf.setFont("helvetica");
+      pdf.setFontSize(11);
+      const text = ["Planta y Raiz — Orientação Técnica", report.content_md.replace(/[#*_`]/g, ""), `Revisado em: ${report.approved_at || ""}`, `Código: ${report.verification_code || ""}`, "Conteúdo educativo. Não é receita nem substitui consulta médica."].join("\n\n");
+      const lines: string[] = pdf.splitTextToSize(text, 174);
+      let y = 20;
+      for (const line of lines) {
+        if (y > 275) { pdf.addPage(); y = 20; }
+        pdf.text(line, 18, y);
+        y += 6;
+      }
+      pdf.save(`orientacao-${report.id}.pdf`);
+    } catch {
+      toast.error("Não foi possível baixar o PDF. Tente novamente ou use Imprimir.");
+    } finally { setDownloading(false); }
   };
 
   if (loading) {
@@ -87,19 +111,20 @@ export default function OrientacaoRelatorio() {
     );
   }
 
-  const isApproved = report.status === "approved";
+  const isApproved = canDownloadOtReport(report.status);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       {/* Botões de Ação na Tela (Ocultos na impressão) */}
-      <div className="max-w-3xl mx-auto mb-6 flex items-center justify-between print:hidden">
+      <div className="max-w-3xl mx-auto mb-6 flex flex-wrap gap-2 items-center justify-between print:hidden">
         <Button variant="ghost" onClick={() => navigate("/orientacao-tecnica")} className="gap-2">
           <ArrowLeft size={16} /> Voltar à Sala
         </Button>
         {isApproved && (
-          <Button onClick={handlePrint} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
-            <Printer size={16} /> Imprimir / Salvar PDF
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => void downloadPdf()} disabled={downloading} className="gap-2"><FileText size={16} />{downloading ? "Preparando PDF…" : "Baixar PDF"}</Button>
+            <Button variant="outline" onClick={handlePrint} className="gap-2"><Printer size={16} /> Imprimir</Button>
+          </div>
         )}
       </div>
 

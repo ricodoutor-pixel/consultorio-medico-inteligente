@@ -17,6 +17,8 @@ interface ReportData {
   approved_at: string | null;
   verification_code: string | null;
   created_at: string;
+  educational_released_at?: string | null;
+  content_hash?: string | null;
 }
 
 export default function OrientacaoRelatorio() {
@@ -44,7 +46,7 @@ export default function OrientacaoRelatorio() {
         }
 
         if (data.status !== "approved") {
-          toast.info("Este relatório ainda está em análise pelo Dr. Edilson Bezerra.");
+          toast.info("Relatório educativo gerado por IA, disponível para baixar. Revisão médica pendente.");
         }
 
         setReport(data as ReportData);
@@ -62,14 +64,14 @@ export default function OrientacaoRelatorio() {
   };
 
   const downloadPdf = async () => {
-    if (!report || !canDownloadOtReport(report.status)) return;
+    if (!report || !canDownloadOtReport(report.status, !!report.educational_released_at)) return;
     setDownloading(true);
     try {
       const { jsPDF } = await import("jspdf");
       const pdf = new jsPDF();
       pdf.setFont("helvetica");
       pdf.setFontSize(11);
-      const text = ["Planta y Raiz — Orientação Técnica", report.content_md.replace(/[#*_`]/g, ""), `Revisado em: ${report.approved_at || ""}`, `Código: ${report.verification_code || ""}`, "Conteúdo educativo. Não é receita nem substitui consulta médica."].join("\n\n");
+      const text = ["Planta y Raiz — Relatório de Orientação Técnica", report.status === "approved" ? `Revisado pelo Dr. Edilson em: ${report.approved_at || ""}` : "Orientação educativa gerada por assistente de IA. Revisão médica pendente. Não há aprovação ou assinatura médica nesta versão.", report.content_md.replace(/[#*_`]/g, ""), `Identificador: ${report.id}`, `Hash SHA-256 de integridade (não é assinatura digital): ${report.content_hash || "não disponível nesta versão"}`, "Conteúdo educativo. Não é receita nem substitui consulta médica."].join("\n\n");
       const lines: string[] = pdf.splitTextToSize(text, 174);
       let y = 20;
       for (const line of lines) {
@@ -111,7 +113,8 @@ export default function OrientacaoRelatorio() {
     );
   }
 
-  const isApproved = canDownloadOtReport(report.status);
+  const isApproved = report.status === "approved";
+  const canDownload = canDownloadOtReport(report.status, !!report.educational_released_at);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8">
@@ -120,7 +123,7 @@ export default function OrientacaoRelatorio() {
         <Button variant="ghost" onClick={() => navigate("/orientacao-tecnica")} className="gap-2">
           <ArrowLeft size={16} /> Voltar à Sala
         </Button>
-        {isApproved && (
+        {canDownload && (
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => void downloadPdf()} disabled={downloading} className="gap-2"><FileText size={16} />{downloading ? "Preparando PDF…" : "Baixar PDF"}</Button>
             <Button variant="outline" onClick={handlePrint} className="gap-2"><Printer size={16} /> Imprimir</Button>
@@ -162,7 +165,7 @@ export default function OrientacaoRelatorio() {
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm mb-6 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
             <div>
-              <strong>Rascunho de Orientação:</strong> Este documento foi gerado pelo assistente de IA e está sob revisão direta do Dr. Edilson Bezerra. A versão final com validade técnica será liberada assim que revisada.
+              <strong>Relatório educativo gerado por IA:</strong> disponível para download, com revisão médica pendente. Esta versão não representa aprovação, prescrição ou assinatura médica. Supervisão da plataforma: Dr. Edilson Bezerra, CEO fundador, CRM Bolívia nº 10963, Santa Cruz de la Sierra.
             </div>
           </div>
         )}

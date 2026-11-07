@@ -1,0 +1,40 @@
+.ot-room {
+  --ot-header: 168 88% 20%;
+  --ot-header-text: 0 0% 100%;
+  --ot-wall: 32 24% 90%;
+  --ot-bubble: 0 0% 100%;
+  --ot-patient: 111 91% 91%;
+  --ot-ink: 160 9% 13%;
+  --ot-secondary: 160 7% 37%;
+  --ot-compose: 0 0% 96%;
+  --ot-read: 199 85% 39%;
+  --ot-shadow: 0 1px 2px hsl(160 9% 13% / .13);
+  color: hsl(var(--ot-ink));
+  background: hsl(var(--ot-wall));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.ot-room-full { position: fixed; inset: 0; width: 100%; height: 100dvh; z-index: 100; border-radius: 0; padding-top: env(safe-area-inset-top); }
+.ot-room-header { background: hsl(var(--ot-header)); color: hsl(var(--ot-header-text)); flex-shrink: 0; }
+.ot-room-header .ot-tool { color: hsl(var(--ot-header-text)); background: transparent; }
+.ot-room-messages { background: hsl(var(--ot-wall)); background-image: radial-gradient(hsl(var(--ot-header) / .08) 1px, transparent 1px); background-size: 24px 24px; overscroll-behavior: contain; }
+.ot-room-full .ot-room-messages { flex: 1; min-height: 0; height: auto; }
+.ot-message { background: hsl(var(--ot-bubble)); color: hsl(var(--ot-ink)); box-shadow: var(--ot-shadow); font-size: 16px; line-height: 1.5; }
+.ot-message p, .ot-message li { font-size: inherit; }
+.ot-message-mine { background: hsl(var(--ot-patient)); }
+.ot-message a { color: hsl(var(--ot-header)); text-decoration: underline; }
+.ot-room-large .ot-message { font-size: 20px; }
+.ot-room .ot-meta { color: hsl(var(--ot-secondary)); font-size: 11px; }
+.ot-room .ot-read { color: hsl(var(--ot-read)); }
+.ot-room-compose { background: hsl(var(--ot-compose)); color: hsl(var(--ot-ink)); flex-shrink: 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.ot-room .ot-input { background: hsl(var(--ot-bubble)); color: hsl(var(--ot-ink)); font-size: 16px; }
+.ot-room .ot-send { background: hsl(var(--ot-header)); color: hsl(var(--ot-header-text)); }
+.ot-room .ot-quick { background: hsl(var(--ot-bubble)); color: hsl(var(--ot-header)); border-color: hsl(var(--ot-header) / .25); }
+.ot-room .ot-system { background: hsl(var(--ot-bubble) / .9); color: hsl(var(--ot-secondary)); }
+.ot-typing span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: hsl(var(--ot-secondary)); margin: 0 2px; animation: ot-pulse 1s ease-in-out infinite; }
+.ot-typing span:nth-child(2) { animation-delay: .15s; }
+.ot-typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes ot-pulse { 50% { opacity: .3; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .ot-typing span { animation: none; } }

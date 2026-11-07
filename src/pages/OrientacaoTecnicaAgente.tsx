@@ -198,7 +198,10 @@ export default function OrientacaoTecnicaAgente() {
   const initDone = useRef(false);
 
   const emergency = hasEmergency(answers);
-  const triageComplete = QUESTIONS.every((item) => (answers[item.id] || "").trim());
+  const triageComplete = QUESTIONS.every((item) =>
+    item.optional ? true
+      : item.id === "queixa" ? !!(answers.queixa?.trim() && answers.tempo?.trim())
+        : !!(answers[item.id] || "").trim());
 
   // ── Auto-preenchimento por query params (Personalização de Link) ─────────
   useEffect(() => {
@@ -283,7 +286,11 @@ export default function OrientacaoTecnicaAgente() {
       setOrderRef(d.order.external_reference);
       if (d.order.triagem) {
         setAnswers(d.order.triagem);
-        const missing = QUESTIONS.findIndex(item => !d.order?.triagem?.[item.id]?.trim());
+        const t = d.order.triagem;
+        const missing = QUESTIONS.findIndex((item) =>
+          item.optional ? false
+            : item.id === "queixa" ? !(t.queixa?.trim() && t.tempo?.trim())
+              : !t[item.id]?.trim());
         setStep(missing < 0 ? QUESTIONS.length - 1 : missing);
       }
       if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });

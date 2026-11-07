@@ -5,7 +5,7 @@
 
 /** Pergunta de encerramento feita pelo agente antes da despedida. */
 export const CLOSING_QUESTION_PATTERN =
-  /posso ajudar (em )?mais (alguma coisa|algo)|mais alguma (coisa|d[úu]vida)|posso te ajudar em algo mais/i;
+  /posso (te )?ajudar (em )?mais (alguma coisa|algo)|mais alguma (coisa|d[úu]vida)|posso (te )?ajudar em algo mais/i;
 
 const normalize = (s: string) =>
   s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();

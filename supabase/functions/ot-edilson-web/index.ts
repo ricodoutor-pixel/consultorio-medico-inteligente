@@ -398,7 +398,7 @@ Deno.serve(async (req) => {
             const { error: replyError } = await sb.from("ot_messages").insert({
               session_id: sess.id,
               role: "agent",
-              content: fullText.trim(),
+              content: sanitizeOutboundLinks(fullText.trim()),
             });
             if (replyError) throw new Error("reply_save_failed");
             await sb.from("ot_web_sessions").update({

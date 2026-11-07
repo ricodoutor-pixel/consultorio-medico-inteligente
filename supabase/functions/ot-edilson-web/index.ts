@@ -628,6 +628,7 @@ Deno.serve(async (req) => {
         success: true,
         report_id: newReport.id,
         status: "draft",
+        code: attendanceCode,
         message: "Relatório educativo disponível para baixar. Gerado por IA; revisão médica pendente.",
       });
     }
@@ -657,6 +658,7 @@ Deno.serve(async (req) => {
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
+      fireClosedNotice(sess, null);
       return json({ success: true, state: "completed" });
     }
 

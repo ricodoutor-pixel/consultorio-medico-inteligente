@@ -214,6 +214,8 @@ export function PWAInstallSection() {
                       Ou clique aqui para baixar apenas o arquivo de atalho (.url)
                     </button>
                   )}
+
+                  <MiniInstallQR />
                 </div>
               </div>
 

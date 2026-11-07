@@ -4,6 +4,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
 import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -20,7 +21,8 @@ Deno.serve(async (req) => {
   const token = auth.replace(/^Bearer\s+/i, "");
   const admin = createClient(url, service);
 
-  if (token !== service) {
+  const internal = token === service || requireServiceAuth(req, corsHeaders) === null;
+  if (!internal) {
     const { data: u } = await admin.auth.getUser(token);
     if (!u?.user) return json({ error: "unauthorized" }, 401);
     const { data: role } = await admin.from("user_roles").select("role")

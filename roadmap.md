@@ -9,13 +9,19 @@
 - [x] Adicionar ampliar/minimizar e letra ampliável à sala; validação visual com sessão paga ainda bloqueada porque conta autorizada abre introdução
 - [x] Diagnosticar tempo do agente, bloqueio do relatório e base científica real (5.348 registros medidos)
 - [x] Confirmar mudança da entrega revisada para relatório educativo imediato sem alterar prescrição ou assinatura
+- [x] Corrigir link `/profissionais/{id}`: instrução do agente reescrita + saneador de links nas respostas e no relatório
+- [x] Avaliação por três carinhas + encerramento: tabela `avaliacoes_orientacao` (1 por atendimento), ações `close_session`/`submit_rating`/`skip_rating`, sala somente leitura, tela de próximos passos com indicação (25/15/10)
+- [x] Triagem curta de 5 perguntas (emergência primeiro, queixa+tempo, intensidade 0–10, medicamentos com "Nenhum", expectativa opcional); nome/idade do cadastro; 9 testes passam
+- [x] Aviso de pagamento ao Dr. Edilson com dedup e registro (`payment_notify_log`), ligado ao webhook E à confirmação direta; formato sem sintomas/CPF
+- [x] Citações restritas à busca real: contagem medida injetada no prompt (5.348), regra "não encontrei estudo" quando a busca vem vazia
+- [ ] Reutilizar resumo da triagem (30 dias) nas consultas pagas com médicos reais
+- [ ] Consultas com médicos reais: avaliação antes de encerrar + liberação financeira só após avaliação
+- [ ] Microfone para ditar mensagem na sala; chips dinâmicos por assunto
+- [ ] Painel admin: aba "Relatórios para revisar" com média das avaliações; envio do PDF por e-mail e listagem em "Meu painel"
+- [ ] Corrigir duplicidade de rotas `/afiliados` e `/indicacoes`
+- [ ] Testar fluxo completo com pagamento real (seção 13 do prompt) e publicar
 - [ ] Ajustar tempo, relatório com saída em 60s e revisão administrativa
-- [ ] Implementar 5 perguntas e resumo reutilizável nas consultas pagas
-- [ ] Refazer somente sala de Orientação no padrão WhatsApp
-- [ ] Restringir citações à busca real e informar contagem medida
-- [ ] Implementar avaliação, encerramento e novo pagamento por orientação
 - [ ] Testar conversa/ampliar/minimizar com sala paga acessível — conta autorizada não acessa sala existente; PDF real foi baixado sem erros
-- [ ] Publicar e verificar versão oficial; testes novos 13 passaram, compilação aprovada
 
 ## Relatório do teste de Orientação — 07/11/2026
 - [x] Confirmar ausência de ot_messages/ot_reports no banco e aplicar criação protegida; corrigir persistência fragmentada e erros ocultos sem alterar pagamento primeiro

@@ -12,6 +12,7 @@ import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
 import { notifyPaymentConfirmedOnce, notifyOrientationEvent } from "../_shared/payment-notify.ts";
 import { shouldAutoClose, FAREWELL_MESSAGE } from "../_shared/orientation-farewell.ts";
+import { orientationCode, enforceAttendanceCode } from "../_shared/orientation-code.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -28,6 +29,8 @@ type SessionRow = {
   paused_by?: string | null;
   paused_at?: string | null;
   messages_count: number | null;
+  attendance_code?: string;
+  closed_at?: string | null;
 };
 
 const secondsLeft = (row: SessionRow) => {
@@ -102,17 +105,22 @@ Deno.serve(async (req) => {
     };
 
     /** Aviso de encerramento ao Dr. Edilson (dedup por pedido; sem dados de saúde). */
-    const fireClosedNotice = (sess: SessionRow, rating: number | null) => {
-      const durationMin = sess.started_at
-        ? Math.max(1, Math.round((Date.now() - new Date(sess.started_at).getTime()) / 60000))
-        : null;
+    const fireClosedNotice = (sess: SessionRow, rating: number | null, waitForRating = false) => {
       EdgeRuntime.waitUntil((async () => {
+        // Give the visible rating screen time to save. Submission can dispatch sooner;
+        // both paths use the same atomic event claim, never duplicate the notice.
+        if (waitForRating) await new Promise(resolve => setTimeout(resolve, 40_000));
+        const { data: saved } = await sb.from("avaliacoes_orientacao").select("rating").eq("session_id", sess.id).maybeSingle();
+        const { data: closed } = await sb.from("ot_web_sessions").select("closed_at").eq("id", sess.id).maybeSingle();
+        const durationMin = sess.started_at
+          ? Math.max(0, Math.round((Date.parse(closed?.closed_at || new Date().toISOString()) - Date.parse(sess.started_at)) / 60000)) : null;
         await notifyOrientationEvent(sb, {
           externalReference: sess.external_reference,
           patientName: await patientName(sess.user_id),
           event: "fim",
-          rating,
+          rating: saved?.rating ?? rating,
           durationMin,
+          attendanceCode: sess.attendance_code,
         });
       })());
     };
@@ -133,7 +141,7 @@ Deno.serve(async (req) => {
       const row = data as SessionRow;
 
       const { data: order } = await sb.from("orientacao_tecnica_orders")
-        .select("status, triagem, ai_analysis, flow_status")
+        .select("id, status, triagem, ai_analysis, flow_status")
         .eq("external_reference", row.external_reference).eq("user_id", uid).maybeSingle();
       let triage = order?.triagem || {};
       if (!Object.keys(triage).length && order?.ai_analysis) {
@@ -143,17 +151,19 @@ Deno.serve(async (req) => {
       // de respostas antigas (ex.: "45 anos"); exigir apenas pagamento aprovado e ausência de emergência.
       const paid = ["approved", "completed", "dispatched"].includes(order?.status ?? "");
       if (!order || !paid || hasEmergency(triage as Record<string, unknown>)) return null;
+      row.attendance_code = orientationCode(order.id);
 
       // Fim dos 30 min: encerra no servidor (sala vira somente leitura e a avaliação aparece).
       if (row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() <= Date.now()) {
-        await sb.from("ot_web_sessions").update({ status: "completed", closed_at: new Date().toISOString() }).eq("id", row.id);
+        const { error: closeError } = await sb.from("ot_web_sessions").update({ status: "completed", closed_at: new Date().toISOString() }).eq("id", row.id);
+        if (closeError) throw closeError;
         await sb.from("ot_messages").insert({
           session_id: row.id,
           role: "system",
           content: `⏱️ Os ${ORIENTACAO_MINUTES} minutos da Orientação Técnica chegaram ao fim. A sala foi encerrada — avalie o atendimento abaixo e baixe seu relatório.`,
         });
         row.status = "completed";
-        fireClosedNotice(row, null);
+        fireClosedNotice(row, null, true);
       }
 
       return row;
@@ -333,6 +343,7 @@ Deno.serve(async (req) => {
             externalReference: sess.external_reference,
             patientName: await patientName(uid),
             event: "inicio",
+            attendanceCode: sess.attendance_code,
           });
         })());
 
@@ -417,11 +428,12 @@ Deno.serve(async (req) => {
           role: "agent",
           content: FAREWELL_MESSAGE,
         });
-        await sb.from("ot_web_sessions").update({
+        const { error: closeError } = await sb.from("ot_web_sessions").update({
           status: "completed",
           closed_at: new Date().toISOString(),
         }).eq("id", sess.id).neq("status", "completed");
-        fireClosedNotice(sess, null);
+        if (closeError) return json({ error: "Não foi possível encerrar a sala. Tente de novo." }, 500);
+        fireClosedNotice(sess, null, true);
         return json({ closed: true, state: "completed", farewell: FAREWELL_MESSAGE });
       }
 
@@ -560,7 +572,7 @@ Deno.serve(async (req) => {
       const triageStr = JSON.stringify(sess.triage || {});
 
       // Identificação estruturada do atendimento (não depende da redação da IA).
-      const attendanceCode = `OT-${sess.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+      const attendanceCode = sess.attendance_code || orientationCode(sess.id);
       const name = await patientName(uid);
       const quando = new Intl.DateTimeFormat("pt-BR", {
         timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric",
@@ -604,16 +616,17 @@ Deno.serve(async (req) => {
       if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
       // Garante o tratamento neutro mesmo se a IA desobedecer ao prompt.
-      const neutralContent = reportContent
+      const neutralContent = enforceAttendanceCode(sanitizeOutboundLinks(reportContent
         .replace(/senhor\(a\)/gi, "você")
         .replace(/\b[Ss]enhora\b/g, "você")
-        .replace(/\b[Ss]enhor\b/g, "você");
+        .replace(/\b[Ss]enhor\b/g, "você")), attendanceCode);
 
       const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(neutralContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
         user_id: uid,
-        content_md: sanitizeOutboundLinks(neutralContent),
+        content_md: neutralContent,
+        verification_code: attendanceCode,
         status: "draft",
         educational_released_at: new Date().toISOString(),
         generation_ms: Date.now() - started,
@@ -654,11 +667,12 @@ Deno.serve(async (req) => {
       if (!sess) return json({ error: "Sessão não encontrada" }, 404);
       if (sess.status === "completed") return json({ success: true, state: "completed" });
       if (sess.status === "ready") return json({ error: "A sessão ainda não foi iniciada." }, 409);
-      await sb.from("ot_web_sessions").update({
+      const { error: closeError } = await sb.from("ot_web_sessions").update({
         status: "completed",
         closed_at: new Date().toISOString(),
       }).eq("id", sess.id).neq("status", "completed");
-      fireClosedNotice(sess, null);
+      if (closeError) return json({ error: "Não foi possível encerrar a sala. Tente de novo." }, 500);
+      fireClosedNotice(sess, null, true);
       return json({ success: true, state: "completed" });
     }
 
@@ -667,27 +681,26 @@ Deno.serve(async (req) => {
       const sess = await loadUserSession();
       if (!sess) return json({ error: "Sessão não encontrada" }, 404);
       const rating = Number(body?.rating);
+      if (sess.status !== "completed") return json({ error: "Encerre a orientação antes de avaliar." }, 409);
       if (![1, 2, 3].includes(rating)) return json({ error: "rating_invalid" }, 400);
       const comment = sanitize(body?.comment, 1000) || null;
 
       const { data: existing } = await sb.from("avaliacoes_orientacao")
-        .select("id").eq("session_id", sess.id).maybeSingle();
+        .select("id, rating, comment").eq("session_id", sess.id).maybeSingle();
       if (!existing) {
-        const { error: rErr } = await sb.from("avaliacoes_orientacao").insert({
+        const { error: rErr } = await sb.from("avaliacoes_orientacao").upsert({
           session_id: sess.id,
           user_id: uid,
           rating,
           comment,
-        });
+        }, { onConflict: "session_id", ignoreDuplicates: true });
         if (rErr) return json({ error: "rating_save_failed" }, 500);
       }
-      // Encerramento no servidor: sala vira somente leitura.
-      await sb.from("ot_web_sessions").update({
-        status: "completed",
-        closed_at: new Date().toISOString(),
-      }).eq("id", sess.id).neq("status", "completed");
-      fireClosedNotice(sess, rating);
-      return json({ success: true, state: "completed", alreadyRated: !!existing });
+      const { data: saved, error: readError } = await sb.from("avaliacoes_orientacao")
+        .select("rating, comment").eq("session_id", sess.id).single();
+      if (readError || !saved) return json({ error: "Não foi possível confirmar a avaliação. Tente de novo." }, 500);
+      fireClosedNotice(sess, saved.rating);
+      return json({ success: true, state: "completed", alreadyRated: !!existing, rating: saved.rating, comment: saved.comment, code: sess.attendance_code });
     }
 
     // ── 9. SKIP RATING (paciente pulou: registra encerramento sem avaliação) ──

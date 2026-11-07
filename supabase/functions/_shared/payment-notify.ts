@@ -81,14 +81,13 @@ async function sendOnce(text: string): Promise<{ ok: boolean; http: number | nul
 }
 
 /** Tenta enviar até 3 vezes, registrando cada tentativa. */
-async function deliver(sb: Sb, logId: string, input: NotifyInput, trigger: string, startNo: number): Promise<boolean> {
-  const text = buildPaymentMessage(input);
+async function deliver(sb: Sb, logId: string, text: string, logKey: string, trigger: string, startNo: number): Promise<boolean> {
   let n = startNo;
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     n += 1;
     const r = await sendOnce(text);
     await sb.from("payment_notify_attempts").insert({
-      log_id: logId, external_reference: input.externalReference, attempt_no: n, trigger,
+      log_id: logId, external_reference: logKey, attempt_no: n, trigger,
       status: r.ok ? "sent" : "failed", http_status: r.http, error: r.error, duration_ms: r.ms,
     });
     await sb.from("payment_notify_log").update({

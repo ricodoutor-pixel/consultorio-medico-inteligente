@@ -10,7 +10,8 @@ import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
-import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
+import { notifyPaymentConfirmedOnce, notifyOrientationEvent } from "../_shared/payment-notify.ts";
+import { shouldAutoClose, FAREWELL_MESSAGE } from "../_shared/orientation-farewell.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -94,6 +95,27 @@ Deno.serve(async (req) => {
     };
 
     const targetSessionId = (typeof body?.sessionId === "string" ? body.sessionId : (typeof body?.session_id === "string" ? body.session_id : null));
+
+    const patientName = async (userId: string): Promise<string> => {
+      const { data: prof } = await sb.from("profiles").select("full_name").eq("id", userId).maybeSingle();
+      return (prof as { full_name?: string } | null)?.full_name || "Paciente";
+    };
+
+    /** Aviso de encerramento ao Dr. Edilson (dedup por pedido; sem dados de saúde). */
+    const fireClosedNotice = (sess: SessionRow, rating: number | null) => {
+      const durationMin = sess.started_at
+        ? Math.max(1, Math.round((Date.now() - new Date(sess.started_at).getTime()) / 60000))
+        : null;
+      EdgeRuntime.waitUntil((async () => {
+        await notifyOrientationEvent(sb, {
+          externalReference: sess.external_reference,
+          patientName: await patientName(sess.user_id),
+          event: "fim",
+          rating,
+          durationMin,
+        });
+      })());
+    };
 
     // Carrega a sessão do usuário (específica por ID ou a mais recente)
     const loadUserSession = async (): Promise<SessionRow | null> => {

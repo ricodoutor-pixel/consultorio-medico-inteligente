@@ -901,9 +901,10 @@ export default function OrientacaoTecnicaAgente() {
           {phase === "emergency" && (
             <div role="alert" className="border-2 border-destructive bg-destructive/10 p-6 space-y-4">
               <AlertTriangle className="text-destructive" size={40} />
-              <h2 className="text-2xl font-bold text-destructive">Sinal de emergência: SAMU 192</h2>
-              <p>Procure atendimento presencial agora. Ligue 192 ou vá ao pronto-socorro mais próximo. A sala não será liberada.</p>
-              <Button variant="outline" onClick={() => { setStep(9); setPhase("triage"); }}>Marquei por engano — revisar resposta</Button>
+              <h2 className="text-2xl font-bold text-destructive">Você não está sozinho(a) — procure ajuda agora</h2>
+              <p>Pelo que você relatou, o mais seguro é atendimento presencial imediato: ligue <strong>SAMU 192</strong> ou vá ao pronto-socorro mais próximo. Se estiver passando por uma crise emocional, o <strong>CVV 188</strong> atende 24h, de graça.</p>
+              <p className="text-sm text-muted-foreground">Seu pagamento continua válido e guardado — quando estiver em segurança, você pode voltar e corrigir sua resposta sem pagar de novo.</p>
+              <Button variant="outline" onClick={() => { setStep(0); setPhase("triage"); }}>Voltar e corrigir minha resposta</Button>
             </div>
           )}
 
@@ -1046,14 +1047,14 @@ export default function OrientacaoTecnicaAgente() {
                     <p className="font-black text-red-500 mb-1">Sinal de emergência identificado</p>
                     <p className="text-muted-foreground">
                       Pelo que você relatou, procure atendimento presencial agora: ligue <strong>SAMU 192</strong> ou
-                      vá ao pronto-socorro mais próximo. A Orientação Técnica não substitui urgência médica, por isso o
-                      pagamento não está disponível neste momento.
+                      vá ao pronto-socorro mais próximo. Em crise emocional, o <strong>CVV 188</strong> atende 24h.
+                      A Orientação Técnica não substitui urgência médica, por isso o pagamento não está disponível neste momento.
                     </p>
                     <button
-                      onClick={() => { setStep(QUESTIONS.length - 1); setPhase("triage"); }}
+                      onClick={() => { setStep(0); setPhase("triage"); }}
                       className="mt-3 text-xs underline text-muted-foreground"
                     >
-                      Marquei por engano — revisar resposta
+                      Voltar e corrigir minha resposta
                     </button>
                   </div>
                 </div>

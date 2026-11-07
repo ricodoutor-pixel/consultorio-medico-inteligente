@@ -1106,7 +1106,7 @@ export default function OrientacaoTecnicaAgente() {
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
-                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" ? "encerrado" : otState}</p>
+                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -1122,6 +1122,18 @@ export default function OrientacaoTecnicaAgente() {
                     >
                       <Clock size={12} /> {fmtClock(secondsLeft)}
                     </div>
+                  )}
+                  {otState === "active" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ot-tool h-9 px-2 text-xs font-bold"
+                      onClick={() => void closeSession()}
+                      disabled={closing}
+                      aria-label="Encerrar orientação"
+                    >
+                      {closing ? <Loader2 size={14} className="animate-spin" /> : "Encerrar"}
+                    </Button>
                   )}
                   </div>
                 </div>

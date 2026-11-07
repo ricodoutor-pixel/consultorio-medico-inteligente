@@ -8,6 +8,7 @@
 - Busca real às 21:59 UTC: consulta expandida Title/Abstract medical cannabis OR cannabinoids OR cannabidiol OR therapeutic cannabis = 22.062 resultados; acrescida de anxiety AND sleep = 297. Tais valores correspondem SOMENTE às consultas executadas, não confirmam estimativas de outros filtros.
 - EFetch retornou PMIDs 26103030, 38385885, 39299947 e 35093949 com títulos, anos, tipos e abstracts reais.
 - 18 testes de recuperação, privacidade e preservação do encerramento passaram. Funções Orientação/copiloto implantadas.
+- Chamada autenticada real ao copiloto às 22:00 UTC retornou HTTP 200, `success: true`, origem Gemini 3.8 Flash e referências PubMed. Isso verifica resposta do serviço, não acompanhamento de consulta real pela tela.
 
 ## Limites
 - Pesquisa dinâmica não equivale a importar 30–50 mil publicações, acessar texto integral protegido, treinar o modelo ou comprovar eficácia clínica. Não foi executada importação em massa nem alterado documento histórico.

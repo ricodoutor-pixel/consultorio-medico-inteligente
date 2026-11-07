@@ -1,9 +1,10 @@
 # Roadmap
 
 ## PubMed e agente compartilhado — 07/11/2026
-- [ ] Verificar Gemini 3.8 na Orientação e pesquisa PubMed real
-- [ ] Compartilhar recuperação científica segura com copiloto médico, preservando supervisão humana
-- [ ] Testar fontes, ausência de dados pessoais nas buscas e falhas de API; disponibilizar funções atualizadas
+- [x] Verificar Gemini 3.8 na Orientação (logs reais) e pesquisa PubMed real (ESearch/EFetch, resumos e contagens medidas)
+- [x] Compartilhar recuperação científica segura com copiloto médico Gemini 3.8, preservando supervisão humana; remover triagem simulada enviada ao agente no Workspace
+- [x] 18 testes passam; funções implantadas; chamada autenticada real ao copiloto retornou HTTP 200, Gemini 3.8 e referências PubMed; compilação OK
+- [ ] Validar pela tela durante consulta real com médico aprovado — bloqueado: não há atendimento ativo/consentido fornecido; nenhuma cobrança/sala criada artificialmente
 
 ## Correções finais do teste 18:12–18:22 — 07/11/2026
 - [x] 1. Despedida independente da pergunta anterior; nova dúvida impede fechamento (testes)

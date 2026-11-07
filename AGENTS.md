@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Orientation and medical copilot share scientific-context retrieval: internal catalog plus bounded live PubMed ESearch/EFetch; only allowlisted clinical terms leave for NCBI, and external totals never represent imported records or model training.
+
 - Orientation codes derive from the persisted payment-order identifier and are persisted in new reports; historical report codes come from their original content to avoid silently rewriting documents.
 - All referral screens consume the ownership-checked, transaction-locked ensure_referral_code function and referral_links as the canonical store; browser-generated fallback codes are never shareable.
 - Orientation completion exposes rating immediately and returns the server-read rating; notice acceptance is stored separately from delivery receipts, preventing false delivery claims.

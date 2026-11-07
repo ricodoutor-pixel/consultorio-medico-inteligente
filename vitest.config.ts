@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 // testes de integração escritos para o runtime Deno (`deno test`) e dependem de
 // credenciais reais — não devem ser coletados pelo Vitest/CI comum.
 export default defineConfig({
-  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
+  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)), "npm:fast-xml-parser@5.12.0": "fast-xml-parser" } },
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["node_modules/**", "dist/**", "supabase/**"],

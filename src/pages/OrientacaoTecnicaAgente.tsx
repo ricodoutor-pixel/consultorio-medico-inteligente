@@ -134,6 +134,9 @@ export default function OrientacaoTecnicaAgente() {
   const [draft, setDraft] = useState("");
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string>("");
+  const [profileAge, setProfileAge] = useState<number | null>(null);
+  const [comboTempo, setComboTempo] = useState("");
 
   const [orderRef, setOrderRef] = useState<string | null>(searchParams.get("ref"));
   const orderRefRef = useRef<string | null>(searchParams.get("ref"));
@@ -220,6 +223,25 @@ export default function OrientacaoTecnicaAgente() {
       if (!alive) return;
       setAuthed(!!data.session);
       setUserId(data.session?.user?.id ?? null);
+      const uid = data.session?.user?.id;
+      if (uid) {
+        // Nome e idade vêm do cadastro — a triagem não pergunta de novo.
+        void supabase.from("profiles").select("full_name, date_of_birth").eq("id", uid).maybeSingle()
+          .then(({ data: p }) => {
+            if (!alive || !p) return;
+            if (p.full_name) setProfileName(p.full_name);
+            if (p.date_of_birth) {
+              const birth = new Date(p.date_of_birth);
+              if (!Number.isNaN(birth.getTime())) {
+                const now = new Date();
+                let age = now.getFullYear() - birth.getFullYear();
+                const m = now.getMonth() - birth.getMonth();
+                if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age -= 1;
+                if (age >= 0 && age <= 120) setProfileAge(age);
+              }
+            }
+          });
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session);

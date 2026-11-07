@@ -1507,13 +1507,27 @@ export default function OrientacaoTecnicaAgente() {
                             Fazer nova orientação (R$ 30)
                           </Button>
                           <div className="w-full rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 p-3 text-left space-y-2">
-                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique e participe do programa de ganhos</p>
+                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique a Planta y Raiz</p>
                             <p className="text-[11px] text-neutral-700 leading-snug">
-                              50% do valor líquido distribuídos na rede, em três níveis (25%, 15% e 10%). Obtenha seu link personalizado e acompanhe seus ganhos.
+                              Quando alguém indicado por você contrata um serviço, 50% do valor líquido é distribuído na rede em três níveis (25%, 15% e 10%). Os ganhos dependem de indicações que realmente contratem — não há ganho garantido.
                             </p>
-                            <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
-                              Obter meu link de indicação
-                            </Button>
+                            {refCode ? (
+                              <div className="space-y-2">
+                                <div className="p-2 bg-white rounded-lg border border-[#25D366]/40 text-[11px] font-mono break-all select-all text-neutral-700">
+                                  https://plantayraiz.com.br/cadastro?ref={refCode}
+                                </div>
+                                <Button onClick={() => void copyRefLink()} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                                  {copiedRef ? <><Check size={14} className="mr-1" /> Link copiado!</> : "Copiar meu link de indicação"}
+                                </Button>
+                                <Button onClick={() => navigate("/afiliados")} size="sm" variant="ghost" className="w-full rounded-lg font-bold text-neutral-600 text-xs">
+                                  Ver meu painel de indicações
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button onClick={() => navigate("/afiliados")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                                Obter meu link de indicação
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>

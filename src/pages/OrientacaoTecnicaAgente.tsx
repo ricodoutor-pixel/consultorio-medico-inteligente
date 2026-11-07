@@ -443,8 +443,14 @@ export default function OrientacaoTecnicaAgente() {
       setDraft("");
       if (response.state === "emergency") setPhase("emergency");
       else if (response.state === "ready") {
-        const st = await fetchStatus();
-        if (st === "ready") await startRoomRef.current?.();
+        // A última resposta obrigatória já libera a sala no servidor, mas a
+        // pergunta opcional (objetivo) ainda não apareceu: mostra antes de iniciar.
+        const objetivoPendente = step < QUESTIONS.length - 1 && !(response.triagem?.objetivo || "").trim();
+        if (objetivoPendente) setStep(QUESTIONS.length - 1);
+        else {
+          const st = await fetchStatus();
+          if (st === "ready") await startRoomRef.current?.();
+        }
       }
       else if (step < QUESTIONS.length - 1) setStep(step + 1);
       else {
@@ -674,6 +680,19 @@ export default function OrientacaoTecnicaAgente() {
       if (!res.ok || !res.body) {
         const failure = await res.json().catch(() => null);
         throw new Error(failure?.error || "Não foi possível receber a resposta agora.");
+      }
+
+      // Encerramento automático: o servidor responde JSON (não SSE) quando o
+      // paciente se despediu — mostra a despedida e abre a avaliação.
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await res.json().catch(() => null);
+        if (data?.closed && data?.farewell) {
+          setMessages(prev => [...prev, { id: `farewell-${Date.now()}`, role: "agent", content: data.farewell, created_at: new Date().toISOString() }]);
+          setOtState("completed");
+          return;
+        }
+        throw new Error(data?.error || "Não foi possível receber a resposta agora.");
       }
 
       const reader = res.body.getReader();

@@ -1,6 +1,7 @@
 # Project architecture rules
 
 - AccountProvider centralizes verified identity, server roles, logout and administrator inactivity; all account menus and route guards consume it so stale page-local state cannot restore access after signout.
+- Orientation messages and reports use the existing session-bound stores with server-only writes and approved-only patient report reads; streamed response persistence retains partial chunks and runs under EdgeRuntime.waitUntil to survive response delivery.
 
 - The fixed Navbar publishes its measured occupied height to its page wrapper; the homepage uses that value for content clearance so promo-banner changes cannot cover its heading.
 

@@ -178,8 +178,9 @@ export default function OrientacaoRelatorio() {
                 <ShieldCheck size={14} />
                 {isApproved ? "Aprovado pelo Dr. Edilson" : "Em Revisão"}
               </span>
-              {report.verification_code && (
-                <p className="text-[10px] text-slate-400 font-mono mt-1">Cód: {report.verification_code}</p>
+              <p className="text-[10px] text-slate-400 font-mono mt-1">Cód: {attendanceCode}</p>
+              {patientName && (
+                <p className="text-[10px] text-slate-500 mt-0.5">Paciente: {patientName}</p>
               )}
             </div>
           </div>

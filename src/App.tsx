@@ -33,6 +33,7 @@ import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
 import { AccountProvider } from "@/contexts/AccountContext";
+import { PageScrollReset } from "@/components/PageScrollReset";
 import { MasterPortalSwitcher } from "@/components/MasterPortalSwitcher";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
@@ -317,6 +318,7 @@ const App = () => (
             <ConsentManager />
             <MasterPortalSwitcher />
             <Suspense fallback={<Loading />}>
+              <PageScrollReset />
               <main id="main-content" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />

@@ -1,5 +1,10 @@
 # Roadmap
 
+## PubMed e agente compartilhado — 07/11/2026
+- [ ] Verificar Gemini 3.8 na Orientação e pesquisa PubMed real
+- [ ] Compartilhar recuperação científica segura com copiloto médico, preservando supervisão humana
+- [ ] Testar fontes, ausência de dados pessoais nas buscas e falhas de API; disponibilizar funções atualizadas
+
 ## Correções finais do teste 18:12–18:22 — 07/11/2026
 - [x] 1. Despedida independente da pergunta anterior; nova dúvida impede fechamento (testes)
 - [x] 2. Avaliação com rolagem imediata, confirmação da nota lida no servidor e erro com retentativa; nota real 3/3 exibida

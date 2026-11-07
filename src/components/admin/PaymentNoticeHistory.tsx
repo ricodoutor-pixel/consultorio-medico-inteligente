@@ -14,6 +14,7 @@ export function PaymentNoticeHistory() {
   const [error, setError] = useState(false);
   const load = async () => {
     if (!isAdmin) return;
+    await supabase.functions.invoke("payment-notify-history", { body: {} });
     const result = await supabase.from("payment_notify_log").select("id,service,status,error,created_at,sent_at,delivered_at,attempts,external_reference,provider_message_id").order("created_at", { ascending: false }).limit(50);
     setError(!!result.error);
     if (!result.data) return;

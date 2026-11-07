@@ -781,11 +781,11 @@ export default function OrientacaoTecnicaAgente() {
     if (otState !== "completed" || !ratingDone || !userId || refCode) return;
     let alive = true;
     void (async () => {
-      const { data: profile } = await supabase.from("profiles").select("referral_code").eq("id", userId).maybeSingle();
+      const { data: profile } = await (supabase as any).from("profiles").select("referral_code").eq("id", userId).maybeSingle();
       let code = (profile as { referral_code?: string | null } | null)?.referral_code || null;
       if (!code) {
         code = `PRZ-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
-        const { data: updated } = await supabase.from("profiles").update({ referral_code: code }).eq("id", userId).select("referral_code").maybeSingle();
+        const { data: updated } = await (supabase as any).from("profiles").update({ referral_code: code }).eq("id", userId).select("referral_code").maybeSingle();
         code = (updated as { referral_code?: string } | null)?.referral_code || code;
       }
       if (alive) setRefCode(code);

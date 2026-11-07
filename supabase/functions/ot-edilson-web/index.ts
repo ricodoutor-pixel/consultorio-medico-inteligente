@@ -399,6 +399,32 @@ Deno.serve(async (req) => {
       }).select().single();
       if (messageError) return json({ error: "Não foi possível gravar sua mensagem. Tente novamente." }, 500);
 
+      // Encerramento automático: o agente perguntou "posso ajudar em mais alguma coisa?"
+      // e o paciente confirmou que não precisa de mais nada → despedida curta, sem nova
+      // pergunta, sala encerrada no servidor (a avaliação aparece sem exigir botão).
+      const { data: lastAgent } = await sb
+        .from("ot_messages")
+        .select("content")
+        .eq("session_id", sess.id)
+        .eq("role", "agent")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (shouldAutoClose(userText, lastAgent?.content ?? null)) {
+        await sb.from("ot_messages").insert({
+          session_id: sess.id,
+          role: "agent",
+          content: FAREWELL_MESSAGE,
+        });
+        await sb.from("ot_web_sessions").update({
+          status: "completed",
+          closed_at: new Date().toISOString(),
+        }).eq("id", sess.id).neq("status", "completed");
+        fireClosedNotice(sess, null);
+        return json({ closed: true, state: "completed", farewell: FAREWELL_MESSAGE });
+      }
+
       // Busca contexto científico
       const evidence = await buildScientificContextBlock(userText, 3).catch(() => "");
 

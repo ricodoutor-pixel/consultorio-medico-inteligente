@@ -1,5 +1,14 @@
 # Roadmap
 
+## Correções finais do teste 18:12–18:22 — 07/11/2026
+- [ ] 1. Despedida clara independente da pergunta anterior, sem fechar mensagens com nova dúvida
+- [ ] 2. Avaliação imediatamente visível, confirmação por leitura e erro com retentativa
+- [ ] 3. Código único do atendimento em relatório, PDF e avisos, sem reescrever históricos
+- [ ] 4. Código fixo de indicação compartilhado com painel e vínculos preservados
+- [ ] 5. Busca bilíngue CBD/ansiedade e auditoria de DOI/PMID validados
+- [ ] 6. Avisos de pagamento/início/fim no painel com tentativas e entrega separada de aceitação
+- [ ] Relatório técnico com testes e bloqueios; publicação após informar prontidão
+
 ## Melhorias do relatório final da Orientação — 07/11/2026
 - [x] Encerramento automático: despedida após "posso ajudar em mais algo?" fecha a sala no servidor e mostra as três carinhas; fim dos 30 min também encerra com aviso; 14 testes passam
 - [x] Citações verdadeiras: DOI validado no Crossref antes de virar link; sem link confirmado o agente diz "não consegui confirmar o link"; contagem sem "exatamente"; DOI 10.1177/15347354241292978 confirmado inexistente (Crossref 404, ausente da base)

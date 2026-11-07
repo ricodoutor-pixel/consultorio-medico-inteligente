@@ -27,6 +27,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const [warning, setWarning] = useState(false);
   const lastActivity = useRef(Date.now());
   const busy = useRef(false);
+  const verifiedId = useRef<string | null>(null);
 
   useEffect(() => {
     let alive = true; let generation = 0;
@@ -34,8 +35,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       const current = ++generation;
       const { data: { user: verified } } = await supabase.auth.getUser();
       if (!alive || current !== generation) return;
-      setUser(verified); setIsAdmin(false);
-      if (!verified) { setFullName(""); setAvatarUrl(undefined); setLoading(false); return; }
+      if (!verified) { verifiedId.current = null; setUser(null); setIsAdmin(false); setFullName(""); setAvatarUrl(undefined); setLoading(false); return; }
+      // Same account re-verifying (token refresh, back/forward): keep current access until the
+      // server answers, so guards never see a false "not admin" gap. New account: hold the guards.
+      if (verifiedId.current !== verified.id) { setIsAdmin(false); setLoading(true); }
+      verifiedId.current = verified.id;
+      setUser(verified);
       const [admin, profile] = await Promise.all([
         verifyAndEnsureAdmin(verified),
         supabase.from("profiles").select("full_name,avatar_url").eq("id", verified.id).maybeSingle(),
@@ -50,9 +55,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     };
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
-        generation++; setUser(null); setIsAdmin(false); setFullName(""); setAvatarUrl(undefined); setWarning(false); setLoading(false);
+        generation++; verifiedId.current = null; setUser(null); setIsAdmin(false); setFullName(""); setAvatarUrl(undefined); setWarning(false); setLoading(false);
         void queryClient.cancelQueries(); queryClient.clear();
-      } else { window.setTimeout(() => { if (alive) void refresh(event === "SIGNED_IN"); }, 0); }
+      } else {
+        // A fresh sign-in must hold route guards until verification finishes.
+        if (event === "SIGNED_IN" && !verifiedId.current) setLoading(true);
+        window.setTimeout(() => { if (alive) void refresh(event === "SIGNED_IN"); }, 0); }
     });
     void refresh();
     const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) void refresh(); };

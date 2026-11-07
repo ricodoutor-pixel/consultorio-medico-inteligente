@@ -2,7 +2,8 @@
 
 ## Instalação direta pelo QR Code — 07/11/2026
 - [x] Abrir a opção de instalar diretamente ao escanear, com confirmação do navegador e instruções específicas para iPhone, sem baixar atalho de computador no celular
-- [ ] Conferir entrada de instalação no celular e computador; instalação física depende de confirmação no dispositivo publicado
+- [x] Conferir entrada direta em Android, iPhone e computador; botão exercitado com evento de instalação simulado, instruções iPhone e ausência de transbordamento verificadas
+- [ ] Instalação física pelo QR no site oficial — depende de publicação e confirmação do usuário no dispositivo; instalação nativa real não foi comprovada na prévia
 
 ## Revisão do teste e autorização condicionada da Fase 2 — 07/11/2026
 - [x] Conferir pagamento, tentativa de WhatsApp, relatório, avaliações, fontes científicas e destino atual do site; entregar relatório técnico e prompt sem executar cobrança, mensagens ou repasses

@@ -38,6 +38,22 @@ function sanitize(input: unknown, max = 4000): string {
   return input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "").trim().slice(0, max);
 }
 
+/**
+ * Garante que links de profissionais enviados ao paciente sejam reais e clicáveis.
+ * Substitui qualquer ocorrência do texto literal "{id}" (com ou sem URL) pela vitrine geral,
+ * e normaliza links relativos /profissionais/... para a URL completa do site.
+ */
+function sanitizeOutboundLinks(text: string): string {
+  const SITE = "https://plantayraiz.com.br";
+  let out = text;
+  // Remove placeholder literal em qualquer formato: /profissionais/{id}, {id} solto em link, etc.
+  out = out.replace(/https?:\/\/[^\s)]*\/profissionais\/\{[^}]*\}/gi, `${SITE}/profissionais`);
+  out = out.replace(/\/profissionais\/\{[^}]*\}/g, "/profissionais");
+  // Completa links relativos da vitrine para URL absoluta clicável.
+  out = out.replace(/(?<!https?:\/\/[^\s)]*)\/profissionais(\/[0-9a-fA-F-]{36})?/g, `${SITE}/profissionais$1`);
+  return out;
+}
+
 Deno.serve(async (req) => {
   const cors = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -398,7 +414,7 @@ Deno.serve(async (req) => {
             const { error: replyError } = await sb.from("ot_messages").insert({
               session_id: sess.id,
               role: "agent",
-              content: fullText.trim(),
+              content: sanitizeOutboundLinks(fullText.trim()),
             });
             if (replyError) throw new Error("reply_save_failed");
             await sb.from("ot_web_sessions").update({
@@ -481,7 +497,7 @@ Deno.serve(async (req) => {
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
         user_id: uid,
-        content_md: reportContent,
+        content_md: sanitizeOutboundLinks(reportContent),
         status: "draft",
         educational_released_at: new Date().toISOString(),
         generation_ms: Date.now() - started,

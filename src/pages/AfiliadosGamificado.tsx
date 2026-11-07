@@ -10,6 +10,7 @@ import { Users, Copy, Wallet, Gift, Trophy, ArrowUpRight, Medal, Crown, Star, Al
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { loadPermanentReferralCode } from "@/lib/referral-code";
 
 const leaderboardData = [
   { rank: 1, name: "Dr. Marcos T.", coins: 14500, avatar: "MT", type: "medico" },
@@ -33,15 +34,6 @@ export default function AfiliadosGamificado() {
     fetchProfile();
   }, []);
 
-  const generateRefCode = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = 'PRZ-';
-    for (let i = 0; i < 5; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
-
   const fetchProfile = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
@@ -51,10 +43,11 @@ export default function AfiliadosGamificado() {
 
     let { data } = await (supabase as any).from("profiles").select("*").eq("id", session.user.id).single();
     
-    if (data && !data.referral_code) {
-      const newRefCode = generateRefCode();
-      const { data: updated } = await (supabase as any).from("profiles").update({ referral_code: newRefCode }).eq("id", session.user.id).select().single();
-      if (updated) data = updated;
+    try {
+      const code = await loadPermanentReferralCode(session.user.id);
+      if (data) data = { ...data, referral_code: code };
+    } catch {
+      toast({ title: "Não foi possível carregar o link de indicação. Tente novamente.", variant: "destructive" });
     }
 
     setProfile(data);
@@ -65,7 +58,7 @@ export default function AfiliadosGamificado() {
   };
 
   const brlEquivalent = (balance * 0.1).toFixed(2); // 10 RC = 1 BRL
-  const refCode = profile?.referral_code || "PRZ-00000";
+  const refCode = profile?.referral_code || "";
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro?ref=${refCode}`);
@@ -169,8 +162,8 @@ export default function AfiliadosGamificado() {
                   <div className="flex-1 bg-muted p-4 rounded-xl border border-border font-mono text-sm text-foreground overflow-hidden text-ellipsis whitespace-nowrap">
                     https://plantayraiz.com.br/cadastro?ref={refCode}
                   </div>
-                  <Button onClick={copyToClipboard} size="lg" className="rounded-xl px-6">
-                    <Copy size={18} className="mr-2" /> Copiar Link
+                  <Button onClick={refCode ? copyToClipboard : fetchProfile} size="lg" className="rounded-xl px-6">
+                    <Copy size={18} className="mr-2" /> {refCode ? "Copiar Link" : "Tentar de novo"}
                   </Button>
                 </div>
 

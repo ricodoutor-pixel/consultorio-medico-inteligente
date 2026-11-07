@@ -14,6 +14,8 @@ const normalize = (s: string) =>
 export function isFarewell(text: string): boolean {
   const t = normalize(text);
   if (!t || t.length > 300) return false;
+  // A new question always takes precedence over a farewell in the same message.
+  if (/\?|\b(mas|porem|qual|quais|como|quando|onde|quanto|duvida)\b|\be (a|o|sobre)\b/.test(t)) return false;
   const patterns: RegExp[] = [
     /\bnao[, ]? (e so isso|preciso de mais nada|quero mais nada|tenho mais duvidas?)\b/,
     /\b(e|era|foi) so isso\b/,
@@ -29,6 +31,7 @@ export function isFarewell(text: string): boolean {
     /\bmuito obrigad[oa][, ]? (tchau|ate mais|por hoje e isso)\b/,
     /\btchau\b/,
     /\bate mais\b/,
+    /\bate logo\b/,
   ];
   return patterns.some((p) => p.test(t));
 }
@@ -39,9 +42,7 @@ export function isFarewell(text: string): boolean {
  * sala no meio da conversa quando o paciente apenas agradece.
  */
 export function shouldAutoClose(patientText: string, lastAgentText: string | null): boolean {
-  if (!isFarewell(patientText)) return false;
-  if (!lastAgentText) return false;
-  return CLOSING_QUESTION_PATTERN.test(lastAgentText);
+  return isFarewell(patientText);
 }
 
 /** Despedida curta e final: sem pergunta nova, sem conteúdo clínico. */

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Printer, ArrowLeft, ArrowRight, ShieldCheck, FileText, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
+import { reportAttendanceCode } from "../../supabase/functions/_shared/orientation-code";
 
 interface ReportData {
   id: string;
@@ -74,7 +75,7 @@ export default function OrientacaoRelatorio() {
   // Código curto do atendimento: usa o código de verificação quando existe;
   // caso contrário deriva do identificador do relatório (determinístico).
   const attendanceCode = report
-    ? report.verification_code || `OT-${report.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`
+    ? reportAttendanceCode(report)
     : "";
 
   const downloadPdf = async () => {

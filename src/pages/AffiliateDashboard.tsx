@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { EarningsNotificationBell } from "@/components/affiliates/EarningsNotificationBell";
@@ -73,16 +74,15 @@ export default function AffiliateDashboard() {
 
       if (commData) setCommissions(commData);
 
-      // Generate ref code from user id
-      const short = user.id.replace(/-/g, "").substring(0, 8).toUpperCase();
-      setReferralCode(`PLR-${short}`);
+      setReferralCode(await loadPermanentReferralCode(user.id));
     } catch (err) {
       console.error("Error loading affiliate data:", err);
+      toast.error("Não foi possível carregar seu link. Tente novamente.");
     }
     setLoading(false);
   };
 
-  const referralLink = `https://plantayraiz.com.br?ref=${referralCode}`;
+  const referralLink = referralCode ? `https://plantayraiz.com.br/cadastro?ref=${referralCode}` : "Link indisponível";
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -149,9 +149,9 @@ export default function AffiliateDashboard() {
                 <div className="flex-1 bg-background/50 border border-border/30 rounded-lg px-3 py-2 text-sm text-muted-foreground font-mono truncate">
                   {loading ? <Skeleton className="h-5 w-full" /> : referralLink}
                 </div>
-                <Button onClick={copyLink} variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 gap-2">
+                <Button onClick={referralCode ? copyLink : loadData} variant="outline" disabled={loading} className="border-primary/30 text-primary hover:bg-primary/10 gap-2">
                   {copied ? <CheckCircle2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  {copied ? "Copiado" : "Copiar"}
+                  {!referralCode ? "Tentar de novo" : copied ? "Copiado" : "Copiar"}
                 </Button>
               </div>
             </CardContent>

@@ -516,7 +516,7 @@ export default function OrientacaoTecnicaAgente() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(
-        `${supabase.supabaseUrl}/functions/v1/ot-edilson-web`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ot-edilson-web`,
         {
           method: "POST",
           headers: {

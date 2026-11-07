@@ -497,7 +497,7 @@ Deno.serve(async (req) => {
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
         user_id: uid,
-        content_md: reportContent,
+        content_md: sanitizeOutboundLinks(reportContent),
         status: "draft",
         educational_released_at: new Date().toISOString(),
         generation_ms: Date.now() - started,

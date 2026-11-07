@@ -1,15 +1,17 @@
 # Roadmap
 
 ## Orientação Técnica v3 — 07/11/2026
-- [ ] Prioridade atual: liberar PDF educativo sem revisão obrigatória e adicionar ampliar/minimizar sala WhatsApp em celular/computador
-- [ ] Diagnosticar tempo do agente, bloqueio do relatório e base científica real
-- [ ] Confirmar mudança da entrega revisada para relatório educativo imediato sem alterar prescrição ou assinatura
+- [x] Liberar PDF educativo: download real verificado com conta proprietária; revisão não bloqueia, sem aprovação médica automática
+- [x] Adicionar ampliar/minimizar e letra ampliável à sala; validação visual com sessão paga ainda bloqueada porque conta autorizada abre introdução
+- [x] Diagnosticar tempo do agente, bloqueio do relatório e base científica real (5.348 registros medidos)
+- [x] Confirmar mudança da entrega revisada para relatório educativo imediato sem alterar prescrição ou assinatura
 - [ ] Ajustar tempo, relatório com saída em 60s e revisão administrativa
 - [ ] Implementar 5 perguntas e resumo reutilizável nas consultas pagas
 - [ ] Refazer somente sala de Orientação no padrão WhatsApp
 - [ ] Restringir citações à busca real e informar contagem medida
 - [ ] Implementar avaliação, encerramento e novo pagamento por orientação
-- [ ] Testar fluxo autorizado e publicar, distinguindo testes reais de pendências
+- [ ] Testar conversa/ampliar/minimizar com sala paga acessível — conta autorizada não acessa sala existente; PDF real foi baixado sem erros
+- [ ] Publicar e verificar versão oficial; testes novos 13 passaram, compilação aprovada
 
 ## Relatório do teste de Orientação — 07/11/2026
 - [x] Confirmar ausência de ot_messages/ot_reports no banco e aplicar criação protegida; corrigir persistência fragmentada e erros ocultos sem alterar pagamento primeiro

@@ -559,8 +559,21 @@ Deno.serve(async (req) => {
 
       const triageStr = JSON.stringify(sess.triage || {});
 
+      // Identificação estruturada do atendimento (não depende da redação da IA).
+      const attendanceCode = `OT-${sess.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+      const name = await patientName(uid);
+      const quando = new Intl.DateTimeFormat("pt-BR", {
+        timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit", hour12: false,
+      }).format(new Date());
+
       const prompt =
         `Você é o Dr. Edilson Bezerra ON. Crie um Relatório de Orientação Técnica e Acolhimento Individual para o paciente com base na triagem e conversa abaixo.\n\n` +
+        `IDENTIFICAÇÃO OBRIGATÓRIA (use exatamente estes dados na seção 1):\n` +
+        `- Paciente: ${name}\n` +
+        `- Código do atendimento: ${attendanceCode}\n` +
+        `- Data e hora: ${quando} (São Paulo)\n\n` +
+        `REDACÃO: use sempre "você" para se dirigir ao paciente. NUNCA use "senhor(a)", "senhor" ou "senhora".\n\n` +
         `DIRETRIZES LEGAIS RIGOROSAS:\n` +
         `- NÃO diagnostique, NÃO prescreva medicamentos, NÃO indique marcas comerciais nem doses/posologias.\n` +
         `- Estruture o relatório em markdown elegante:\n` +
@@ -590,11 +603,17 @@ Deno.serve(async (req) => {
       const reportContent = repData.choices?.[0]?.message?.content;
       if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
-      const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(reportContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
+      // Garante o tratamento neutro mesmo se a IA desobedecer ao prompt.
+      const neutralContent = reportContent
+        .replace(/senhor\(a\)/gi, "você")
+        .replace(/\b[Ss]enhora\b/g, "você")
+        .replace(/\b[Ss]enhor\b/g, "você");
+
+      const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(neutralContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({
         session_id: sess.id,
         user_id: uid,
-        content_md: sanitizeOutboundLinks(reportContent),
+        content_md: sanitizeOutboundLinks(neutralContent),
         status: "draft",
         educational_released_at: new Date().toISOString(),
         generation_ms: Date.now() - started,

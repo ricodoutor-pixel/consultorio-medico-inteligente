@@ -1,5 +1,9 @@
 # Roadmap
 
+## Prompt para novo teste integral — 07/11/2026
+- [x] Entregar prompt do agente: novo pagamento, notificações, triagem, Orientação/consulta, três carinhas, encerramento, indicação, agenda e auditoria; divergências atuais documentadas, sem executar pagamento ou alterar plataforma
+- Implementação e comprovação destes novos requisitos serão tarefas do agente executor; não considerar funcionalidades aprovadas apenas por constarem no roteiro.
+
 ## Orientação Técnica v3 — 07/11/2026
 - [x] Liberar PDF educativo: download real verificado com conta proprietária; revisão não bloqueia, sem aprovação médica automática
 - [x] Adicionar ampliar/minimizar e letra ampliável à sala; validação visual com sessão paga ainda bloqueada porque conta autorizada abre introdução

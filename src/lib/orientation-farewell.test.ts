@@ -33,9 +33,17 @@ describe("shouldAutoClose", () => {
     expect(shouldAutoClose("não preciso de mais nada", "Posso ajudar em algo mais?")).toBe(true);
   });
 
-  it("não fecha no meio da conversa sem a pergunta de encerramento", () => {
-    expect(shouldAutoClose("Não, é só isso", "O canabidiol é estudado para o sono.")).toBe(false);
-    expect(shouldAutoClose("tchau", null)).toBe(false);
+  it("encerra despedida clara sem exigir pergunta anterior", () => {
+    expect(shouldAutoClose("Não preciso de mais nada. Até logo!", null)).toBe(true);
+    expect(shouldAutoClose("Obrigada, doutor, entendi tudo. Não preciso de mais nada. Até logo!", "O canabidiol é estudado para o sono.")).toBe(true);
+    expect(shouldAutoClose("Não, é só isso mesmo. Obrigada!", null)).toBe(true);
+    expect(shouldAutoClose("tchau", null)).toBe(true);
+  });
+
+  it("não encerra despedida acompanhada de nova dúvida", () => {
+    expect(shouldAutoClose("Obrigada, mas qual o horário do médico?", null)).toBe(false);
+    expect(shouldAutoClose("Tchau, mas e a dose?", CLOSING_QUESTION)).toBe(false);
+    expect(shouldAutoClose("Até logo, como marco a consulta", null)).toBe(false);
   });
 
   it("a despedida final não contém pergunta nova", () => {

@@ -34,7 +34,23 @@ export interface ScientificEvidence {
   year: number | null;
   url: string | null;
   doi: string | null;
+  doiVerified: boolean;
   abstract: string;
+}
+
+/** Valida um DOI no Crossref antes de liberá-lo como link ao paciente. */
+export async function validateDoi(doi: string): Promise<boolean> {
+  const clean = doi.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+  if (!/^10\.\d{4,9}\/\S+$/.test(clean)) return false;
+  try {
+    const r = await fetch(`https://api.crossref.org/works/${encodeURIComponent(clean)}`, {
+      headers: { "User-Agent": "PlantaYRaiz-Orientacao/1.0 (mailto:contato@plantayraiz.com.br)" },
+      signal: AbortSignal.timeout(4_000),
+    });
+    return r.ok;
+  } catch {
+    return false;
+  }
 }
 
 /** Converte a fala do paciente em uma consulta útil para o índice em inglês. */

@@ -1,5 +1,15 @@
 # Roadmap
 
+## Orientação Técnica v3 — 07/11/2026
+- [ ] Diagnosticar tempo do agente, bloqueio do relatório e base científica real
+- [ ] Confirmar mudança da entrega revisada para relatório educativo imediato sem alterar prescrição ou assinatura
+- [ ] Ajustar tempo, relatório com saída em 60s e revisão administrativa
+- [ ] Implementar 5 perguntas e resumo reutilizável nas consultas pagas
+- [ ] Refazer somente sala de Orientação no padrão WhatsApp
+- [ ] Restringir citações à busca real e informar contagem medida
+- [ ] Implementar avaliação, encerramento e novo pagamento por orientação
+- [ ] Testar fluxo autorizado e publicar, distinguindo testes reais de pendências
+
 ## Relatório do teste de Orientação — 07/11/2026
 - [x] Confirmar ausência de ot_messages/ot_reports no banco e aplicar criação protegida; corrigir persistência fragmentada e erros ocultos sem alterar pagamento primeiro
 - [x] Mostrar falhas e estados de geração na sala, ajustar rolagem e ocultar balão na Orientação; adicionar download PDF aprovado

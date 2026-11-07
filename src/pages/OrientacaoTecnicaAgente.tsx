@@ -2,6 +2,8 @@ import { RED_FLAG_OPTIONS, hasEmergency, invalidTriageFields } from "../../supab
 import { setVisibleInterval } from "@/lib/visible-interval";
 import { createOtStreamParser } from "../../supabase/functions/_shared/ot-stream";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
+import "@/styles/orientation-room.css";
+import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
@@ -21,7 +23,7 @@ import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight, AlertTriangle,
   CheckCircle2, Sparkles, BookOpen, FileText, ArrowRight, Paperclip, X, PauseCircle,
-  UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check,
+  UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check, Maximize2, Minimize2, Type, CheckCheck,
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "pyr_ot_external_reference";
@@ -56,6 +58,7 @@ type OtReport = {
   created_at: string;
   approved_at?: string | null;
   verification_code?: string | null;
+  educational_released_at?: string | null;
 };
 
 type Attachment = { path: string; name: string; mime: string };
@@ -170,6 +173,23 @@ export default function OrientacaoTecnicaAgente() {
 
   const [reports, setReports] = useState<OtReport[]>([]);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [fullRoom, setFullRoom] = useState(false);
+  const [largeText, setLargeText] = useState(false);
+  const [reportWait, setReportWait] = useState(0);
+  useEffect(() => {
+    if (!generatingReport) { setReportWait(0); return; }
+    const started = Date.now();
+    const timer = window.setInterval(() => setReportWait(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [generatingReport]);
+  useEffect(() => {
+    if (!fullRoom) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setFullRoom(false); };
+    document.addEventListener("keydown", escape);
+    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", escape); };
+  }, [fullRoom]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const questionCardRef = useRef<HTMLDivElement>(null);
@@ -589,8 +609,8 @@ export default function OrientacaoTecnicaAgente() {
       const result = await callFn<{ success?: boolean; report_id?: string }>({ action: "generate_report", sessionId: otSession?.id });
       if (!result.success || !result.report_id) throw new Error("O relatório não foi gravado. Tente novamente.");
       toast({
-        title: "Relatório enviado para revisão",
-        description: "O Dr. Edilson Bezerra revisa e aprova antes de liberar o PDF para você.",
+        title: "Relatório educativo pronto",
+        description: "Você já pode baixar o PDF. Gerado por IA; revisão médica pendente.",
       });
       await loadReports();
     } catch (e) {
@@ -603,6 +623,14 @@ export default function OrientacaoTecnicaAgente() {
   };
 
   const resetForNew = () => {
+    orderRefRef.current = null;
+    setOrderRef(null);
+    setOtSession(null);
+    setOtState("none");
+    setAnswers({});
+    setPixData(null);
+    setFullRoom(false);
+    navigate("/orientacao-tecnica?new=1", { replace: true });
     setMessages([]);
     setReports([]);
     setStep(0);
@@ -1028,9 +1056,9 @@ export default function OrientacaoTecnicaAgente() {
           {/* ── SALA (estilo WhatsApp) ── */}
           {phase === "room" && (
             <div className="space-y-4">
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-black/10">
+              <div className={`ot-room ${fullRoom ? "ot-room-full" : "border border-border"} ${largeText ? "ot-room-large" : ""}`} role={fullRoom ? "dialog" : undefined} aria-modal={fullRoom ? true : undefined} aria-label="Conversa de Orientação Técnica">
                 {/* Header verde */}
-                <div className="flex items-center justify-between gap-3 px-3 py-2.5 bg-[#075E54] text-white">
+                <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-2.5">
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={DrEdilsonPhoto}
@@ -1039,9 +1067,12 @@ export default function OrientacaoTecnicaAgente() {
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
-                      <p className="text-[11px] text-white/80 truncate">Assistente de IA supervisionado</p>
+                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" ? "encerrado" : otState}</p>
                     </div>
                   </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" className="ot-tool h-9 w-9" title={largeText ? "Diminuir letra" : "Aumentar letra"} aria-label={largeText ? "Diminuir letra" : "Aumentar letra"} onClick={() => setLargeText(v => !v)}><Type size={18} /></Button>
+                  <Button variant="ghost" size="icon" className="ot-tool h-9 w-9" title={fullRoom ? "Minimizar conversa" : "Ampliar conversa"} aria-label={fullRoom ? "Minimizar conversa" : "Ampliar conversa"} onClick={() => setFullRoom(v => !v)}>{fullRoom ? <Minimize2 size={18} /> : <Maximize2 size={18} />}</Button>
                   {(otState === "active" || otState === "paused") && (
                     <div
                       className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black shrink-0 ${
@@ -1053,6 +1084,7 @@ export default function OrientacaoTecnicaAgente() {
                       <Clock size={12} /> {fmtClock(secondsLeft)}
                     </div>
                   )}
+                  </div>
                 </div>
 
                 {otState === "paused" && (
@@ -1063,7 +1095,9 @@ export default function OrientacaoTecnicaAgente() {
                 )}
 
                 {/* Mensagens */}
-                <div ref={scrollRef} className="h-[58vh] min-h-[340px] overflow-y-auto px-3 py-4 space-y-2" style={CHAT_BG_STYLE}>
+                <div ref={scrollRef} className="ot-room-messages h-[58vh] min-h-[260px] overflow-y-auto px-3 py-4 space-y-2">
+                  <div className="flex justify-center"><span className="ot-system text-xs rounded-md px-3 py-1">Hoje</span></div>
+                  {otState === "active" && secondsLeft <= 300 && secondsLeft > 0 && <div role="status" className="ot-system text-center text-sm p-2 rounded-md">{secondsLeft <= 60 ? "Falta 1 minuto para encerrar." : "Faltam 5 minutos para encerrar."}</div>}
                   <div className="flex justify-center">
                     <span className="text-[11px] bg-[#FFF3C4] text-neutral-700 px-3 py-1.5 rounded-lg shadow-sm text-center max-w-[90%]">
                       🔒 Conversa educativa com assistente de IA supervisionado pelo Dr. Edilson Bezerra. Não é
@@ -1103,12 +1137,12 @@ export default function OrientacaoTecnicaAgente() {
                     return (
                       <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                         <div
-                          className={`relative max-w-[85%] rounded-lg px-3 py-2 shadow-sm text-sm text-neutral-900 ${
+                          className={`ot-message relative max-w-[85%] rounded-lg px-3 py-2 ${
                             mine
-                              ? "bg-[#DCF8C6] rounded-tr-none"
+                              ? "ot-message-mine rounded-tr-none"
                               : m.role === "supervisor"
-                                ? "bg-white rounded-tl-none border-l-4 border-amber-500"
-                                : "bg-white rounded-tl-none"
+                                ? "rounded-tl-none border-l-4 border-primary"
+                                : "rounded-tl-none"
                           }`}
                         >
                           {m.role === "supervisor" && (
@@ -1129,11 +1163,11 @@ export default function OrientacaoTecnicaAgente() {
                           {mine ? (
                             <p className="whitespace-pre-wrap break-words">{m.content}</p>
                           ) : (
-                            <div className="prose prose-sm max-w-none prose-neutral prose-a:text-[#075E54] break-words">
+                            <div className="max-w-none break-words">
                               <ReactMarkdown>{m.content}</ReactMarkdown>
                             </div>
                           )}
-                          <p className="text-[10px] text-neutral-500 text-right mt-0.5">{fmtHour(m.created_at)}</p>
+                          <div className="ot-meta flex justify-end items-center gap-1 mt-1">{fmtHour(m.created_at)}{mine && <CheckCheck size={14} aria-label="Mensagem registrada" />}</div>
                         </div>
                       </div>
                     );
@@ -1141,13 +1175,13 @@ export default function OrientacaoTecnicaAgente() {
 
                   {streamText !== null && (
                     <div className="flex justify-start">
-                      <div className="max-w-[85%] rounded-lg rounded-tl-none px-3 py-2 shadow-sm text-sm text-neutral-900 bg-white">
+                      <div className="ot-message max-w-[85%] rounded-lg rounded-tl-none px-3 py-2">
                         {streamText ? (
-                          <div className="prose prose-sm max-w-none prose-neutral break-words">
+                          <div className="max-w-none break-words">
                             <ReactMarkdown>{streamText}</ReactMarkdown>
                           </div>
                         ) : (
-                          <span className="text-neutral-500 text-xs animate-pulse">digitando…</span>
+                          <span className="ot-typing" aria-label="digitando"><span /><span /><span /></span>
                         )}
                       </div>
                     </div>
@@ -1160,7 +1194,8 @@ export default function OrientacaoTecnicaAgente() {
                 </div>
 
                 {/* Rodapé / input */}
-                <div className="bg-[#F0F0F0] px-2 py-2">
+                <div className="ot-room-compose px-2 py-2">
+                  {otState === "active" && <div className="flex gap-2 overflow-x-auto pb-2"><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Acordo de madrugada")}>Acordo de madrugada</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Tenho dúvidas sobre tratamento")}>Dúvidas sobre tratamento</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" asChild><a href={`https://wa.me/${BRISA_WHATSAPP}`} target="_blank" rel="noopener noreferrer">Falar com a equipe</a></Button></div>}
                   {chatError && (
                     <div role="alert" className="mb-3 p-3 bg-destructive/10 text-destructive text-sm space-y-2">
                       <p>{chatError}</p>
@@ -1226,17 +1261,17 @@ export default function OrientacaoTecnicaAgente() {
                           disabled={otState !== "active"}
                           placeholder={otState === "paused" ? "Sala pausada pelo Dr. Edilson…" : "Mensagem"}
                           aria-label="Mensagem para o Dr. Edilson Bezerra ON"
-                          className="resize-none min-h-[44px] max-h-32 rounded-3xl bg-white text-neutral-900 border-0 shadow-sm px-4 py-3 focus-visible:ring-1 focus-visible:ring-[#075E54]"
+                          className="ot-input resize-none min-h-[44px] max-h-32 rounded-3xl border-0 px-4 py-3"
                         />
-                        <button
+                        <Button
                           type="button"
                           onClick={() => void sendMessage()}
                           disabled={streaming || otState !== "active" || (!input.trim() && !attachment)}
-                          className="h-11 w-11 shrink-0 rounded-full flex items-center justify-center bg-[#075E54] text-white disabled:opacity-50"
+                          className="ot-send h-11 w-11 shrink-0 rounded-full flex items-center justify-center disabled:opacity-50"
                           aria-label="Enviar mensagem"
                         >
                           {streaming ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                        </button>
+                        </Button>
                       </div>
                     </>
                   )}
@@ -1247,14 +1282,14 @@ export default function OrientacaoTecnicaAgente() {
               </div>
 
               {/* Relatórios */}
-              {otState !== "ready" && (
+              {otState !== "ready" && !fullRoom && (
                 <Card className="border-border">
                   <CardContent className="p-5 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="font-display font-black text-foreground text-sm">Relatório individual</p>
                         <p className="text-[11px] text-muted-foreground">
-                          Rascunho gerado pela IA e liberado somente após revisão e aprovação do Dr. Edilson Bezerra.
+                          Relatório educativo gerado por IA, disponível assim que concluído. Revisão médica pendente não bloqueia o PDF.
                         </p>
                       </div>
                       <Button
@@ -1268,24 +1303,25 @@ export default function OrientacaoTecnicaAgente() {
                       </Button>
                     </div>
                     {reportError && <p role="alert" className="text-sm text-destructive">{reportError}</p>}
+                    {generatingReport && <p role="status" className="text-sm text-muted-foreground">{reportWait >= 60 ? "A geração está demorando. Você pode chamar a equipe e consultar seus relatórios sem pagar novamente; não há confirmação de envio por e-mail ou WhatsApp." : `Montando seu relatório… ${reportWait}s`} {reportWait >= 60 && <Button variant="outline" size="sm" onClick={() => void loadReports()}>Verificar relatório</Button>}</p>}
 
                     {reports.length > 0 && (
                       <ul className="divide-y divide-border">
                         {reports.map((r) => (
                           <li key={r.id} className="py-2 flex items-center justify-between gap-3 text-sm">
                             <span className="text-muted-foreground text-xs">{fmtDateTime(r.created_at)}</span>
-                            {r.status === "approved" ? (
+                            {canDownloadOtReport(r.status, !!r.educational_released_at) ? (
                               <Link
                                 to={`/orientacao-tecnica/relatorio/${r.id}`}
                                 className="inline-flex items-center gap-1 text-primary font-bold text-xs"
                               >
-                                <CheckCircle2 size={13} /> Aprovado · Ver e baixar PDF <ArrowRight size={12} />
+                                <CheckCircle2 size={13} /> {r.status === "approved" ? "Revisado" : "Educativo · revisão pendente"} · Baixar PDF <ArrowRight size={12} />
                               </Link>
                             ) : r.status === "rejected" ? (
                               <span className="text-xs font-bold text-red-500">Não aprovado — gere um novo após conversar mais</span>
                             ) : (
                               <span className="text-xs font-bold text-amber-500 inline-flex items-center gap-1">
-                                <Loader2 size={12} className="animate-spin" /> Aguardando revisão do Dr. Edilson
+                                <Loader2 size={12} className="animate-spin" /> Revisão médica pendente
                               </span>
                             )}
                           </li>

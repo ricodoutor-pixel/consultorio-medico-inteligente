@@ -320,6 +320,39 @@ export default function OrientacaoTecnicaAgente() {
     void loadReports();
   }, [phase, loadMessages, loadReports]);
 
+  // ── Encerramento e avaliação (três carinhas) ─────────────────────────
+  const closeSession = useCallback(async () => {
+    if (closing) return;
+    setClosing(true);
+    try {
+      await callFn({ action: "close_session" });
+      setOtState("completed");
+    } catch {
+      toast({ title: "Não foi possível encerrar agora. Tente de novo.", variant: "destructive" });
+    } finally {
+      setClosing(false);
+    }
+  }, [callFn, closing, toast]);
+
+  const submitRating = useCallback(async (value: 1 | 2 | 3 | null) => {
+    if (submittingRating) return;
+    setSubmittingRating(true);
+    try {
+      if (value) {
+        await callFn({ action: "submit_rating", rating: value, comment: ratingComment.trim() || undefined });
+        setRating(value);
+      } else {
+        await callFn({ action: "skip_rating" });
+      }
+      setRatingDone(true);
+      setOtState("completed");
+    } catch {
+      toast({ title: "Não foi possível registrar sua avaliação. Tente de novo.", variant: "destructive" });
+    } finally {
+      setSubmittingRating(false);
+    }
+  }, [callFn, ratingComment, submittingRating, toast]);
+
   // Poll da sala (5s): status (pausa/expiração) + mensagens (inclui Dr. Edilson humano).
   useEffect(() => {
     if (phase !== "room" || otState === "expired" || otState === "completed") return;

@@ -426,7 +426,7 @@ export default function OrientacaoTecnicaAgente() {
     }
     const fields = invalidTriageFields({ [q.id]: value }, false);
     if (fields.length) {
-      toast({ title: "Revise sua resposta", description: q.id === "idade" ? "Informe uma idade de 0 a 120 anos." : "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
+      toast({ title: "Revise sua resposta", description: "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
       return;
     }
     setSavingAnswer(true);
@@ -454,8 +454,55 @@ export default function OrientacaoTecnicaAgente() {
     } finally { setSavingAnswer(false); }
   };
 
+  // Tela 2 (combo): grava queixa + tempo em sequência e avança uma única vez.
+  const saveComboAnswers = async () => {
+    const queixa = (draft || answers.queixa || "").trim();
+    const tempo = comboTempo || answers.tempo || "";
+    if (!queixa || queixa.length < 3) {
+      toast({ title: "Descreva o problema", description: "Escreva pelo menos 3 caracteres sobre o que você está sentindo.", variant: "destructive" });
+      return;
+    }
+    if (!tempo) {
+      toast({ title: "Selecione o tempo", description: "Escolha há quanto tempo você sente isso.", variant: "destructive" });
+      return;
+    }
+    if (!orderRef) {
+      toast({ title: "Pagamento ainda não vinculado", description: "Conclua o pagamento de R$ 30 para gravarmos suas respostas.", variant: "destructive" });
+      setPhase("checkout");
+      return;
+    }
+    setSavingAnswer(true);
+    try {
+      await callFn({ action: "save_triage", answer: { queixa } });
+      const response = await callFn<{ state: string; triagem: Record<string, string> }>({ action: "save_triage", answer: { tempo } });
+      setAnswers(response.triagem);
+      setDraft("");
+      setComboTempo("");
+      if (step < QUESTIONS.length - 1) setStep(step + 1);
+      else await fetchStatus();
+    } catch {
+      toast({ title: "Não foi possível salvar a resposta", description: "Sua pergunta permanece aqui. Tente novamente.", variant: "destructive" });
+    } finally { setSavingAnswer(false); }
+  };
+
+  // Pergunta opcional (expectativa): pular sem gravar.
+  const skipOptional = async () => {
+    if (step < QUESTIONS.length - 1) { setStep(step + 1); return; }
+    try {
+      const st = await fetchStatus();
+      if (st === "ready") await startRoomRef.current?.();
+    } catch { /* status já tratado */ }
+  };
+
+  const isQuestionAnswered = (item: TriageQuestion) =>
+    item.id === "queixa"
+      ? !!(answers.queixa?.trim() && answers.tempo?.trim())
+      : item.optional
+        ? true
+        : !!answers[item.id]?.trim();
+
   const startTriage = () => {
-    setStep(Math.max(0, QUESTIONS.findIndex(item => !answers[item.id]?.trim())));
+    setStep(Math.max(0, QUESTIONS.findIndex((item) => !isQuestionAnswered(item))));
     setPhase("triage");
   };
 

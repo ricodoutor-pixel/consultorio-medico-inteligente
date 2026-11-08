@@ -1,6 +1,7 @@
 // Verificação obrigatória de PMIDs: título, primeiro autor, revista e ano
 // são copiados do registro real do PubMed (EFetch), nunca do texto do modelo.
 import { parsePubMedArticles, type PubMedArticle } from "./pubmed-live.ts";
+import { matchesRequestedEvidence, requestsRandomizedTrial } from "./citation-relevance.ts";
 
 export interface PmidLookup {
   status: "ok" | "unavailable";
@@ -62,19 +63,31 @@ const fmt = (a: PubMedArticle, inLibrary: boolean) =>
  * Remove metadados escritos pelo modelo ao lado de PMIDs e anexa a lista
  * conferida no registro real. Rótulos de origem vêm do banco/API.
  */
-export function applyCitationVerification(text: string, lookup: PmidLookup, libraryPmids: Set<string>): string {
+export function applyCitationVerification(text: string, lookup: PmidLookup, libraryPmids: Set<string>, question = ""): string {
   const ids = extractPmids(text);
   if (!ids.length) return text;
   // Rótulos de origem escritos pelo modelo não são confiáveis.
-  let body = text.replace(/\s*\[(?:Biblioteca interna|PubMed)\]/gi, "");
+  // A PMID confirms the record, NOT the model's interpretation of it. Discard
+  // entire citation-bearing paragraphs, including multiline descriptions.
+  const body = text.split(/\n\s*\n/).filter(paragraph =>
+    !extractPmids(paragraph).length &&
+    !/\blink confirmado\b|\bet al\.?\s*\(?\d{4}/i.test(paragraph)
+  ).join("\n\n").replace(/\s*\[(?:Biblioteca interna|PubMed)\]/gi, "").trim();
   if (lookup.status !== "ok") {
-    body = body.replace(/segundo o pubmed|conforme o pubmed|link confirmado|confirmad[oa] no pubmed/gi, "(não conferido)");
     return `${body}\n\n⚠️ Não consegui conferir agora no PubMed os PMIDs citados (${ids.join(", ")}). Considere essas referências NÃO verificadas até nova conferência.`;
   }
   const refs: string[] = [];
   for (const id of ids) {
     const a = lookup.found.get(id);
-    refs.push(a ? fmt(a, libraryPmids.has(id)) : `• PMID ${id}: não existe no PubMed — desconsidere esta citação.`);
+    if (a && matchesRequestedEvidence(a, question)) refs.push(fmt(a, libraryPmids.has(id)));
+    else if (!a) refs.push(`• PMID ${id}: não existe no PubMed — desconsidere esta citação.`);
   }
-  return `${body}\n\n📚 Referências conferidas agora no registro do PubMed (título, autor, revista e ano copiados do registro):\n${refs.join("\n")}`;
+  const relevant = ids.some(id => {
+    const article = lookup.found.get(id);
+    return article && matchesRequestedEvidence(article, question);
+  });
+  const noEvidence = question && !relevant
+    ? requestsRandomizedTrial(question) ? "Não encontrei ensaio randomizado sobre isso nos registros conferidos." : "Não encontrei estudo confiável sobre isso nos registros conferidos."
+    : "";
+  return [noEvidence || body, refs.length ? `📚 Referências conferidas agora no registro do PubMed (título, autor, revista e ano copiados do registro):\n${refs.join("\n")}` : ""].filter(Boolean).join("\n\n");
 }

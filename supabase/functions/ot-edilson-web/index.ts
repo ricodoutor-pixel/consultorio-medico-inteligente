@@ -14,6 +14,7 @@ import { extractPmids, lookupPmids, buildPatientPmidBlock, applyCitationVerifica
 import { notifyPaymentConfirmedOnce, notifyOrientationEvent } from "../_shared/payment-notify.ts";
 import { shouldAutoClose, FAREWELL_MESSAGE } from "../_shared/orientation-farewell.ts";
 import { orientationCode, enforceAttendanceCode, reportAttendanceCode } from "../_shared/orientation-code.ts";
+import { normalizeReportAddress } from "../_shared/orientation-report-language.ts";
 import { generateChatCompletion, streamChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 
@@ -546,7 +547,7 @@ Deno.serve(async (req) => {
         const urls = citedPmids.map((id) => `https://pubmed.ncbi.nlm.nih.gov/${id}/`);
         const { data: libRows } = await sb.from("scientific_articles").select("url").in("url", [...urls, ...urls.map((u) => u.slice(0, -1))]);
         const libraryPmids = new Set((libRows || []).map((r: any) => String(r.url).match(/(\d+)\/?$/)?.[1]).filter(Boolean) as string[]);
-        finalText = applyCitationVerification(finalText, lookup, libraryPmids);
+        finalText = applyCitationVerification(finalText, lookup, libraryPmids, userText);
       }
       if (finalText) {
         const { error: replyError } = await sb.from("ot_messages").insert({ session_id: sess.id, role: "agent", content: finalText });
@@ -605,7 +606,7 @@ Deno.serve(async (req) => {
         `- Paciente: ${name}\n` +
         `- Código do atendimento: ${attendanceCode}\n` +
         `- Data e hora: ${quando} (São Paulo)\n\n` +
-        `REDACÃO: use sempre "você" para se dirigir ao paciente. NUNCA use "senhor(a)", "senhor" ou "senhora".\n\n` +
+        `REDACÃO: use sempre "você", inclusive nas perguntas ao médico: "Quais alternativas terapêuticas seguras você recomenda?". NUNCA use "senhor(a)", "senhor", "senhora", "o você", "a você" ou tratamento com barra de gênero.\n\n` +
         `DIRETRIZES LEGAIS RIGOROSAS:\n` +
         `- NÃO diagnostique, NÃO prescreva medicamentos, NÃO indique marcas comerciais nem doses/posologias.\n` +
         `- Estruture o relatório em markdown elegante:\n` +
@@ -636,10 +637,7 @@ Deno.serve(async (req) => {
       if (typeof reportContent !== "string" || !reportContent.trim()) return json({ error: "O relatório não foi concluído. Tente novamente." }, 502);
 
       // Garante o tratamento neutro mesmo se a IA desobedecer ao prompt.
-      const neutralContent = enforceAttendanceCode(sanitizeOutboundLinks(reportContent
-        .replace(/senhor\(a\)/gi, "você")
-        .replace(/\b[Ss]enhora\b/g, "você")
-        .replace(/\b[Ss]enhor\b/g, "você")), attendanceCode);
+      const neutralContent = enforceAttendanceCode(sanitizeOutboundLinks(normalizeReportAddress(reportContent)), attendanceCode);
 
       const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(neutralContent)))).map(b => b.toString(16).padStart(2, "0")).join("");
       const { data: newReport, error: repErr } = await sb.from("ot_reports").insert({

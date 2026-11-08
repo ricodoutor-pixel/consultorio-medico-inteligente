@@ -1,5 +1,12 @@
 # Roadmap
 
+## Citações — ajustes finais do teste 6 (08/11/2026)
+- [x] Remover parágrafos bibliográficos contraditórios antes de anexar metadados reais
+- [x] Exigir relação com CBD/ansiedade e tipo randomizado quando solicitado; canonicalizar registros internos via PubMed
+- [x] Corrigir tratamento "você" nos novos relatórios sem formas com barra
+- [x] 37 regressões + 1 consulta real PubMed aprovadas; funções implantadas; provas em docs/CITACOES_TESTE6_2026-11-08.md; compilação OK
+- [ ] Repetir pergunta e gerar relatório na sala paga pela tela — depende do próximo teste consentido do usuário; nenhum atendimento artificial criado
+
 ## Mensagens WhatsApp duplicadas — 08/11/2026
 - [x] Corrigir proteção ausente no Cloud: tabela de IDs não existia; agora somente uma inserção atômica inicia a resposta e falha de armazenamento bloqueia o envio. brisa-bot implantado; permissões servidor-only conferidas
 - [x] Preparar trava de processo Hostinger, histórico canônico e checagem sem registrar envio antecipadamente; 11 testes + 32 verificações passam, sintaxe válida, compilação OK

@@ -146,7 +146,7 @@ export default function MonitorCardiacoPage() {
         <Card className="p-5 text-center bg-card border-primary/30">
           <h3 className="font-bold mb-2">Resultado preocupante?</h3>
           <p className="text-sm text-muted-foreground mb-4">Fale com um médico por R$ 30 — atendimento por orientação técnica.</p>
-          <Button onClick={() => window.location.href = "/falar-com-especialista"} className="bg-green-600 hover:bg-green-700 text-white">
+          <Button onClick={() => window.location.href = "/orientacao-tecnica"} className="bg-green-600 hover:bg-green-700 text-white">
             Consultar agora
           </Button>
         </Card>

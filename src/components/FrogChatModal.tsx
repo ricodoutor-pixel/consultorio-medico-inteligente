@@ -448,7 +448,12 @@ export const FrogChatModal = () => {
               {QUICK_ACTIONS.map((action) => (
                 <button
                   key={action.label}
-                  onClick={() => sendMessage(action.msg)}
+                  onClick={() => {
+                    if ("cta" in action && action.cta) {
+                      setIsOpen(false);
+                      navigate("/orientacao-tecnica");
+                    } else sendMessage(action.msg);
+                  }}
                   className="text-xs px-3 py-1.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-semibold"
                 >
                   {action.label}

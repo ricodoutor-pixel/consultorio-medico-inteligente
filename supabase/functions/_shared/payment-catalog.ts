@@ -14,9 +14,18 @@ export interface PaymentService {
   active: boolean;
 }
 
-/** Nome da conta recebedora conforme cadastro no provedor (Mercado Pago).
- *  Atualizado após consulta em /users/me — ver docs/NOME_PAGAMENTO_2026-11-08.md. */
-export const PAYMENT_RECEIVER_NAME = "Doutor Rico Ltda";
+/** Descrição comercial, nunca o nome do titular bancário do Pix. */
+export function formatPaymentName(raw: unknown): string {
+  const suffix = " — Planta y Raiz";
+  const name = String(raw ?? "")
+    .replace(/planta\s*(?:y|e|&)\s*ra[ií]z/gi, "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s—–-]+|[\s—–-]+$/g, "")
+    .trim() || "Serviço";
+  return name.slice(0, 255 - suffix.length).trimEnd() + suffix;
+}
 
 export const FALLBACK_DESCRIPTOR = "PLANTAYRAIZ";
 
@@ -64,7 +73,7 @@ export async function getPaymentServices(sb: Sb): Promise<Record<string, Payment
     for (const row of data as any[]) {
       map[row.code] = {
         code: row.code,
-        display_name: String(row.display_name),
+        display_name: formatPaymentName(row.display_name),
         amount_brl: Number(row.amount_brl),
         descriptor: sanitizeDescriptor(String(row.descriptor || FALLBACK_DESCRIPTOR)),
         recurring: Boolean(row.recurring),
@@ -97,7 +106,7 @@ export function sanitizeDescriptor(raw: string): string {
  */
 export function resolveDisplayName(catalog: Record<string, PaymentService>, code: string): string {
   const svc = catalog[code];
-  if (svc?.active && svc.display_name) return svc.display_name;
+  if (svc?.active && svc.display_name) return formatPaymentName(svc.display_name);
   console.warn(`[payment-catalog] ATENÇÃO ADMIN: serviço sem nome cadastrado na tabela payment_services: "${code}" — usando nome genérico.`);
-  return "Serviço Planta y Raiz";
+  return formatPaymentName("Serviço");
 }

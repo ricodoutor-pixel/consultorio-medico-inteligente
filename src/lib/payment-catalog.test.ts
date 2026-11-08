@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FALLBACK_DESCRIPTOR,
   FALLBACK_SERVICES,
+  formatPaymentName,
   resolveDisplayName,
   sanitizeDescriptor,
 } from "../../supabase/functions/_shared/payment-catalog";
@@ -26,7 +27,7 @@ describe("payment-catalog — nome que aparece no pagamento", () => {
   });
 
   it("serviço sem cadastro usa nome genérico da empresa", () => {
-    expect(resolveDisplayName(FALLBACK_SERVICES, "servico_inexistente")).toBe("Serviço Planta y Raiz");
+    expect(resolveDisplayName(FALLBACK_SERVICES, "servico_inexistente")).toBe("Serviço — Planta y Raiz");
   });
 
   it("descritor da fatura: maiúsculas, sem acentos, até 16 caracteres", () => {
@@ -41,5 +42,12 @@ describe("payment-catalog — nome que aparece no pagamento", () => {
       orientacao_tecnica: { ...FALLBACK_SERVICES.orientacao_tecnica, display_name: "Orientação Especial — Planta y Raiz" },
     };
     expect(resolveDisplayName(catalog, "orientacao_tecnica")).toBe("Orientação Especial — Planta y Raiz");
+  });
+
+  it("personaliza qualquer produto mantendo a marca depois do nome", () => {
+    expect(formatPaymentName("Camiseta Botânica")).toBe("Camiseta Botânica — Planta y Raiz");
+    expect(formatPaymentName("Planta y Raíz — Caneca")).toBe("Caneca — Planta y Raiz");
+    expect(formatPaymentName("Orientação Técnica — Planta y Raiz")).toBe("Orientação Técnica — Planta y Raiz");
+    expect(formatPaymentName("x".repeat(300))).toBe("x".repeat(240) + " — Planta y Raiz");
   });
 });

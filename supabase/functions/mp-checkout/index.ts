@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
 import {
   FALLBACK_DESCRIPTOR,
+  formatPaymentName,
   getPaymentServices,
   resolveDisplayName,
   type PaymentService,
@@ -288,6 +289,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    title = formatPaymentName(title);
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";
     const isAllowedSuccess = typeof returnUrl === "string" && ALLOWED_ORIGINS.some((origin) => returnUrl.startsWith(origin));
@@ -479,6 +481,7 @@ Deno.serve(async (req) => {
         ticket_url: ticketUrl,
         external_reference: externalReference,
         amount,
+        description: title,
         split: splitDetails,
       });
     }

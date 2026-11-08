@@ -254,7 +254,7 @@ const DownloadApp = () => {
                 <Link to="/cadastro">Cadastre-se Grátis <ArrowRight size={18} className="ml-2" /></Link>
               </Button>
               <Button size="lg" variant="outline" className="h-14 px-8 border-primary/30 text-primary font-black rounded-2xl" asChild>
-                <Link to="/telemedicina">Iniciar Orientação Técnica IA</Link>
+                <Link to="/orientacao-tecnica">Iniciar Orientação Técnica IA</Link>
               </Button>
             </div>
           </motion.div>

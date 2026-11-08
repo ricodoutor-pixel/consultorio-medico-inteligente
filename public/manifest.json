@@ -44,10 +44,10 @@
       "icons": [{ "src": "/dr-verdinho-192.png?v=9", "sizes": "192x192" }]
     },
     {
-      "name": "Triagem Rápida",
-      "short_name": "Triagem",
-      "description": "Faça sua triagem clínica gratuita",
-      "url": "/triagem?source=shortcut",
+      "name": "Orientação Técnica",
+      "short_name": "Orientação",
+      "description": "Acesse sua orientação técnica educativa",
+      "url": "/orientacao-tecnica?source=shortcut",
       "icons": [{ "src": "/dr-verdinho-192.png?v=9", "sizes": "192x192" }]
     },
     {

@@ -187,7 +187,6 @@ const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelD
 const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
 const BrisaOrientacoes = lazyWithRecovery(() => import("./pages/admin/BrisaOrientacoes"), { sourceRef: "/admin/brisa-orientacoes" });
 const OrientacaoAoVivo = lazyWithRecovery(() => import("./pages/admin/OrientacaoAoVivo"), { sourceRef: "/admin/orientacao-ao-vivo" });
-const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
 const AdminComprovantesPagamento = lazyWithRecovery(() => import("./pages/admin/AdminComprovantesPagamento"), { sourceRef: "/admin/comprovantes-pagamento" });
@@ -354,6 +353,7 @@ const App = () => (
                 <Route path="/telemedicina" element={<Telemedicina />} />
                 <Route path="/rodizio" element={<RodizioMedicos />} />
                 <Route path="/brisa-orientacao" element={<OrientationEntryRedirect />} />
+                <Route path="/triagem" element={<OrientationEntryRedirect />} />
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
@@ -511,7 +511,7 @@ const App = () => (
                 <Route path="/admin/medicos-online" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/medicos" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
-                <Route path="/oferta-especial" element={<OfertaEspecial />} />
+                <Route path="/oferta-especial" element={<OrientationEntryRedirect />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />

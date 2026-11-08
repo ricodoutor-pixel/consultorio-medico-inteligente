@@ -21,7 +21,7 @@ export const UrgencyAlert = ({ level, triggers, onDismiss }: UrgencyAlertProps) 
       title: "Posso te ajudar com isso!",
       description: "Nossos médicos especialistas podem avaliar seu caso.",
       cta: "Agendar Orientação Técnica",
-      ctaAction: () => { onDismiss(); navigate("/agendamento"); },
+      ctaAction: () => { onDismiss(); navigate("/orientacao-tecnica"); },
       className: "border-yellow-500/30 bg-yellow-500/10",
       iconColor: "text-yellow-500",
     },

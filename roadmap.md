@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Citações — ajustes finais do teste 6 (08/11/2026)
+- [ ] Revalidar pedido reiterado às 14:10 UTC: corpo integral, pertinência dos registros e perguntas do relatório; entregar provas atuais e informar publicação
 - [x] Remover parágrafos bibliográficos contraditórios antes de anexar metadados reais
 - [x] Exigir relação com CBD/ansiedade e tipo randomizado quando solicitado; canonicalizar registros internos via PubMed
 - [x] Corrigir tratamento "você" nos novos relatórios sem formas com barra

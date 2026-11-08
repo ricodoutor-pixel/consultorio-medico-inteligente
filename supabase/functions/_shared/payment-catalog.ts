@@ -85,6 +85,7 @@ export function sanitizeDescriptor(raw: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .replace(/[^A-Z0-9 ]/g, "")
+    .replace(/\s+/g, " ")
     .trim()
     .slice(0, 16);
   return clean || FALLBACK_DESCRIPTOR;

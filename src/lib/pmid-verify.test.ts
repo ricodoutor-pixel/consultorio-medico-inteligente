@@ -14,6 +14,7 @@ describe("PMID verification", () => {
     expect(out).toContain("J Pers Assess, 2022");
     expect(out).toContain("PMID 35112940 [PubMed]");
     expect(out).not.toContain("[Biblioteca interna]");
+    expect(out).not.toContain("Berger");
   });
   it("labels Biblioteca interna only when the PMID is in the library", () => {
     expect(applyCitationVerification("PMID 35112940", ok, new Set(["35112940"]))).toContain("[Biblioteca interna]");
@@ -29,5 +30,16 @@ describe("PMID verification", () => {
   it("patient-requested PMID block says it does not exist / could not check", () => {
     expect(buildPatientPmidBlock(ok, ["99999999"])).toContain("NÃO EXISTE");
     expect(buildPatientPmidBlock({ status: "unavailable", found: new Map(), missing: [] }, ["1"])).toContain("não consegui conferir");
+  });
+  it("discards the entire contradictory multiline paragraph before returning metadata", () => {
+    const out = applyCitationVerification("Sobre os registros:\n\nEstudo piloto aberto de Berger et al. (2022)\nlink confirmado: https://pubmed.ncbi.nlm.nih.gov/35112940/\nO estudo demonstrou benefício.\n\nConverse com seu médico.", ok, new Set());
+    expect(out).not.toMatch(/Berger|piloto|demonstrou benefício|link confirmado/);
+    expect(out).toContain("Roberts JM");
+    expect(out).toContain("Converse com seu médico.");
+  });
+  it("never presents forensic PMID 35112940 as evidence for CBD anxiety", () => {
+    const out = applyCitationVerification("Berger et al. PMID 35112940 comprova eficácia do CBD.", ok, new Set(["35112940"]), "Quais ensaios clínicos randomizados avaliaram canabidiol em transtorno de ansiedade?");
+    expect(out).not.toMatch(/35112940|Roberts|Biblioteca interna|Berger|eficácia/);
+    expect(out).toContain("Não encontrei ensaio randomizado");
   });
 });

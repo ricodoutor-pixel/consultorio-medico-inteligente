@@ -56,7 +56,7 @@ export function buildPatientPmidBlock(lookup: PmidLookup, ids: string[]): string
 }
 
 const fmt = (a: PubMedArticle, inLibrary: boolean) =>
-  `• PMID ${a.pmid} ${inLibrary ? "[Biblioteca interna]" : "[PubMed]"} — ${a.firstAuthor || "autor não informado"}${a.authors.includes(",") ? " et al." : ""}. ${a.title} ${a.journal || "revista não informada"}${a.year ? `, ${a.year}` : ""}. ${a.url}`;
+  `• PMID ${a.pmid} ${inLibrary ? "[Biblioteca interna]" : "[PubMed]"} — ${a.firstAuthor || "autor não informado"}${a.authors.includes(",") ? " et al" : ""}. ${a.title} ${a.journal || "revista não informada"}${a.year ? `, ${a.year}` : ""}. ${a.url}`;
 
 /**
  * Remove metadados escritos pelo modelo ao lado de PMIDs e anexa a lista

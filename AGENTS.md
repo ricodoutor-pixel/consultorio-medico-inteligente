@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Payment creators share payment-catalog name normalization and return the commercial description to Pix views; never hardcode a beneficiary because product descriptions do not identify the bank-account holder.
+
 - All technical orientation entry points target `/orientacao-tecnica`; retired entry routes redirect there preserving order, referral and session context, while report routes remain independent to keep historical documents accessible.
 
 - Orientation and medical copilot share scientific-context retrieval: internal catalog plus bounded live PubMed ESearch/EFetch; only allowlisted clinical terms leave for NCBI, and external totals never represent imported records or model training.

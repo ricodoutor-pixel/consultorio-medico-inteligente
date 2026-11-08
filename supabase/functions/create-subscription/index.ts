@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,7 +81,7 @@ Deno.serve(async (req) => {
 
     // ========== Try Mercado Pago Preapproval (Real Recurring) ==========
     const preapprovalPayload = {
-      reason: plan.title,
+      reason: formatPaymentName(plan.title),
       auto_recurring: {
         frequency: 1,
         frequency_type: "months",
@@ -126,7 +127,7 @@ Deno.serve(async (req) => {
 
     const preference = {
       items: [{
-        title: plan.title,
+        title: formatPaymentName(plan.title),
         quantity: 1,
         unit_price: plan.amount,
         currency_id: "BRL",

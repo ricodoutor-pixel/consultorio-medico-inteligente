@@ -5,6 +5,7 @@ import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import "@/styles/orientation-room.css";
 import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
 import { loadPermanentReferralCode } from "@/lib/referral-code";
+import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
@@ -148,6 +149,7 @@ export default function OrientacaoTecnicaAgente() {
     qr_code: string;
     qr_code_base64: string;
     payment_id: string | number;
+    description?: string;
   } | null>(null);
   const [copiedPix, setCopiedPix] = useState(false);
   const [awaitingSince, setAwaitingSince] = useState<number>(Date.now());
@@ -303,7 +305,13 @@ export default function OrientacaoTecnicaAgente() {
               : !t[item.id]?.trim());
         setStep(missing < 0 ? QUESTIONS.length - 1 : missing);
       }
-      if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });
+      if (d.order.qr_code && d.order.qr_code_base64) {
+        const qr = d.order.qr_code;
+        const image = d.order.qr_code_base64;
+        const paymentId = d.order.mp_payment_id || "";
+        setPixData((previous) => ({ qr_code: qr, qr_code_base64: image, payment_id: paymentId,
+          description: String(previous?.payment_id) === String(paymentId) ? previous?.description : undefined }));
+      }
     }
     if (LIVE_STATES.includes(st) || st === "expired" || st === "completed") setPhase("room");
     else if (st === "triage") setPhase(hasEmergency(d.order?.triagem || {}) ? "emergency" : "triage");
@@ -561,7 +569,7 @@ export default function OrientacaoTecnicaAgente() {
         window.history.replaceState(null, "", url);
       }
       if (method === "pix" && data.qr_code && data.qr_code_base64) {
-        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id });
+        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id, description: data.description });
         setAwaitingSince(Date.now());
         setPhase("awaiting");
       } else if (data.init_point) window.location.href = data.init_point;
@@ -1198,7 +1206,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                      Pagamento: <strong>Orientação Técnica — Planta y Raiz</strong> · R$ 30,00 · Recebedor: <strong>Doutor Rico Ltda</strong>
+                      Pagamento: <strong>{formatPaymentName(pixData.description || "Orientação Técnica")}</strong> · R$ 30,00
                     </p>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">

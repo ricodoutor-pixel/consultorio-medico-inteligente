@@ -1,6 +1,7 @@
 // Edge: process-saude-plus-subscription
 // Cria assinatura no Mercado Pago (preapproval) + linha pending em health_card_subscriptions.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,7 +70,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           transaction_amount: amount,
-          description: `Cartão Saúde Plus ${plan_type} (${billing_cycle})`,
+          description: formatPaymentName(`Cartão Saúde Plus ${plan_type === "individual" ? "Individual" : "Familiar"} (${billing_cycle === "monthly" ? "Mensal" : "Anual"})`),
           payment_method_id: "pix",
           payer: { email: payer_email || user.email },
           external_reference: `saude_plus:${user.id}:${card_number}`,

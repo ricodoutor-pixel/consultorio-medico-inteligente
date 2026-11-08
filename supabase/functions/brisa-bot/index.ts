@@ -7,6 +7,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { claimBrisaInbound } from '../_shared/brisa-inbound-claim.ts';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -219,21 +220,6 @@ function parseWAHA(body: Record<string, unknown>) {
 }
 
 // ── DEDUP via banco ──────────────────────────────────────────────────────
-async function isDup(waId: string): Promise<boolean> {
-  if (!waId || !SB_URL || !SB_KEY) return false;
-  try {
-    const sb = createClient(SB_URL, SB_KEY);
-    const { data } = await sb.from('brisa_processed_messages').select('wa_message_id').eq('wa_message_id', waId).maybeSingle();
-    return Boolean(data);
-  } catch { return false; }
-}
-async function markDone(waId: string, chatId: string) {
-  if (!waId || !SB_URL || !SB_KEY) return;
-  try {
-    const sb = createClient(SB_URL, SB_KEY);
-    await sb.from('brisa_processed_messages').upsert({ wa_message_id: waId, remote_jid: chatId }, { onConflict: 'wa_message_id', ignoreDuplicates: true });
-  } catch {}
-}
 
 // ── ENVIO WAHA / Evolution ────────────────────────────────────────────────
 async function sendWAHA(chatId: string, text: string): Promise<boolean> {
@@ -395,9 +381,14 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({ ok: true, ignored: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
-  if (messageId) {
-    if (await isDup(messageId)) return new Response(JSON.stringify({ ok: true, ignored: 'duplicate' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
-    await markDone(messageId, chatId);
+  const claim = SB_URL && SB_KEY
+    ? await claimBrisaInbound(createClient(SB_URL, SB_KEY), messageId, chatId)
+    : 'unavailable';
+  if (claim !== 'claimed') {
+    return new Response(JSON.stringify({ ok: claim === 'duplicate', ignored: claim }), {
+      status: claim === 'duplicate' ? 200 : 503,
+      headers: { ...cors, 'Content-Type': 'application/json' },
+    });
   }
 
   // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────

@@ -20,6 +20,7 @@
 
 - Brisa deterministic response safety is shared between chat-brisa and the Hostinger responder; outbound dedup checks are read-only and successful sends alone enter the 24-hour history, preventing a pre-check from blocking its own send.
 - The Hostinger responder is a single serial worker guarded by a local process lock; its shared response policy must accompany deployments, and human-request pauses remain until explicit operator release.
+- WhatsApp webhook responses require an atomic server-only inbound ID insert before processing; storage failures stop sends rather than bypass deduplication. Hostinger startup uses an exclusive PID lock to reject overlapping workers.
 
 - Agents must read `docs/ORIENTACAO_ATUAL_AGENTES.md` before operational work and treat historical audits as dated evidence, not current configuration; this prevents conflicting backend and deployment instructions.
 - The managed Lovable Cloud project is the sole operational data source; outages never authorize switching to a legacy backend or editing generated connection files, because that splits clinical and payment records.

@@ -48,7 +48,6 @@ Pelo processo de implantação já utilizado, leve a versão atual destes arquiv
 - `scripts/agent_evolution_brisa_live_responder.mjs`
 - `scripts/lib/brisa-worker-lock.mjs`
 - `scripts/lib/brisa_security.mjs`
-- `scripts/lib/brisa-response-policy.mjs`
 - `scripts/brisa_onboarding_config.mjs`
 - `ecosystem.config.cjs` (sem iniciar outros aplicativos da lista)
 
@@ -83,3 +82,5 @@ Se houver resultado desconhecido, procure o envio no histórico da Evolution ant
 3. Confirmar resposta e avisos no telefone no próximo evento real autorizado.
 
 A proteção dos avisos no Cloud não depende de republicar o visual do site. A proteção do responder na Hostinger depende das etapas acima.
+
+As três funções que utilizam o envio de avisos (`mercadopago-webhook`, `ot-edilson-web` e `payment-notify-resend`) foram implantadas nesta entrega. Verificação em 08/11/2026 às 06:29 UTC (03:29 São Paulo).

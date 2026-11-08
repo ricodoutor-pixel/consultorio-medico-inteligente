@@ -305,7 +305,13 @@ export default function OrientacaoTecnicaAgente() {
               : !t[item.id]?.trim());
         setStep(missing < 0 ? QUESTIONS.length - 1 : missing);
       }
-      if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });
+      if (d.order.qr_code && d.order.qr_code_base64) {
+        const qr = d.order.qr_code;
+        const image = d.order.qr_code_base64;
+        const paymentId = d.order.mp_payment_id || "";
+        setPixData((previous) => ({ qr_code: qr, qr_code_base64: image, payment_id: paymentId,
+          description: String(previous?.payment_id) === String(paymentId) ? previous?.description : undefined }));
+      }
     }
     if (LIVE_STATES.includes(st) || st === "expired" || st === "completed") setPhase("room");
     else if (st === "triage") setPhase(hasEmergency(d.order?.triagem || {}) ? "emergency" : "triage");

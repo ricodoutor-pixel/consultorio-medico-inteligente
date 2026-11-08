@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: `subscription-${planId}-${Date.now()}`,
-      statement_descriptor: "PLANTA E RAIZ",
+      statement_descriptor: "PLANTAYRAIZ",
       payment_methods: {
         excluded_payment_types: [] as { id: string }[],
         installments: 1,

@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         transaction_amount: value,
-        description: `Carga Carteira Saúde Plus — R$ ${value.toFixed(2)}`,
+        description: `Carga Carteira Saúde Plus — Planta y Raiz — R$ ${value.toFixed(2)}`,
         payment_method_id: "pix",
         payer: { email: user.email },
         external_reference: `wallet_load:${user.id}:${Date.now()}`,

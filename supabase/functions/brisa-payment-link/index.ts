@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       const guestRef = `brisa-orientacao-${String(phone).replace(/\D/g, "") || "anon"}-${Date.now()}`;
       const guestPref = {
         items: [{
-          title: "Orientação Técnica — Planta y Raíz Ltda",
+          title: "Orientação Técnica — Planta y Raiz",
           description: "Orientação Técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório em PDF e encaminhamento clínico pela Planta y Raíz Ltda.",
           quantity: 1,
           unit_price: 30.0,
@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
 
       const preference: any = {
         items: [{
-          title: "Orientação Técnica — Planta y Raíz Ltda",
+          title: "Orientação Técnica — Planta y Raiz",
           description: "Orientação Técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório em PDF e encaminhamento clínico pela Planta y Raíz Ltda.",
           quantity: 1,
           unit_price: 30.0,

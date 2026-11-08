@@ -7101,6 +7101,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pubmed_query_audit: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          session_id: string | null
+          source: string
+          status: string
+          total: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          session_id?: string | null
+          source?: string
+          status: string
+          total?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          session_id?: string | null
+          source?: string
+          status?: string
+          total?: number | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth_key: string

@@ -10,6 +10,7 @@ import { drEdilsonPersona, ORIENTACAO_MINUTES } from "../_shared/agents.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { createOtStreamParser } from "../_shared/ot-stream.ts";
+import { extractPmids, lookupPmids, buildPatientPmidBlock, applyCitationVerification } from "../_shared/pmid-verify.ts";
 import { notifyPaymentConfirmedOnce, notifyOrientationEvent } from "../_shared/payment-notify.ts";
 import { shouldAutoClose, FAREWELL_MESSAGE } from "../_shared/orientation-farewell.ts";
 import { orientationCode, enforceAttendanceCode, reportAttendanceCode } from "../_shared/orientation-code.ts";
@@ -456,6 +457,11 @@ Deno.serve(async (req) => {
         },
       }).catch(() => "");
 
+      // PMIDs pedidos pelo paciente: consulta real ao PubMed antes da resposta.
+      const askedPmids = extractPmids(userText);
+      const askedLookup = await lookupPmids(askedPmids);
+      const patientPmidBlock = buildPatientPmidBlock(askedLookup, askedPmids);
+
       // Busca médicos reais cadastrados na vitrine (para encaminhamento humanizado sem veterinários)
       const { data: realDocs } = await sb
         .from("doctors")
@@ -507,7 +513,7 @@ Deno.serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: drEdilsonPersona(minutes) + triageBlock + continuityBlock + evidence + doctorsReferralBlock,
+              content: drEdilsonPersona(minutes) + triageBlock + continuityBlock + evidence + patientPmidBlock + doctorsReferralBlock,
             },
             ...cleanHistory,
           ],
@@ -517,43 +523,41 @@ Deno.serve(async (req) => {
         return json({ error: "Erro no serviço de inteligência clínica" }, 502);
       }
 
-      // Cria tee stream para repassar ao cliente e ao mesmo tempo gravar a resposta final no banco
-      const [clientStream, dbStream] = aiRes.body.tee();
-
-      // Gravação assíncrona do texto completo da IA
-      const persistResponse = (async () => {
-        try {
-          const reader = dbStream.getReader();
-          const decoder = new TextDecoder();
-          const parse = createOtStreamParser();
-          let fullText = "";
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            fullText += parse(decoder.decode(value, { stream: true }));
-          }
-          fullText += parse(decoder.decode() + "\n");
-
-          if (fullText.trim()) {
-            const { error: replyError } = await sb.from("ot_messages").insert({
-              session_id: sess.id,
-              role: "agent",
-              content: sanitizeOutboundLinks(fullText.trim()),
-            });
-            if (replyError) throw new Error("reply_save_failed");
-            await sb.from("ot_web_sessions").update({
-              messages_count: (sess.messages_count ?? 0) + 2,
-              last_message_at: new Date().toISOString(),
-            }).eq("id", sess.id);
-          }
-        } catch (e) {
-          console.error("[ot-edilson-web] stream db error", e);
+      // Resposta completa é lida no servidor e cada PMID é conferido no PubMed
+      // antes de chegar ao paciente: metadados vêm do registro real, nunca do modelo.
+      const reader = aiRes.body.getReader();
+      const decoder = new TextDecoder();
+      const parse = createOtStreamParser();
+      let rawText = "";
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          rawText += parse(decoder.decode(value, { stream: true }));
         }
-      })();
-      EdgeRuntime.waitUntil(persistResponse);
-
-      return new Response(clientStream, {
+        rawText += parse(decoder.decode() + "\n");
+      } catch {
+        return json({ error: "A resposta foi interrompida. Tente novamente." }, 502);
+      }
+      let finalText = sanitizeOutboundLinks(rawText.trim());
+      const citedPmids = extractPmids(finalText);
+      if (citedPmids.length) {
+        const lookup = await lookupPmids(citedPmids);
+        const urls = citedPmids.map((id) => `https://pubmed.ncbi.nlm.nih.gov/${id}/`);
+        const { data: libRows } = await sb.from("scientific_articles").select("url").in("url", [...urls, ...urls.map((u) => u.slice(0, -1))]);
+        const libraryPmids = new Set((libRows || []).map((r: any) => String(r.url).match(/(\d+)\/?$/)?.[1]).filter(Boolean) as string[]);
+        finalText = applyCitationVerification(finalText, lookup, libraryPmids);
+      }
+      if (finalText) {
+        const { error: replyError } = await sb.from("ot_messages").insert({ session_id: sess.id, role: "agent", content: finalText });
+        if (replyError) console.error("[ot-edilson-web] reply save failed", replyError);
+        await sb.from("ot_web_sessions").update({
+          messages_count: (sess.messages_count ?? 0) + 2,
+          last_message_at: new Date().toISOString(),
+        }).eq("id", sess.id);
+      }
+      const sse = `data: ${JSON.stringify({ choices: [{ delta: { content: finalText } }] })}\n\ndata: [DONE]\n\n`;
+      return new Response(sse, {
         headers: { ...cors, "Content-Type": "text/event-stream" },
       });
     }

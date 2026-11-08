@@ -16,7 +16,7 @@ export interface PaymentService {
 
 /** Nome da conta recebedora conforme cadastro no provedor (Mercado Pago).
  *  Atualizado após consulta em /users/me — ver docs/NOME_PAGAMENTO_2026-11-08.md. */
-export const PAYMENT_RECEIVER_NAME = "Planta y Raiz";
+export const PAYMENT_RECEIVER_NAME = "Doutor Rico Ltda";
 
 export const FALLBACK_DESCRIPTOR = "PLANTAYRAIZ";
 

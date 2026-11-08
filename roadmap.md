@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Fechamento da Orientação e aviso de pagamento — 08/11/2026
-- [ ] Mostrar sucesso e continuação após confirmação real de cada pagamento, sem liberar serviço por retorno do checkout
-- [ ] Executar regressões de pagamento, triagem, citações, avaliação e envio único
-- [ ] Conferir retomada e acesso autenticado disponível, sem criar atendimento ou pagamento artificial
-- [ ] Publicar e conferir site oficial e fonte operacional
+- [x] Mostrar sucesso e continuação após confirmação real nos retornos compartilhados, Orientação, compras/planos em /pay e consulta; sem liberar serviço por retorno do checkout
+- [x] Executar regressões: 90 testes aprovados; compilação OK; três funções implantadas
+- [x] Conferir retomada autenticada disponível, parâmetros falsos bloqueados e aviso de Pix aprovado preexistente pela tela; sem criar atendimento ou pagamento artificial
+- [ ] Publicação solicitada; conferir nova versão oficial. Fonte operacional oficial confirmada pelo navegador antes da publicação
 - [ ] Concluir implantação Hostinger se houver acesso seguro disponível; caso contrário documentar bloqueio
 - [ ] Aceite integral com próximo pagamento e atendimento consentido; confirmar avisos no celular e Pix no banco
 

@@ -1,5 +1,11 @@
 # Roadmap
 
+## Citações — ajustes finais do teste 6 (08/11/2026)
+- [ ] Remover narrativa contraditória com registros PubMed antes da resposta
+- [ ] Exigir relação com CBD e ansiedade para referências dessa pergunta
+- [ ] Corrigir tratamento "você" nos novos relatórios sem formas com barra
+- [ ] Executar regressões, registrar provas e disponibilizar correções; novo teste pago depende do usuário
+
 ## Mensagens WhatsApp duplicadas — 08/11/2026
 - [x] Corrigir proteção ausente no Cloud: tabela de IDs não existia; agora somente uma inserção atômica inicia a resposta e falha de armazenamento bloqueia o envio. brisa-bot implantado; permissões servidor-only conferidas
 - [x] Preparar trava de processo Hostinger, histórico canônico e checagem sem registrar envio antecipadamente; 11 testes + 32 verificações passam, sintaxe válida, compilação OK

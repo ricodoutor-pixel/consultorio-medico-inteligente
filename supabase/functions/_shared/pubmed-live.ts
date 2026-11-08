@@ -51,8 +51,10 @@ export function buildPrivatePubMedQuery(text: string): string | null {
     ? `${CANNABIS_QUERY} AND (${terms.map(term => `"${term}"[Title/Abstract]`).join(" AND ")})`
     : CANNABIS_QUERY;
   // Study-type filters: without them PubMed relevance ranks reviews first and the RCT gate discards everything.
-  if (/randomiz|randomis|aleatoriz|\brct\b/i.test(text)) return `${base} AND "randomized controlled trial"[Publication Type]`;
-  if (/ensaios? cl[ií]nicos?|clinical trials?/i.test(text)) return `${base} AND "clinical trial"[Publication Type]`;
+  // Filtered trial lists also require the clinical topic in the title, so off-topic trials don't fill the 5 slots.
+  const focused = terms.length ? `${base} AND (${terms.map(term => `"${term}"[Title]`).join(" AND ")})` : base;
+  if (/randomiz|randomis|aleatoriz|\brct\b/i.test(text)) return `${focused} AND "randomized controlled trial"[Publication Type]`;
+  if (/ensaios? cl[ií]nicos?|clinical trials?/i.test(text)) return `${focused} AND "clinical trial"[Publication Type]`;
   return base;
 }
 

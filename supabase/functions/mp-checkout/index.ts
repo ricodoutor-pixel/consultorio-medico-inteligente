@@ -123,8 +123,12 @@ Deno.serve(async (req) => {
     }
 
 
+    // Catálogo único de nomes/valores (tabela payment_services, com espelho de segurança).
+    const catalog = await getPaymentServices(supabase);
+
     let title: string;
     let amount: number;
+    let descriptor = FALLBACK_DESCRIPTOR;
     let externalReference: string;
     let type = "sku";
     let marketplaceFee: number | null = null;
@@ -182,7 +186,7 @@ Deno.serve(async (req) => {
         })
         .eq("id", order.id);
 
-      title = "Pedido Shopping Planta y Raiz";
+      title = "Pedido Shopping — Planta y Raiz";
       externalReference = `order:${order.id}`;
       type = "marketplace_order";
     } else if (cartToken && typeof cartToken === "string") {
@@ -196,7 +200,7 @@ Deno.serve(async (req) => {
       if (cart.status !== "pending") return json({ error: "Carrinho não está pendente" }, 400, req);
       amount = round2(Number(cart.total_amount || 0));
       if (!(amount > 0)) return json({ error: "Carrinho sem valor válido" }, 400, req);
-      title = "Carrinho de Prescrição Médica";
+      title = "Compra com Prescrição — Planta y Raiz";
       externalReference = `cart:${cart.id}`;
       type = "prescription_cart";
     } else if (appointmentId && typeof appointmentId === "string") {
@@ -215,7 +219,11 @@ Deno.serve(async (req) => {
         if (priceError) return json({ error: "Não foi possível registrar o valor da consulta" }, 500, req);
       }
       if (!(amount > 0)) return json({ error: "Consulta sem valor válido" }, 400, req);
-      title = appt.type === "video" ? CATALOG.consulta_video.title : appt.type === "chat" ? CATALOG.consulta_chat.title : "Consulta médica — Planta y Raiz";
+      title = appt.type === "video"
+        ? resolveDisplayName(catalog, "consulta_video")
+        : appt.type === "chat"
+        ? resolveDisplayName(catalog, "consulta_chat")
+        : "Consulta médica — Planta y Raiz";
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
 
@@ -237,15 +245,12 @@ Deno.serve(async (req) => {
         collector_id: collectorId,
       };
     } else {
-      let item = typeof sku === "string" ? CATALOG[sku] : undefined;
+      const item: PaymentService | undefined = typeof sku === "string" ? catalog[sku] : undefined;
 
-      if (typeof sku === "string" && sku.startsWith("tool_")) {
-        item = TOOL_CATALOG[sku];
-      }
-
-      if (!item) return json({ error: "SKU inválido" }, 400, req);
-      title = item.title;
-      amount = item.amount;
+      if (!item || !item.active) return json({ error: "SKU inválido" }, 400, req);
+      title = resolveDisplayName(catalog, sku as string);
+      descriptor = item.descriptor || FALLBACK_DESCRIPTOR;
+      amount = item.amount_brl;
       // Consulta Premium é o único serviço com valor definido pelo profissional.
       if (sku === "consulta_premium" && typeof doctorId === "string") {
         const { data: doc } = await supabase
@@ -306,7 +311,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: externalReference,
-      statement_descriptor: "PLANTA Y RAIZ",
+      statement_descriptor: descriptor,
       metadata: {
         type,
         user_id: userId,

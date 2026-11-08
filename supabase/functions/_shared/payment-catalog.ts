@@ -83,6 +83,9 @@ export function sanitizeDescriptor(raw: string): string {
   const clean = raw
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
+    .normalize("NFC")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .toUpperCase()
     .replace(/[^A-Z0-9 ]/g, "")
     .trim()

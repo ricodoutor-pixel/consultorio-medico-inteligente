@@ -30,7 +30,7 @@ describe("payment-catalog — nome que aparece no pagamento", () => {
   });
 
   it("descritor da fatura: maiúsculas, sem acentos, até 16 caracteres", () => {
-    expect(sanitizeDescriptor("Planta y Raíz — Orientação Técnica")).toBe("PLANTA Y RAIZ O");
+    expect(sanitizeDescriptor("Planta y Raíz — Orientação Técnica")).toBe("PLANTA Y RAIZ OR");
     expect(sanitizeDescriptor("")).toBe(FALLBACK_DESCRIPTOR);
     expect(sanitizeDescriptor("plantayraiz")).toBe("PLANTAYRAIZ");
   });

@@ -47,9 +47,9 @@ export const RodizioMedicos = () => {
   const handleSelect = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
-      window.location.href = `https://wa.me/5511991363154?text=${encodeURIComponent("Iniciar orientação agora")}`;
+      navigate("/orientacao-tecnica");
     } else {
-      navigate(`/login?redirect=${encodeURIComponent("/brisa-orientacao")}`);
+      navigate(`/login?redirect=${encodeURIComponent("/orientacao-tecnica")}`);
     }
   };
 

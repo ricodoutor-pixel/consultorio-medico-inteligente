@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- All technical orientation entry points target `/orientacao-tecnica`; retired entry routes redirect there preserving order, referral and session context, while report routes remain independent to keep historical documents accessible.
+
 - Orientation and medical copilot share scientific-context retrieval: internal catalog plus bounded live PubMed ESearch/EFetch; only allowlisted clinical terms leave for NCBI, and external totals never represent imported records or model training.
 
 - Orientation codes derive from the persisted payment-order identifier and are persisted in new reports; historical report codes come from their original content to avoid silently rewriting documents.

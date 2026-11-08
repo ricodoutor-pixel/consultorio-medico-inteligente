@@ -6,6 +6,8 @@ import "@/styles/orientation-room.css";
 import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
 import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
+import { orientationPaymentConfirmed } from "@/lib/payment-confirmation";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
@@ -991,6 +993,13 @@ export default function OrientacaoTecnicaAgente() {
           )}
 
           {/* ── TRIAGEM ── */}
+          {orientationPaymentConfirmed(otState) && (phase === "triage" || otState === "ready") && (
+            <PaymentConfirmedNotice pix={!!pixData} label={phase === "triage" ? "Continuar triagem" : "Continuar atendimento"}
+              onContinue={() => {
+                if (phase === "triage") questionCardRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+                else if (otState === "ready") void startRoom();
+              }} />
+          )}
           {phase === "triage" && (
             <Card ref={questionCardRef} className="border-border scroll-mt-24">
               <CardContent className="p-6 md:p-8">

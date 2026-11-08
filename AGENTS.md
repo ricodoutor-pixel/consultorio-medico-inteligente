@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Payment success notices consume authenticated provider confirmation or the existing server-authoritative Orientation/appointment state; redirect parameters and copied Pix codes never confirm payment, and return pages share this gate to prevent false success claims.
+
 - Payment creators share payment-catalog name normalization and return the commercial description to Pix views; never hardcode a beneficiary because product descriptions do not identify the bank-account holder.
 
 - All technical orientation entry points target `/orientacao-tecnica`; retired entry routes redirect there preserving order, referral and session context, while report routes remain independent to keep historical documents accessible.

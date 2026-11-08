@@ -1,5 +1,9 @@
 # Roadmap
 
+## Mensagens WhatsApp duplicadas — 08/11/2026
+- [ ] Identificar repetição nos registros, corrigir o envio concorrente e testar sem disparar mensagens não solicitadas
+- [ ] Implantar a correção e comprovar ausência de duplicação no próximo evento real
+
 ## Copiloto e leituras protegidas — 08/11/2026
 - [x] Copiloto implantado: resposta retida até conferir PMID; linhas bibliográficas substituídas por autoria/metadados PubMed, citações indisponíveis omitidas; SOAP sem citações preservado
 - [x] Acesso anônimo bloqueado nos quatro conjuntos (HTTP 401); leitura autenticada dos catálogos preservada (HTTP 200); experiências somente do titular/admin, leitura de outro titular vazia

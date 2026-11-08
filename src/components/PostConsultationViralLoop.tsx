@@ -25,27 +25,10 @@ export function PostConsultationViralLoop({ coinsEarned = 15, bonusPerReferral =
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { setLoading(false); return; }
 
-        // Busca código existente
-        const { data: existing } = await supabase
-          .from("referral_links")
-          .select("code")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (existing?.code) {
-          setRefCode(existing.code);
-        } else {
-          // Cria um novo se não existir
-          const newCode = `PLR-${user.id.replace(/-/g, "").substring(0, 6).toUpperCase()}${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
-          await supabase.from("referral_links").insert({
-            user_id: user.id,
-            code: newCode,
-            level1_referrer: null,
-            level2_referrer: null,
-            level3_referrer: null,
-          });
-          setRefCode(newCode);
-        }
+        // Código permanente vem sempre do servidor (referral_links é a fonte canônica);
+        // códigos gerados no navegador nunca são compartilháveis.
+        const { loadPermanentReferralCode } = await import("@/lib/referral-code");
+        setRefCode(await loadPermanentReferralCode(user.id));
       } catch (e) {
         console.warn("[ViralLoop] erro ao carregar código:", e);
       } finally {

@@ -50,7 +50,7 @@ export async function linkReferralOnSignup(newUserId: string) {
     // 2. Fallback: If not found, try matching by code suffix (e.g. 5WQ65M).
     // Legacy prefixes (PRZ-, PLANTA-, PLR-) all map to the same persisted code.
     if (!referrer) {
-      const codeSuffix = cleanRef.replace(/^(PLANTA-|PLR-|PRZ-)/i, "");
+      const codeSuffix = stripReferralPrefix(cleanRef);
       if (codeSuffix.length >= 4) {
         const { data: fallbackRef } = await supabase
           .from("referral_links")
@@ -111,6 +111,11 @@ export async function linkReferralOnSignup(newUserId: string) {
   } catch (error) {
     console.error("[Referral] Error linking referral:", error);
   }
+}
+
+/** Legacy prefixes (PRZ-, PLANTA-, PLR-) all map to the same persisted code. */
+export function stripReferralPrefix(code: string): string {
+  return code.trim().replace(/^(PLANTA-|PLR-|PRZ-)/i, "");
 }
 
 function setCookie(name: string, value: string, days: number) {

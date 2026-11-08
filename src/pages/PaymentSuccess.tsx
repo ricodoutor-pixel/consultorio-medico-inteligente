@@ -13,7 +13,7 @@ const PaymentSuccess = () => {
   const ref = params.get("external_reference") || params.get("ref") || "";
   const paymentId = params.get("payment_id") || params.get("collection_id") || "";
   const { status, method, confirmedReference, recheck } = usePaymentConfirmation(ref, paymentId);
-  const isOrientation = /^(brisa-orientacao-|orientacao[:\-]|ot[:\-])/.test(confirmedReference);
+  const isOrientation = /^(brisa-orientacao-|orientacao(?:_tecnica)?[:\-]|ot[:\-])/.test(confirmedReference);
 
   return (
   <div className="min-h-dvh bg-background">

@@ -1,9 +1,11 @@
 # Roadmap
 
 ## Nomes personalizados dos pagamentos — 08/11/2026
-- [ ] Padronizar todos os criadores de pagamentos com o sufixo Planta y Raiz, sem alterar valores ou conta
-- [ ] Retirar recebedor fixo da Orientação e exibir descrição retornada pelo pagamento
-- [ ] Testar regras, implantar funções e verificar tela sem criar cobrança real
+- [x] Padronizar descrições nos criadores de pagamento identificados, incluindo produtos dos carrinhos, planos, carteira e renovações; 11 funções implantadas, sem alterar valores ou conta
+- [x] Retirar recebedor fixo da Orientação; novos Pix exibem descrição retornada pelo pagamento, sem substituir titular bancário
+- [x] 12 testes aprovados e compilação OK; consulta confirma 26 serviços existentes já com sufixo; nenhuma cobrança criada
+- [ ] Conferir novo Pix na tela e no banco — conta autorizada não abriu tela de Pix pendente; depende do próximo Pix do usuário
+- [ ] Publicar alteração da tela no site oficial — funções já implantadas; frontend ainda não publicado nesta entrega
 
 ## Citações — ajustes finais do teste 6 (08/11/2026)
 - [x] Pedido reiterado às 14:10 UTC revalidado: 38 regressões + 1 consulta real PubMed aprovadas; teste adicional comprova exclusão do registro interno incorreto antes do prompt; funções reimplantadas; provas em docs/CITACOES_TESTE6_REVALIDACAO_2026-11-08.md

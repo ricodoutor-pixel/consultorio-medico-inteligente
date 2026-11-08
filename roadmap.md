@@ -8,6 +8,8 @@
 - [ ] Repetir pergunta e gerar relatório na sala paga pela tela — depende do próximo teste consentido do usuário; nenhum atendimento artificial criado
 
 ## Mensagens WhatsApp duplicadas — 08/11/2026
+- [x] Concluir exclusão mútua durante retentativas dos avisos e impedir repetição em resultado incerto; 19 testes + 32 verificações passam; três funções implantadas, sem mensagens reais
+- [x] Entregar passos da Hostinger em docs/WHATSAPP_ENVIO_UNICO_HOSTINGER_2026-11-08.md; caminho/processo previstos no projeto distinguem-se da VPS não acessada
 - [x] Corrigir proteção ausente no Cloud: tabela de IDs não existia; agora somente uma inserção atômica inicia a resposta e falha de armazenamento bloqueia o envio. brisa-bot implantado; permissões servidor-only conferidas
 - [x] Preparar trava de processo Hostinger, histórico canônico e checagem sem registrar envio antecipadamente; 11 testes + 32 verificações passam, sintaxe válida, compilação OK
 - [ ] Implantar alterações Hostinger — API administrativa acessível (HTTP 200), mas SSH rejeita a chave armazenada por formato inválido; nenhum serviço remoto foi alterado

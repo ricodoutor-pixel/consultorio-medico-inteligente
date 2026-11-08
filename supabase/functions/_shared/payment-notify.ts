@@ -3,6 +3,7 @@
 // uma linha por external_reference em payment_notify_log; cada tentativa fica em
 // payment_notify_attempts com status, código HTTP, erro e duração.
 import { orientationCode } from "./orientation-code.ts";
+import { deliverNotice } from "./notice-delivery.ts";
 
 interface NotifyInput {
   externalReference: string;
@@ -24,8 +25,6 @@ export interface OrientationEventInput {
 }
 
 type Sb = { from: (t: string) => any };
-
-const MAX_ATTEMPTS = 3;
 
 function saoPauloNow(): { data: string; hora: string } {
   const parts = new Intl.DateTimeFormat("pt-BR", {
@@ -85,30 +84,9 @@ async function sendOnce(text: string): Promise<{ ok: boolean; http: number | nul
   }
 }
 
-/** Tenta enviar até 3 vezes, registrando cada tentativa. */
+/** Retries only explicit rate-limit rejections; ambiguous results stay claimed. */
 async function deliver(sb: Sb, logId: string, text: string, logKey: string, trigger: string, startNo: number): Promise<boolean> {
-  let n = startNo;
-  for (let i = 0; i < MAX_ATTEMPTS; i++) {
-    n += 1;
-    const r = await sendOnce(text);
-    await sb.from("payment_notify_attempts").insert({
-      log_id: logId, external_reference: logKey, attempt_no: n, trigger,
-      status: r.ok ? "sent" : "failed", http_status: r.http, error: r.error, duration_ms: r.ms,
-      provider_message_id: r.messageId ?? null,
-    });
-    await sb.from("payment_notify_log").update({
-      status: r.ok ? "sent" : "failed", error: r.error, http_status: r.http,
-      attempts: n, last_attempt_at: new Date().toISOString(),
-      sent_at: r.ok ? new Date().toISOString() : null,
-      provider_message_id: r.messageId ?? null,
-      delivery_status: r.ok ? "accepted" : "failed",
-    }).eq("id", logId);
-    if (r.ok) return true;
-    if (r.error?.startsWith("evolution_not_configured")) return false; // não adianta repetir
-    if (r.http && r.http >= 400 && r.http < 500 && r.http !== 429) return false;
-    await new Promise((s) => setTimeout(s, 1500 * (i + 1)));
-  }
-  return false;
+  return deliverNotice(sb, logId, text, logKey, trigger, startNo, sendOnce);
 }
 
 /**

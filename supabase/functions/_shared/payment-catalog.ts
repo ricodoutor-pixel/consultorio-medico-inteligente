@@ -82,10 +82,7 @@ export async function getPaymentServices(sb: Sb): Promise<Record<string, Payment
 export function sanitizeDescriptor(raw: string): string {
   const clean = raw
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .normalize("NFC")
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .replace(/[^A-Z0-9 ]/g, "")
     .trim()

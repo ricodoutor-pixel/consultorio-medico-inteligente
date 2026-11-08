@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: appointmentId || `pyr-srv-${Date.now()}`,
-      statement_descriptor: "PLANTA Y RAIZ",
+      statement_descriptor: "PLANTAYRAIZ",
       metadata: {
         type: appointmentId ? "consultation" : "service_subscription",
         patient_id: userId,

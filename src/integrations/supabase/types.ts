@@ -6295,6 +6295,36 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_services: {
+        Row: {
+          active: boolean
+          amount_brl: number
+          code: string
+          descriptor: string
+          display_name: string
+          recurring: boolean
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amount_brl: number
+          code: string
+          descriptor?: string
+          display_name: string
+          recurring?: boolean
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amount_brl?: number
+          code?: string
+          descriptor?: string
+          display_name?: string
+          recurring?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_webhooks: {
         Row: {
           action: string | null

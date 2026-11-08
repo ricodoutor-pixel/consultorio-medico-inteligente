@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         items: [{
           title: `Cartão Saúde Verde — ${plan.name}`,
-          description: `Assinatura mensal com até 80% de desconto em saúde`,
+          description: `Assinatura mensal com até 80% de desconto em saúde — Planta y Raiz`,
           quantity: 1,
           currency_id: "BRL",
           unit_price: Number(plan.price_brl),

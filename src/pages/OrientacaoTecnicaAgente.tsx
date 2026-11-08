@@ -1198,6 +1198,10 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                      Pagamento: <strong>Orientação Técnica — Planta y Raiz</strong> · R$ 30,00 · Recebedor: <strong>Planta y Raiz</strong>
+                    </p>
+
+                    <p className="text-xs text-muted-foreground max-w-md mx-auto">
                       Abra o aplicativo do seu banco, escolha <strong>Pix &gt; Ler QR Code</strong> ou use a opção <strong>Pix Copia e Cola</strong>. Não é necessário sair desta página: a triagem abre automaticamente após a confirmação!
                     </p>
 

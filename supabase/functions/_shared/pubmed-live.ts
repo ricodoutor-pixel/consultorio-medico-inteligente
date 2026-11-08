@@ -1,8 +1,11 @@
 import { XMLParser } from "npm:fast-xml-parser@5.12.0";
 
 export interface PubMedArticle {
+  pmid: string;
   title: string;
   authors: string;
+  firstAuthor: string | null;
+  journal: string | null;
   year: number | null;
   url: string;
   doi: string | null;
@@ -73,14 +76,19 @@ export function parsePubMedArticles(xml: string): PubMedArticle[] {
     if (!/^\d+$/.test(pmid) || !title) return [];
     const ids = list(record(row.PubmedData).ArticleIdList && record(record(row.PubmedData).ArticleIdList).ArticleId);
     const doi = ids.find(id => record(id)["@_IdType"] === "doi");
-    const date = record(record(record(article.Journal).JournalIssue).PubDate);
+    const journal = record(article.Journal);
+    const date = record(record(journal.JournalIssue).PubDate);
     const yearMatch = textValue(date.Year || date.MedlineDate).match(/\b(19|20)\d{2}\b/);
+    const authorNames = list(record(article.AuthorList).Author).map(author => {
+      const a = record(author);
+      return textValue(a.CollectiveName) || `${textValue(a.LastName)} ${textValue(a.Initials)}`.trim();
+    }).filter(Boolean);
     return [{
+      pmid,
       title: title.slice(0, 350),
-      authors: list(record(article.AuthorList).Author).map(author => {
-        const a = record(author);
-        return textValue(a.CollectiveName) || `${textValue(a.LastName)} ${textValue(a.Initials)}`.trim();
-      }).filter(Boolean).join(", ").slice(0, 500),
+      authors: authorNames.join(", ").slice(0, 500),
+      firstAuthor: authorNames[0] || null,
+      journal: (textValue(journal.Title) || textValue(journal.ISOAbbreviation) || "").slice(0, 200) || null,
       year: yearMatch ? Number(yearMatch[0]) : null,
       url: `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`,
       doi: doi ? textValue(doi) : null,
@@ -121,7 +129,8 @@ export async function searchLivePubMed(text: string, limit = 3): Promise<PubMedS
     if (ids.length && !articles.length) throw new Error("pubmed_invalid_records");
     const response: PubMedSearchResult = { query, total, checkedAt, status: "ok", articles };
     if (cache.size >= 100) cache.clear();
-    cache.set(cacheKey, { expires: Date.now() + 300_000, result: response });
+    // 24h cache per query: respects NCBI rate limits and keeps answers stable within a day.
+    cache.set(cacheKey, { expires: Date.now() + 86_400_000, result: response });
     return response;
   } catch {
     return { query, total: null, checkedAt, status: "unavailable", articles: [] };

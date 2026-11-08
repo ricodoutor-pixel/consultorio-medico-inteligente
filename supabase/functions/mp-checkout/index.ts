@@ -466,10 +466,10 @@ Deno.serve(async (req) => {
         action: "mp_pix_created",
         table_name: "orientacao_tecnica_orders",
         record_id: String(mpData.id),
-        new_data: { type, amount, external_reference: externalReference, payment_id: mpData.id },
+        new_data: { type, amount, external_reference: externalReference, payment_id: mpData.id, description: title },
       });
 
-      console.info("[mp-checkout] pix_created", { amount, payment_id: mpData.id, status: mpData.status });
+      console.info("[mp-checkout] pix_created", { amount, payment_id: mpData.id, status: mpData.status, description: title });
       return json({
         success: true,
         payment_method: "pix",

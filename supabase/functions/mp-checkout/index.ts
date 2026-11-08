@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
+import { paymentOrderName } from "../_shared/payment-order-name.ts";
 import {
   FALLBACK_DESCRIPTOR,
   formatPaymentName,
@@ -140,7 +141,7 @@ Deno.serve(async (req) => {
       // Shopping / Club (camisetas, canecas, souvenirs, produtos): valor SEMPRE do banco.
       const { data: order } = await supabase
         .from("orders")
-        .select("id, user_id, vendor_id, subtotal, shipping_cost, total, status")
+        .select("id, user_id, vendor_id, subtotal, shipping_cost, total, status, items")
         .eq("id", orderId)
         .maybeSingle();
       if (!order) return json({ error: "Pedido não encontrado" }, 404, req);
@@ -187,13 +188,13 @@ Deno.serve(async (req) => {
         })
         .eq("id", order.id);
 
-      title = "Pedido Shopping — Planta y Raiz";
+      title = paymentOrderName(order.items, "Pedido Shopping");
       externalReference = `order:${order.id}`;
       type = "marketplace_order";
     } else if (cartToken && typeof cartToken === "string") {
       const { data: cart } = await supabase
         .from("prescription_carts")
-        .select("id, patient_id, total_amount, status, cart_token")
+        .select("id, patient_id, total_amount, status, cart_token, items")
         .eq("cart_token", cartToken)
         .maybeSingle();
       if (!cart) return json({ error: "Carrinho não encontrado" }, 404, req);
@@ -201,7 +202,7 @@ Deno.serve(async (req) => {
       if (cart.status !== "pending") return json({ error: "Carrinho não está pendente" }, 400, req);
       amount = round2(Number(cart.total_amount || 0));
       if (!(amount > 0)) return json({ error: "Carrinho sem valor válido" }, 400, req);
-      title = "Compra com Prescrição — Planta y Raiz";
+      title = paymentOrderName(cart.items, "Compra com Prescrição");
       externalReference = `cart:${cart.id}`;
       type = "prescription_cart";
     } else if (appointmentId && typeof appointmentId === "string") {

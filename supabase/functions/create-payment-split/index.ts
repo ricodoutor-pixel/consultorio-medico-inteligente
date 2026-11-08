@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { FALLBACK_DESCRIPTOR, getPaymentServices, resolveDisplayName } from "../_shared/payment-catalog.ts";
 
 const PLATFORM_FEE_CONSULTATION = 0.07; // 7% consultas
 const PLATFORM_FEE_MARKETPLACE = 0.05; // 5% marketplace
@@ -50,7 +51,7 @@ Deno.serve(async (req) => {
     // Fetch appointment details
     const { data: appt, error: apptErr } = await supabase
       .from("appointments")
-      .select("amount, patient_id, doctor_id")
+      .select("amount, patient_id, doctor_id, type")
       .eq("id", appointmentId)
       .single();
 
@@ -81,12 +82,14 @@ Deno.serve(async (req) => {
       .single();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const catalog = await getPaymentServices(supabase);
+    const modalityCode: Record<string, string> = { video: "consulta_video", chat: "consulta_chat", retorno: "retorno_consulta", renovacao: "retorno_consulta", premium: "consulta_premium" };
 
     // Create Mercado Pago preference with marketplace split info in metadata
     const preference = {
       items: [
         {
-          title: `Consulta Cannabis Medicinal - ${doctor?.specialty || "Especialista"}`,
+          title: resolveDisplayName(catalog, modalityCode[String(appt.type)] || "consulta_video"),
           quantity: 1,
           unit_price: totalAmount,
           currency_id: "BRL",
@@ -101,7 +104,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: appointmentId,
-      statement_descriptor: "PLANTA E RAIZ",
+      statement_descriptor: FALLBACK_DESCRIPTOR,
       metadata: {
         appointment_id: appointmentId,
         doctor_id: appt.doctor_id,

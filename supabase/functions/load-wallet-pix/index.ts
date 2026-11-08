@@ -1,5 +1,6 @@
 // Edge: load-wallet-pix — gera PIX para carga de saldo na carteira do Cartão Saúde Plus
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         transaction_amount: value,
-        description: `Carga Carteira Saúde Plus — Planta y Raiz — R$ ${value.toFixed(2)}`,
+        description: formatPaymentName("Carga Carteira Saúde Plus"),
         payment_method_id: "pix",
         payer: { email: user.email },
         external_reference: `wallet_load:${user.id}:${Date.now()}`,

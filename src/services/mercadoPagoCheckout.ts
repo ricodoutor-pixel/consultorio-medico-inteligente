@@ -1,4 +1,5 @@
 import { CartItem } from '@/store/cart';
+import { formatPaymentName } from '../../supabase/functions/_shared/payment-catalog';
 
 export interface CheckoutData {
   items: CartItem[];
@@ -22,7 +23,7 @@ export async function createMercadoPagoPreference(checkoutData: CheckoutData): P
     const preference = {
       items: checkoutData.items.map((item) => ({
         id: item.product.id,
-        title: item.product.title,
+        title: formatPaymentName(item.product.title),
         quantity: item.qty,
         unit_price: item.product.priceValue,
       })),

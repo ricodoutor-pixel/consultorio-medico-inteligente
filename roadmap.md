@@ -1,5 +1,9 @@
 # Roadmap
 
+## Unificação da Orientação Técnica — 08/11/2026
+- [ ] Direcionar todos os acessos à página atual e retirar telas antigas concorrentes, preservando links de retomada, relatórios e registros reais
+- [ ] Testar redirecionamentos e botões em celular e computador sem criar cobrança
+
 ## PubMed e agente compartilhado — 07/11/2026
 - [x] Verificar Gemini 3.8 na Orientação (logs reais) e pesquisa PubMed real (ESearch/EFetch, resumos e contagens medidas)
 - [x] Compartilhar recuperação científica segura com copiloto médico Gemini 3.8, preservando supervisão humana; remover triagem simulada enviada ao agente no Workspace

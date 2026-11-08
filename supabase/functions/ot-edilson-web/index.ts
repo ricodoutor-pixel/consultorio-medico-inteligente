@@ -437,8 +437,24 @@ Deno.serve(async (req) => {
         return json({ closed: true, state: "completed", farewell: FAREWELL_MESSAGE });
       }
 
-      // Busca contexto científico
-      const evidence = await buildScientificContextBlock(userText, 3).catch(() => "");
+      // Busca contexto científico (biblioteca interna + PubMed em tempo real).
+      // Auditoria: registra apenas os termos clínicos genéricos enviados ao PubMed,
+      // a hora e o total — nunca texto livre do paciente.
+      const evidence = await buildScientificContextBlock(userText, 3, {
+        onPubMedResult: (result) => {
+          if (!result.query) return;
+          const auditInsert = sb.from("pubmed_query_audit").insert({
+            session_id: sess.id,
+            source: "orientacao",
+            query: result.query,
+            total: result.total,
+            status: result.status,
+          });
+          const waitUntil = (globalThis as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } }).EdgeRuntime?.waitUntil;
+          if (waitUntil) waitUntil(auditInsert.then(() => undefined));
+          else auditInsert.then(() => undefined);
+        },
+      }).catch(() => "");
 
       // Busca médicos reais cadastrados na vitrine (para encaminhamento humanizado sem veterinários)
       const { data: realDocs } = await sb

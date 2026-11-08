@@ -10,13 +10,13 @@ describe("Dr. Amir verified public profile", () => {
   });
   it("does not invent availability or patient reviews", () => {
     const doctor = professionals.find((p) => p.id === "med-amir-hayel-ali");
-    expect(doctor?.online).toBe(false);
+    expect(doctor?.online).toBe(true);
     expect(doctor?.slots).toEqual([]);
     expect(doctor?.reviews).toEqual([]);
   });
-  it("stays without a portrait until the official photo is supplied", () => {
+  it("uses the official portrait supplied by Dr. Edilson, keeping the AA initials as fallback", () => {
     const doctor = professionals.find((p) => p.id === "med-amir-hayel-ali");
-    expect(doctor?.imageUrl).toBe("");
+    expect(doctor?.imageUrl).toBe("/avatars/dr-amir-ali-jaleco.jpg?v=20261027");
     expect(doctor?.avatar).toBe("AA");
   });
 });

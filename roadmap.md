@@ -159,3 +159,17 @@
 
 - [x] Resolver aviso de qualidade pendente no monitoramento (explicar causa e correção)
 - [x] QR Code para instalar o app em qualquer aparelho + opção de baixar
+
+## Últimos detalhes da Orientação Técnica (teste de 08/11/2026)
+
+- [x] 1. Honestidade sobre a base: agente diz "consulto o PubMed em tempo real e uma biblioteca interna curada", sem número fixo nem "treinado"; citações rotuladas [PubMed]/[Biblioteca interna]
+- [x] 2. Citações verificadas: PMID, primeiro autor, ano e revista vêm do registro do PubMed; cache de 24h; PMID 29307505 confirmado (MacCallum & Russo, Eur J Intern Med, 2018)
+- [x] 3. Privacidade: só termos clínicos genéricos saem ao PubMed; auditoria por atendimento em pubmed_query_audit (termos, hora, total)
+- [x] 4. Totais só de chamada real à API, com termo e data da busca
+- [x] 5. Níveis de evidência sempre com desfecho e população; proibido "a ciência prova"/"comprovado"
+- [x] 6. Painel de Notificações já mostra pagamento/início/encerramento com horário, status e tentativas
+- [x] 7. Links antigos PRZ-/PLR-/PLANTA- mapeiam para o mesmo código; códigos de indicação só nascem no servidor (removidos geradores do navegador)
+- [x] 8. PDF baixa como .pdf com o código do atendimento no nome (verificado no código)
+- [x] 9. Sem pergunta após despedida ou resposta objetiva; "você" sempre; sem evidência → "não encontrei estudo confiável sobre isso" + sugerir médico
+- [ ] Conta de paciente de teste separada — pendente: exige cadastro comum no site (não crio usuário de autenticação por fora)
+- [ ] Publicar frontend e repetir o teste completo com Pix real — depende do Dr. Edilson

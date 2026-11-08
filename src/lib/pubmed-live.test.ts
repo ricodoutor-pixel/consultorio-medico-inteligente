@@ -19,7 +19,11 @@ describe("shared PubMed knowledge retrieval", () => {
     expect(query).toContain("cannabidiol[Title/Abstract]");
   });
   it("preserves genuine abstract, PMID, authors, year and publication type", () => {
-    expect(parsePubMedArticles(xml)[0]).toMatchObject({ year: 2019, authors: "Shannon S", url: "https://pubmed.ncbi.nlm.nih.gov/30624194/", abstract: "Observed results, not a randomized trial.", publicationTypes: ["Case Reports"] });
+    expect(parsePubMedArticles(xml)[0]).toMatchObject({ pmid: "30624194", year: 2019, authors: "Shannon S", firstAuthor: "Shannon S", url: "https://pubmed.ncbi.nlm.nih.gov/30624194/", abstract: "Observed results, not a randomized trial.", publicationTypes: ["Case Reports"] });
+  });
+  it("reads the journal title from the PubMed record", () => {
+    const withJournal = xml.replace("<Journal><JournalIssue>", "<Journal><Title>The Permanente Journal</Title><JournalIssue>");
+    expect(parsePubMedArticles(withJournal)[0].journal).toBe("The Permanente Journal");
   });
   it("leaves missing abstracts empty rather than substituting journal or title", () => {
     expect(parsePubMedArticles(xml.replace(/<Abstract>.*?<\/Abstract>/, ""))[0].abstract).toBe("");

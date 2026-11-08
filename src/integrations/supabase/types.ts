@@ -1252,6 +1252,24 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_processed_messages: {
+        Row: {
+          processed_at: string
+          remote_jid: string
+          wa_message_id: string
+        }
+        Insert: {
+          processed_at?: string
+          remote_jid: string
+          wa_message_id: string
+        }
+        Update: {
+          processed_at?: string
+          remote_jid?: string
+          wa_message_id?: string
+        }
+        Relationships: []
+      }
       brisa_triage_severity: {
         Row: {
           created_at: string

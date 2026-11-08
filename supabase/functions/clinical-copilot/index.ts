@@ -3,6 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { generateChatCompletion, GatewayError } from "npm:@lovable.dev/ai-gateway@0.1.11";
 import type {} from "../_shared/generated/ai-gateway/models.d.ts";
 import { buildScientificContextBlock } from "../_shared/scientific-context.ts";
+import { verifyCopilotResponse } from "../_shared/copilot-citations.ts";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 serve(async (req) => {
@@ -79,7 +80,8 @@ Não deduza doses a partir de metadados nem invente esquemas sem suporte. Quando
     });
     const generated = res.choices?.[0]?.message?.content?.trim();
     if (!generated) return new Response(JSON.stringify({ error: "Resposta de IA indisponível" }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    return new Response(JSON.stringify({ success: true, result: generated, source: "google/gemini-3.8-flash" }), {
+    const verifiedResponse = await verifyCopilotResponse(generated);
+    return new Response(JSON.stringify(verifiedResponse), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 

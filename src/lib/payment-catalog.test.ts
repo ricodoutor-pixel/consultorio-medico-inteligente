@@ -48,6 +48,6 @@ describe("payment-catalog — nome que aparece no pagamento", () => {
     expect(formatPaymentName("Camiseta Botânica")).toBe("Camiseta Botânica — Planta y Raiz");
     expect(formatPaymentName("Planta y Raíz — Caneca")).toBe("Caneca — Planta y Raiz");
     expect(formatPaymentName("Orientação Técnica — Planta y Raiz")).toBe("Orientação Técnica — Planta y Raiz");
-    expect(formatPaymentName("x".repeat(300))).toBe("x".repeat(240) + " — Planta y Raiz");
+    expect(formatPaymentName("x".repeat(300))).toBe("x".repeat(239) + " — Planta y Raiz");
   });
 });

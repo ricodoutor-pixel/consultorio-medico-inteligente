@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { buildSearchQuery, normalizeDoi, validateDoi, validatePubmed } from "../../supabase/functions/_shared/scientific-context";
+import { buildSearchQuery, normalizeDoi, validateDoi, validatePubmed, fetchScientificEvidence } from "../../supabase/functions/_shared/scientific-context";
 
 afterEach(() => vi.unstubAllGlobals());
 describe("scientific evidence", () => {
@@ -20,5 +20,19 @@ describe("scientific evidence", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(new Response("", { status: 404 })).mockResolvedValueOnce(new Response(JSON.stringify({ result: { "39394179": { uid: "39394179", title: "Review" } } }))));
     expect(await validateDoi("10.1177/15347354241292978")).toBe(false);
     expect(await validatePubmed("https://pubmed.ncbi.nlm.nih.gov/39394179/")).toBe(true);
+  });
+  it("excludes an internal CBD anxiety claim when PMID 35112940 resolves to unrelated forensic metadata", async () => {
+    // Local test-only values; no hosted database or patient data is accessed.
+    vi.stubGlobal("Deno", { env: { get: (name: string) => ({ SUPABASE_URL: "https://example.invalid", SUPABASE_SERVICE_ROLE_KEY: "test-only" })[name] } });
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify([{
+        title: "Cannabidiol randomized trial for anxiety by Berger", authors: "Berger", year: 2022,
+        url: "https://pubmed.ncbi.nlm.nih.gov/35112940/", abstract: "Cannabidiol improves anxiety", doi: null,
+      }])))
+      .mockResolvedValueOnce(new Response(`<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>35112940</PMID><Article><ArticleTitle>Trauma in forensic evaluations</ArticleTitle><Abstract><AbstractText>Forensic assessment of trauma</AbstractText></Abstract><AuthorList><Author><LastName>Roberts</LastName><Initials>JM</Initials></Author></AuthorList><PublicationTypeList><PublicationType>Journal Article</PublicationType></PublicationTypeList></Article></MedlineCitation></PubmedArticle></PubmedArticleSet>`));
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await fetchScientificEvidence("Quais ensaios clínicos randomizados avaliaram canabidiol em transtorno de ansiedade?"))
+      .toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

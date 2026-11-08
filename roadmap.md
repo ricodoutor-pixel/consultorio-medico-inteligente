@@ -1,8 +1,10 @@
 # Roadmap
 
 ## Mensagens WhatsApp duplicadas — 08/11/2026
-- [ ] Identificar repetição nos registros, corrigir o envio concorrente e testar sem disparar mensagens não solicitadas
-- [ ] Implantar a correção e comprovar ausência de duplicação no próximo evento real
+- [x] Corrigir proteção ausente no Cloud: tabela de IDs não existia; agora somente uma inserção atômica inicia a resposta e falha de armazenamento bloqueia o envio. brisa-bot implantado; permissões servidor-only conferidas
+- [x] Preparar trava de processo Hostinger, histórico canônico e checagem sem registrar envio antecipadamente; 11 testes + 32 verificações passam, sintaxe válida, compilação OK
+- [ ] Implantar alterações Hostinger — API administrativa acessível (HTTP 200), mas SSH rejeita a chave armazenada por formato inválido; nenhum serviço remoto foi alterado
+- [ ] Comprovar ausência de duplicação no WhatsApp real — logs antigos do bot não registram mensagens atuais; avisos recentes de pagamento/início/fim têm um único envio aceito por evento. Depende de implantação Hostinger e próximo evento real
 
 ## Copiloto e leituras protegidas — 08/11/2026
 - [x] Copiloto implantado: resposta retida até conferir PMID; linhas bibliográficas substituídas por autoria/metadados PubMed, citações indisponíveis omitidas; SOAP sem citações preservado

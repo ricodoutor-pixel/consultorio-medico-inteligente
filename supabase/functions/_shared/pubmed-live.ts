@@ -47,9 +47,15 @@ const CANNABIS_QUERY = '("medical cannabis"[Title/Abstract] OR cannabinoids[Titl
 export function buildPrivatePubMedQuery(text: string): string | null {
   const terms = CLINICAL_TERMS.filter(([re]) => re.test(text)).map(([, term]) => term).slice(0, 4);
   if (!terms.length && !/cannabis|canabino|cannabino|canabidiol|cannabidiol|\bcbd\b|\bthc\b|pubmed/i.test(text)) return null;
-  return terms.length
+  const base = terms.length
     ? `${CANNABIS_QUERY} AND (${terms.map(term => `"${term}"[Title/Abstract]`).join(" AND ")})`
     : CANNABIS_QUERY;
+  // Study-type filters: without them PubMed relevance ranks reviews first and the RCT gate discards everything.
+  // Filtered trial lists also require the clinical topic in the title, so off-topic trials don't fill the 5 slots.
+  const focused = terms.length ? `${base} AND (${terms.map(term => `"${term}"[Title]`).join(" AND ")})` : base;
+  if (/randomiz|randomis|aleatoriz|\brct\b/i.test(text)) return `${focused} AND "randomized controlled trial"[Publication Type]`;
+  if (/ensaios? cl[ií]nicos?|clinical trials?/i.test(text)) return `${focused} AND "clinical trial"[Publication Type]`;
+  return base;
 }
 
 const env = (name: string): string => {
@@ -66,7 +72,7 @@ const textValue = (value: unknown): string => {
 };
 
 export function parsePubMedArticles(xml: string): PubMedArticle[] {
-  const parsed = new XMLParser({ ignoreAttributes: false, processEntities: true }).parse(xml);
+  const parsed = new XMLParser({ ignoreAttributes: false, processEntities: true, htmlEntities: true }).parse(xml);
   return list(parsed?.PubmedArticleSet?.PubmedArticle).flatMap(item => {
     const row = record(item);
     const citation = record(row.MedlineCitation);
@@ -102,7 +108,8 @@ export async function searchLivePubMed(text: string, limit = 3): Promise<PubMedS
   const query = buildPrivatePubMedQuery(text);
   const checkedAt = new Date().toISOString();
   if (!query) return { query: "", total: null, checkedAt, status: "no_clinical_terms", articles: [] };
-  const boundedLimit = Math.max(1, Math.min(5, Math.floor(limit) || 3));
+  const studyFiltered = /\[Publication Type\]/.test(query);
+  const boundedLimit = studyFiltered ? 5 : Math.max(1, Math.min(5, Math.floor(limit) || 3));
   const cacheKey = `${query}:${boundedLimit}`;
   const cached = cache.get(cacheKey);
   if (cached && cached.expires > Date.now()) return cached.result;

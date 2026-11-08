@@ -43,3 +43,16 @@ describe("shared PubMed knowledge retrieval", () => {
     expect(result.total).toBeNull();
   });
 });
+describe("study-type filter", () => {
+  it("adds the RCT publication-type filter and topic-in-title when randomized trials are requested", () => {
+    const q = buildPrivatePubMedQuery("Quais ensaios clínicos randomizados avaliaram canabidiol em transtorno de ansiedade?")!;
+    expect(q).toContain('"randomized controlled trial"[Publication Type]');
+    expect(q).toContain('"anxiety"[Title]');
+  });
+  it("adds the clinical trial filter for 'ensaio clínico' without randomization", () => {
+    expect(buildPrivatePubMedQuery("ensaio clínico de CBD para insônia")).toContain('"clinical trial"[Publication Type]');
+  });
+  it("keeps plain questions unfiltered", () => {
+    expect(buildPrivatePubMedQuery("CBD ansiedade")).not.toContain("[Publication Type]");
+  });
+});

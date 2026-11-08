@@ -32,7 +32,7 @@ export default function CheckoutReturn() {
                       <p className="text-sm font-medium text-foreground">Agende sua Orientação Técnica</p>
                       <p className="text-xs text-muted-foreground">Escolha o melhor horário com seu especialista.</p>
                       <Button size="sm" variant="outline" asChild className="w-full">
-                        <Link to="/falar-com-especialista">Agendar</Link>
+                        <Link to="/orientacao-tecnica">Agendar</Link>
                       </Button>
                     </CardContent>
                   </Card>

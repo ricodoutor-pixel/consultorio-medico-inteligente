@@ -42,7 +42,6 @@ CFM 2.314/2022 (telemedicina) · ANVISA RDC 660/2022 (importação) · ANVISA RD
 - [Como Funciona](/como-funciona): Passo a passo da teleconsulta e prescrição ANVISA.
 - [Telemedicina](/telemedicina): Atendimento online 24/7 com especialistas.
 - [Orientação Técnica](/orientacao-tecnica): Consulta digital sob supervisão da Dra. Suelen Rodrigues (CRM 49354/PR) com rede de médicos prescritores habilitados.
-- [Brisa Orientação](/brisa-orientacao): Triagem inteligente por IA antes da consulta.
 - [Shopping](/shopping): Marketplace de óleos CBD, cápsulas e acessórios verificados.
 - [Tratamentos](/tratamentos): Indicações para ansiedade, dor crônica, epilepsia, fibromialgia, insônia, Parkinson, autismo, TDAH, depressão, esclerose múltipla.
 - [SEO Condições](/seo-condicoes): Hub de condições clínicas atendidas.

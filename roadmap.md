@@ -1,5 +1,11 @@
 # Roadmap
 
+## Unificação da Orientação Técnica — 08/11/2026
+- [x] Direcionar entradas de orientação da vitrine, menu de serviços, painel, ações rápidas, download, quiz e retorno de pagamento à página atual; retirar OrientacaoRapida, BrisaOrientacaoRedirect e OfertaEspecial
+- [x] Endereços antigos redirecionam preservando pedidos, indicação e sessão; relatórios e dados reais intactos; atalhos do app e sitemap atualizados
+- [x] 16 testes passam; sete endereços antigos e botão da vitrine testados em celular e computador, sem cobranças nem erros de execução; compilação OK
+- [ ] Disponibilizar unificação no site oficial — depende de publicação; teste pago permanece aguardando aviso do Dr. Edilson
+
 ## PubMed e agente compartilhado — 07/11/2026
 - [x] Verificar Gemini 3.8 na Orientação (logs reais) e pesquisa PubMed real (ESearch/EFetch, resumos e contagens medidas)
 - [x] Compartilhar recuperação científica segura com copiloto médico Gemini 3.8, preservando supervisão humana; remover triagem simulada enviada ao agente no Workspace

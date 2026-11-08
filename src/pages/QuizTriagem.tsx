@@ -260,7 +260,7 @@ const QuizTriagem = () => {
 
             <div className="grid gap-3">
               <Button
-                onClick={() => navigate("/agendamento")}
+                onClick={() => navigate("/orientacao-tecnica")}
                 className="w-full gap-2 bg-gradient-to-r from-primary to-secondary text-primary-foreground h-12"
               >
                 <Zap className="w-5 h-5" /> Agendar Orientação Técnica Agora

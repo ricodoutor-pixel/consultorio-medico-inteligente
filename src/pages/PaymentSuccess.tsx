@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { PostConsultationViralLoop } from "@/components/PostConsultationViralLoop";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { orientationEntryUrl } from "@/lib/orientation-navigation";
 
 const PaymentSuccess = () => {
   const [orientationStatus, setOrientationStatus] = useState<"checking" | "approved" | "pending" | "other">("other");
@@ -29,8 +30,6 @@ const PaymentSuccess = () => {
     return () => { active = false; };
   }, [isOrientation, ref]);
 
-  const officialWhatsApp = (import.meta.env.VITE_DOCTOR_WHATSAPP_NUMBER || "5511991363154").replace(/\D/g, "");
-
   return (
   <div className="min-h-dvh bg-background">
     <Navbar />
@@ -42,7 +41,7 @@ const PaymentSuccess = () => {
           <p className="text-muted-foreground max-w-md mx-auto">{orientationStatus === "checking" ? "Estamos confirmando seu pagamento..." : orientationStatus === "pending" ? "O Mercado Pago ainda está confirmando seu pagamento. Você receberá uma mensagem assim que for aprovado." : "Seu pagamento foi processado com sucesso. Você receberá uma confirmação por e-mail e WhatsApp."}</p>
           {orientationStatus === "checking" && <Loader2 className="mx-auto animate-spin text-primary" />}
           {orientationStatus === "approved" ? (
-            <Button asChild className="bg-primary text-primary-foreground"><a href={`https://wa.me/${officialWhatsApp}?text=${encodeURIComponent(`Olá, meu pagamento foi confirmado. Pedido: ${ref}. Quero iniciar minha Orientação Técnica.`)}`} target="_blank" rel="noreferrer"><MessageCircle className="mr-2" />Iniciar Orientação Técnica</a></Button>
+            <Button asChild className="bg-primary text-primary-foreground"><Link to={orientationEntryUrl(`?ref=${encodeURIComponent(ref)}`)}><MessageCircle className="mr-2" />Iniciar Orientação Técnica</Link></Button>
           ) : (
             <Button asChild className="bg-primary text-primary-foreground"><Link to="/dashboard">Ir para o Painel</Link></Button>
           )}

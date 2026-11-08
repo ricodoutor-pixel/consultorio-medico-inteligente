@@ -19,7 +19,7 @@ const urls = [
   { loc: "/saude-verde", priority: "0.8", changefreq: "weekly" },
   { loc: "/saude-verde/rede", priority: "0.8", changefreq: "weekly" },
   { loc: "/saude-verde/cartao", priority: "0.8", changefreq: "monthly" },
-  { loc: "/brisa-orientacao", priority: "0.8", changefreq: "weekly" },
+  { loc: "/orientacao-tecnica", priority: "0.8", changefreq: "weekly" },
   { loc: "/telemed-whatsapp", priority: "0.8", changefreq: "weekly" },
 
   // Nível 3 - Tratamentos e Condições Específicas (0.8 - SEO Alto)

@@ -426,7 +426,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                 <Link to="/telemed-whatsapp"><MessageCircle size={14} className="mr-1" /> Telemed WhatsApp</Link>
               </Button>
               <Button size="sm" className="rounded-xl text-xs bg-primary text-primary-foreground" asChild>
-                <a href={`https://wa.me/5511991363154?text=${encodeURIComponent(`Olá Enfermeira Brisa, ${profile?.full_name || "sou paciente"}, gostaria de iniciar uma nova Orientação Técnica.`)}`} target="_blank" rel="noopener noreferrer"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</a>
+                <Link to="/orientacao-tecnica"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</Link>
               </Button>
             </div>
           </motion.div>
@@ -605,7 +605,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                         <Stethoscope size={32} className="text-muted-foreground mx-auto mb-3" />
                         <p className="text-sm text-muted-foreground">Nenhuma consulta ainda.</p>
                         <Button size="sm" className="mt-3 rounded-xl bg-primary text-primary-foreground" asChild>
-                          <a href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Brisa, quero agendar minha primeira Orientação Técnica.")}`} target="_blank" rel="noopener noreferrer">Agendar Primeira Orientação Técnica</a>
+                          <Link to="/orientacao-tecnica">Agendar Primeira Orientação Técnica</Link>
                         </Button>
                       </div>
                     ) : (
@@ -1028,7 +1028,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                     <p className="text-sm text-muted-foreground">Nenhuma triagem realizada.</p>
                     <p className="text-xs text-muted-foreground mt-1">Use a Brisa IA para fazer sua triagem antes de agendar.</p>
                     <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
-                      <a href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Brisa, quero iniciar minha triagem.")}`} target="_blank" rel="noopener noreferrer">Iniciar Triagem</a>
+                      <Link to="/orientacao-tecnica">Iniciar Triagem</Link>
                     </Button>
                   </CardContent>
                 </Card>

@@ -43,10 +43,10 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
 
   const handleSelect = async (item: ServiceMenuItem) => {
     // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
-    // leva à seção explicativa da landing, que conduz triagem → pagamento → sala.
+    // leva à página única, que conduz pagamento → triagem → sala.
     // Não exige sessão aqui — a própria página trata login.
     if (item.redirectToEdilson) {
-      navigate("/telemedicina#orientacao-tecnica");
+      navigate("/orientacao-tecnica");
       return;
     }
 

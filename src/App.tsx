@@ -34,6 +34,7 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
 import { AccountProvider } from "@/contexts/AccountContext";
 import { PageScrollReset } from "@/components/PageScrollReset";
+import { OrientationEntryRedirect } from "@/components/OrientationEntryRedirect";
 import { MasterPortalSwitcher } from "@/components/MasterPortalSwitcher";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
@@ -131,7 +132,6 @@ const LegacyVideoCallRedirect = () => {
   const location = useLocation();
   return <Navigate to={`/orientacao-video${location.search}`} replace />;
 };
-const OrientacaoRapida = lazyWithRecovery(() => import("./pages/OrientacaoRapida"), { sourceRef: "/orientacao-rapida" });
 const OrientacaoTecnicaAgente = lazyWithRecovery(() => import("./pages/OrientacaoTecnicaAgente"), { sourceRef: "/orientacao-tecnica" });
 const OrientacaoRelatorio = lazyWithRecovery(() => import("./pages/OrientacaoRelatorio"), { sourceRef: "/orientacao-tecnica/relatorio/:id" });
 const FluxoAtendimento = lazyWithRecovery(() => import("./pages/FluxoAtendimento"), { sourceRef: "/atendimento" });
@@ -187,7 +187,6 @@ const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelD
 const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
 const BrisaOrientacoes = lazyWithRecovery(() => import("./pages/admin/BrisaOrientacoes"), { sourceRef: "/admin/brisa-orientacoes" });
 const OrientacaoAoVivo = lazyWithRecovery(() => import("./pages/admin/OrientacaoAoVivo"), { sourceRef: "/admin/orientacao-ao-vivo" });
-const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
 const AdminComprovantesPagamento = lazyWithRecovery(() => import("./pages/admin/AdminComprovantesPagamento"), { sourceRef: "/admin/comprovantes-pagamento" });
@@ -204,7 +203,6 @@ const CheckoutReturn = lazyWithRecovery(() => import("./pages/CheckoutReturn"), 
 const GestaoPacientes = lazyWithRecovery(() => import("./pages/GestaoPacientes"), { sourceRef: "/gestao-pacientes" });
 const NotFound = lazyWithRecovery(() => import("./pages/NotFound"), { sourceRef: "*" });
 const RodizioMedicos = lazyWithRecovery(() => import("./pages/RodizioMedicos"), { sourceRef: "/rodizio" });
-const BrisaOrientacaoRedirect = lazyWithRecovery(() => import("./pages/BrisaOrientacaoRedirect"), { sourceRef: "/brisa-orientacao" });
 const AuditLog = lazyWithRecovery(() => import("./pages/admin/AuditLog"), { sourceRef: "/admin/audit-log" });
 const CronHealth = lazyWithRecovery(() => import("./pages/admin/CronHealth"), { sourceRef: "/admin/cron-health" });
 const RemoteCommandLog = lazyWithRecovery(() => import("./pages/admin/RemoteCommandLog"), { sourceRef: "/admin/remote-commands" });
@@ -354,7 +352,8 @@ const App = () => (
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
                 <Route path="/telemedicina" element={<Telemedicina />} />
                 <Route path="/rodizio" element={<RodizioMedicos />} />
-                <Route path="/brisa-orientacao" element={<BrisaOrientacaoRedirect />} />
+                <Route path="/brisa-orientacao" element={<OrientationEntryRedirect />} />
+                <Route path="/triagem" element={<OrientationEntryRedirect />} />
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
@@ -432,11 +431,11 @@ const App = () => (
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<AdminRoute><InvestorDashboard /></AdminRoute>} />
                 <Route path="/videochamada" element={<LegacyVideoCallRedirect />} />
-                <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
-                <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
+                <Route path="/orientacao-rapida" element={<OrientationEntryRedirect />} />
+                <Route path="/consulta-rapida" element={<OrientationEntryRedirect />} />
                 <Route path="/orientacao-tecnica" element={<OrientacaoTecnicaAgente />} />
-                <Route path="/orientacao-tecnica/chat" element={<OrientacaoTecnicaAgente />} />
-                <Route path="/orientacao-tecnica/chat/:sessionId" element={<OrientacaoTecnicaAgente />} />
+                <Route path="/orientacao-tecnica/chat" element={<OrientationEntryRedirect />} />
+                <Route path="/orientacao-tecnica/chat/:sessionId" element={<OrientationEntryRedirect />} />
                 <Route path="/orientacao-tecnica/relatorio/:id" element={<OrientacaoRelatorio />} />
                 <Route path="/atendimento" element={<FluxoAtendimento />} />
 
@@ -512,7 +511,7 @@ const App = () => (
                 <Route path="/admin/medicos-online" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/medicos" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
-                <Route path="/oferta-especial" element={<OfertaEspecial />} />
+                <Route path="/oferta-especial" element={<OrientationEntryRedirect />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />

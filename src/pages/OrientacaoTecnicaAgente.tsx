@@ -1198,7 +1198,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                      Pagamento: <strong>Orientação Técnica — Planta y Raiz</strong> · R$ 30,00 · Recebedor: <strong>Planta y Raiz</strong>
+                      Pagamento: <strong>Orientação Técnica — Planta y Raiz</strong> · R$ 30,00 · Recebedor: <strong>Doutor Rico Ltda</strong>
                     </p>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">

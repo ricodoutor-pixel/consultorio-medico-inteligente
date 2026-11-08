@@ -1,5 +1,10 @@
 # Roadmap
 
+## Copiloto e leituras protegidas — 08/11/2026
+- [ ] Conferir PMID e autoria no PubMed antes de entregar respostas do copiloto, preservando o formato clínico
+- [ ] Fechar acesso anônimo aos três catálogos e restringir experiências, sem alterar Orientação ou pagamentos
+- [ ] Testar regras e acessos reais, implantar copiloto e conferir novamente os quatro achados
+
 ## Unificação da Orientação Técnica — 08/11/2026
 - [x] Direcionar entradas de orientação da vitrine, menu de serviços, painel, ações rápidas, download, quiz e retorno de pagamento à página atual; retirar OrientacaoRapida, BrisaOrientacaoRedirect e OfertaEspecial
 - [x] Endereços antigos redirecionam preservando pedidos, indicação e sessão; relatórios e dados reais intactos; atalhos do app e sitemap atualizados

@@ -23,7 +23,8 @@ describe("scientific evidence", () => {
   });
   it("excludes an internal CBD anxiety claim when PMID 35112940 resolves to unrelated forensic metadata", async () => {
     // Local test-only values; no hosted database or patient data is accessed.
-    vi.stubGlobal("Deno", { env: { get: (name: string) => ({ SUPABASE_URL: "https://example.invalid", SUPABASE_SERVICE_ROLE_KEY: "test-only" })[name] } });
+    const testEnv: Record<string, string> = { SUPABASE_URL: "https://example.invalid", SUPABASE_SERVICE_ROLE_KEY: "test-only" };
+    vi.stubGlobal("Deno", { env: { get: (name: string) => testEnv[name] } });
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(new Response(JSON.stringify([{
         title: "Cannabidiol randomized trial for anxiety by Berger", authors: "Berger", year: 2022,

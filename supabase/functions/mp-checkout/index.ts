@@ -1,5 +1,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
+import {
+  FALLBACK_DESCRIPTOR,
+  getPaymentServices,
+  resolveDisplayName,
+  type PaymentService,
+} from "../_shared/payment-catalog.ts";
 
 const ALLOWED_ORIGINS = [
   "https://plantayraiz.com.br",
@@ -36,42 +42,12 @@ const json = (body: unknown, status = 200, req?: Request) => {
 
 /**
  * Catálogo autoritativo (server-side). O cliente NUNCA envia preço.
+ * Nomes exibidos ao pagador, valores e descritor da fatura vêm da tabela
+ * única public.payment_services (ver _shared/payment-catalog.ts).
  * Tabela oficial 2026-08-03:
  *  serviços → Orientação R$30 · Retorno R$90 · Chat R$100 · Vídeo R$150
  *  planos   → 3 planos universais (paciente/médico/lojista) a R$99/mês
  */
-const CATALOG: Record<string, { title: string; amount: number; recurring?: boolean }> = {
-  orientacao_tecnica: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
-  orientacao: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
-  retorno_consulta: { title: "Retorno de Consulta — Planta y Raíz Ltda", amount: 90 },
-  consulta_chat: { title: "Consulta por Chat — Planta y Raíz Ltda", amount: 100 },
-  consulta_video: { title: "Consulta por Vídeo — Planta y Raíz Ltda", amount: 150 },
-  consulta_premium: { title: "Consulta Premium — Planta y Raíz Ltda", amount: 180 },
-  consulta_canabinoide: { title: "Consulta Especializada — Planta y Raíz Ltda", amount: 250 },
-  plano_paciente: { title: "Plano Paciente — Planta y Raíz Ltda", amount: 99, recurring: true },
-  plano_medico: { title: "Plano Médico — Planta y Raíz Ltda", amount: 99, recurring: true },
-  plano_lojista: { title: "Plano Lojista — Planta y Raíz Ltda", amount: 99, recurring: true },
-  plano_basic: { title: "Plano Individual Básico — Planta y Raíz Ltda", amount: 49.90, recurring: true },
-  plano_professional: { title: "Plano Médico Profissional — Planta y Raíz Ltda", amount: 99.90, recurring: true },
-  plano_premium: { title: "Plano Saúde Verde Família — Planta y Raíz Ltda", amount: 199.90, recurring: true },
-  plano_enterprise: { title: "Plano Empresa & Parceiros — Planta y Raíz Ltda", amount: 499.90, recurring: true },
-};
-
-/** Módulos/apps de monitoramento do Consultório Digital (preço server-side). */
-const TOOL_CATALOG: Record<string, { title: string; amount: number }> = {
-  tool_combo_tools: { title: "Combo 11 Módulos (Consultório Digital)", amount: 97 },
-  tool_cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
-  tool_fundoscopia: { title: "Módulo Fundo de Olho (Fundoscopia)", amount: 29.9 },
-  tool_oximetria: { title: "Módulo Oximetria Óptica (SpO2)", amount: 29.9 },
-  tool_dermatoscopia: { title: "Módulo Dermatoscopia Digital", amount: 29.9 },
-  tool_mobilidade: { title: "Módulo Mobilidade Articular", amount: 29.9 },
-  tool_estetoscopio: { title: "Módulo Estetoscópio Digital IA", amount: 29.9 },
-  tool_pulmonar: { title: "Módulo Ausculta Pulmonar IA", amount: 29.9 },
-  tool_tremor: { title: "Módulo Tremorometria IA", amount: 29.9 },
-  tool_urine: { title: "Módulo Urinálise IA", amount: 29.9 },
-  tool_acuity: { title: "Módulo Acuidade Visual", amount: 29.9 },
-  tool_gps: { title: "Módulo Rastreador GPS Cardíaco", amount: 29.9 },
-};
 
 /** Taxas oficiais de intermediação. */
 const FEE_TELEMEDICINE = 0.07; // 7% plataforma / 93% profissional

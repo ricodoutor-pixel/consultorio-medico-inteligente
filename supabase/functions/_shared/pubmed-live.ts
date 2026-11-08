@@ -72,7 +72,7 @@ const textValue = (value: unknown): string => {
 };
 
 export function parsePubMedArticles(xml: string): PubMedArticle[] {
-  const parsed = new XMLParser({ ignoreAttributes: false, processEntities: true }).parse(xml);
+  const parsed = new XMLParser({ ignoreAttributes: false, processEntities: true, htmlEntities: true }).parse(xml);
   return list(parsed?.PubmedArticleSet?.PubmedArticle).flatMap(item => {
     const row = record(item);
     const citation = record(row.MedlineCitation);

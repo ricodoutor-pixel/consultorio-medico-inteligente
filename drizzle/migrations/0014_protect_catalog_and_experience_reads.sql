@@ -1,0 +1,16 @@
+REVOKE SELECT ON public.strains_library, public.strain_images, public.verdinho_knowledge, public.user_experiences FROM anon, PUBLIC;
+GRANT SELECT ON public.strains_library, public.strain_images, public.verdinho_knowledge, public.user_experiences TO authenticated;
+GRANT ALL ON public.strains_library, public.strain_images, public.verdinho_knowledge, public.user_experiences TO service_role;
+ALTER TABLE public.strains_library ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.strain_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.verdinho_knowledge ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_experiences ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can view strains library" ON public.strains_library;
+CREATE POLICY "Signed in users read strains library" ON public.strains_library FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Anyone can view strain images" ON public.strain_images;
+CREATE POLICY "Signed in users read strain images" ON public.strain_images FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Anyone can view verdinho knowledge" ON public.verdinho_knowledge;
+CREATE POLICY "Signed in users read verdinho knowledge" ON public.verdinho_knowledge FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Anyone can view experiences" ON public.user_experiences;
+DROP POLICY IF EXISTS "Authenticated users can view experiences" ON public.user_experiences;
+CREATE POLICY "Users read own experiences" ON public.user_experiences FOR SELECT TO authenticated USING (auth.uid() = user_id);

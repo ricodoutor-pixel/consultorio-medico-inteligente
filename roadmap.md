@@ -1,5 +1,13 @@
 # Roadmap
 
+## Fechamento da Orientação e aviso de pagamento — 08/11/2026
+- [ ] Mostrar sucesso e continuação após confirmação real de cada pagamento, sem liberar serviço por retorno do checkout
+- [ ] Executar regressões de pagamento, triagem, citações, avaliação e envio único
+- [ ] Conferir retomada e acesso autenticado disponível, sem criar atendimento ou pagamento artificial
+- [ ] Publicar e conferir site oficial e fonte operacional
+- [ ] Concluir implantação Hostinger se houver acesso seguro disponível; caso contrário documentar bloqueio
+- [ ] Aceite integral com próximo pagamento e atendimento consentido; confirmar avisos no celular e Pix no banco
+
 ## Nomes personalizados dos pagamentos — 08/11/2026
 - [x] Padronizar descrições nos criadores de pagamento identificados, incluindo produtos dos carrinhos, planos, carteira e renovações; 11 funções implantadas, sem alterar valores ou conta
 - [x] Retirar recebedor fixo da Orientação; novos Pix exibem descrição retornada pelo pagamento, sem substituir titular bancário

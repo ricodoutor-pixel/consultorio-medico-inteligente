@@ -99,6 +99,13 @@
       "when": 1794115425450,
       "tag": "0013_create_payment_services_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794116500950,
+      "tag": "0014_protect_catalog_and_experience_reads",
+      "breakpoints": true
     }
   ]
 }

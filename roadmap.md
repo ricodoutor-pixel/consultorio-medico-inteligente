@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Copiloto e leituras protegidas — 08/11/2026
-- [ ] Conferir PMID e autoria no PubMed antes de entregar respostas do copiloto, preservando o formato clínico
-- [ ] Fechar acesso anônimo aos três catálogos e restringir experiências, sem alterar Orientação ou pagamentos
-- [ ] Testar regras e acessos reais, implantar copiloto e conferir novamente os quatro achados
+- [x] Copiloto implantado: resposta retida até conferir PMID; linhas bibliográficas substituídas por autoria/metadados PubMed, citações indisponíveis omitidas; SOAP sem citações preservado
+- [x] Acesso anônimo bloqueado nos quatro conjuntos (HTTP 401); leitura autenticada dos catálogos preservada (HTTP 200); experiências somente do titular/admin, leitura de outro titular vazia
+- [x] 37 testes passam; chamada autenticada ao copiloto HTTP 200 com três PMIDs e autoria reconferidos no PubMed; nova varredura sem os quatro achados anteriores, mantendo informações de catálogo compartilhado entre contas logadas
+- [ ] Testar pela tela durante consulta real — depende de médico participante e atendimento consentido; não criados pagamentos, salas ou atendimentos artificiais
 
 ## Unificação da Orientação Técnica — 08/11/2026
 - [x] Direcionar entradas de orientação da vitrine, menu de serviços, painel, ações rápidas, download, quiz e retorno de pagamento à página atual; retirar OrientacaoRapida, BrisaOrientacaoRedirect e OfertaEspecial

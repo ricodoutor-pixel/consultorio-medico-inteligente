@@ -2768,6 +2768,8 @@ export type Database = {
           contract_ip: string | null
           contract_signed_at: string | null
           contract_version: string | null
+          council_number: string | null
+          council_type: string
           country: string | null
           created_at: string
           crm: string
@@ -2815,6 +2817,8 @@ export type Database = {
           contract_ip?: string | null
           contract_signed_at?: string | null
           contract_version?: string | null
+          council_number?: string | null
+          council_type?: string
           country?: string | null
           created_at?: string
           crm: string
@@ -2862,6 +2866,8 @@ export type Database = {
           contract_ip?: string | null
           contract_signed_at?: string | null
           contract_version?: string | null
+          council_number?: string | null
+          council_type?: string
           country?: string | null
           created_at?: string
           crm?: string

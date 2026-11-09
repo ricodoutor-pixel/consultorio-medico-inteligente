@@ -58,7 +58,7 @@ export function buildPaymentMessage(input: NotifyInput): string {
     `Pedido: ${input.externalReference}` + (input.attendanceCode ? `\nCódigo: ${input.attendanceCode}` : "");
 }
 
-async function sendOnce(text: string): Promise<{ ok: boolean; http: number | null; error: string | null; ms: number; messageId?: string | null }> {
+async function sendOnce(text: string, to?: string): Promise<{ ok: boolean; http: number | null; error: string | null; ms: number; messageId?: string | null }> {
   const c = evolutionConfig();
   const t0 = Date.now();
   if (!c.url || !c.key) {
@@ -70,7 +70,7 @@ async function sendOnce(text: string): Promise<{ ok: boolean; http: number | nul
     const res = await fetch(`${c.url}/message/sendText/${encodeURIComponent(c.instance)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: c.key },
-      body: JSON.stringify({ number: c.phone, text }),
+      body: JSON.stringify({ number: to || c.phone, text }),
       signal: ctrl.signal,
     });
     const body = await res.text().catch(() => "");
@@ -161,6 +161,33 @@ export async function notifyOrientationEvent(sb: Sb, input: OrientationEventInpu
     return await deliver(sb, retry.id, text, logKey, trigger, retry.attempts ?? 0);
   } catch (e) {
     console.error("[payment-notify] evento erro", (e as Error).message);
+    return false;
+  }
+}
+
+/** Texto do aviso ao médico: consulta paga aguardando atendimento (sem dados de saúde). */
+export function buildDoctorConsultationMessage(i: { doctorName: string; patientFirstName: string; modality: string; amountBrl: number }): string {
+  return `Planta y Raiz — nova consulta paga.\n` +
+    `Olá, ${i.doctorName}! ${i.patientFirstName} pagou a ${i.modality} (R$ ${i.amountBrl.toFixed(2).replace(".", ",")}).\n` +
+    `Entre no Consultório Médico com o botão ON ativado para atender: https://www.plantayraiz.com.br/dashboard-medico`;
+}
+
+/** Aviso único a um destinatário específico (dedup pela chave). Nunca lança exceção. */
+export async function notifyRecipientOnce(sb: Sb, input: { key: string; phone: string; text: string; service: string }, trigger = "auto"): Promise<boolean> {
+  const phone = input.phone.replace(/\D/g, "");
+  if (phone.length < 10) return false;
+  const send = (t: string) => sendOnce(t, phone);
+  try {
+    const { data: claim } = await sb.from("payment_notify_log").insert({
+      external_reference: input.key, recipient: phone, channel: "whatsapp", status: "pending", service: input.service,
+    }).select("id, attempts").maybeSingle();
+    if (claim) return await deliverNotice(sb, claim.id, input.text, input.key, trigger, 0, send);
+    const { data: retry } = await sb.from("payment_notify_log").update({ status: "pending" })
+      .eq("external_reference", input.key).eq("status", "failed").select("id, attempts").maybeSingle();
+    if (!retry) return false;
+    return await deliverNotice(sb, retry.id, input.text, input.key, trigger, retry.attempts ?? 0, send);
+  } catch (e) {
+    console.error("[payment-notify] destinatário erro", (e as Error).message);
     return false;
   }
 }

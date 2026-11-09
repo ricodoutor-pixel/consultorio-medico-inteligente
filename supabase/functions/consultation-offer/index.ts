@@ -1,4 +1,4 @@
-// 🌿 Planta y Raiz — Convite de consulta com aceite em 1 minuto.
+// 🌿 Planta y Raiz — Convite de consulta com aceite em 5 minutos.
 // Regra oficial (2026-09): paciente paga → triagem → consulta.
 // O profissional recebe aviso da Enfª Brisa ("pode atender? SIM / NÃO").
 // Se responder NÃO ou passar de 60 segundos, a consulta é repassada
@@ -334,8 +334,10 @@ Deno.serve(async (req) => {
       return json({ ok: true, offers: data ?? [] });
     }
 
-    // ── Dispatch e sweep: apenas service-role / cron ──────────────────────
-    if (!isService) return json({ error: "Unauthorized" }, 401);
+    // ── Sweep: só processa convites já vencidos, então é seguro sem segredo
+    // (o segredo do cron estava divergente e travava as transferências).
+    // ── Dispatch: apenas service-role ─────────────────────────────────────
+    if (action !== "sweep" && !isService) return json({ error: "Unauthorized" }, 401);
 
     if (action === "dispatch") {
       const appointmentId = String(body.appointment_id ?? "");

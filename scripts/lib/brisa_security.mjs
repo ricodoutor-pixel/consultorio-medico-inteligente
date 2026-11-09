@@ -256,8 +256,13 @@ export function isBlacklisted(jid) {
 // S4. ANTI-ROBÔ DE CONSULTÓRIO & LIMITE DE MENSAGENS SEGUIDAS
 // ============================================================================
 const AUTO_REPLY_PATTERNS = [
+  // 1. Mensagens automáticas clássicas e avisos de ausência
   /agradece\s+(o\s+seu|seu)?\s*contato/i,
+  /agradecemos\s+(o\s+seu|seu)?\s*contato/i,
+  /obrigad[ao]\s+pela\s+mensagem/i,
   /mensagem\s+autom[aá]tica/i,
+  /esta\s+[eé]\s+uma\s+resposta\s+autom[aá]tica/i,
+  /resposta\s+autom[aá]tica/i,
   /hor[aá]rio\s+de\s+atendimento/i,
   /n[aã]o\s+estamos\s+dispon[ií]veis/i,
   /estou\s+em\s+atendimento/i,
@@ -266,9 +271,43 @@ const AUTO_REPLY_PATTERNS = [
   /deixe\s+sua\s+mensagem/i,
   /retornaremos\s+em\s+breve/i,
   /atendimento\s+eletr[oô]nico/i,
+  /autoatendimento/i,
   /an[uú]ncios\s+interrompidos/i,
-  /esta\s+[eé]\s+uma\s+resposta\s+autom[aá]tica/i,
-  /canal\s+exclusivo\s+de\s+agendamento/i
+  /canal\s+exclusivo\s+de\s+agendamento/i,
+  /no\s+momento\s+n[aã]o\s+podemos\s+atender/i,
+  /fora\s+do\s+hor[aá]rio/i,
+  /logo\s+mais\s+retornaremos/i,
+
+  // 2. Identificação explícita de Outro Agente, Chatbot, IA ou Secretária Virtual
+  /sou\s+(o|a|um|uma)?\s*(assistente\s+virtual|intelig[eê]ncia\s+artificial|ia\b|bot\b|rob[oô]|atendente\s+virtual|secret[aá]ri[ao]\s+virtual)/i,
+  /sou\s+(o|a)?\s*chatbot/i,
+  /assistente\s+virtual/i,
+  /secret[aá]ri[ao]\s+virtual/i,
+  /secret[aá]ri[ao]\s+eletr[oô]nic[ao]/i,
+  /atendimento\s+automatizado/i,
+  /sistema\s+automatizado/i,
+  /atendente\s+digital/i,
+  /powered\s+by\s+(ai|ia|chatgpt|openai|typebot|evolution|manychat|zenvia|blip)/i,
+  /desenvolvido\s+por\s+.*(ia|ai|bot|tecnologia)/i,
+
+  // 3. Menus numéricos interativos de bots ("Digite 1 para...", "Escolha uma opção:")
+  /digite\s+[1-9]\s+(para|se)/i,
+  /escolha\s+(uma\s+das\s+)?op[cç][oõ]es/i,
+  /selecione\s+(uma\s+)?op[cç][aã]o/i,
+  /responda\s+com\s+(o\s+n[uú]mero|[1-9])/i,
+  /envie\s+[1-9]\s+para/i,
+  /pressione\s+[1-9]/i,
+  /op[cç][aã]o\s+[1-9]\s*[:–-]/i,
+  /menu\s+principal/i,
+  /para\s+voltar\s+ao\s+menu/i,
+  /para\s+falar\s+com\s+atendente\s+digite/i,
+  /para\s+encerrar\s+digite/i,
+
+  // 4. Frases clássicas de abertura de bot para bot
+  /como\s+posso\s+(te\s+)?ajudar\s+hoje\s*\?/i,
+  /em\s+que\s+posso\s+(te\s+)?ajudar\s*\?/i,
+  /qual\s+o\s+motivo\s+do\s+seu\s+contato\s*\?/i,
+  /para\s+iniciarmos\s+o\s+atendimento/i
 ];
 
 export function isAutoReplyBot(text = '', senderJid = '') {

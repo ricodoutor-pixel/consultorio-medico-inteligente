@@ -1815,9 +1815,23 @@ async function loop() {
                 continue;
               }
 
-              // 🛑 VERIFICAÇÃO 3: Filtro de resposta automática de consultório
+              // 🛑 VERIFICAÇÃO 3: Filtro de resposta de outro AGENTE, BOT ou SECRETÁRIA VIRTUAL
               if (isAutoReplyBot(combinedText, recipient)) {
-                log(`🤖 [ANTI-ROBÔ] Mensagem automática identificada de ${senderName} (${canonical}). Silenciando IA.`);
+                log(`🤖 [OUTRO AGENTE/BOT DETECTADO] Mensagem de outro bot/assistente identificada de ${senderName} (${canonical}): "${combinedText.slice(0, 80)}...". PAUSANDO automação por 24h para impedir loop de robôs.`);
+                
+                // 🔒 PAUSA A IA IMEDIATAMENTE POR 24H PARA ESTE CONTATO (grava no arquivo human_mode e bloqueia qualquer resposta futura)
+                registerHumanTakeover(canonical, true, false);
+                registerHumanTakeover(recipient, true, false);
+
+                // NÃO RESPONDE! (Silêncio total para cortar a conversa e nunca ficar falando por horas)
+                lastRepliedAt.set(canonical, Date.now());
+                lastRepliedAt.set(recipient, Date.now());
+
+                try {
+                  const alertMsg = `🤖 *[ALERTA: OUTRO AGENTE/BOT DETECTADO]*\n\n*Contato:* ${senderName} (${recipient})\n*Mensagem:* "${combinedText.slice(0, 200)}"\n\n🛑 A IA Enfª Brisa foi pausada por 24h para esta conversa para evitar loop infinito entre agentes. Se for um humano real, um operador pode intervir.`;
+                  await sendWhatsApp(ADMIN_PHONE, alertMsg);
+                } catch (e) {}
+
                 continue;
               }
 

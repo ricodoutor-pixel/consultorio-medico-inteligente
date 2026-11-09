@@ -6,7 +6,8 @@ import {
   isGeneralSpamOrUnrelated,
   isAngryOrDemandsHuman,
   calculateStringSimilarity,
-  checkSemanticRepetition
+  checkSemanticRepetition,
+  isAutoReplyBot
 } from './lib/brisa_security.mjs';
 
 console.log("=== INICIANDO BATERIA DE TESTES DA AUDITORIA ENFª BRISA ===");
@@ -24,7 +25,7 @@ function assert(condition, testName) {
   }
 }
 
-// 1. Teste de Higienização de Nome de Paciente (Defeito 5 - Regra 2: "Nunca use nome de usuário, e-mail ou números como nome. Não use Dr. ou Dra. para pacientes.")
+// 1. Teste de Higienização de Nome de Paciente (Defeito 5)
 assert(sanitizePatientName("Dr. Franciscopego263") === "", "Dr. Franciscopego263 -> vazio (bloqueia username e título)");
 assert(sanitizePatientName("franciscopego263") === "", "franciscopego263 -> vazio (bloqueia username)");
 assert(sanitizePatientName("usuario12345") === "", "usuario12345 -> vazio (bloqueia username)");
@@ -78,6 +79,16 @@ assert(isAngryOrDemandsHuman("quero falar com um atendente agora") === true, "De
 assert(isAngryOrDemandsHuman("isso aqui é um golpe ou o que?") === true, "Detecta reclamação/golpe");
 assert(isAngryOrDemandsHuman("Quero uma pessoa de verdade") === true, "Detecta pedido de pessoa humana");
 assert(isAngryOrDemandsHuman("Olá, como funciona a consulta?") === false, "Mensagem normal não ativa modo de raiva");
+
+// 9. NOVO TESTE: Detecção de Outro Agente / Chatbot / Secretária Virtual (Impede Loop Infinito)
+assert(isAutoReplyBot("Olá! Sou a assistente virtual da Clínica São Lucas. Como posso te ajudar hoje?") === true, "Detecta 'assistente virtual'");
+assert(isAutoReplyBot("Esta é uma resposta automática: no momento estamos fora do horário de atendimento.") === true, "Detecta 'resposta automática / fora do horário'");
+assert(isAutoReplyBot("Olá! Escolha uma das opções abaixo:\n1 - Agendamentos\n2 - Financeiro\n3 - Falar com atendente") === true, "Detecta menu numérico de bot");
+assert(isAutoReplyBot("Agradecemos o seu contato! Em breve um de nossos consultores irá te responder.") === true, "Detecta auto-reply de agradecimento");
+assert(isAutoReplyBot("Mensagem automática: nosso horário de atendimento é de 08:00 às 18:00.") === true, "Detecta 'mensagem automática / horário'");
+assert(isAutoReplyBot("Powered by Typebot / ChatGPT") === true, "Detecta powered by bot");
+assert(isAutoReplyBot("Boa tarde, doutor! Gostaria de saber como funciona o tratamento com canabidiol para ansiedade.") === false, "Mensagem de paciente real NÃO é bot");
+assert(isAutoReplyBot("Tenho dores crônicas na coluna e gostaria de marcar consulta com especialista.") === false, "Pergunta de saúde real NÃO é bot");
 
 console.log(`\n=== RESULTADO: ${passed} PASSARAM, ${failed} FALHARAM ===`);
 if (failed > 0) process.exit(1);

@@ -14,7 +14,7 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 import { sendWhatsAppAlert } from "../_shared/waha.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
-const OFFER_SECONDS = 60;
+const OFFER_SECONDS = 300; // 5 minutos para o médico aceitar
 
 type Pool = {
   doctor_id: string;
@@ -87,10 +87,21 @@ async function dispatchOffer(
   }
 
   const candidates = ((pool ?? []) as Pool[]).filter((d) => !tried.has(d.doctor_id));
-  // Preferência: escolhido pelo paciente, se ainda não tentado
-  const preferred = candidates.find((d) => d.doctor_id === appt.doctor_id);
-  const next = preferred ?? candidates[0];
-  if (!next) return { ok: false, reason: "no_doctor_available" };
+  // Ordem: 1) médico escolhido pelo paciente; 2) assinantes ativos online; 3) demais médicos online.
+  const preferred = list.length === 0 ? candidates.find((d) => d.doctor_id === appt.doctor_id) : undefined;
+  let next: Pool | undefined = preferred;
+  if (!next) {
+    const online = candidates.filter((d) => d.is_online);
+    const subs = await Promise.all(online.map(async (d) => {
+      const { data } = await svc.rpc("has_active_subscription", { user_uuid: d.user_id, check_env: "live" });
+      return data === true;
+    }));
+    next = online.find((_, i) => subs[i]) ?? online[0];
+  }
+  if (!next) {
+    if (list.length > 0) await notifyPatientTransfer(svc, appt.patient_id as string, null, null);
+    return { ok: false, reason: "no_doctor_available" };
+  }
 
   const token = crypto.randomUUID().replace(/-/g, "");
   const expiresAt = new Date(Date.now() + OFFER_SECONDS * 1000).toISOString();
@@ -131,10 +142,10 @@ async function dispatchOffer(
     `*Paciente:* ${patient?.full_name ?? "Paciente"}\n` +
     `*Modalidade:* ${String(appt.type ?? "video")}\n` +
     `*Pagamento:* confirmado\n\n` +
-    `*Pode atender?* Você tem 1 minuto para responder:\n` +
+    `*Pode atender?* Você tem 5 minutos para responder:\n` +
     `✅ SIM → ${base}&reply=yes\n` +
     `❌ NÃO → ${base}&reply=no\n\n` +
-    `Sem resposta em 1 minuto, a consulta passa automaticamente ao próximo profissional de plantão. — Enfª Brisa 💚`;
+    `Sem resposta em 5 minutos, a consulta passa automaticamente ao próximo profissional de plantão. — Enfª Brisa 💚`;
 
   if (next.phone) {
     try {
@@ -147,12 +158,43 @@ async function dispatchOffer(
   await svc.from("notifications").insert({
     user_id: next.user_id,
     title: "Consulta agora — pode atender?",
-    message: `${patient?.full_name ?? "Paciente"} aguarda. Responda em 1 minuto.`,
+    message: `${patient?.full_name ?? "Paciente"} aguarda. Responda em 5 minutos.`,
     type: "consultation_offer",
     action_url: `/dashboard-medico?offer=${offer.id}`,
   });
 
+  if (list.length > 0) {
+    // Transferência: remarca para agora + prazo de aceite e avisa o paciente com o novo horário.
+    const newTime = new Date(Date.now() + OFFER_SECONDS * 1000);
+    await svc.from("appointments").update({ scheduled_at: newTime.toISOString() }).eq("id", appt.id);
+    await notifyPatientTransfer(svc, appt.patient_id as string, next.full_name, newTime);
+  }
+
   return { ok: true, offer_id: offer.id as string, doctor: next.full_name ?? next.doctor_id };
+}
+
+async function notifyPatientTransfer(
+  svc: ReturnType<typeof svcClient>,
+  patientId: string,
+  doctorName: string | null,
+  newTime: Date | null,
+) {
+  const hour = newTime?.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+  const text = doctorName && hour
+    ? `O médico escolhido não pôde atender agora. Sua consulta paga foi transferida para Dr(a). ${doctorName}. Novo horário: até ${hour} (Brasília).`
+    : "Nenhum médico conseguiu atender agora. Seu pagamento continua como crédito e nossa equipe vai remarcar sua consulta.";
+  await svc.from("notifications").insert({
+    user_id: patientId,
+    title: doctorName ? "Consulta transferida" : "Consulta será remarcada",
+    message: text,
+    type: "consultation",
+    action_url: "/consultas",
+  });
+  const { data: p } = await svc.from("profiles").select("phone").eq("id", patientId).maybeSingle();
+  if (p?.phone) {
+    try { await sendWhatsAppAlert(p.phone, `🌱 *Planta y Raiz*\n\n${text}\n\nAcompanhe: ${SITE}/consultas\n\n— Enfª Brisa 💚`); }
+    catch (e) { console.error("[consultation-offer] patient whatsapp", e); }
+  }
 }
 
 Deno.serve(async (req) => {
@@ -214,7 +256,7 @@ Deno.serve(async (req) => {
         const next = await dispatchOffer(svc, String(offer.appointment_id));
         return htmlPageCors(
           expired ? "Tempo esgotado" : "Consulta repassada",
-          `<p>${expired ? "O prazo de 1 minuto expirou." : "Tudo bem, obrigado pela resposta."} ${
+          `<p>${expired ? "O prazo de 5 minutos expirou." : "Tudo bem, obrigado pela resposta."} ${
             next.ok ? "A consulta foi encaminhada ao próximo profissional de plantão." : "Nossa equipe foi avisada."
           }</p><a href="${SITE}/dashboard-medico">Abrir meu painel</a>`,
         );

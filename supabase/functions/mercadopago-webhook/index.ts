@@ -822,7 +822,8 @@ Deno.serve(async (req) => {
           const { data: doc } = await supabase
             .from("doctors").select("id, crm, user_id").eq("user_id", planUserId).maybeSingle();
           if (doc?.id) {
-            const tier = "vip";
+            // medical_subscriptions só aceita basic/professional/premium/enterprise
+            const tier = "premium";
             const { data: existingMed } = await supabase
               .from("medical_subscriptions").select("id")
               .eq("doctor_id", doc.id).eq("plan_tier", tier).maybeSingle();

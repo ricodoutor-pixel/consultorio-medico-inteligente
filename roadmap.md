@@ -1,5 +1,11 @@
 # Roadmap
 
+## Ativação automática do VIP médico — 09/11/2026
+- [ ] Reconciliar pagamento confirmado de Milton e identificar a segunda assinatura real, preservando vigência e KYC
+- [ ] Unificar ativação automática e reconhecimento VIP no painel, vitrine, prontuário e copiloto
+- [ ] Enviar boas-vindas com benefícios ao médico e aviso administrativo uma única vez
+- [ ] Executar testes e conferir dados persistidos e acesso autenticado; registrar limites da entrega no celular
+
 ## Fechamento da Orientação e aviso de pagamento — 08/11/2026
 - [x] Mostrar sucesso e continuação após confirmação real nos retornos compartilhados, Orientação, compras/planos em /pay e consulta; sem liberar serviço por retorno do checkout
 - [x] Executar regressões: 90 testes e 1 consulta PubMed real aprovados; compilação OK; três funções implantadas

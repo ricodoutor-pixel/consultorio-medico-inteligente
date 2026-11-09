@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { canEnterOrientation } from "../_shared/orientation-triage.ts";
-import { notifyPaymentConfirmedOnce } from "../_shared/payment-notify.ts";
+import { notifyPaymentConfirmedOnce, notifyRecipientOnce, buildDoctorConsultationMessage } from "../_shared/payment-notify.ts";
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {
@@ -1028,7 +1028,7 @@ Deno.serve(async (req) => {
         // 2. Fetch appointment details
         const { data: appt } = await supabase
           .from("appointments")
-          .select("patient_id, doctor_id, scheduled_at, amount")
+          .select("patient_id, doctor_id, scheduled_at, amount, type")
           .eq("id", appointmentId)
           .single();
 
@@ -1095,7 +1095,7 @@ Deno.serve(async (req) => {
               const refLink = `https://plantayraiz.com.br/?ref=${refSlug}`;
               const viralMsg =
                 `Olá ${firstName}! 🌿\n\n` +
-                `Parabéns, sua orientação foi concluída com sucesso!\n` +
+                `Seu pagamento foi confirmado com sucesso!\n` +
                 `Você ganhou *${coinsEarned} Planta-Coins* 🪙 que valem desconto no Shopping.\n\n` +
                 `💚 *Indique um amigo e ganhe +20 coins extras* (ele ganha R$5 de desconto):\n` +
                 `${refLink}\n\n` +
@@ -1144,6 +1144,24 @@ Deno.serve(async (req) => {
               type: "consultation_confirmed",
               action_url: "/dashboard-medico",
             });
+
+            // 5b. WhatsApp único ao médico (sem dados de saúde)
+            const { data: docProfile } = await supabase.from("profiles").select("full_name, phone").eq("id", doctorRecord.user_id).maybeSingle();
+            const docPhone = String((docProfile as any)?.phone || "");
+            const apptType = String((appt as any).type || "");
+            const modality = /chat/i.test(apptType) ? "consulta por chat" : /retorno/i.test(apptType) ? "consulta de retorno" : "consulta por vídeo";
+            if (docPhone) {
+              await notifyRecipientOnce(supabase, {
+                key: `appointment:${appointmentId}:doctor`,
+                phone: docPhone,
+                service: "Aviso ao médico — consulta paga",
+                text: buildDoctorConsultationMessage({
+                  doctorName: (docProfile as any)?.full_name || "Doutor(a)",
+                  patientFirstName: patientName.split(" ")[0] || "Paciente",
+                  modality, amountBrl: totalAmount,
+                }),
+              });
+            }
 
             console.log(`📩 Doctor ${doctorRecord.user_id} notified — payout R$ ${doctorPayout.toFixed(2)}`);
           }

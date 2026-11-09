@@ -396,15 +396,8 @@ const Profissionais = () => {
       });
     }
 
-    const list = professionals.filter((p) => p.category === activeCategory);
-    if (activeCategory === "Médicos Prescritores") {
-      const vIdx = list.findIndex((p) => (p.name || "").toLowerCase().includes("victor"));
-      if (vIdx !== -1) {
-        const [victorDoc] = list.splice(vIdx, 1);
-        list.unshift(victorDoc);
-      }
-    }
-    return list;
+    // A ordem dos assinantes (pagamento em dia primeiro) vem de useRealProfessionals.
+    return professionals.filter((p) => p.category === activeCategory);
   }, [professionals, activeCategory, searchQuery]);
 
   if (id) {

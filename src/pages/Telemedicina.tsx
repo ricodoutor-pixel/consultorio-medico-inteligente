@@ -446,8 +446,15 @@ const Telemedicina = () => {
 
       setAnswers(completeAnswers);
       setTriageId(data.id);
-      
-      // Avança imediatamente para o Passo 6: Pagamento & Escolha da Modalidade
+
+      // Pagamento primeiro: com a consulta já paga, a triagem é ligada a ela e o paciente segue para a sala de espera.
+      if (appointmentId && consultPaid) {
+        await supabase.from("appointments").update({ notes: `Triagem: ${data.id}` }).eq("id", appointmentId).eq("patient_id", user.id);
+        sessionStorage.removeItem("telemedicine_pending_checkout");
+        toast({ title: "Triagem concluída (5/5)!", description: "O médico já foi avisado. Aguarde o início da consulta." });
+        navigate("/consultas");
+        return;
+      }
       setStep(6);
       toast({ title: "Entrevista Prévia Concluída (5/5)!", description: "Escolha sua modalidade de atendimento para prosseguir." });
     } catch (error) {
@@ -466,8 +473,8 @@ const Telemedicina = () => {
     setAiLoading(true);
     try {
       if (await isConsultationPaid(id)) {
-        sessionStorage.removeItem("telemedicine_pending_checkout");
-        navigate("/consultas");
+        setConsultPaid(true);
+        setStep(0);
       } else {
         toast({ title: "Pagamento ainda não confirmado", description: "Aguarde a confirmação do Mercado Pago e tente novamente." });
       }
@@ -725,7 +732,7 @@ const Telemedicina = () => {
                         className="h-14 font-black rounded-2xl bg-primary text-primary-foreground text-base shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                         onClick={() => {
                           if (tcleAccepted) {
-                            setStep(0);
+                            setStep(6);
                           } else {
                             setShowTCLE(true);
                           }
@@ -967,7 +974,7 @@ const Telemedicina = () => {
                     </div>
 
                     {consultPaid && (
-                      <PaymentConfirmedNotice pix label="Continuar" onContinue={() => navigate("/consultas")} />
+                      <PaymentConfirmedNotice pix label="Continuar para a triagem" onContinue={() => setStep(0)} />
                     )}
                     {consultPix && !consultPaid && (
                       <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
@@ -993,8 +1000,7 @@ const Telemedicina = () => {
                             let pending: { appointmentId?: string; mode?: string; triageId?: string } = {};
                             try { pending = JSON.parse(sessionStorage.getItem("telemedicine_pending_checkout") || "{}"); } catch { /* discard invalid draft */ }
                             const id = appointmentId || (pending.mode === selectedServiceMode && pending.triageId === triageId ? pending.appointmentId : null);
-                            if (!triageId && !id) throw new Error("Conclua a entrevista antes de pagar.");
-                            const checkout = await createConsultationCheckout(selectedServiceMode, triageId || "", id);
+                                                        const checkout = await createConsultationCheckout(selectedServiceMode, triageId || "", id);
                             setAppointmentId(checkout.appointmentId);
                             setConsultPix(checkout.pix);
                           } catch (error) {

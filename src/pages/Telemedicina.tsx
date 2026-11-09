@@ -914,7 +914,7 @@ const Telemedicina = () => {
                         Escolha sua <span className="text-gradient-green">Modalidade de Atendimento</span>
                       </h2>
                       <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto">
-                        Sua entrevista prévia em 5 perguntas foi gravada com sucesso no prontuário. Escolha como prefere ser atendido(a):
+                        Escolha como prefere ser atendido(a). Depois do Pix confirmado, você faz a triagem de 5 perguntas com a Enfª Brisa.
                       </p>
                     </div>
 

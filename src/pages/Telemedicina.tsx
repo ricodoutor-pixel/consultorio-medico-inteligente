@@ -26,7 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import { createConsultationCheckout, isConsultationPaid, type ConsultationPix } from "@/lib/telemedicine-checkout";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
-import { formatPaymentName } from "@/lib/payment-name";
+import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 

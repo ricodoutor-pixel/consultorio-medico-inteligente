@@ -1,5 +1,9 @@
 # Roadmap
 
+## Vitrine — 09/11/2026
+- [x] Foto correta da Dra. Ana Karoliny; Dr. Milton 1º e Dr. Victor 2º; fotos dos médicos 20 MB → 1,2 MB
+- [ ] Publicar no site oficial
+
 ## Ativação automática do VIP médico — 09/11/2026
 - [ ] Encerrar benefícios no vencimento, enviar oferta de renovação e analisar recorrência autorizada no Mercado Pago sem cobrança automática não consentida
 - [ ] Reconciliar pagamento confirmado de Milton e identificar a segunda assinatura real, preservando vigência e KYC

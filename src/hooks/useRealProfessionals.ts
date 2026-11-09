@@ -421,8 +421,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     }
 
     // Insere os dois assinantes VIP no topo absoluto da vitrine
-    if (miltonDoc) medicos.unshift(miltonDoc);
+    // Ordem: assinante mais recente (Dr. Milton) em 1º, Dr. Victor em 2º
     if (victorDoc) medicos.unshift(victorDoc);
+    if (miltonDoc) medicos.unshift(miltonDoc);
 
     return [...medicos, ...nonMedicos];
   }, [dbDoctors]);

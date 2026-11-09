@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import dotenv from 'dotenv';
+import { acquireBrisaWorkerLock } from './lib/brisa-worker-lock.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { BRISA_CONFIG, buildLgpdOriginReply, buildKycChecklistReply } from './brisa_onboarding_config.mjs';
 import {
@@ -32,6 +33,14 @@ import {
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const releaseWorkerLock = acquireBrisaWorkerLock(path.join(__dirname, 'brisa-responder.lock'));
+if (!releaseWorkerLock) {
+  console.error('Brisa responder already running; duplicate worker stopped.');
+  process.exit(0);
+}
+process.on('exit', releaseWorkerLock);
+process.on('SIGTERM', () => process.exit(0));
+process.on('SIGINT', () => process.exit(0));
 const LOG_FILE = path.join(__dirname, 'evolution_brisa_responder.log');
 const PROCESSED_FILE = path.join(__dirname, 'evolution_processed_messages.json');
 const HUMAN_LOCK_FILE = path.join(__dirname, 'evolution_human_mode_contacts.json');
@@ -188,15 +197,8 @@ function hasRecentlySent(target, text) {
     }
   }
 
-  history.push({ text, time: now });
   const filtered = history.filter(item => (now - item.time) < 24 * 60 * 60 * 1000).slice(-20);
   recentSentHistory.set(canonical, filtered);
-
-  if (target !== canonical) {
-    const targetHist = recentSentHistory.get(target) || [];
-    targetHist.push({ text, time: now });
-    recentSentHistory.set(target, targetHist.slice(-20));
-  }
 
   return false;
 }
@@ -812,6 +814,9 @@ async function sendWhatsApp(recipient, text) {
   }
 
   const result = await res.json();
+  const canonical = getCanonicalContactId(recipient);
+  const sent = recentSentHistory.get(canonical) || [];
+  recentSentHistory.set(canonical, [...sent, { text, time: Date.now() }].slice(-20));
   log(`✅ Mensagem enviada com sucesso para ${targetNumber}`);
 
   // Atualiza histórico e controle de repetição
@@ -819,6 +824,10 @@ async function sendWhatsApp(recipient, text) {
   if (!mem.sentHistory24h) mem.sentHistory24h = [];
   mem.sentHistory24h.push({ text, sentAt: Date.now() });
   mem.sentHistory24h = mem.sentHistory24h.filter(m => (Date.now() - m.sentAt) < 24 * 3600 * 1000);
+  if (canonical !== recipient) {
+    const canonicalMemory = getContactMemory(canonical);
+    canonicalMemory.sentHistory24h = mem.sentHistory24h;
+  }
   if (text.toLowerCase().includes('muitos atendimentos')) {
     mem.busyNoticeSentCount = (mem.busyNoticeSentCount || 0) + 1;
   }

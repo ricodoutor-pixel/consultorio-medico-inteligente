@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders, corsHeaders } from "../_shared/cors.ts";
+import { formatPaymentName, getPaymentServices, resolveDisplayName } from "../_shared/payment-catalog.ts";
 
 /**
  * TABELA DE PREÇOS OFICIAIS SERVER-SIDE (IMUTÁVEL)
@@ -77,7 +78,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { appointmentId, doctorName, patientEmail, description, service_id, sku, planSlug } = body;
 
-    let title: string = description || "Atendimento Planta y Raíz";
+    const catalog = await getPaymentServices(supabase);
+    let title = formatPaymentName("Atendimento");
     let amount: number;
     let successPath = "/dashboard?payment=success";
 
@@ -110,7 +112,8 @@ Deno.serve(async (req) => {
       if (appt.needs_scheduling) {
         successPath = `/agendamento?appt=${appointmentId}`;
       }
-      title = description || `Consulta com ${doctorName || "Especialista Prescritor"}`;
+      const modalityCode: Record<string, string> = { chat: "consulta_chat", video: "consulta_video", premium: "consulta_premium", retorno: "retorno_consulta", renovacao: "retorno_consulta" };
+      title = resolveDisplayName(catalog, modalityCode[String(appt.type || "video")] || "consulta_video");
     } else {
       // 2) Se for contratação de serviço/plano avulso, valida ESTRITAMENTE contra OFFICIAL_PRICES
       const targetSlug = (service_id || sku || planSlug || "").toLowerCase().trim();
@@ -129,7 +132,9 @@ Deno.serve(async (req) => {
       }
 
       amount = officialItem.amount;
-      title = officialItem.title;
+      title = catalog[targetSlug]?.active
+        ? resolveDisplayName(catalog, targetSlug)
+        : formatPaymentName(officialItem.title);
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -155,7 +160,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: appointmentId || `pyr-srv-${Date.now()}`,
-      statement_descriptor: "PLANTA Y RAIZ",
+      statement_descriptor: "PLANTAYRAIZ",
       metadata: {
         type: appointmentId ? "consultation" : "service_subscription",
         patient_id: userId,
@@ -203,6 +208,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         init_point: mpData.init_point,
         preference_id: mpData.id,
+        external_reference: preference.external_reference,
         amount,
       }),
       {

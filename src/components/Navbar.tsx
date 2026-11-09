@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
 import { HolidayPlantaoBanner } from "@/components/HolidayPlantaoBanner";
 
-import { supabase } from "@/integrations/supabase/client";
+import { useAccount } from "@/contexts/AccountContext";
+import { AccountMenu } from "@/components/AccountMenu";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -19,13 +20,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
+  const navbarRef = useRef<HTMLElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<{ id: string; email?: string; fullName?: string; avatarUrl?: string } | null>(null);
+  const { user, logout, signingOut } = useAccount();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
   const showNavbarMascot = !(isDenseCatalogRoute && isMobile);
+
+  useEffect(() => {
+    const navbar = navbarRef.current;
+    const container = navbar?.parentElement;
+    if (!navbar || !container) return;
+    const measureHeader = () => {
+      container.style.setProperty("--site-header-height", `${Math.ceil(navbar.getBoundingClientRect().bottom)}px`);
+    };
+    measureHeader();
+    const observer = new ResizeObserver(measureHeader);
+    observer.observe(navbar);
+    return () => {
+      observer.disconnect();
+      container.style.removeProperty("--site-header-height");
+    };
+  }, []);
 
   useEffect(() => {
     setIsOpen(false);
@@ -39,61 +57,6 @@ export const Navbar = () => {
     }
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, avatar_url")
-          .eq("id", session.user.id)
-          .maybeSingle();
-
-        const fullName = profile?.full_name || session.user.email?.split("@")[0] || "Usuário";
-        const avatarUrl = profile?.avatar_url || undefined;
-
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          fullName,
-          avatarUrl,
-        });
-      } else {
-        setUser(null);
-      }
-    });
-
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, avatar_url")
-          .eq("id", session.user.id)
-          .maybeSingle();
-
-        const fullName = profile?.full_name || session.user.email?.split("@")[0] || "Usuário";
-        const avatarUrl = profile?.avatar_url || undefined;
-
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          fullName,
-          avatarUrl,
-        });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
-  const getInitials = (name: string) => {
-    return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
-  };
 
   const primaryLinks = [
     { to: "/", label: "Início" },
@@ -120,33 +83,10 @@ export const Navbar = () => {
 
   const openChat = useCallback(() => window.dispatchEvent(new Event("open-frog-chat")), []);
 
-  const UserMenu = ({ compact = false }: { compact?: boolean }) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="ghost" className="gap-2 font-bold rounded-xl text-muted-foreground hover:text-foreground">
-          <Avatar className="h-7 w-7">
-            <AvatarImage src={user?.avatarUrl} />
-            <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">
-              {getInitials(user?.fullName || "U")}
-            </AvatarFallback>
-          </Avatar>
-          {!compact && <span className="max-w-[120px] truncate">{user?.fullName}</span>}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={() => navigate("/dashboard")} className="gap-2 cursor-pointer">
-          <User size={14} /> Meu Painel
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout} className="gap-2 cursor-pointer text-destructive">
-          <LogOut size={14} /> Sair
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-
   return (
     <>
       <nav
+        ref={navbarRef}
         className={isDenseCatalogRoute
           ? "fixed top-0 left-0 right-0 border-b border-border z-50 will-change-transform sticky-header bg-background/95"
           : "fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform sticky-header"
@@ -185,14 +125,14 @@ export const Navbar = () => {
                 )}
               </div>
             {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
-            <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center min-w-[80px]`}>
+            <div className={`hidden ${showNavbarMascot ? "2xl:flex" : ""} flex-1 items-center justify-center min-w-[80px]`}>
               <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
                 <FrogMascot size={64} mood="happy" onClick={openChat} enableJumpToNav={true} compact={true} />
               </div>
             </div>
 
-            {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3 justify-end flex-shrink-0">
+            {/* Full navigation only when the complete row fits. */}
+            <div className="hidden 2xl:flex items-center gap-2 xl:gap-3 justify-end flex-shrink-0">
               <div className="flex items-center gap-1 xl:gap-2" role="menubar">
                 {primaryLinks.map((link) => (
                   <NavLink
@@ -242,11 +182,11 @@ export const Navbar = () => {
 
 
                 {user ? (
-                  <UserMenu compact />
+                  <><AccountMenu /><Button size="sm" variant="ghost" disabled={signingOut} onClick={() => void logout()} className="text-destructive">Sair da conta</Button></>
                 ) : (
                   <div className="flex items-center gap-1.5">
                     <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-xs h-9 px-3" asChild>
-                      <NavLink to="/login"><LogIn size={14} /> Login</NavLink>
+                      <NavLink to="/login"><LogIn size={14} /> Entrar</NavLink>
                     </Button>
                     <Button size="sm" variant="outline" className="hidden xl:inline-flex font-bold rounded-xl border-primary/40 text-primary text-xs h-9 px-3" asChild>
                       <NavLink to="/cadastro">Cadastro</NavLink>
@@ -256,9 +196,10 @@ export const Navbar = () => {
               </div>
             </div>
 
-            {/* Mobile Actions (até lg) */}
-            <div className="lg:hidden flex items-center gap-2">
-               <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse shadow-lg shadow-secondary/40" asChild>
+            {/* Compact navigation for phones, tablets and narrower desktops. */}
+            <div className="2xl:hidden flex items-center gap-1 min-w-0">
+              <AccountMenu />
+               <Button size="sm" className="hidden sm:inline-flex bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse shadow-lg shadow-secondary/40" asChild>
                 <NavLink to="/telemedicina">CONSULTA</NavLink>
               </Button>
               <button
@@ -271,11 +212,14 @@ export const Navbar = () => {
             </div>
           </div>
         </div>
+        <div className="2xl:hidden flex justify-end items-center px-3 pb-1">
+          {user ? <Button variant="ghost" size="sm" disabled={signingOut} onClick={() => void logout()} className="h-7 text-xs text-destructive"><LogOut size={14} className="mr-1" />Sair da conta</Button> : <Button variant="ghost" size="sm" asChild className="h-7 text-xs"><Link to="/cadastro">Cadastro</Link></Button>}
+        </div>
       </nav>
 
       {/* MOBILE MENU OVERLAY - Embutido e Padronizado */}
       <div 
-        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl lg:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl 2xl:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
           isOpen ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"
         }`}
       >
@@ -312,13 +256,13 @@ export const Navbar = () => {
           <div className="pt-6 border-t border-border mt-4 space-y-4">
             {user ? (
               <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl mb-3">
-                <UserMenu compact={false} />
+                <AccountMenu /><Button variant="ghost" disabled={signingOut} onClick={() => void logout()} className="text-destructive">Sair da conta</Button>
               </div>
             ) : (
               <div className="flex gap-2 mb-3">
                 <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
                   <NavLink to="/login" onClick={() => setIsOpen(false)}>
-                    <LogIn size={16} className="mr-1" /> Login
+                    <LogIn size={16} className="mr-1" /> Entrar
                   </NavLink>
                 </Button>
                 <Button className="flex-1 font-bold rounded-xl bg-primary text-primary-foreground" asChild>

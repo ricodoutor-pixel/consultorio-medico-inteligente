@@ -1,5 +1,13 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
+import { paymentOrderName } from "../_shared/payment-order-name.ts";
+import {
+  FALLBACK_DESCRIPTOR,
+  formatPaymentName,
+  getPaymentServices,
+  resolveDisplayName,
+  type PaymentService,
+} from "../_shared/payment-catalog.ts";
 
 const ALLOWED_ORIGINS = [
   "https://plantayraiz.com.br",
@@ -36,42 +44,12 @@ const json = (body: unknown, status = 200, req?: Request) => {
 
 /**
  * Catálogo autoritativo (server-side). O cliente NUNCA envia preço.
+ * Nomes exibidos ao pagador, valores e descritor da fatura vêm da tabela
+ * única public.payment_services (ver _shared/payment-catalog.ts).
  * Tabela oficial 2026-08-03:
  *  serviços → Orientação R$30 · Retorno R$90 · Chat R$100 · Vídeo R$150
  *  planos   → 3 planos universais (paciente/médico/lojista) a R$99/mês
  */
-const CATALOG: Record<string, { title: string; amount: number; recurring?: boolean }> = {
-  orientacao_tecnica: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
-  orientacao: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
-  retorno_consulta: { title: "Retorno de Consulta — Planta y Raíz Ltda", amount: 90 },
-  consulta_chat: { title: "Consulta por Chat — Planta y Raíz Ltda", amount: 100 },
-  consulta_video: { title: "Consulta por Vídeo — Planta y Raíz Ltda", amount: 150 },
-  consulta_premium: { title: "Consulta Premium — Planta y Raíz Ltda", amount: 180 },
-  consulta_canabinoide: { title: "Consulta Especializada — Planta y Raíz Ltda", amount: 250 },
-  plano_paciente: { title: "Plano Paciente — Planta y Raíz Ltda", amount: 99, recurring: true },
-  plano_medico: { title: "Plano Médico — Planta y Raíz Ltda", amount: 99, recurring: true },
-  plano_lojista: { title: "Plano Lojista — Planta y Raíz Ltda", amount: 99, recurring: true },
-  plano_basic: { title: "Plano Individual Básico — Planta y Raíz Ltda", amount: 49.90, recurring: true },
-  plano_professional: { title: "Plano Médico Profissional — Planta y Raíz Ltda", amount: 99.90, recurring: true },
-  plano_premium: { title: "Plano Saúde Verde Família — Planta y Raíz Ltda", amount: 199.90, recurring: true },
-  plano_enterprise: { title: "Plano Empresa & Parceiros — Planta y Raíz Ltda", amount: 499.90, recurring: true },
-};
-
-/** Módulos/apps de monitoramento do Consultório Digital (preço server-side). */
-const TOOL_CATALOG: Record<string, { title: string; amount: number }> = {
-  tool_combo_tools: { title: "Combo 11 Módulos (Consultório Digital)", amount: 97 },
-  tool_cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
-  tool_fundoscopia: { title: "Módulo Fundo de Olho (Fundoscopia)", amount: 29.9 },
-  tool_oximetria: { title: "Módulo Oximetria Óptica (SpO2)", amount: 29.9 },
-  tool_dermatoscopia: { title: "Módulo Dermatoscopia Digital", amount: 29.9 },
-  tool_mobilidade: { title: "Módulo Mobilidade Articular", amount: 29.9 },
-  tool_estetoscopio: { title: "Módulo Estetoscópio Digital IA", amount: 29.9 },
-  tool_pulmonar: { title: "Módulo Ausculta Pulmonar IA", amount: 29.9 },
-  tool_tremor: { title: "Módulo Tremorometria IA", amount: 29.9 },
-  tool_urine: { title: "Módulo Urinálise IA", amount: 29.9 },
-  tool_acuity: { title: "Módulo Acuidade Visual", amount: 29.9 },
-  tool_gps: { title: "Módulo Rastreador GPS Cardíaco", amount: 29.9 },
-};
 
 /** Taxas oficiais de intermediação. */
 const FEE_TELEMEDICINE = 0.07; // 7% plataforma / 93% profissional
@@ -147,8 +125,12 @@ Deno.serve(async (req) => {
     }
 
 
+    // Catálogo único de nomes/valores (tabela payment_services, com espelho de segurança).
+    const catalog = await getPaymentServices(supabase);
+
     let title: string;
     let amount: number;
+    let descriptor = FALLBACK_DESCRIPTOR;
     let externalReference: string;
     let type = "sku";
     let marketplaceFee: number | null = null;
@@ -159,7 +141,7 @@ Deno.serve(async (req) => {
       // Shopping / Club (camisetas, canecas, souvenirs, produtos): valor SEMPRE do banco.
       const { data: order } = await supabase
         .from("orders")
-        .select("id, user_id, vendor_id, subtotal, shipping_cost, total, status")
+        .select("id, user_id, vendor_id, subtotal, shipping_cost, total, status, items")
         .eq("id", orderId)
         .maybeSingle();
       if (!order) return json({ error: "Pedido não encontrado" }, 404, req);
@@ -206,13 +188,13 @@ Deno.serve(async (req) => {
         })
         .eq("id", order.id);
 
-      title = "Pedido Shopping Planta y Raiz";
+      title = paymentOrderName(order.items, "Pedido Shopping");
       externalReference = `order:${order.id}`;
       type = "marketplace_order";
     } else if (cartToken && typeof cartToken === "string") {
       const { data: cart } = await supabase
         .from("prescription_carts")
-        .select("id, patient_id, total_amount, status, cart_token")
+        .select("id, patient_id, total_amount, status, cart_token, items")
         .eq("cart_token", cartToken)
         .maybeSingle();
       if (!cart) return json({ error: "Carrinho não encontrado" }, 404, req);
@@ -220,7 +202,7 @@ Deno.serve(async (req) => {
       if (cart.status !== "pending") return json({ error: "Carrinho não está pendente" }, 400, req);
       amount = round2(Number(cart.total_amount || 0));
       if (!(amount > 0)) return json({ error: "Carrinho sem valor válido" }, 400, req);
-      title = "Carrinho de Prescrição Médica";
+      title = paymentOrderName(cart.items, "Compra com Prescrição");
       externalReference = `cart:${cart.id}`;
       type = "prescription_cart";
     } else if (appointmentId && typeof appointmentId === "string") {
@@ -239,7 +221,11 @@ Deno.serve(async (req) => {
         if (priceError) return json({ error: "Não foi possível registrar o valor da consulta" }, 500, req);
       }
       if (!(amount > 0)) return json({ error: "Consulta sem valor válido" }, 400, req);
-      title = appt.type === "video" ? CATALOG.consulta_video.title : appt.type === "chat" ? CATALOG.consulta_chat.title : "Consulta médica — Planta y Raiz";
+      title = appt.type === "video"
+        ? resolveDisplayName(catalog, "consulta_video")
+        : appt.type === "chat"
+        ? resolveDisplayName(catalog, "consulta_chat")
+        : "Consulta médica — Planta y Raiz";
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
 
@@ -261,15 +247,12 @@ Deno.serve(async (req) => {
         collector_id: collectorId,
       };
     } else {
-      let item = typeof sku === "string" ? CATALOG[sku] : undefined;
+      const item: PaymentService | undefined = typeof sku === "string" ? catalog[sku] : undefined;
 
-      if (typeof sku === "string" && sku.startsWith("tool_")) {
-        item = TOOL_CATALOG[sku];
-      }
-
-      if (!item) return json({ error: "SKU inválido" }, 400, req);
-      title = item.title;
-      amount = item.amount;
+      if (!item || !item.active) return json({ error: "SKU inválido" }, 400, req);
+      title = resolveDisplayName(catalog, sku as string);
+      descriptor = item.descriptor || FALLBACK_DESCRIPTOR;
+      amount = item.amount_brl;
       // Consulta Premium é o único serviço com valor definido pelo profissional.
       if (sku === "consulta_premium" && typeof doctorId === "string") {
         const { data: doc } = await supabase
@@ -307,6 +290,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    title = formatPaymentName(title);
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";
     const isAllowedSuccess = typeof returnUrl === "string" && ALLOWED_ORIGINS.some((origin) => returnUrl.startsWith(origin));
@@ -330,7 +314,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: externalReference,
-      statement_descriptor: "PLANTA Y RAIZ",
+      statement_descriptor: descriptor,
       metadata: {
         type,
         user_id: userId,
@@ -485,10 +469,10 @@ Deno.serve(async (req) => {
         action: "mp_pix_created",
         table_name: "orientacao_tecnica_orders",
         record_id: String(mpData.id),
-        new_data: { type, amount, external_reference: externalReference, payment_id: mpData.id },
+        new_data: { type, amount, external_reference: externalReference, payment_id: mpData.id, description: title },
       });
 
-      console.info("[mp-checkout] pix_created", { amount, payment_id: mpData.id, status: mpData.status });
+      console.info("[mp-checkout] pix_created", { amount, payment_id: mpData.id, status: mpData.status, description: title });
       return json({
         success: true,
         payment_method: "pix",
@@ -498,6 +482,7 @@ Deno.serve(async (req) => {
         ticket_url: ticketUrl,
         external_reference: externalReference,
         amount,
+        description: title,
         split: splitDetails,
       });
     }

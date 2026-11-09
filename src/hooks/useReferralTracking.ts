@@ -47,9 +47,10 @@ export async function linkReferralOnSignup(newUserId: string) {
       .ilike("code", cleanRef)
       .maybeSingle();
 
-    // 2. Fallback: If not found, try matching by code suffix (e.g. 5WQ65M)
+    // 2. Fallback: If not found, try matching by code suffix (e.g. 5WQ65M).
+    // Legacy prefixes (PRZ-, PLANTA-, PLR-) all map to the same persisted code.
     if (!referrer) {
-      const codeSuffix = cleanRef.replace(/^(PLANTA-|PLR-)/i, "");
+      const codeSuffix = stripReferralPrefix(cleanRef);
       if (codeSuffix.length >= 4) {
         const { data: fallbackRef } = await supabase
           .from("referral_links")
@@ -62,12 +63,8 @@ export async function linkReferralOnSignup(newUserId: string) {
 
     if (!referrer) {
       console.log("[Referral] Code captured but no DB referrer row found:", cleanRef);
-      // Still create a referral_link for new user so they get their own code
-      const newCode = generateCode(newUserId);
-      await supabase.from("referral_links").insert({
-        user_id: newUserId,
-        code: newCode,
-      });
+      // Still ensure the new user gets their own persisted code (server-generated).
+      await supabase.rpc("ensure_referral_code", { _user_id: newUserId });
       return;
     }
 
@@ -91,18 +88,16 @@ export async function linkReferralOnSignup(newUserId: string) {
       }
     }
 
-    // Generate unique code for the new user
-    const newCode = generateCode(newUserId);
+    // Ensure the new user gets their own persisted code (server-generated, canonical store)
+    await supabase.rpc("ensure_referral_code", { _user_id: newUserId });
 
-    // Create referral_links entry for the new user
-    await supabase.from("referral_links").insert({
-      user_id: newUserId,
-      code: newCode,
+    // Link the referral tree on the existing persisted row
+    await supabase.from("referral_links").update({
       referred_by: level1,
       level1_referrer: level1,
       level2_referrer: level2,
       level3_referrer: level3,
-    });
+    }).eq("user_id", newUserId);
 
     // Update profiles.referred_by
     await supabase
@@ -118,10 +113,9 @@ export async function linkReferralOnSignup(newUserId: string) {
   }
 }
 
-function generateCode(userId: string): string {
-  const short = userId.replace(/-/g, "").substring(0, 6).toUpperCase();
-  const rand = Math.random().toString(36).substring(2, 5).toUpperCase();
-  return `PLR-${short}${rand}`;
+/** Legacy prefixes (PRZ-, PLANTA-, PLR-) all map to the same persisted code. */
+export function stripReferralPrefix(code: string): string {
+  return code.trim().replace(/^(PLANTA-|PLR-|PRZ-)/i, "");
 }
 
 function setCookie(name: string, value: string, days: number) {

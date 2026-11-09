@@ -4,6 +4,7 @@
 // o pagamento e reativa/estende o período.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +27,7 @@ async function createPixCharge(amount: number, externalRef: string, payerEmail: 
     },
     body: JSON.stringify({
       transaction_amount: Number(amount.toFixed(2)),
-      description: `Planta y Raiz — ${title} (renovação mensal)`,
+      description: formatPaymentName(`${title} (renovação mensal)`),
       payment_method_id: "pix",
       payer: { email: payerEmail || "noreply@plantayraiz.com.br" },
       external_reference: externalRef,

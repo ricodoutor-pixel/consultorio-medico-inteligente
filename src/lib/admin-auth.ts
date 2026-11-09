@@ -23,15 +23,16 @@ export function isMasterAdminEmail(email?: string | null): boolean {
  * Nunca concede papel a partir do navegador nem por e-mail.
  */
 export async function verifyAndEnsureAdmin(user: { id: string; email?: string | null }): Promise<boolean> {
-  if (isMasterAdminEmail(user.email)) return true;
+  const { data: { user: verified }, error } = await supabase.auth.getUser();
+  if (error || !verified || verified.id !== user.id) return false;
 
 
-  const { data: role } = await supabase
+  const { data: role, error: roleError } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id)
     .eq("role", "admin")
     .maybeSingle();
 
-  return !!role;
+  return !roleError && !!role;
 }

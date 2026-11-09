@@ -1,3 +1,5 @@
+import { useAccount } from "@/contexts/AccountContext";
+import { AccountMenu } from "@/components/AccountMenu";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { userChannel } from "@/lib/realtime-channels";
@@ -308,7 +310,7 @@ const AdminMaster = () => {
     };
   }, [loadDashboardData]);
 
-  const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
+  const { logout: handleLogout } = useAccount();
 
   const simulatedMonthlyRevenue = totalRevenue;
   const conversionRate = totalUsers > 0 ? ((totalDoctors * 3.2 / totalUsers) * 100).toFixed(1) : "0";
@@ -1091,7 +1093,7 @@ const AdminMaster = () => {
               Ao vivo • {lastRefresh.toLocaleTimeString("pt-BR")}
             </div>
             <Button size="sm" variant="ghost" onClick={loadDashboardData} className="gap-1 h-8" style={{ color: "#39FF14" }}><RefreshCw size={13} /></Button>
-            <Button size="sm" variant="ghost" onClick={handleLogout} className="gap-1 h-8 text-red-400 hover:text-red-300"><LogOut size={13} /></Button>
+            <Button size="sm" variant="ghost" onClick={() => void handleLogout()} className="gap-1 h-8 text-red-400 hover:text-red-300"><LogOut size={13} />Sair da conta</Button><AccountMenu />
           </div>
         </div>
       </header>

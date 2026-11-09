@@ -175,7 +175,7 @@ export const WhatsAppButton = () => {
     };
   }, [isOpen]);
 
-  if (isPlansRoute || isTelemedWhatsappRoute || isConsultorioRoute) return null;
+  if (isPlansRoute || isTelemedWhatsappRoute || isConsultorioRoute || location.pathname.startsWith("/orientacao-tecnica")) return null;
 
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });

@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -82,7 +83,7 @@ Deno.serve(async (req) => {
     // Assinatura recorrente: o Mercado Pago cobra automaticamente todo mês (preapproval).
     // external_reference começa com `plano_medico:` para o webhook ativar o plano a cada cobrança.
     const preference = {
-      reason: plan.title,
+      reason: formatPaymentName(plan.title),
       external_reference: `plano_medico:${user.id}:${Date.now()}:${planId}`,
       payer_email: user.email,
       auto_recurring: {

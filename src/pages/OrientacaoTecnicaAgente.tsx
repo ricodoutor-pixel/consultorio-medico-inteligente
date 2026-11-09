@@ -1,5 +1,13 @@
 import { RED_FLAG_OPTIONS, hasEmergency, invalidTriageFields } from "../../supabase/functions/_shared/orientation-triage";
 import { setVisibleInterval } from "@/lib/visible-interval";
+import { createOtStreamParser } from "../../supabase/functions/_shared/ot-stream";
+import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
+import "@/styles/orientation-room.css";
+import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
+import { loadPermanentReferralCode } from "@/lib/referral-code";
+import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
+import { orientationPaymentConfirmed } from "@/lib/payment-confirmation";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
@@ -19,7 +27,8 @@ import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight, AlertTriangle,
   CheckCircle2, Sparkles, BookOpen, FileText, ArrowRight, Paperclip, X, PauseCircle,
-  UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check,
+  UserCheck, XCircle, Info, MapPin, QrCode, Copy, Check, Maximize2, Minimize2, Type, CheckCheck,
+  Frown, Meh, Smile, Gift,
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "pyr_ot_external_reference";
@@ -28,7 +37,7 @@ const ATTACH_BUCKET = "ot-attachments";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 type Phase = "loading" | "intro" | "triage" | "checkout" | "awaiting" | "room" | "emergency";
-type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired";
+type OtState = "none" | "awaiting_payment" | "triage" | "emergency" | "ready" | "active" | "paused" | "expired" | "completed";
 
 type OtSession = {
   id: string;
@@ -54,6 +63,7 @@ type OtReport = {
   created_at: string;
   approved_at?: string | null;
   verification_code?: string | null;
+  educational_released_at?: string | null;
 };
 
 type Attachment = { path: string; name: string; mime: string };
@@ -62,31 +72,22 @@ type TriageQuestion = {
   id: string;
   label: string;
   hint: string;
-  type: "text" | "long" | "choice";
+  type: "text" | "long" | "choice" | "combo" | "scale";
   options?: string[];
+  optional?: boolean;
+  allowNone?: boolean;
 };
 
+// Triagem curta v3: 5 telas. Nome e idade vêm do cadastro (não perguntar).
 const QUESTIONS: TriageQuestion[] = [
-  { id: "nome", label: "Como você se chama?", hint: "Nome que a equipe clínica vai usar no atendimento.", type: "text" },
-  { id: "idade", label: "Qual a sua idade?", hint: "Idade em anos.", type: "text" },
-  { id: "queixa", label: "Qual a sua queixa principal?", hint: "Descreva o que mais te incomoda hoje.", type: "long" },
-  { id: "tempo", label: "Há quanto tempo você sente isso?", hint: "Selecione a opção mais próxima.", type: "choice", options: ["Menos de 1 mês", "1 a 6 meses", "6 meses a 2 anos", "Mais de 2 anos"] },
-  { id: "intensidade", label: "De 0 a 10, qual a intensidade dos sintomas?", hint: "0 = nenhum sintoma, 10 = insuportável.", type: "choice", options: ["0 a 3 (leve)", "4 a 6 (moderado)", "7 a 8 (forte)", "9 a 10 (insuportável)"] },
-  { id: "medicamentos", label: "Quais medicamentos ou tratamentos você usa hoje?", hint: "Liste nomes e doses, se souber. Escreva 'nenhum' se não usar.", type: "long" },
-  { id: "canabinoides", label: "Já usou canabinoides (CBD/THC)?", hint: "Sua experiência prévia ajuda a contextualizar a orientação.", type: "choice", options: ["Nunca usei", "Já usei por conta própria", "Uso com receita médica", "Usei e parei"] },
-  { id: "comorbidades", label: "Tem outras condições de saúde relevantes?", hint: "Fígado, coração, rins, gestação, psiquiátricas... Escreva 'nenhuma' se não houver.", type: "long" },
-  { id: "objetivo", label: "Qual o seu principal objetivo?", hint: "O que você espera alcançar.", type: "choice", options: ["Aliviar dor", "Dormir melhor", "Reduzir ansiedade", "Reduzir medicamentos pesados", "Controlar crises/convulsões", "Qualidade de vida geral"] },
-  { id: "red_flags", label: "Está sentindo algum destes sinais agora?", hint: "Se houver sinal de emergência, procure o SAMU 192 imediatamente.", type: "choice", options: ["Nenhum desses", "Dor no peito / falta de ar", "Desmaio ou confusão", "Sangramento ativo", "Pensamentos de me machucar"] },
+  { id: "red_flags", label: "Está com algum sinal de emergência agora?", hint: "Ex.: dor no peito, falta de ar, desmaio, sangramento ativo ou pensamentos de se machucar.", type: "choice" },
+  { id: "queixa", label: "Qual o principal problema e há quanto tempo?", hint: "Descreva com suas palavras e escolha o tempo mais próximo.", type: "combo", options: ["Menos de 1 mês", "1 a 6 meses", "Mais de 6 meses"] },
+  { id: "intensidade", label: "De 0 a 10, qual a intensidade dos sintomas?", hint: "0 = nenhum sintoma · 10 = insuportável.", type: "scale" },
+  { id: "medicamentos", label: "Medicamentos, alergias e outras condições de saúde", hint: "Inclua gravidez ou amamentação, se for o caso. Toque em “Nenhum” se não houver.", type: "long", allowNone: true },
+  { id: "objetivo", label: "O que você espera do atendimento?", hint: "Opcional — pode pular se preferir.", type: "choice", optional: true, options: ["Dormir melhor", "Aliviar dor", "Reduzir ansiedade", "Outro"] },
 ];
 
-const EMERGENCY_ANSWERS = new Set([
-  "Dor no peito / falta de ar",
-  "Desmaio ou confusão",
-  "Sangramento ativo",
-  "Pensamentos de me machucar",
-]);
-
-const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired"];
+const ROOM_STATES: OtState[] = ["ready", "active", "paused", "expired", "completed"];
 const LIVE_STATES: OtState[] = ["ready", "active", "paused"];
 
 const fmtClock = (s: number) => {
@@ -137,6 +138,9 @@ export default function OrientacaoTecnicaAgente() {
   const [draft, setDraft] = useState("");
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string>("");
+  const [profileAge, setProfileAge] = useState<number | null>(null);
+  const [comboTempo, setComboTempo] = useState("");
 
   const [orderRef, setOrderRef] = useState<string | null>(searchParams.get("ref"));
   const orderRefRef = useRef<string | null>(searchParams.get("ref"));
@@ -147,6 +151,7 @@ export default function OrientacaoTecnicaAgente() {
     qr_code: string;
     qr_code_base64: string;
     payment_id: string | number;
+    description?: string;
   } | null>(null);
   const [copiedPix, setCopiedPix] = useState(false);
   const [awaitingSince, setAwaitingSince] = useState<number>(Date.now());
@@ -161,20 +166,51 @@ export default function OrientacaoTecnicaAgente() {
   const [streamText, setStreamText] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [reportError, setReportError] = useState<string | null>(null);
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const [reports, setReports] = useState<OtReport[]>([]);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [rating, setRating] = useState<1 | 2 | 3 | null>(null);
+  const [ratingDone, setRatingDone] = useState(false);
+  const [ratingError, setRatingError] = useState<string | null>(null);
+  const [ratingComment, setRatingComment] = useState("");
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [fullRoom, setFullRoom] = useState(false);
+  const [largeText, setLargeText] = useState(false);
+  const [reportWait, setReportWait] = useState(0);
+  const [refCode, setRefCode] = useState<string | null>(null);
+  const [copiedRef, setCopiedRef] = useState(false);
+  useEffect(() => {
+    if (!generatingReport) { setReportWait(0); return; }
+    const started = Date.now();
+    const timer = window.setInterval(() => setReportWait(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [generatingReport]);
+  useEffect(() => {
+    if (!fullRoom) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setFullRoom(false); };
+    document.addEventListener("keydown", escape);
+    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", escape); };
+  }, [fullRoom]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const questionCardRef = useRef<HTMLDivElement>(null);
+  const ratingPanelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const initDone = useRef(false);
 
   const emergency = hasEmergency(answers);
-  const triageComplete = QUESTIONS.every((item) => (answers[item.id] || "").trim());
+  const triageComplete = QUESTIONS.every((item) =>
+    item.optional ? true
+      : item.id === "queixa" ? !!(answers.queixa?.trim() && answers.tempo?.trim())
+        : !!(answers[item.id] || "").trim());
 
   // ── Auto-preenchimento por query params (Personalização de Link) ─────────
   useEffect(() => {
@@ -199,6 +235,25 @@ export default function OrientacaoTecnicaAgente() {
       if (!alive) return;
       setAuthed(!!data.session);
       setUserId(data.session?.user?.id ?? null);
+      const uid = data.session?.user?.id;
+      if (uid) {
+        // Nome e idade vêm do cadastro — a triagem não pergunta de novo.
+        void supabase.from("profiles").select("full_name, date_of_birth").eq("id", uid).maybeSingle()
+          .then(({ data: p }) => {
+            if (!alive || !p) return;
+            if (p.full_name) setProfileName(p.full_name);
+            if (p.date_of_birth) {
+              const birth = new Date(p.date_of_birth);
+              if (!Number.isNaN(birth.getTime())) {
+                const now = new Date();
+                let age = now.getFullYear() - birth.getFullYear();
+                const m = now.getMonth() - birth.getMonth();
+                if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age -= 1;
+                if (age >= 0 && age <= 120) setProfileAge(age);
+              }
+            }
+          });
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session);
@@ -211,23 +266,32 @@ export default function OrientacaoTecnicaAgente() {
     const payload = { ...(activeSessionId ? { sessionId: activeSessionId } : {}), ...(orderRefRef.current ? { external_reference: orderRefRef.current } : {}), ...body };
     const { data, error } = await supabase.functions.invoke("ot-edilson-web", { body: payload });
     if (error) throw error;
+    if (data?.error) throw new Error(data.error);
     return data as T;
   }, [activeSessionId]);
 
   // ── Status (fonte única para liberar a sala) ───────────────────────────
-  const applyStatus = useCallback((d: { state?: OtState; session?: OtSession | null; minutesLeft?: number } | null) => {
+  const applyStatus = useCallback((d: { state?: OtState; session?: OtSession | null; minutesLeft?: number; rating?: number | null } | null) => {
     const st: OtState = (d?.state as OtState) || "none";
     const sess = d?.session ?? null;
     setOtState(st);
     setOtSession(sess);
+    if (st === "completed") {
+      const saved = d?.rating;
+      setRating(typeof saved === "number" ? saved as 1 | 2 | 3 : null);
+      setRatingDone(typeof saved === "number");
+      setSecondsLeft(0);
+    }
     if (sess?.expires_at) {
       setSecondsLeft(Math.max(0, Math.floor((Date.parse(sess.expires_at) - Date.now()) / 1000)));
     } else if (typeof d?.minutesLeft === "number") {
       setSecondsLeft(Math.max(0, Math.floor(d.minutesLeft * 60)));
     }
+    if (sess && "triage" in sess && sess.triage && typeof sess.triage === "object") setAnswers(sess.triage as Record<string, string>);
     return st;
   }, []);
 
+  const startRoomRef = useRef<(() => Promise<void>) | null>(null);
   const fetchStatus = useCallback(async () => {
     const d = await callFn<{ state?: OtState; session?: OtSession | null; minutesLeft?: number; order?: { external_reference: string; triagem?: Record<string, string>; qr_code?: string; qr_code_base64?: string; mp_payment_id?: string } }>({ action: "status" });
     const st = applyStatus(d);
@@ -236,12 +300,22 @@ export default function OrientacaoTecnicaAgente() {
       setOrderRef(d.order.external_reference);
       if (d.order.triagem) {
         setAnswers(d.order.triagem);
-        const missing = QUESTIONS.findIndex(item => !d.order?.triagem?.[item.id]?.trim());
+        const t = d.order.triagem;
+        const missing = QUESTIONS.findIndex((item) =>
+          item.optional ? false
+            : item.id === "queixa" ? !(t.queixa?.trim() && t.tempo?.trim())
+              : !t[item.id]?.trim());
         setStep(missing < 0 ? QUESTIONS.length - 1 : missing);
       }
-      if (d.order.qr_code && d.order.qr_code_base64) setPixData({ qr_code: d.order.qr_code, qr_code_base64: d.order.qr_code_base64, payment_id: d.order.mp_payment_id || "" });
+      if (d.order.qr_code && d.order.qr_code_base64) {
+        const qr = d.order.qr_code;
+        const image = d.order.qr_code_base64;
+        const paymentId = d.order.mp_payment_id || "";
+        setPixData((previous) => ({ qr_code: qr, qr_code_base64: image, payment_id: paymentId,
+          description: String(previous?.payment_id) === String(paymentId) ? previous?.description : undefined }));
+      }
     }
-    if (LIVE_STATES.includes(st) || st === "expired") setPhase("room");
+    if (LIVE_STATES.includes(st) || st === "expired" || st === "completed") setPhase("room");
     else if (st === "triage") setPhase(hasEmergency(d.order?.triagem || {}) ? "emergency" : "triage");
     else if (st === "awaiting_payment") setPhase("awaiting");
     else setPhase("intro");
@@ -256,7 +330,7 @@ export default function OrientacaoTecnicaAgente() {
 
   useEffect(() => {
     if (phase !== "awaiting" || !authed) return;
-    return setVisibleInterval(() => void fetchStatus().catch(() => undefined), 5000);
+    return setVisibleInterval(() => void fetchStatus().catch(() => undefined), 3000);
   }, [phase, authed, fetchStatus]);
 
   // ── Mensagens e relatórios da sala ─────────────────────────────────────
@@ -267,6 +341,7 @@ export default function OrientacaoTecnicaAgente() {
       setMessages(list);
     } catch (e) {
       console.warn("[ot] messages", e);
+      setChatError("Não foi possível carregar a conversa. Tente novamente ou chame a equipe.");
     }
   }, [callFn]);
 
@@ -276,6 +351,7 @@ export default function OrientacaoTecnicaAgente() {
       setReports(Array.isArray(d) ? d : d?.reports ?? []);
     } catch (e) {
       console.warn("[ot] reports", e);
+      setReportError("Não foi possível carregar seus relatórios. Tente novamente.");
     }
   }, [callFn]);
 
@@ -285,9 +361,53 @@ export default function OrientacaoTecnicaAgente() {
     void loadReports();
   }, [phase, loadMessages, loadReports]);
 
+  // ── Encerramento e avaliação (três carinhas) ─────────────────────────
+  const closeSession = useCallback(async () => {
+    if (closing) return;
+    setClosing(true);
+    try {
+      await callFn({ action: "close_session" });
+      setRatingDone(false);
+      setSecondsLeft(0);
+      setOtState("completed");
+    } catch {
+      toast({ title: "Não foi possível encerrar agora. Tente de novo.", variant: "destructive" });
+    } finally {
+      setClosing(false);
+    }
+  }, [callFn, closing, toast]);
+
+  const submitRating = useCallback(async (value: 1 | 2 | 3 | null) => {
+    if (submittingRating) return;
+    setSubmittingRating(true);
+    setRatingError(null);
+    try {
+      if (value) {
+        const result = await callFn<{ rating: 1 | 2 | 3; comment: string | null }>({ action: "submit_rating", rating: value, comment: ratingComment.trim() || undefined });
+        if (![1, 2, 3].includes(result.rating)) throw new Error("rating_not_confirmed");
+        setRating(result.rating);
+        setRatingComment(result.comment || "");
+      } else {
+        await callFn({ action: "skip_rating" });
+      }
+      setRatingDone(true);
+      setOtState("completed");
+    } catch {
+      setRatingError("Não foi possível confirmar sua avaliação. Tente de novo.");
+      toast({ title: "Não foi possível registrar sua avaliação. Tente de novo.", variant: "destructive" });
+    } finally {
+      setSubmittingRating(false);
+    }
+  }, [callFn, ratingComment, submittingRating, toast]);
+
+  useEffect(() => {
+    if (otState !== "completed") return;
+    ratingPanelRef.current?.scrollIntoView({ block: "center", behavior: "instant" });
+  }, [otState, ratingDone]);
+
   // Poll da sala (5s): status (pausa/expiração) + mensagens (inclui Dr. Edilson humano).
   useEffect(() => {
-    if (phase !== "room" || otState === "expired") return;
+    if (phase !== "room" || otState === "expired" || otState === "completed") return;
     const cleanup = setVisibleInterval(() => {
       if (streaming) return;
       void fetchStatus().catch(() => undefined);
@@ -320,6 +440,10 @@ export default function OrientacaoTecnicaAgente() {
   }, [messages, streamText, pendingPatient]);
 
   useEffect(() => {
+    if (phase === "checkout" || phase === "triage" || phase === "awaiting") window.scrollTo({ top: 0, behavior: "instant" });
+  }, [phase]);
+
+  useEffect(() => {
     if (phase === "room" && otState === "active" && !streaming) inputRef.current?.focus();
   }, [phase, otState, streaming]);
 
@@ -327,10 +451,20 @@ export default function OrientacaoTecnicaAgente() {
   const q = QUESTIONS[step];
 
   const saveAnswer = async (value: string) => {
-    if (savingAnswer || !orderRef) return;
+    if (savingAnswer) return;
+    if (!orderRef) {
+      // Sem pedido pago vinculado, a resposta não tem onde ser gravada: explica em vez de falhar em silêncio.
+      toast({
+        title: "Pagamento ainda não vinculado",
+        description: "Conclua o pagamento de R$ 30 para gravarmos suas respostas e liberarmos a orientação.",
+        variant: "destructive",
+      });
+      setPhase("checkout");
+      return;
+    }
     const fields = invalidTriageFields({ [q.id]: value }, false);
     if (fields.length) {
-      toast({ title: "Revise sua resposta", description: q.id === "idade" ? "Informe uma idade de 0 a 120 anos." : "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
+      toast({ title: "Revise sua resposta", description: "Escreva pelo menos 3 caracteres para a queixa.", variant: "destructive" });
       return;
     }
     setSavingAnswer(true);
@@ -339,15 +473,80 @@ export default function OrientacaoTecnicaAgente() {
       setAnswers(response.triagem);
       setDraft("");
       if (response.state === "emergency") setPhase("emergency");
-      else if (response.state === "ready") await fetchStatus();
+      else if (response.state === "ready") {
+        // A última resposta obrigatória já libera a sala no servidor, mas a
+        // pergunta opcional (objetivo) ainda não apareceu: mostra antes de iniciar.
+        const objetivoPendente = step < QUESTIONS.length - 1 && !(response.triagem?.objetivo || "").trim();
+        if (objetivoPendente) setStep(QUESTIONS.length - 1);
+        else {
+          const st = await fetchStatus();
+          if (st === "ready") await startRoomRef.current?.();
+        }
+      }
       else if (step < QUESTIONS.length - 1) setStep(step + 1);
+      else {
+        // Última pergunta respondida mas alguma anterior ficou vazia/inválida: leva até ela em vez de travar.
+        const bad = invalidTriageFields(response.triagem || {});
+        const idx = QUESTIONS.findIndex(item => bad.includes(item.id));
+        if (idx >= 0) {
+          setStep(idx);
+          toast({ title: "Falta revisar uma resposta", description: "Complete esta pergunta para liberar sua Orientação." });
+        } else await fetchStatus();
+      }
     } catch {
       toast({ title: "Não foi possível salvar a resposta", description: "Sua pergunta permanece aqui. Tente novamente.", variant: "destructive" });
     } finally { setSavingAnswer(false); }
   };
 
+  // Tela 2 (combo): grava queixa + tempo em sequência e avança uma única vez.
+  const saveComboAnswers = async () => {
+    const queixa = (draft || answers.queixa || "").trim();
+    const tempo = comboTempo || answers.tempo || "";
+    if (!queixa || queixa.length < 3) {
+      toast({ title: "Descreva o problema", description: "Escreva pelo menos 3 caracteres sobre o que você está sentindo.", variant: "destructive" });
+      return;
+    }
+    if (!tempo) {
+      toast({ title: "Selecione o tempo", description: "Escolha há quanto tempo você sente isso.", variant: "destructive" });
+      return;
+    }
+    if (!orderRef) {
+      toast({ title: "Pagamento ainda não vinculado", description: "Conclua o pagamento de R$ 30 para gravarmos suas respostas.", variant: "destructive" });
+      setPhase("checkout");
+      return;
+    }
+    setSavingAnswer(true);
+    try {
+      await callFn({ action: "save_triage", answer: { queixa } });
+      const response = await callFn<{ state: string; triagem: Record<string, string> }>({ action: "save_triage", answer: { tempo } });
+      setAnswers(response.triagem);
+      setDraft("");
+      setComboTempo("");
+      if (step < QUESTIONS.length - 1) setStep(step + 1);
+      else await fetchStatus();
+    } catch {
+      toast({ title: "Não foi possível salvar a resposta", description: "Sua pergunta permanece aqui. Tente novamente.", variant: "destructive" });
+    } finally { setSavingAnswer(false); }
+  };
+
+  // Pergunta opcional (expectativa): pular sem gravar.
+  const skipOptional = async () => {
+    if (step < QUESTIONS.length - 1) { setStep(step + 1); return; }
+    try {
+      const st = await fetchStatus();
+      if (st === "ready") await startRoomRef.current?.();
+    } catch { /* status já tratado */ }
+  };
+
+  const isQuestionAnswered = (item: TriageQuestion) =>
+    item.id === "queixa"
+      ? !!(answers.queixa?.trim() && answers.tempo?.trim())
+      : item.optional
+        ? true
+        : !!answers[item.id]?.trim();
+
   const startTriage = () => {
-    setStep(Math.max(0, QUESTIONS.findIndex(item => !answers[item.id]?.trim())));
+    setStep(Math.max(0, QUESTIONS.findIndex((item) => !isQuestionAnswered(item))));
     setPhase("triage");
   };
 
@@ -372,7 +571,7 @@ export default function OrientacaoTecnicaAgente() {
         window.history.replaceState(null, "", url);
       }
       if (method === "pix" && data.qr_code && data.qr_code_base64) {
-        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id });
+        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id, description: data.description });
         setAwaitingSince(Date.now());
         setPhase("awaiting");
       } else if (data.init_point) window.location.href = data.init_point;
@@ -417,6 +616,7 @@ export default function OrientacaoTecnicaAgente() {
       setStarting(false);
     }
   };
+  startRoomRef.current = startRoom;
 
   // ── Anexos (PDF/imagem → bucket privado ot-attachments) ────────────────
   const onPickFile = async (file: File | undefined) => {
@@ -475,6 +675,7 @@ export default function OrientacaoTecnicaAgente() {
     setInput("");
     setAttachment(null);
     setStreaming(true);
+    setChatError(null);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -491,7 +692,8 @@ export default function OrientacaoTecnicaAgente() {
             action: "chat",
             message: text,
             ...(att ? { attachment: att } : {}),
-            ...(activeSessionId ? { sessionId: activeSessionId } : {}),
+            ...(otSession?.id ? { sessionId: otSession.id } : {}),
+            ...(orderRefRef.current ? { external_reference: orderRefRef.current } : {}),
           }),
         },
       );
@@ -506,43 +708,53 @@ export default function OrientacaoTecnicaAgente() {
         setOtState("expired");
         return;
       }
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok || !res.body) {
+        const failure = await res.json().catch(() => null);
+        throw new Error(failure?.error || "Não foi possível receber a resposta agora.");
+      }
+
+      // Encerramento automático: o servidor responde JSON (não SSE) quando o
+      // paciente se despediu — mostra a despedida e abre a avaliação.
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await res.json().catch(() => null);
+        if (data?.closed && data?.farewell) {
+          setMessages(prev => [...prev, { id: `farewell-${Date.now()}`, role: "agent", content: data.farewell, created_at: new Date().toISOString() }]);
+          setRatingDone(false);
+          setSecondsLeft(0);
+          setOtState("completed");
+          return;
+        }
+        throw new Error(data?.error || "Não foi possível receber a resposta agora.");
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = "";
+      const parse = createOtStreamParser();
       let acc = "";
       setStreamText("");
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const payload = line.slice(6).trim();
-          if (payload === "[DONE]") continue;
-          try {
-            const delta = JSON.parse(payload)?.choices?.[0]?.delta?.content;
-            if (typeof delta === "string" && delta) {
-              acc += delta;
-              setStreamText(acc);
-            }
-          } catch { /* keep-alive ou fragmento */ }
-        }
+        acc += parse(decoder.decode(value, { stream: true }));
+        setStreamText(acc);
       }
+      acc += parse(decoder.decode() + "\n");
       if (!acc) throw new Error("resposta vazia");
+      setMessages(prev => [...prev, { id: `reply-${Date.now()}`, role: "agent", content: acc, created_at: new Date().toISOString() }]);
     } catch (e) {
       console.error("[ot] chat", e);
+      setInput(text);
+      setAttachment(att);
+      setChatError(e instanceof Error ? e.message : "A resposta falhou. Sua mensagem foi preservada.");
       toast({
         title: "Falha momentânea de conexão",
         description: "Sua mensagem pode não ter sido entregue. Reenvie, por favor.",
         variant: "destructive",
       });
     } finally {
-      await loadMessages();
+      if (pendingPatient) setMessages(prev => [...prev, pendingPatient]);
       setPendingPatient(null);
       setStreamText(null);
       setStreaming(false);
@@ -551,15 +763,18 @@ export default function OrientacaoTecnicaAgente() {
 
   const generateReport = async () => {
     setGeneratingReport(true);
+    setReportError(null);
     try {
-      await callFn({ action: "generate_report" });
+      const result = await callFn<{ success?: boolean; report_id?: string }>({ action: "generate_report", sessionId: otSession?.id });
+      if (!result.success || !result.report_id) throw new Error("O relatório não foi gravado. Tente novamente.");
       toast({
-        title: "Relatório enviado para revisão",
-        description: "O Dr. Edilson Bezerra revisa e aprova antes de liberar o PDF para você.",
+        title: "Relatório educativo pronto",
+        description: "Você já pode baixar o PDF. Gerado por IA; revisão médica pendente.",
       });
       await loadReports();
     } catch (e) {
       console.error("[ot] report", e);
+      setReportError("Não foi possível gerar o relatório. Tente novamente ou chame a equipe.");
       toast({ title: "Não foi possível gerar o relatório agora", description: "Tente novamente em instantes.", variant: "destructive" });
     } finally {
       setGeneratingReport(false);
@@ -567,6 +782,18 @@ export default function OrientacaoTecnicaAgente() {
   };
 
   const resetForNew = () => {
+    orderRefRef.current = null;
+    setOrderRef(null);
+    setOtSession(null);
+    setOtState("none");
+    setAnswers({});
+    setPixData(null);
+    setFullRoom(false);
+    setRatingDone(false);
+    setRating(null);
+    setRatingComment("");
+    setRatingError(null);
+    navigate("/orientacao-tecnica?new=1", { replace: true });
     setMessages([]);
     setReports([]);
     setStep(0);
@@ -579,6 +806,34 @@ export default function OrientacaoTecnicaAgente() {
     return list;
   }, [messages, pendingPatient]);
 
+  const downloadableReport = useMemo(
+    () => reports.find((r) => canDownloadOtReport(r.status, !!r.educational_released_at)),
+    [reports],
+  );
+
+  // Link de indicação da própria conta logada (mostrado na tela de encerramento).
+  useEffect(() => {
+    if (otState !== "completed" || !ratingDone || !userId || refCode) return;
+    let alive = true;
+    void (async () => {
+      const code = await loadPermanentReferralCode(userId);
+      if (alive) setRefCode(code);
+    })().catch(() => { /* No unpersisted fallback link. The panel offers retry. */ });
+    return () => { alive = false; };
+  }, [otState, ratingDone, userId, refCode]);
+
+  const copyRefLink = async () => {
+    if (!refCode) return;
+    try {
+      await navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro?ref=${refCode}`);
+      setCopiedRef(true);
+      toast({ title: "Link de indicação copiado!" });
+      setTimeout(() => setCopiedRef(false), 4000);
+    } catch {
+      toast({ title: "Erro ao copiar", description: "Selecione o link e copie manualmente.", variant: "destructive" });
+    }
+  };
+
   const firstName = (answers.nome || "").split(" ")[0];
   const awaitingLong = Date.now() - awaitingSince > 3 * 60 * 1000;
 
@@ -587,7 +842,7 @@ export default function OrientacaoTecnicaAgente() {
     <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
 
-      <main className="flex-1 pt-24 pb-12 md:pt-28">
+      <main className="flex-1 pt-[calc(var(--site-header-height,96px)+16px)] pb-12">
         <div className="container mx-auto px-4 max-w-3xl">
           {/* Cabeçalho */}
           {phase !== "room" && (
@@ -704,7 +959,7 @@ export default function OrientacaoTecnicaAgente() {
 
                   <p className="text-xs text-muted-foreground">
                     Como funciona: <strong className="text-foreground">1.</strong> pagamento seguro de R$ 30 pelo Mercado Pago →{" "}
-                    <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (10 perguntas), após confirmação →{" "}
+                    <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (5 perguntas), após confirmação →{" "}
                     <strong className="text-foreground">3.</strong> sala com o Dr. Edilson ON, após concluir a triagem.
                   </p>
 
@@ -730,13 +985,21 @@ export default function OrientacaoTecnicaAgente() {
           {phase === "emergency" && (
             <div role="alert" className="border-2 border-destructive bg-destructive/10 p-6 space-y-4">
               <AlertTriangle className="text-destructive" size={40} />
-              <h2 className="text-2xl font-bold text-destructive">Sinal de emergência: SAMU 192</h2>
-              <p>Procure atendimento presencial agora. Ligue 192 ou vá ao pronto-socorro mais próximo. A sala não será liberada.</p>
-              <Button variant="outline" onClick={() => { setStep(9); setPhase("triage"); }}>Marquei por engano — revisar resposta</Button>
+              <h2 className="text-2xl font-bold text-destructive">Você não está sozinho(a) — procure ajuda agora</h2>
+              <p>Pelo que você relatou, o mais seguro é atendimento presencial imediato: ligue <strong>SAMU 192</strong> ou vá ao pronto-socorro mais próximo. Se estiver passando por uma crise emocional, o <strong>CVV 188</strong> atende 24h, de graça.</p>
+              <p className="text-sm text-muted-foreground">Seu pagamento continua válido e guardado — quando estiver em segurança, você pode voltar e corrigir sua resposta sem pagar de novo.</p>
+              <Button variant="outline" onClick={() => { setStep(0); setPhase("triage"); }}>Voltar e corrigir minha resposta</Button>
             </div>
           )}
 
           {/* ── TRIAGEM ── */}
+          {orientationPaymentConfirmed(otState) && (phase === "triage" || otState === "ready") && (
+            <PaymentConfirmedNotice pix={!!pixData} label={phase === "triage" ? "Continuar triagem" : "Continuar atendimento"}
+              onContinue={() => {
+                if (phase === "triage") questionCardRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+                else if (otState === "ready") void startRoom();
+              }} />
+          )}
           {phase === "triage" && (
             <Card ref={questionCardRef} className="border-border scroll-mt-24">
               <CardContent className="p-6 md:p-8">
@@ -744,6 +1007,13 @@ export default function OrientacaoTecnicaAgente() {
                 <p className="text-xs text-muted-foreground font-bold text-right mb-6">
                   Enfª Brisa · Pergunta {step + 1} de {QUESTIONS.length}
                 </p>
+
+                {(profileName || profileAge !== null) && (
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Atendendo: <strong className="text-foreground">{profileName || "paciente cadastrado"}</strong>
+                    {profileAge !== null ? ` · ${profileAge} anos` : ""} (dados do seu cadastro)
+                  </p>
+                )}
 
                 <h2 className="text-xl md:text-2xl font-display font-black text-foreground mb-1">{q.label}</h2>
                 <p className="text-sm text-muted-foreground mb-6">{q.hint}</p>
@@ -757,6 +1027,54 @@ export default function OrientacaoTecnicaAgente() {
                         <span>{opt.label}</span><ChevronRight size={18} />
                       </Button>
                     ))}
+                    {q.optional && (
+                      <button type="button" onClick={() => void skipOptional()} disabled={savingAnswer}
+                        className="w-full text-center text-xs text-muted-foreground hover:text-foreground underline pt-1">
+                        Pular esta pergunta
+                      </button>
+                    )}
+                  </div>
+                ) : q.type === "scale" ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-6 gap-2" role="group" aria-label="Escala de intensidade de 0 a 10">
+                      {Array.from({ length: 11 }, (_, n) => (
+                        <Button key={n} variant="outline" disabled={savingAnswer}
+                          onClick={() => void saveAnswer(String(n))}
+                          className={`h-12 font-black ${answers[q.id] === String(n) ? "border-primary bg-primary/10" : "border-border"}`}>
+                          {n}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[11px] text-muted-foreground px-1">
+                      <span>Nenhum sintoma</span><span>Insuportável</span>
+                    </div>
+                  </div>
+                ) : q.type === "combo" ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      value={draft || answers.queixa || ""}
+                      onChange={(e) => setDraft(e.target.value)}
+                      rows={4}
+                      placeholder="Descreva o principal problema com suas palavras..."
+                      aria-label="Qual o principal problema?"
+                    />
+                    <div className="flex flex-wrap gap-2" role="group" aria-label="Há quanto tempo?">
+                      {(q.options || []).map((label) => (
+                        <Button key={label} size="sm" variant="outline" disabled={savingAnswer}
+                          onClick={() => setComboTempo(label)}
+                          className={`rounded-full ${(comboTempo || answers.tempo) === label ? "border-primary bg-primary/10" : "border-border"}`}>
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => void saveComboAnswers()}
+                      disabled={savingAnswer || !(draft || answers.queixa || "").trim() || !(comboTempo || answers.tempo)}
+                      className="w-full h-12 rounded-2xl font-black"
+                    >
+                      {savingAnswer ? <Loader2 size={16} className="animate-spin mr-1" /> : null}
+                      Continuar <ChevronRight size={16} className="ml-1" />
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -773,21 +1091,28 @@ export default function OrientacaoTecnicaAgente() {
                         value={draft || answers[q.id] || ""}
                         onChange={(e) => setDraft(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter" && !savingAnswer) { e.preventDefault(); void saveAnswer((draft || answers[q.id] || "").trim()); } }}
-                        inputMode={q.id === "idade" ? "numeric" : "text"}
                         placeholder="Digite aqui..."
                         aria-label={q.label}
                       />
                     )}
-                    <Button
-                      onClick={() => {
-                        const v = (draft || answers[q.id] || "").trim();
-                        if (v) void saveAnswer(v);
-                      }}
-                      disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
-                      className="w-full h-12 rounded-2xl font-black"
-                    >
-                      Continuar <ChevronRight size={16} className="ml-1" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          const v = (draft || answers[q.id] || "").trim();
+                          if (v) void saveAnswer(v);
+                        }}
+                        disabled={savingAnswer || !(draft || answers[q.id] || "").trim()}
+                        className="flex-1 h-12 rounded-2xl font-black"
+                      >
+                        Continuar <ChevronRight size={16} className="ml-1" />
+                      </Button>
+                      {q.allowNone && (
+                        <Button variant="outline" onClick={() => void saveAnswer("Nenhum")} disabled={savingAnswer}
+                          className="h-12 rounded-2xl font-bold">
+                          Nenhum
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -813,14 +1138,14 @@ export default function OrientacaoTecnicaAgente() {
                     <p className="font-black text-red-500 mb-1">Sinal de emergência identificado</p>
                     <p className="text-muted-foreground">
                       Pelo que você relatou, procure atendimento presencial agora: ligue <strong>SAMU 192</strong> ou
-                      vá ao pronto-socorro mais próximo. A Orientação Técnica não substitui urgência médica, por isso o
-                      pagamento não está disponível neste momento.
+                      vá ao pronto-socorro mais próximo. Em crise emocional, o <strong>CVV 188</strong> atende 24h.
+                      A Orientação Técnica não substitui urgência médica, por isso o pagamento não está disponível neste momento.
                     </p>
                     <button
-                      onClick={() => { setStep(QUESTIONS.length - 1); setPhase("triage"); }}
+                      onClick={() => { setStep(0); setPhase("triage"); }}
                       className="mt-3 text-xs underline text-muted-foreground"
                     >
-                      Marquei por engano — revisar resposta
+                      Voltar e corrigir minha resposta
                     </button>
                   </div>
                 </div>
@@ -870,7 +1195,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1 justify-center">
-                      <ShieldCheck size={12} className="text-primary" /> Pix instantâneo ou cartão. A triagem abre após a confirmação.
+                      <ShieldCheck size={12} className="text-primary" /> Pix ou cartão. A triagem abre após a confirmação do pagamento.
                     </p>
                   </CardContent>
                 </Card>
@@ -888,6 +1213,10 @@ export default function OrientacaoTecnicaAgente() {
                       <QrCode size={24} />
                       <h2>Pagamento Pix — R$ 30,00</h2>
                     </div>
+
+                    <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                      Pagamento: <strong>{formatPaymentName(pixData.description || "Orientação Técnica")}</strong> · R$ 30,00
+                    </p>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
                       Abra o aplicativo do seu banco, escolha <strong>Pix &gt; Ler QR Code</strong> ou use a opção <strong>Pix Copia e Cola</strong>. Não é necessário sair desta página: a triagem abre automaticamente após a confirmação!
@@ -992,20 +1321,23 @@ export default function OrientacaoTecnicaAgente() {
           {/* ── SALA (estilo WhatsApp) ── */}
           {phase === "room" && (
             <div className="space-y-4">
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-black/10">
-                {/* Header verde */}
-                <div className="flex items-center justify-between gap-3 px-3 py-2.5 bg-[#075E54] text-white">
-                  <div className="flex items-center gap-3 min-w-0">
+              <div className={`ot-room ${fullRoom ? "ot-room-full" : "border border-border"} ${largeText ? "ot-room-large" : ""}`} role={fullRoom ? "dialog" : undefined} aria-modal={fullRoom ? true : undefined} aria-label="Conversa de Orientação Técnica">
+                {/* Header verde (compacto) */}
+                <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-1.5">
+                  <div className="flex items-center gap-2 min-w-0">
                     <img
                       src={DrEdilsonPhoto}
                       alt="Dr. Edilson Bezerra"
-                      className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-white/30"
+                      className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-white/30"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
-                      <p className="text-[11px] text-white/80 truncate">Assistente de IA supervisionado</p>
+                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
                     </div>
                   </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" className="ot-tool h-9 w-9" title={largeText ? "Diminuir letra" : "Aumentar letra"} aria-label={largeText ? "Diminuir letra" : "Aumentar letra"} onClick={() => setLargeText(v => !v)}><Type size={18} /></Button>
+                  <Button variant="ghost" size="icon" className="ot-tool h-9 w-9" title={fullRoom ? "Minimizar conversa" : "Ampliar conversa"} aria-label={fullRoom ? "Minimizar conversa" : "Ampliar conversa"} onClick={() => setFullRoom(v => !v)}>{fullRoom ? <Minimize2 size={18} /> : <Maximize2 size={18} />}</Button>
                   {(otState === "active" || otState === "paused") && (
                     <div
                       className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black shrink-0 ${
@@ -1017,6 +1349,19 @@ export default function OrientacaoTecnicaAgente() {
                       <Clock size={12} /> {fmtClock(secondsLeft)}
                     </div>
                   )}
+                  {otState === "active" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ot-tool h-9 px-2 text-xs font-bold"
+                      onClick={() => void closeSession()}
+                      disabled={closing}
+                      aria-label="Encerrar orientação"
+                    >
+                      {closing ? <Loader2 size={14} className="animate-spin" /> : "Encerrar"}
+                    </Button>
+                  )}
+                  </div>
                 </div>
 
                 {otState === "paused" && (
@@ -1027,7 +1372,9 @@ export default function OrientacaoTecnicaAgente() {
                 )}
 
                 {/* Mensagens */}
-                <div ref={scrollRef} className="h-[58vh] min-h-[340px] overflow-y-auto px-3 py-4 space-y-2" style={CHAT_BG_STYLE}>
+                <div ref={scrollRef} className="ot-room-messages h-[58vh] min-h-[260px] overflow-y-auto px-3 py-4 space-y-2">
+                  <div className="flex justify-center"><span className="ot-system text-xs rounded-md px-3 py-1">Hoje</span></div>
+                  {otState === "active" && secondsLeft <= 300 && secondsLeft > 0 && <div role="status" className="ot-system text-center text-sm p-2 rounded-md">{secondsLeft <= 60 ? "Falta 1 minuto para encerrar." : "Faltam 5 minutos para encerrar."}</div>}
                   <div className="flex justify-center">
                     <span className="text-[11px] bg-[#FFF3C4] text-neutral-700 px-3 py-1.5 rounded-lg shadow-sm text-center max-w-[90%]">
                       🔒 Conversa educativa com assistente de IA supervisionado pelo Dr. Edilson Bezerra. Não é
@@ -1067,12 +1414,12 @@ export default function OrientacaoTecnicaAgente() {
                     return (
                       <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                         <div
-                          className={`relative max-w-[85%] rounded-lg px-3 py-2 shadow-sm text-sm text-neutral-900 ${
+                          className={`ot-message relative max-w-[85%] rounded-lg px-3 py-2 ${
                             mine
-                              ? "bg-[#DCF8C6] rounded-tr-none"
+                              ? "ot-message-mine rounded-tr-none"
                               : m.role === "supervisor"
-                                ? "bg-white rounded-tl-none border-l-4 border-amber-500"
-                                : "bg-white rounded-tl-none"
+                                ? "rounded-tl-none border-l-4 border-primary"
+                                : "rounded-tl-none"
                           }`}
                         >
                           {m.role === "supervisor" && (
@@ -1093,11 +1440,11 @@ export default function OrientacaoTecnicaAgente() {
                           {mine ? (
                             <p className="whitespace-pre-wrap break-words">{m.content}</p>
                           ) : (
-                            <div className="prose prose-sm max-w-none prose-neutral prose-a:text-[#075E54] break-words">
+                            <div className="max-w-none break-words">
                               <ReactMarkdown>{m.content}</ReactMarkdown>
                             </div>
                           )}
-                          <p className="text-[10px] text-neutral-500 text-right mt-0.5">{fmtHour(m.created_at)}</p>
+                          <div className="ot-meta flex justify-end items-center gap-1 mt-1">{fmtHour(m.created_at)}{mine && <CheckCheck size={14} aria-label="Mensagem registrada" />}</div>
                         </div>
                       </div>
                     );
@@ -1105,13 +1452,13 @@ export default function OrientacaoTecnicaAgente() {
 
                   {streamText !== null && (
                     <div className="flex justify-start">
-                      <div className="max-w-[85%] rounded-lg rounded-tl-none px-3 py-2 shadow-sm text-sm text-neutral-900 bg-white">
+                      <div className="ot-message max-w-[85%] rounded-lg rounded-tl-none px-3 py-2">
                         {streamText ? (
-                          <div className="prose prose-sm max-w-none prose-neutral break-words">
+                          <div className="max-w-none break-words">
                             <ReactMarkdown>{streamText}</ReactMarkdown>
                           </div>
                         ) : (
-                          <span className="text-neutral-500 text-xs animate-pulse">digitando…</span>
+                          <span className="ot-typing" aria-label="digitando"><span /><span /><span /></span>
                         )}
                       </div>
                     </div>
@@ -1124,8 +1471,136 @@ export default function OrientacaoTecnicaAgente() {
                 </div>
 
                 {/* Rodapé / input */}
-                <div className="bg-[#F0F0F0] px-2 py-2">
-                  {otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
+                <div className="ot-room-compose px-2 py-2">
+                  {/* Relatório dentro da sala: visível, com estado "Gerando… Ns" e depois "Baixar PDF" */}
+                  {(otState === "active" || otState === "paused") && messages.some((m) => m.role === "patient") && (
+                    <div className="flex justify-center pb-2">
+                      {downloadableReport ? (
+                        <Button size="sm" asChild className="ot-quick shrink-0 font-bold">
+                          <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
+                            <FileText size={14} className="mr-1" /> Baixar PDF do relatório
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="ot-quick shrink-0 font-bold"
+                          onClick={() => void generateReport()}
+                          disabled={generatingReport || streaming || reports.some((r) => r.status === "draft")}
+                        >
+                          {generatingReport ? (
+                            <><Loader2 size={14} className="animate-spin mr-1" /> Gerando… {reportWait}s</>
+                          ) : (
+                            <><FileText size={14} className="mr-1" /> Gerar relatório</>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                  {otState === "active" && <div className="flex gap-2 overflow-x-auto pb-2"><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Acordo de madrugada")}>Acordo de madrugada</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" onClick={() => setInput("Tenho dúvidas sobre tratamento")}>Dúvidas sobre tratamento</Button><Button size="sm" variant="outline" className="ot-quick shrink-0" asChild><a href={`https://wa.me/${BRISA_WHATSAPP}`} target="_blank" rel="noopener noreferrer">Falar com a equipe</a></Button></div>}
+                  {chatError && (
+                    <div role="alert" className="mb-3 p-3 bg-destructive/10 text-destructive text-sm space-y-2">
+                      <p>{chatError}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" onClick={() => { setChatError(null); void loadMessages(); }}>Tentar de novo</Button>
+                        <Button variant="outline" size="sm" asChild><a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent("Preciso falar com a equipe sobre minha Orientação Técnica paga.")}`} target="_blank" rel="noopener noreferrer">Chamar a equipe</a></Button>
+                      </div>
+                    </div>
+                  )}
+                  {otState === "completed" ? (
+                    !ratingDone ? (
+                      <div ref={ratingPanelRef} className="text-center space-y-4 py-3" role="group" aria-label="Avaliação da orientação">
+                        <p className="text-base font-black text-neutral-800">Como foi sua orientação?</p>
+                        <div className="flex items-start justify-center gap-4">
+                          {([
+                            { value: 1 as const, label: "Insatisfeito", Icon: Frown, active: "text-red-500 border-red-400 bg-red-50" },
+                            { value: 2 as const, label: "Neutro", Icon: Meh, active: "text-amber-500 border-amber-400 bg-amber-50" },
+                            { value: 3 as const, label: "Satisfeito", Icon: Smile, active: "text-green-600 border-green-500 bg-green-50" },
+                          ]).map(({ value, label, Icon, active }) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => setRating(value)}
+                              aria-pressed={rating === value}
+                              className={`flex flex-col items-center gap-1 p-3 rounded-2xl border-2 min-w-[84px] transition-colors ${
+                                rating === value ? active : "border-neutral-200 text-neutral-500 bg-white hover:border-neutral-300"
+                              }`}
+                            >
+                              <Icon size={40} strokeWidth={1.6} />
+                              <span className="text-xs font-bold">{label}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <Textarea
+                          value={ratingComment}
+                          onChange={(e) => setRatingComment(e.target.value)}
+                          rows={2}
+                          placeholder="Quer contar o que podemos melhorar? (opcional)"
+                          aria-label="Comentário opcional sobre a orientação"
+                          className="max-w-md mx-auto resize-none rounded-xl bg-white"
+                        />
+                        <div className="flex items-center justify-center gap-2">
+                          {ratingError && <p role="alert" className="text-sm text-destructive">{ratingError}</p>}
+                          <Button
+                            onClick={() => void submitRating(rating)}
+                            disabled={!rating || submittingRating}
+                            className="rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white"
+                          >
+                            {submittingRating ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
+                            {ratingError ? "Tentar de novo" : "Enviar avaliação"}
+                          </Button>
+                          <Button variant="ghost" onClick={() => void submitRating(null)} disabled={submittingRating} className="rounded-xl font-bold text-neutral-600">
+                            Pular
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div ref={ratingPanelRef} className="text-center space-y-4 py-3">
+                        <p className="text-base font-black text-neutral-800">Orientação encerrada. Obrigado! 🌿</p>
+                        {rating && <p role="status" className="text-sm text-primary">Obrigado pela avaliação! {rating === 3 ? "Satisfeito" : rating === 2 ? "Neutro" : "Insatisfeito"} ({rating}/3)</p>}
+                        <p className="text-xs text-neutral-600">Seu histórico e seu relatório continuam disponíveis nesta página.</p>
+                        <div className="flex flex-col items-center gap-2 max-w-sm mx-auto">
+                          {downloadableReport && (
+                            <Button asChild className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white">
+                              <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
+                                <FileText size={14} className="mr-1" /> Baixar relatório
+                              </Link>
+                            </Button>
+                          )}
+                          <Button onClick={() => navigate("/profissionais")} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
+                            Falar com um médico agora (Chat R$ 100 · Vídeo R$ 150) <ArrowRight size={14} className="ml-1" />
+                          </Button>
+                          <Button onClick={resetForNew} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
+                            Fazer nova orientação (R$ 30)
+                          </Button>
+                          <div className="w-full rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 p-3 text-left space-y-2">
+                            <p className="text-xs font-black text-neutral-800 flex items-center gap-1"><Gift size={14} className="text-[#075E54]" /> Indique a Planta y Raiz</p>
+                            <p className="text-[11px] text-neutral-700 leading-snug">
+                              Quando alguém indicado por você contrata um serviço, 50% do valor líquido é distribuído na rede em três níveis (25%, 15% e 10%). Os ganhos dependem de indicações que realmente contratem — não há ganho garantido.
+                            </p>
+                            {refCode ? (
+                              <div className="space-y-2">
+                                <div className="p-2 bg-white rounded-lg border border-[#25D366]/40 text-[11px] font-mono break-all select-all text-neutral-700">
+                                  https://plantayraiz.com.br/cadastro?ref={refCode}
+                                </div>
+                                <Button onClick={() => void copyRefLink()} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                                  {copiedRef ? <><Check size={14} className="mr-1" /> Link copiado!</> : "Copiar meu link de indicação"}
+                                </Button>
+                                <Button onClick={() => navigate("/afiliados/dashboard")} size="sm" variant="ghost" className="w-full rounded-lg font-bold text-neutral-600 text-xs">
+                                  Ver meu painel de indicações
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button onClick={() => navigate("/afiliados/dashboard")} size="sm" className="w-full rounded-lg font-black bg-[#25D366] hover:bg-[#1ebe5b] text-white">
+                                Obter meu link de indicação
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  ) : otState === "expired" || (otState === "active" && secondsLeft <= 0) ? (
                     <div className="text-center space-y-3 py-2">
                       <p className="text-sm font-bold text-neutral-800">Sessão de 30 minutos encerrada.</p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
@@ -1181,17 +1656,17 @@ export default function OrientacaoTecnicaAgente() {
                           disabled={otState !== "active"}
                           placeholder={otState === "paused" ? "Sala pausada pelo Dr. Edilson…" : "Mensagem"}
                           aria-label="Mensagem para o Dr. Edilson Bezerra ON"
-                          className="resize-none min-h-[44px] max-h-32 rounded-3xl bg-white text-neutral-900 border-0 shadow-sm px-4 py-3 focus-visible:ring-1 focus-visible:ring-[#075E54]"
+                          className="ot-input resize-none min-h-[44px] max-h-32 rounded-3xl border-0 px-4 py-3"
                         />
-                        <button
+                        <Button
                           type="button"
                           onClick={() => void sendMessage()}
                           disabled={streaming || otState !== "active" || (!input.trim() && !attachment)}
-                          className="h-11 w-11 shrink-0 rounded-full flex items-center justify-center bg-[#075E54] text-white disabled:opacity-50"
+                          className="ot-send h-11 w-11 shrink-0 rounded-full flex items-center justify-center disabled:opacity-50"
                           aria-label="Enviar mensagem"
                         >
                           {streaming ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                        </button>
+                        </Button>
                       </div>
                     </>
                   )}
@@ -1202,44 +1677,46 @@ export default function OrientacaoTecnicaAgente() {
               </div>
 
               {/* Relatórios */}
-              {otState !== "ready" && (
+              {otState !== "ready" && !fullRoom && (
                 <Card className="border-border">
                   <CardContent className="p-5 space-y-3">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="font-display font-black text-foreground text-sm">Relatório individual</p>
                         <p className="text-[11px] text-muted-foreground">
-                          Rascunho gerado pela IA e liberado somente após revisão e aprovação do Dr. Edilson Bezerra.
+                          Relatório educativo gerado por IA, disponível assim que concluído. Revisão médica pendente não bloqueia o PDF.
                         </p>
                       </div>
                       <Button
                         size="sm"
                         onClick={() => void generateReport()}
-                        disabled={generatingReport || timeline.length === 0 || reports.some((r) => r.status === "draft")}
+                        disabled={generatingReport || streaming || !messages.some(m => m.role === "patient") || reports.some((r) => r.status === "draft")}
                         className="rounded-xl font-bold shrink-0"
                       >
                         {generatingReport ? <Loader2 size={14} className="animate-spin mr-1" /> : <FileText size={14} className="mr-1" />}
-                        Gerar relatório
+                        {generatingReport ? "Gerando seu relatório…" : "Gerar relatório"}
                       </Button>
                     </div>
+                    {reportError && <p role="alert" className="text-sm text-destructive">{reportError}</p>}
+                    {generatingReport && <p role="status" className="text-sm text-muted-foreground">{reportWait >= 60 ? "A geração está demorando. Você pode chamar a equipe e consultar seus relatórios sem pagar novamente; não há confirmação de envio por e-mail ou WhatsApp." : `Montando seu relatório… ${reportWait}s`} {reportWait >= 60 && <Button variant="outline" size="sm" onClick={() => void loadReports()}>Verificar relatório</Button>}</p>}
 
                     {reports.length > 0 && (
                       <ul className="divide-y divide-border">
                         {reports.map((r) => (
                           <li key={r.id} className="py-2 flex items-center justify-between gap-3 text-sm">
                             <span className="text-muted-foreground text-xs">{fmtDateTime(r.created_at)}</span>
-                            {r.status === "approved" ? (
+                            {canDownloadOtReport(r.status, !!r.educational_released_at) ? (
                               <Link
                                 to={`/orientacao-tecnica/relatorio/${r.id}`}
                                 className="inline-flex items-center gap-1 text-primary font-bold text-xs"
                               >
-                                <CheckCircle2 size={13} /> Aprovado · Ver e baixar PDF <ArrowRight size={12} />
+                                <CheckCircle2 size={13} /> {r.status === "approved" ? "Revisado" : "Educativo · revisão pendente"} · Baixar PDF <ArrowRight size={12} />
                               </Link>
                             ) : r.status === "rejected" ? (
                               <span className="text-xs font-bold text-red-500">Não aprovado — gere um novo após conversar mais</span>
                             ) : (
                               <span className="text-xs font-bold text-amber-500 inline-flex items-center gap-1">
-                                <Loader2 size={12} className="animate-spin" /> Aguardando revisão do Dr. Edilson
+                                <Loader2 size={12} className="animate-spin" /> Revisão médica pendente
                               </span>
                             )}
                           </li>

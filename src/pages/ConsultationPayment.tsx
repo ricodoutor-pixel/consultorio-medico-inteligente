@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { userChannel } from "@/lib/realtime-channels";
 import { usePaymentGateway } from "@/hooks/usePaymentGateway";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -310,6 +311,7 @@ const ConsultationPayment = () => {
                   </div>
                 ) : status === "confirmed" ? (
                   <div className="text-center py-8">
+                    <PaymentConfirmedNotice label="Continuar atendimento" to={appointmentId ? `/sala-espera?appointment=${encodeURIComponent(appointmentId)}` : "/dashboard"} />
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Confirmado!</h4>
                     <p className="text-muted-foreground mb-4">Sua consulta com {proView.name} está agendada.</p>

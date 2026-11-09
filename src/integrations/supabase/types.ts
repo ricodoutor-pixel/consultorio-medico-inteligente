@@ -841,6 +841,41 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes_orientacao: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_orientacao_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "ot_web_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author: string
@@ -1214,6 +1249,24 @@ export type Database = {
           raw_payload?: Json | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      brisa_processed_messages: {
+        Row: {
+          processed_at: string
+          remote_jid: string
+          wa_message_id: string
+        }
+        Insert: {
+          processed_at?: string
+          remote_jid: string
+          wa_message_id: string
+        }
+        Update: {
+          processed_at?: string
+          remote_jid?: string
+          wa_message_id?: string
         }
         Relationships: []
       }
@@ -2715,6 +2768,8 @@ export type Database = {
           contract_ip: string | null
           contract_signed_at: string | null
           contract_version: string | null
+          council_number: string | null
+          council_type: string
           country: string | null
           created_at: string
           crm: string
@@ -2762,6 +2817,8 @@ export type Database = {
           contract_ip?: string | null
           contract_signed_at?: string | null
           contract_version?: string | null
+          council_number?: string | null
+          council_type?: string
           country?: string | null
           created_at?: string
           crm: string
@@ -2809,6 +2866,8 @@ export type Database = {
           contract_ip?: string | null
           contract_signed_at?: string | null
           contract_version?: string | null
+          council_number?: string | null
+          council_type?: string
           country?: string | null
           created_at?: string
           crm?: string
@@ -5688,6 +5747,103 @@ export type Database = {
           },
         ]
       }
+      ot_messages: {
+        Row: {
+          attachment_mime: string | null
+          attachment_name: string | null
+          attachment_path: string | null
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+        }
+        Insert: {
+          attachment_mime?: string | null
+          attachment_name?: string | null
+          attachment_path?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+        }
+        Update: {
+          attachment_mime?: string | null
+          attachment_name?: string | null
+          attachment_path?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ot_web_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ot_reports: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          content_hash: string | null
+          content_md: string
+          created_at: string
+          educational_released_at: string | null
+          generation_ms: number | null
+          id: string
+          rejection_reason: string | null
+          session_id: string
+          status: string
+          user_id: string
+          verification_code: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          content_hash?: string | null
+          content_md: string
+          created_at?: string
+          educational_released_at?: string | null
+          generation_ms?: number | null
+          id?: string
+          rejection_reason?: string | null
+          session_id: string
+          status?: string
+          user_id: string
+          verification_code?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          content_hash?: string | null
+          content_md?: string
+          created_at?: string
+          educational_released_at?: string | null
+          generation_ms?: number | null
+          id?: string
+          rejection_reason?: string | null
+          session_id?: string
+          status?: string
+          user_id?: string
+          verification_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "ot_web_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ot_token_access_log: {
         Row: {
           accessed_at: string
@@ -5716,13 +5872,17 @@ export type Database = {
         Row: {
           closed_at: string | null
           created_at: string
-          expires_at: string
+          expires_at: string | null
           external_reference: string
           id: string
           last_message_at: string | null
           messages_count: number
           mp_payment_id: string | null
-          started_at: string
+          paused: boolean
+          paused_at: string | null
+          paused_by: string | null
+          report_generation_started_at: string | null
+          started_at: string | null
           status: string
           triage: Json
           user_id: string
@@ -5730,13 +5890,17 @@ export type Database = {
         Insert: {
           closed_at?: string | null
           created_at?: string
-          expires_at: string
+          expires_at?: string | null
           external_reference: string
           id?: string
           last_message_at?: string | null
           messages_count?: number
           mp_payment_id?: string | null
-          started_at?: string
+          paused?: boolean
+          paused_at?: string | null
+          paused_by?: string | null
+          report_generation_started_at?: string | null
+          started_at?: string | null
           status?: string
           triage?: Json
           user_id: string
@@ -5744,13 +5908,17 @@ export type Database = {
         Update: {
           closed_at?: string | null
           created_at?: string
-          expires_at?: string
+          expires_at?: string | null
           external_reference?: string
           id?: string
           last_message_at?: string | null
           messages_count?: number
           mp_payment_id?: string | null
-          started_at?: string
+          paused?: boolean
+          paused_at?: string | null
+          paused_by?: string | null
+          report_generation_started_at?: string | null
+          started_at?: string | null
           status?: string
           triage?: Json
           user_id?: string
@@ -6005,6 +6173,119 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_notify_attempts: {
+        Row: {
+          attempt_no: number
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          external_reference: string
+          http_status: number | null
+          id: string
+          log_id: string
+          provider_message_id: string | null
+          status: string
+          trigger: string
+        }
+        Insert: {
+          attempt_no: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          external_reference: string
+          http_status?: number | null
+          id?: string
+          log_id: string
+          provider_message_id?: string | null
+          status: string
+          trigger?: string
+        }
+        Update: {
+          attempt_no?: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          external_reference?: string
+          http_status?: number | null
+          id?: string
+          log_id?: string
+          provider_message_id?: string | null
+          status?: string
+          trigger?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_notify_attempts_log_id_fkey"
+            columns: ["log_id"]
+            isOneToOne: false
+            referencedRelation: "payment_notify_log"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_notify_log: {
+        Row: {
+          amount_brl: number | null
+          attempts: number
+          channel: string
+          created_at: string
+          delivered_at: string | null
+          delivery_status: string | null
+          error: string | null
+          external_reference: string
+          http_status: number | null
+          id: string
+          last_attempt_at: string | null
+          payment_id: string | null
+          provider_message_id: string | null
+          receipt_checked_at: string | null
+          recipient: string
+          sent_at: string | null
+          service: string | null
+          status: string
+        }
+        Insert: {
+          amount_brl?: number | null
+          attempts?: number
+          channel?: string
+          created_at?: string
+          delivered_at?: string | null
+          delivery_status?: string | null
+          error?: string | null
+          external_reference: string
+          http_status?: number | null
+          id?: string
+          last_attempt_at?: string | null
+          payment_id?: string | null
+          provider_message_id?: string | null
+          receipt_checked_at?: string | null
+          recipient: string
+          sent_at?: string | null
+          service?: string | null
+          status?: string
+        }
+        Update: {
+          amount_brl?: number | null
+          attempts?: number
+          channel?: string
+          created_at?: string
+          delivered_at?: string | null
+          delivery_status?: string | null
+          error?: string | null
+          external_reference?: string
+          http_status?: number | null
+          id?: string
+          last_attempt_at?: string | null
+          payment_id?: string | null
+          provider_message_id?: string | null
+          receipt_checked_at?: string | null
+          recipient?: string
+          sent_at?: string | null
+          service?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       payment_provider_health: {
         Row: {
           checked_at: string
@@ -6035,6 +6316,36 @@ export type Database = {
           latency_ms?: number | null
           provider?: string
           status?: string
+        }
+        Relationships: []
+      }
+      payment_services: {
+        Row: {
+          active: boolean
+          amount_brl: number
+          code: string
+          descriptor: string
+          display_name: string
+          recurring: boolean
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amount_brl: number
+          code: string
+          descriptor?: string
+          display_name: string
+          recurring?: boolean
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amount_brl?: number
+          code?: string
+          descriptor?: string
+          display_name?: string
+          recurring?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -6841,6 +7152,36 @@ export type Database = {
           trade_name?: string | null
           updated_at?: string
           user_type?: string
+        }
+        Relationships: []
+      }
+      pubmed_query_audit: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          session_id: string | null
+          source: string
+          status: string
+          total: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          session_id?: string | null
+          source?: string
+          status: string
+          total?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          session_id?: string | null
+          source?: string
+          status?: string
+          total?: number | null
         }
         Relationships: []
       }

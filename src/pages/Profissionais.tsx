@@ -624,11 +624,11 @@ const Profissionais = () => {
                           </span>
                         </div>
 
-                        {/* Orientação Técnica (triagem educativa da plataforma, R$ 30) → seção da landing Telemedicina */}
+                        {/* Orientação Técnica → página única com pagamento, triagem e sala */}
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate("/telemedicina#orientacao-tecnica");
+                            navigate("/orientacao-tecnica");
                           }}
                           className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10 shadow-md shadow-green-600/20"
                         >

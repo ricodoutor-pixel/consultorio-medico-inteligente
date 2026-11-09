@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,8 +13,54 @@ import { Download, Smartphone, Flame, Share, Plus, Check, Monitor, Sparkles, Fol
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { APP_INSTALL_URL } from "@/components/AppInstallQR";
 
 const IOS_HINT_KEY = "pyr_ios_install_hint_shown";
+
+// QR Code compacto: aponta a câmera e o celular abre a página de instalação.
+function MiniInstallQR() {
+  const [dataUrl, setDataUrl] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    QRCode.toDataURL(APP_INSTALL_URL, {
+      width: 320,
+      margin: 1,
+      errorCorrectionLevel: "M",
+      color: { dark: "#1B4332", light: "#FFFFFF" },
+    })
+      .then((url) => {
+        if (alive) setDataUrl(url);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  return (
+    <div className="mt-3 flex flex-col items-center gap-1.5">
+      <div className="rounded-xl bg-white p-2 shadow-lg shadow-emerald-900/20 border border-emerald-500/25">
+        {dataUrl ? (
+          <img
+            src={dataUrl}
+            alt="QR Code para instalar o app Planta y Raiz"
+            width={104}
+            height={104}
+            className="block w-[104px] h-[104px]"
+          />
+        ) : (
+          <div className="w-[104px] h-[104px]" />
+        )}
+      </div>
+      <p className="text-[11px] font-semibold text-muted-foreground text-center leading-tight">
+        Aponte a câmera do celular
+        <br />
+        para instalar o app
+      </p>
+    </div>
+  );
+}
 
 export function PWAInstallSection() {
   const { canInstall, isInstalled, isIOS, isDesktop, promptInstall, downloadDesktopShortcut } = usePWAInstall();
@@ -167,6 +214,8 @@ export function PWAInstallSection() {
                       Ou clique aqui para baixar apenas o arquivo de atalho (.url)
                     </button>
                   )}
+
+                  <MiniInstallQR />
                 </div>
               </div>
 

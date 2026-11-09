@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { CLUB_CATALOG } from "../_shared/club-catalog.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
       const qty = Math.max(1, Math.floor(item.quantity || 1));
 
       mpItems.push({
-        title: String(product.name).substring(0, 255),
+        title: formatPaymentName(product.name),
         quantity: qty,
         unit_price: price,
         currency_id: "BRL",
@@ -137,7 +138,7 @@ Deno.serve(async (req) => {
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: externalRef,
-      statement_descriptor: "PLANTA E RAIZ",
+      statement_descriptor: "PLANTAYRAIZ",
       marketplace_fee: platformFee,
       metadata: {
         type: "marketplace",
@@ -172,6 +173,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       init_point: mpData.init_point,
       preference_id: mpData.id,
+      external_reference: externalRef,
       total: finalTotal,
       platform_fee: platformFee,
     }), {

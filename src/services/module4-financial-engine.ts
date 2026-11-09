@@ -9,6 +9,7 @@
 import { supabase } from '@/lib/supabase';
 import axios from 'axios';
 import { devlog } from '@/lib/devlog';
+import { formatPaymentName } from '../../supabase/functions/_shared/payment-catalog';
 
 // 🟠 CONSTANTES: Split de Taxas
 const SPLIT_RATES = {
@@ -382,10 +383,10 @@ async function createMercadoPagoPreferenceWithSplit(
       {
         items: [
           {
-            title:
+            title: formatPaymentName(
               calculation.type === 'consultation'
                 ? 'Teleconsulta Cannabis Medicinal'
-                : 'Produto Marketplace',
+                : 'Produto Shopping'),
             quantity: 1,
             currency_id: 'BRL',
             unit_price: calculation.grossAmount,

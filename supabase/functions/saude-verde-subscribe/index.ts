@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { FALLBACK_DESCRIPTOR, formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -76,8 +77,8 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         items: [{
-          title: `Cartão Saúde Verde — ${plan.name}`,
-          description: `Assinatura mensal com até 80% de desconto em saúde`,
+          title: formatPaymentName(`Cartão Saúde Verde — ${plan.name}`),
+          description: `Assinatura mensal com até 80% de desconto em saúde — Planta y Raiz`,
           quantity: 1,
           currency_id: "BRL",
           unit_price: Number(plan.price_brl),
@@ -89,6 +90,7 @@ Deno.serve(async (req) => {
           pending: `https://plantayraiz.com.br/saude-verde/cartao?status=pending`,
         },
         auto_return: "approved",
+        statement_descriptor: FALLBACK_DESCRIPTOR,
         external_reference: `sv-sub-${user.id}-${planSlug}`,
         metadata: {
           user_id: user.id,

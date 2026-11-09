@@ -9,6 +9,7 @@ import { Bell, CheckCircle2, Calendar, Pill, DollarSign, MessageSquare, AlertTri
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PaymentNoticeHistory } from "@/components/admin/PaymentNoticeHistory";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -82,6 +83,7 @@ const Notificacoes = () => {
               )}
             </div>
 
+            <PaymentNoticeHistory />
             {loading ? (
               <div className="text-center py-16">
                 <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />

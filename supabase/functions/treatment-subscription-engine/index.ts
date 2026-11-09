@@ -2,6 +2,7 @@
 // Runs on cron: charges due subscriptions via Mercado Pago PIX, logs results.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { formatPaymentName } from "../_shared/payment-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,7 +31,7 @@ async function createMpPixCharge(amount: number, externalRef: string, payerEmail
     },
     body: JSON.stringify({
       transaction_amount: amount,
-      description: "Planta y Raiz — Assinatura Tratamento Mensal",
+      description: formatPaymentName("Assinatura Tratamento Mensal"),
       payment_method_id: "pix",
       payer: { email: payerEmail || "noreply@plantayraiz.com.br" },
       external_reference: externalRef,

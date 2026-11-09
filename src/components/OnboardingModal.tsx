@@ -56,7 +56,7 @@ export const OnboardingModal = () => {
   const allowedRoute = location.pathname.startsWith("/profissionais");
 
   useEffect(() => {
-    if (!allowedRoute) {
+    if (!ONBOARDING_MODAL_ENABLED || !allowedRoute) {
       setOpen(false);
       return;
     }
@@ -93,6 +93,8 @@ export const OnboardingModal = () => {
   };
 
   const rec = recommendations[`${goal}-${experience}`] || { plan: "Essencial", specialist: "Clínico Cannabinoide", cta: "Agendar Orientação Técnica" };
+
+  if (!ONBOARDING_MODAL_ENABLED) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

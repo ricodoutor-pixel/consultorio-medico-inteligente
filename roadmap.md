@@ -227,3 +227,5 @@
 - [x] 9. Sem pergunta após despedida ou resposta objetiva; "você" sempre; sem evidência → "não encontrei estudo confiável sobre isso" + sugerir médico
 - [ ] Conta de paciente de teste separada — pendente: exige cadastro comum no site (não crio usuário de autenticação por fora)
 - [ ] Publicar frontend e repetir o teste completo com Pix real — depende do Dr. Edilson
+- [x] Aviso único por WhatsApp ao médico quando a consulta é paga (sem dados de saúde)
+- [ ] Triagem de 5 perguntas abrir sozinha depois do pagamento da consulta

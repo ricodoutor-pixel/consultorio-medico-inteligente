@@ -9,6 +9,8 @@ import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
+import { usePaymentConfirmation } from "@/hooks/usePaymentConfirmation";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 
 const BRISA_WHATSAPP = "5511991363154";
 
@@ -32,6 +34,8 @@ const Pay = () => {
   const [status, setStatus] = useState<"pending" | "loading" | "approved">("loading");
   const [copied, setCopied] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const [paymentReference, setPaymentReference] = useState("");
+  const confirmation = usePaymentConfirmation(paymentReference);
 
   const pro = proId ? professionals.find((p) => p.id === proId) : null;
   const plan = planId ? plans[planId] : null;
@@ -53,6 +57,10 @@ const Pay = () => {
     createDynamicPayment();
   }, []);
 
+  useEffect(() => {
+    if (confirmation.status === "approved") setStatus("approved");
+  }, [confirmation.status]);
+
   const createDynamicPayment = async () => {
     setStatus("loading");
     try {
@@ -72,14 +80,14 @@ const Pay = () => {
           body: { items: cartItems, description: paymentLabel },
         });
         if (error) throw error;
-        if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
+        if (data?.init_point) { setPaymentReference(data.external_reference || ""); setCheckoutUrl(data.init_point); setStatus("pending"); }
       } else if (payType === "subscription" && planId) {
         // Planos universais R$99 — catálogo server-side do mp-checkout
         const { data, error } = await supabase.functions.invoke("mp-checkout", {
           body: { sku: planId.startsWith("plano_") ? planId : `plano_${planId}` },
         });
         if (error) throw error;
-        if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
+        if (data?.init_point) { setPaymentReference(data.external_reference || ""); setCheckoutUrl(data.init_point); setStatus("pending"); }
       } else if ((payType === "intake" || payType === "appointment") && paymentAmount > 0) {
         const { data, error } = await supabase.functions.invoke("create-payment", {
           body: {
@@ -89,7 +97,7 @@ const Pay = () => {
           },
         });
         if (error) throw error;
-        if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
+        if (data?.init_point) { setPaymentReference(data.external_reference || ""); setCheckoutUrl(data.init_point); setStatus("pending"); }
       } else {
         setStatus("pending");
       }
@@ -188,18 +196,7 @@ const Pay = () => {
 
                 {status === "approved" ? (
                   <div className="text-center py-8">
-                    <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-display font-black text-foreground mb-2">Pagamento Aprovado!</h3>
-                    <p className="text-muted-foreground text-sm mb-6">
-                      {payType === "intake" || payType === "appointment"
-                        ? "Seu atendimento foi liberado automaticamente."
-                        : payType === "subscription"
-                        ? "Sua assinatura foi ativada!"
-                        : "Seu pedido foi confirmado."}
-                    </p>
-                    <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                      <Link to="/carteira">Ver Meus Pedidos <ArrowRight size={16} className="ml-2" /></Link>
-                    </Button>
+                    <PaymentConfirmedNotice pix={confirmation.method === "pix"} label="Continuar para meu painel" to="/dashboard" />
                   </div>
                 ) : status === "loading" ? (
                   <div className="text-center py-12">

@@ -208,6 +208,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         init_point: mpData.init_point,
         preference_id: mpData.id,
+        external_reference: preference.external_reference,
         amount,
       }),
       {

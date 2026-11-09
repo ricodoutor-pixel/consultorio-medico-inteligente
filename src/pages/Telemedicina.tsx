@@ -24,7 +24,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
-import { createConsultationCheckout, isConsultationPaid } from "@/lib/telemedicine-checkout";
+import { createConsultationCheckout, isConsultationPaid, type ConsultationPix } from "@/lib/telemedicine-checkout";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
+import { formatPaymentName } from "@/lib/payment-name";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -256,6 +258,18 @@ const Telemedicina = () => {
   
   const [selectedServiceMode, setSelectedServiceMode] = useState<"video" | "chat">("video");
   const [appointmentId, setAppointmentId] = useState<string | null>(null);
+  const [consultPix, setConsultPix] = useState<ConsultationPix | null>(null);
+  const [consultPaid, setConsultPaid] = useState(false);
+  // Conferência automática do Pix (fonte: pagamento registrado pelo servidor, nunca o botão).
+  useEffect(() => {
+    if (!consultPix || !appointmentId || consultPaid) return;
+    const t = setInterval(() => {
+      isConsultationPaid(appointmentId).then((ok) => {
+        if (ok) { setConsultPaid(true); sessionStorage.removeItem("telemedicine_pending_checkout"); }
+      }).catch(() => undefined);
+    }, 5000);
+    return () => clearInterval(t);
+  }, [consultPix, appointmentId, consultPaid]);
 
   const [patientData, setPatientData] = useState({
     nome: "",
@@ -952,8 +966,25 @@ const Telemedicina = () => {
                       </Link>
                     </div>
 
+                    {consultPaid && (
+                      <PaymentConfirmedNotice pix label="Continuar" onContinue={() => navigate("/consultas")} />
+                    )}
+                    {consultPix && !consultPaid && (
+                      <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
+                        <p className="text-sm text-foreground">
+                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {consultPix.amount.toFixed(2).replace(".", ",")}
+                        </p>
+                        <img src={`data:image/png;base64,${consultPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2" />
+                        <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto">{consultPix.qr_code}</p>
+                        <Button variant="outline" className="w-full" onClick={async () => {
+                          try { await navigator.clipboard.writeText(consultPix.qr_code); toast({ title: "Código Pix copiado!" }); }
+                          catch { toast({ title: "Erro ao copiar", description: "Selecione o código e copie manualmente.", variant: "destructive" }); }
+                        }}>Copiar Código Pix (Copia e Cola)</Button>
+                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="animate-spin" size={14} /> Aguardando confirmação do banco…</p>
+                      </div>
+                    )}
                     {/* Botões de Pagamento */}
-                    <div className="space-y-3 pt-2">
+                    <div className={`space-y-3 pt-2 ${consultPix ? "hidden" : ""}`}>
                       <Button 
                         className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base shadow-lg hover:shadow-xl transition-all"
                         onClick={async () => {
@@ -965,7 +996,7 @@ const Telemedicina = () => {
                             if (!triageId && !id) throw new Error("Conclua a entrevista antes de pagar.");
                             const checkout = await createConsultationCheckout(selectedServiceMode, triageId || "", id);
                             setAppointmentId(checkout.appointmentId);
-                            window.location.href = checkout.paymentUrl;
+                            setConsultPix(checkout.pix);
                           } catch (error) {
                             toast({ title: "Pagamento não iniciado", description: error instanceof Error ? error.message : "Tente novamente.", variant: "destructive" });
                           } finally {

@@ -42,7 +42,7 @@ describe("real consultation rules", () => {
   });
   it("payment errors stay errors rather than claiming payment", async () => {
     mocks.invoke.mockResolvedValue({ data: null, error: new Error("gateway failed") });
-    await expect(createConsultationCheckout("video", "triage-id", "appointment-id")).rejects.toThrow("Não foi possível gerar o pagamento");
+    await expect(createConsultationCheckout("video", "triage-id", "appointment-id")).rejects.toThrow("Não foi possível gerar o Pix");
     expect(mocks.invoke).toHaveBeenCalledWith("mp-checkout", expect.objectContaining({ body: expect.objectContaining({ appointmentId: "appointment-id", sku: "consulta_video" }) }));
   });
 });

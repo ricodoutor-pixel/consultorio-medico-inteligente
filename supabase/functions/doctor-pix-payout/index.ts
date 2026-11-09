@@ -72,7 +72,11 @@ Deno.serve(async (req) => {
     let mpId: string | null = null;
     let failure: string | null = null;
 
-    if (mpToken) {
+    // O envio automático exige a API "Money Out" do Mercado Pago habilitada na conta
+    // (MP_MONEY_OUT_ENABLED=true). O antigo POST /v1/payments criava uma COBRANÇA Pix,
+    // não um envio — por isso fica desligado até a habilitação ser confirmada.
+    const MONEY_OUT_READY = false; // ligar só após integrar /v1/transaction-intents com a conta habilitada
+    if (mpToken && MONEY_OUT_READY) {
       try {
         const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
           method: "POST",
@@ -118,6 +122,16 @@ Deno.serve(async (req) => {
     }
 
     if (mode === "manual") {
+      const { data: admins } = await admin.from("user_roles").select("user_id").eq("role", "admin");
+      if (admins?.length) {
+        await admin.from("notifications").insert(admins.map((r: { user_id: string }) => ({
+          user_id: r.user_id,
+          title: "Saque de médico para enviar",
+          message: `Enviar Pix de R$ ${net.toFixed(2)} para a chave cadastrada (pedido ${payout.withdrawal_id.slice(0, 8)}).`,
+          type: "withdrawal_admin",
+          action_url: "/admin",
+        })));
+      }
       // Sem gateway configurado: pedido fica em fila para liquidação pelo financeiro
       await admin.from("notifications").insert({
         user_id: userData.user.id,

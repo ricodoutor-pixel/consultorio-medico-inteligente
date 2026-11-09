@@ -7,6 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sprout, Brain, Heart, Zap, ArrowRight, Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Pausado por pedido do Dr. Edilson (09/11/2026): o pop-up "Qual seu objetivo de
+// saúde?" estava atrapalhando a navegação. Para reativar, troque para true.
+const ONBOARDING_MODAL_ENABLED = false;
+
 const healthGoals = [
   { id: "dor", label: "Dor Crônica", icon: Zap, desc: "Fibromialgia, enxaqueca, neuropatia" },
   { id: "ansiedade", label: "Ansiedade / Insônia", icon: Brain, desc: "Estresse, insônia, transtorno de ansiedade" },
@@ -52,7 +56,7 @@ export const OnboardingModal = () => {
   const allowedRoute = location.pathname.startsWith("/profissionais");
 
   useEffect(() => {
-    if (!allowedRoute) {
+    if (!ONBOARDING_MODAL_ENABLED || !allowedRoute) {
       setOpen(false);
       return;
     }
@@ -89,6 +93,8 @@ export const OnboardingModal = () => {
   };
 
   const rec = recommendations[`${goal}-${experience}`] || { plan: "Essencial", specialist: "Clínico Cannabinoide", cta: "Agendar Orientação Técnica" };
+
+  if (!ONBOARDING_MODAL_ENABLED) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

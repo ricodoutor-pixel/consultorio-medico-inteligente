@@ -75,7 +75,8 @@ Deno.serve(async (req) => {
     // O envio automático exige a API "Money Out" do Mercado Pago habilitada na conta
     // (MP_MONEY_OUT_ENABLED=true). O antigo POST /v1/payments criava uma COBRANÇA Pix,
     // não um envio — por isso fica desligado até a habilitação ser confirmada.
-    if (mpToken && Deno.env.get("MP_MONEY_OUT_ENABLED") === "true") {
+    const MONEY_OUT_READY = false; // ligar só após integrar /v1/transaction-intents com a conta habilitada
+    if (mpToken && MONEY_OUT_READY) {
       try {
         const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
           method: "POST",

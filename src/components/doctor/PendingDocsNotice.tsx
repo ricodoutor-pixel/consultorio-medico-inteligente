@@ -43,6 +43,10 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
     Boolean(profile?.full_name?.toLowerCase().includes("milton")) ||
     Boolean(profile?.email?.toLowerCase().includes("milton"));
 
+  const isVictor =
+    Boolean(doctorName?.toLowerCase().includes("victor")) ||
+    Boolean(profile?.full_name?.toLowerCase().includes("victor"));
+
   const missingDocs = isExempt ? [] : (KYC_REQUIRED.filter((k) => !uploaded.has(k)) as KycKind[]);
   const missingData = isExempt ? [] : [
     !profile?.cpf && "CPF",

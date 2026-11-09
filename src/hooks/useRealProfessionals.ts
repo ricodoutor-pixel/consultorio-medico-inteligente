@@ -81,7 +81,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("breno") || n.includes("boueri") || n.includes("affonso") || c.includes("75492")) return "/avatars/dr-breno-boueri.jpg?v=4";
   if (n.includes("milton") || n.includes("urban") || c.includes("58169")) return "/avatars/dr-milton-urban.jpg?v=4";
   if (n.includes("raissa") || n.includes("raíssa") || n.includes("ruperto") || n.includes("chagas") || c.includes("26470")) return "/avatars/dra-raissa-chagas.jpg?v=1";
-  if (n.includes("ana karoliny") || (n.includes("karoliny") && n.includes("martins")) || c.includes("13942")) return "/avatars/dra-ana-karoliny.jpg?v=1";
+  if (n.includes("ana karoliny") || (n.includes("karoliny") && n.includes("martins")) || c.includes("13942")) return "/avatars/dra-ana-karoliny.jpg?v=20261109";
   if (n.includes("arthur") || n.includes("barretto") || c.includes("6871")) return "/avatars/dr-arthur-barretto.jpg?v=1";
   if (n.includes("rafaella") || n.includes("soletti") || c.includes("13542")) return "/avatars/dra-rafaella-soletti.jpg?v=1";
   if (n.includes("barbara") || n.includes("matos") || c.includes("12361")) return "/avatars/dra-barbara-matos.jpg?v=3";
@@ -421,8 +421,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     }
 
     // Insere os dois assinantes VIP no topo absoluto da vitrine
-    if (miltonDoc) medicos.unshift(miltonDoc);
+    // Ordem: assinante mais recente (Dr. Milton) em 1º, Dr. Victor em 2º
     if (victorDoc) medicos.unshift(victorDoc);
+    if (miltonDoc) medicos.unshift(miltonDoc);
 
     return [...medicos, ...nonMedicos];
   }, [dbDoctors]);

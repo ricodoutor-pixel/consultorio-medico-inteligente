@@ -1,5 +1,9 @@
 # Roadmap
 
+## Vitrine — 09/11/2026
+- [x] Foto correta da Dra. Ana Karoliny; Dr. Milton 1º e Dr. Victor 2º; fotos dos médicos 20 MB → 1,2 MB
+- [ ] Publicar no site oficial
+
 ## Ativação automática do VIP médico — 09/11/2026
 - [ ] Encerrar benefícios no vencimento, enviar oferta de renovação e analisar recorrência autorizada no Mercado Pago sem cobrança automática não consentida
 - [ ] Reconciliar pagamento confirmado de Milton e identificar a segunda assinatura real, preservando vigência e KYC
@@ -223,3 +227,5 @@
 - [x] 9. Sem pergunta após despedida ou resposta objetiva; "você" sempre; sem evidência → "não encontrei estudo confiável sobre isso" + sugerir médico
 - [ ] Conta de paciente de teste separada — pendente: exige cadastro comum no site (não crio usuário de autenticação por fora)
 - [ ] Publicar frontend e repetir o teste completo com Pix real — depende do Dr. Edilson
+- [x] Aviso único por WhatsApp ao médico quando a consulta é paga (sem dados de saúde)
+- [ ] Triagem de 5 perguntas abrir sozinha depois do pagamento da consulta

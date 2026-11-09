@@ -9,7 +9,7 @@ export const DoctorVIPSeal = ({ tier, size = "sm", npsScore }: { tier?: string |
 
   const isLarge = size === "lg";
 
-  if (tier === "basic") {
+  if (tier === "basic" || tier === "vip" || tier === "vip_prescritor") {
     return (
       <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200 }}>
         <Badge className={`bg-primary/15 text-primary border-primary/30 font-black gap-1 ${isLarge ? "text-sm px-3 py-1" : "text-[10px] px-2"}`}

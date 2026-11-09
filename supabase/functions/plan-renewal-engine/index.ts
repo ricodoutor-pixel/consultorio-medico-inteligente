@@ -115,6 +115,67 @@ Deno.serve(async (req) => {
       }
     }
 
+    // === EXPIRAÇÃO E AVISO DO PLANO MÉDICO VIP ===
+    // Encerra VIPs vencidos sem apagar prontuários e envia mensagem via WhatsApp:
+    // "Atenda mais, não atrase seu plano!"
+    const { data: expiredMedSubs } = await supabase
+      .from("medical_subscriptions")
+      .select("id, doctor_id, plan_tier, expires_at, status")
+      .eq("status", "active")
+      .lte("expires_at", new Date().toISOString())
+      .limit(50);
+
+    for (const medSub of expiredMedSubs ?? []) {
+      try {
+        // 1. Atualiza status da assinatura médica para 'expired'
+        await supabase
+          .from("medical_subscriptions")
+          .update({ status: "expired", updated_at: new Date().toISOString() })
+          .eq("id", medSub.id);
+
+        // 2. Atualiza plano na tabela doctors para 'free' (sem jamais tocar em prontuários ou históricos)
+        await supabase
+          .from("doctors")
+          .update({ plan_tier: "free", updated_at: new Date().toISOString() })
+          .eq("id", medSub.doctor_id);
+
+        // 3. Busca dados do médico para envio do aviso no WhatsApp
+        const { data: doc } = await supabase
+          .from("doctors")
+          .select("crm, user_id")
+          .eq("id", medSub.doctor_id)
+          .maybeSingle();
+
+        if (doc?.user_id) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, phone, email")
+            .eq("id", doc.user_id)
+            .maybeSingle();
+
+          // 4. Dispara notificação de expiração no WhatsApp com frase obrigatória
+          await supabase.functions.invoke("send-doctor-welcome-whatsapp", {
+            body: {
+              phone: profile?.phone,
+              fullName: profile?.full_name || "Doutor(a)",
+              crm: doc.crm,
+              planTier: medSub.plan_tier,
+              actionType: "vip_expired",
+              renewalLink: "https://plantayraiz.com.br/precos",
+            },
+          });
+        }
+
+        results.push({
+          type: "medical_vip_expired",
+          doctor_id: medSub.doctor_id,
+          status: "expired_and_notified",
+        });
+      } catch (medErr) {
+        console.error("[plan-renewal-engine] error expiring doctor VIP:", medErr);
+      }
+    }
+
     await supabase.from("ai_events").insert({
       event_type: "plan_renewal_engine_run",
       payload: { processed: results.length, results },

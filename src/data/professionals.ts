@@ -360,6 +360,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
     crm: "206873/SP",
+    plan_tier: "vip",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
     ],
@@ -385,6 +386,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
     crm: "58169/SP",
+    plan_tier: "vip",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza e dedicação." }
     ],

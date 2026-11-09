@@ -85,15 +85,21 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
 };
 
 /** Médicos com Plano Med VIP ativo (selo exibido no card). Apenas Dr. Victor, Dr. Edilson, Dra. Suelen e Dra. Olívia */
-const VIP_DOCTOR_MATCHERS = ["victor", "edilson", "suelen", "olivia"];
+const VIP_DOCTOR_MATCHERS = ["victor", "milton", "edilson", "suelen", "olivia"];
 const isVipDoctor = (p: Professional) => {
+  if (p.plan_tier === "vip" || p.plan_tier === "vip_prescritor" || p.plan_tier === "premium" || p.plan_tier === "basic") {
+    return true;
+  }
   const name = (p.name || "").toLowerCase();
+  const crm = (p.crm || "");
+  if (crm.includes("206873") || crm.includes("58169")) return true;
   return VIP_DOCTOR_MATCHERS.some((n) => name.includes(n));
 };
 
 const getDoctorSealTier = (p: Professional) => {
   const name = (p.name || "").toLowerCase();
-  if (name.includes("victor") || name.includes("edilson") || name.includes("suelen") || name.includes("olivia")) {
+  const crm = (p.crm || "");
+  if (p.plan_tier === "vip" || p.plan_tier === "vip_prescritor" || p.plan_tier === "premium" || name.includes("victor") || name.includes("milton") || crm.includes("206873") || crm.includes("58169")) {
     return "premium";
   }
   return "basic";

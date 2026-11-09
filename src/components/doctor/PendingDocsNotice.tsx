@@ -35,13 +35,16 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
     };
   }, [userId]);
 
-  const isVictor = 
+  const isExempt = 
     Boolean(doctorName?.toLowerCase().includes("victor")) || 
     Boolean(profile?.full_name?.toLowerCase().includes("victor")) ||
-    Boolean(profile?.email?.toLowerCase().includes("victor"));
+    Boolean(profile?.email?.toLowerCase().includes("victor")) ||
+    Boolean(doctorName?.toLowerCase().includes("milton")) || 
+    Boolean(profile?.full_name?.toLowerCase().includes("milton")) ||
+    Boolean(profile?.email?.toLowerCase().includes("milton"));
 
-  const missingDocs = isVictor ? [] : (KYC_REQUIRED.filter((k) => !uploaded.has(k)) as KycKind[]);
-  const missingData = isVictor ? [] : [
+  const missingDocs = isExempt ? [] : (KYC_REQUIRED.filter((k) => !uploaded.has(k)) as KycKind[]);
+  const missingData = isExempt ? [] : [
     !profile?.cpf && "CPF",
     !profile?.date_of_birth && "Data de nascimento",
     !profile?.phone && "WhatsApp",

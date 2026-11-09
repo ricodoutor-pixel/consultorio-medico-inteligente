@@ -58,7 +58,15 @@ const Consultorio = () => {
       const isVictorUser = Boolean(
         user.email?.toLowerCase().includes("victor") ||
         profileData?.full_name?.toLowerCase().includes("victor") ||
-        doctorData?.crm === "206873"
+        doctorData?.crm === "206873" ||
+        doctorData?.id === "med-victor-fonseca"
+      );
+
+      const isMiltonUser = Boolean(
+        user.email?.toLowerCase().includes("milton") ||
+        profileData?.full_name?.toLowerCase().includes("milton") ||
+        doctorData?.crm === "58169" ||
+        doctorData?.id === "med-milton-urban"
       );
 
       if (isVictorUser) {
@@ -78,9 +86,29 @@ const Consultorio = () => {
           total_consultations: 0,
           ...(doctorData || {}),
         } as typeof doctorData;
-        // Garante flag de verificação ativa
         doctorData.is_verified = true;
         doctorData.is_approved_by_admin = true;
+        doctorData.plan_tier = "vip_prescritor";
+      } else if (isMiltonUser) {
+        doctorData = {
+          id: doctorData?.id || "med-milton-urban",
+          user_id: user.id,
+          crm: "58169",
+          crm_state: "SP",
+          specialty: "Pediatria e Autismo Infantil (TEA) — Cannabis Medicinal",
+          is_online: true,
+          is_available: true,
+          is_verified: true,
+          is_approved_by_admin: true,
+          plan_tier: "vip_prescritor",
+          consultation_price: 150,
+          rating: 5.0,
+          total_consultations: 0,
+          ...(doctorData || {}),
+        } as typeof doctorData;
+        doctorData.is_verified = true;
+        doctorData.is_approved_by_admin = true;
+        doctorData.plan_tier = "vip_prescritor";
       }
 
       setProfile(profileData || (isVictorUser ? {
@@ -89,6 +117,12 @@ const Consultorio = () => {
         email: user.email || "contato@doutorvictorfonseca.com",
         phone: "5511953045378",
         avatar_url: "/avatars/dr-victor-fonseca.jpg",
+      } : isMiltonUser ? {
+        id: user.id,
+        full_name: "Dr. Milton Dimas Tadeu Urban",
+        email: user.email || "drmiltonurban@gmail.com",
+        phone: "5519999059665",
+        avatar_url: "/avatars/dr-milton-urban.jpg",
       } : null));
 
       setDoctor(doctorData);

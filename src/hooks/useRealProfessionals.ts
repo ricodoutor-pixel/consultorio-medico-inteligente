@@ -401,14 +401,28 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       ),
     );
 
-    // Dr. Victor Henrique Bueno da Fonseca sempre em 1º lugar absoluto na vitrine médica (posição 0)
+    // Médicos Assinantes VIP na vitrine médica (Dr. Victor #1 e Dr. Milton #2)
+    // 1. Dr. Victor Henrique Bueno da Fonseca (posição 0)
     const victorIdx = medicos.findIndex(
       (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor")
     );
-    if (victorIdx > 0) {
-      const [victorDoc] = medicos.splice(victorIdx, 1);
-      medicos.unshift(victorDoc);
+    let victorDoc: typeof medicos[0] | null = null;
+    if (victorIdx >= 0) {
+      [victorDoc] = medicos.splice(victorIdx, 1);
     }
+
+    // 2. Dr. Milton Dimas Tadeu Urban (posição 1)
+    const miltonIdx = medicos.findIndex(
+      (m) => m.id === "med-milton-urban" || (m.crm && m.crm.includes("58169")) || m.name.toLowerCase().includes("milton")
+    );
+    let miltonDoc: typeof medicos[0] | null = null;
+    if (miltonIdx >= 0) {
+      [miltonDoc] = medicos.splice(miltonIdx, 1);
+    }
+
+    // Insere os dois assinantes VIP no topo absoluto da vitrine
+    if (miltonDoc) medicos.unshift(miltonDoc);
+    if (victorDoc) medicos.unshift(victorDoc);
 
     return [...medicos, ...nonMedicos];
   }, [dbDoctors]);

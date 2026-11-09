@@ -34,11 +34,12 @@ export default function DoctorPlanViewerModal({ open, onClose, doctor }: Props) 
   if (!doctor) return null;
 
   const isVictor = doctor.doctor_name.toLowerCase().includes("victor") || doctor.doctor_crm.includes("206873");
-  const isVip = isVictor || Boolean(doctor.is_vip);
+  const isMilton = doctor.doctor_name.toLowerCase().includes("milton") || doctor.doctor_crm.includes("58169");
+  const isVip = isVictor || isMilton || Boolean(doctor.is_vip) || doctor.plan_tier === "vip" || doctor.plan_tier === "premium";
   
   // Link de pagamento mensal recorrente configurado no Asaas
   const monthlyPaymentLink = doctor.payment_link || "https://www.asaas.com/c/planta-y-raiz-vip-medico";
-  const receiptUrl = doctor.receipt_url || (isVictor ? "/cfm_prints/comprovante-vip-dr-victor.jpg" : undefined);
+  const receiptUrl = doctor.receipt_url || (isVictor ? "/cfm_prints/comprovante-vip-dr-victor.jpg" : isMilton ? "/cfm_prints/cfm-dr-milton-urban.png" : undefined);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(monthlyPaymentLink);

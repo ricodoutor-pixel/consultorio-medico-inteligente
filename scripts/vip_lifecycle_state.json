@@ -1,0 +1,23 @@
+{
+  "doctors": {
+    "med-victor-fonseca": {
+      "welcomeSent": true,
+      "adminNotified": true,
+      "expirationNotified": false,
+      "currentTier": "vip",
+      "active": true,
+      "welcomeSentAt": "2026-11-09T05:12:56.037Z",
+      "adminNotifiedAt": "2026-11-09T05:12:56.037Z"
+    },
+    "med-milton-urban": {
+      "welcomeSent": true,
+      "adminNotified": true,
+      "expirationNotified": false,
+      "currentTier": "vip",
+      "active": true,
+      "welcomeSentAt": "2026-11-09T05:12:56.037Z",
+      "adminNotifiedAt": "2026-11-09T05:12:56.037Z"
+    }
+  },
+  "history": []
+}

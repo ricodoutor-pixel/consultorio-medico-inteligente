@@ -5,65 +5,128 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const EVO_URL = (Deno.env.get("EVOLUTION_API_URL") || Deno.env.get("EVOLUTION_URL_VPS") || "https://whatsapp.plantayraiz.com.br").replace(/\/$/, "");
+const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY") || Deno.env.get("EVOLUTION_API_KEY_VPS") || "39d3c0208169d52717027e27477cdc9f63d70fda54296c501fbe409c10562a59";
+const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || Deno.env.get("EVOLUTION_INSTANCE_NAME") || "plantayraiz";
+const ADMIN_PHONE = Deno.env.get("ADMIN_WHATSAPP") || "5511991363154"; // Dr. Edilson / Adm
+
+async function sendWhatsApp(to: string, message: string) {
+  const cleanPhone = to.replace(/\D/g, "");
+  if (!cleanPhone) return null;
+  const endpoint = `${EVO_URL}/message/sendText/${EVO_INSTANCE}`;
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: EVO_KEY,
+    },
+    body: JSON.stringify({
+      number: cleanPhone,
+      text: message,
+    }),
+  });
+  const body = await res.text();
+  console.log(`[sendWhatsApp] To: ${cleanPhone} | Status: ${res.status}`);
+  return { status: res.status, body };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { phone, fullName, email, country } = await req.json();
+    const payload = await req.json();
+    const { phone, fullName, email, crm, planTier = "vip", actionType = "welcome_vip", renewalLink } = payload;
 
-    console.log(`[Brisa] Welcome message to ${fullName} (${phone}) - Country: ${country}`);
+    console.log(`[VIP Lifecycle] action=${actionType} to ${fullName} (${phone}) - CRM: ${crm}`);
 
-    // Integração com API da ZAPI / Z-API ou similar
-    // Exemplo genérico:
-    const waToken = Deno.env.get('WHATSAPP_API_TOKEN');
-    const waInstance = Deno.env.get('WHATSAPP_INSTANCE_ID');
-    
-    if (!waToken || !waInstance) {
-      console.warn("WhatsApp credentials not configured.");
+    let doctorMsg = "";
+    let adminMsg = "";
+
+    if (actionType === "vip_expired") {
+      // Regra de Vencimento e Renovação
+      doctorMsg = `Olá, Dr(a). ${fullName}!
+
+Identificamos que a vigência do seu Plano Médico VIP na Planta y Raíz encerrou sua competência mensal.
+
+⚠️ *Atenda mais, não atrase seu plano!*
+
+Para manter sua taxa de intermediação ZERO (0%), destaque ouro na vitrine médica, fila prioritária da Enfª Brisa e o Copiloto Clínico VIP de Consultas, renove agora de forma rápida:
+👉 ${renewalLink || "https://plantayraiz.com.br/precos"}
+
+🛡️ *Seus Prontuários e Pacientes Estão Seguros:*
+Conforme as normas do CFM e a política de segurança da Planta y Raíz, o histórico de seus pacientes e prontuários permanece 100% íntegro e arquivado de forma confidencial.
+
+Equipe de Gestão Médica | Planta y Raíz
+Telemedicina & Cuidado Canabinoide`;
+
+      adminMsg = `🚨 *AVISO PLANO VENCIDO — PLANTA Y RAÍZ*
+Médico: Dr(a). ${fullName}
+CRM: ${crm || "N/A"}
+Telefone: ${phone}
+Status: VIP expirado. Mensagem de regularização ("Atenda mais, não atrase seu plano!") enviada via WhatsApp.`;
+
     } else {
-      const message = `Prezado(a) Dr(a). ${fullName},
+      // Boas-vindas VIP padrão e lista de vantagens
+      doctorMsg = `🌟 *PARABÉNS E SEJA BEM-VINDO(A) AO PLANO MÉDICO VIP!*
 
-Seja muito bem-vindo(a) à Planta y Raíz! É uma imensa satisfação ter você conosco como nosso médico(a) sócio(a) prescritor(a). A plataforma foi projetada para eliminar sobrecargas administrativas, garantir segurança jurídica e valorizar o seu tempo clínico.
+Prezado(a) Dr(a). ${fullName}${crm ? ` (CRM ${crm})` : ""},
 
-O Fluxo de Atendimento na Plataforma
-• Recepção Acolhedora: O paciente inicia o contato diretamente pelo WhatsApp com a Enfermeira Brisa, sendo recebido de forma humanizada e ágil.
-• Triagem Automatizada: Coletamos o histórico de saúde preliminar para que você receba o caso clínico já organizado antes da teleconsulta.
-• Pagamento Seguro: O processamento financeiro é transparente e pré-pago.
-• Atendimento Clínico Completo: A teleconsulta ocorre em ambiente criptografado, integrado ao prontuário eletrônico e às ferramentas de receituários digitais.
+É uma honra confirmar a ativação do seu *Plano Médico VIP Assinante* na Planta y Raíz (plantayraiz.com.br)!
 
-Total Autonomia e Benefícios para Você
-• Liberdade de Honorários: Você define o valor da sua consulta de forma 100% autônoma.
-• Flexibilidade de Tempo: Você determina o tempo necessário para uma escuta qualificada.
-• Seu Link Exclusivo: Você conta com um link direto e personalizado de agendamento para divulgar em suas redes sociais.
-• Programa de Indicação: Nosso ecossistema bonifica a sua participação ativa na expansão da rede.
+Seu perfil foi oficialmente reconhecido pelo sistema e todos os privilégios VIP de alta performance estão liberados para você:
 
-Próximos Passos
-Para explorar a plataforma e iniciar seus atendimentos, acesse o botão "Passo a Passo / Manual do Médico" diretamente no menu do seu Consultório Virtual.
+👑 *SUAS VANTAGENS EXCLUSIVAS DE MÉDICO VIP:*
+1. 💸 *Taxa de Intermediação ZERO (0%):* 100% do valor líquido das suas teleconsultas é repassado a você.
+2. 🏆 *Destaque Ouro na Vitrine:* Posicionamento de topo prioritário na página inicial e na busca médica.
+3. 🤖 *Prioridade na Triagem IA (Enfª Brisa):* Roteamento automático de pacientes pré-triados diretamente para o seu agendamento.
+4. 📋 *Prontuário Eletrônico Inteligente:* Histórico longitudinal, anamnese digital e armazenamento seguro em conformidade com o CFM e LGPD.
+5. 🧠 *Copiloto Clínico VIP de Consultas (IA):* Inteligência de apoio à decisão clínica treinada nas diretrizes ANVISA (RDC 660 e 327), literatura endocanabinoide e checagem de interações medicamentosas em tempo real.
+6. 🎥 *Telemedicina HD Integrada:* Sala criptografada de videochamada sem limite de tempo com chat integrado.
 
-Estamos prontos para caminhar juntos!
-Enfª Brisa | Marketing Médico & Suporte Clínico
-🌿 Planta y Raíz — Inovação, Autonomia e Cuidado Integral`;
+Para acessar seu Consultório Virtual completo com o Copiloto IA e Prontuário, acesse agora:
+👉 https://plantayraiz.com.br/consultorio
 
-      // Chamada fictícia para ilustrar a API (ex: Z-API)
-      /*
-      await fetch(`https://api.z-api.io/instances/${waInstance}/token/${waToken}/send-text`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, message })
-      });
-      */
+Conte sempre conosco para alavancar a sua prática clínica com tecnologia e humanização!
+
+Enfª Brisa | Gestão & Relacionamento Médico
+🌿 Planta y Raíz — Democratizando a Medicina e Cuidado Canabinoide`;
+
+      adminMsg = `👑 *NOVO MÉDICO VIP ATIVADO NA PLATAFORMA!*
+Médico: Dr(a). ${fullName}
+CRM: ${crm || "N/A"}
+WhatsApp: ${phone}
+Plano: ${planTier.toUpperCase()} (R$ 99/mês)
+Privilégios liberados: Taxa 0%, Vitrine Topo, Prontuário Eletrônico e Copiloto Clínico VIP.`;
+    }
+
+    // 1. Envia WhatsApp para o médico (se informado telefone)
+    let doctorDispatch = null;
+    if (phone) {
+      doctorDispatch = await sendWhatsApp(phone, doctorMsg);
+    }
+
+    // 2. Envia WhatsApp no celular do Dr. Edilson / Admin
+    let adminDispatch = null;
+    if (ADMIN_PHONE) {
+      adminDispatch = await sendWhatsApp(ADMIN_PHONE, adminMsg);
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "Welcome message dispatched" }),
+      JSON.stringify({
+        success: true,
+        actionType,
+        doctorNotified: Boolean(doctorDispatch?.status === 200 || doctorDispatch?.status === 201),
+        adminNotified: Boolean(adminDispatch?.status === 200 || adminDispatch?.status === 201),
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
     );
   } catch (error: any) {
+    console.error("[send-doctor-welcome-whatsapp error]", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,

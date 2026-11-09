@@ -830,9 +830,9 @@ Deno.serve(async (req) => {
         // Plano Médico VIP: reflete a assinatura paga no painel do médico e do admin
         if (planSku === "plano_medico") {
           const { data: doc } = await supabase
-            .from("doctors").select("id").eq("user_id", planUserId).maybeSingle();
+            .from("doctors").select("id, crm, user_id").eq("user_id", planUserId).maybeSingle();
           if (doc?.id) {
-            const tier = externalRef.split(":")[3] || "premium";
+            const tier = "vip";
             const { data: existingMed } = await supabase
               .from("medical_subscriptions").select("id")
               .eq("doctor_id", doc.id).eq("plan_tier", tier).maybeSingle();
@@ -850,6 +850,34 @@ Deno.serve(async (req) => {
               ? await supabase.from("medical_subscriptions").update(medPayload).eq("id", existingMed.id)
               : await supabase.from("medical_subscriptions").insert(medPayload);
             if (medErr) console.error("[plan] medical_subscriptions error:", medErr);
+
+            // Atualiza diretamente na tabela doctors
+            await supabase.from("doctors").update({
+              plan_tier: "vip",
+              is_verified: true,
+              is_approved_by_admin: true,
+              updated_at: now.toISOString()
+            }).eq("id", doc.id);
+
+            // Busca perfil para obter nome e telefone do médico
+            const { data: docProfile } = await supabase
+              .from("profiles").select("full_name, phone, email").eq("id", planUserId).maybeSingle();
+
+            // Dispara aviso de boas-vindas VIP automático + aviso no celular do Dr. Edilson
+            try {
+              await supabase.functions.invoke("send-doctor-welcome-whatsapp", {
+                body: {
+                  phone: docProfile?.phone,
+                  fullName: docProfile?.full_name || "Médico Prescritor",
+                  email: docProfile?.email,
+                  crm: doc.crm,
+                  planTier: "vip",
+                  actionType: "welcome_vip"
+                }
+              });
+            } catch (notifyErr) {
+              console.error("[plan] Error invoking send-doctor-welcome-whatsapp:", notifyErr);
+            }
           }
         }
 

@@ -28,12 +28,23 @@ export async function createConsultationCheckout(mode: ConsultationMode, triageI
     // Save before requesting checkout: failures remain pending and can be retried.
     sessionStorage.setItem("telemedicine_pending_checkout", JSON.stringify({ appointmentId, mode, triageId }));
   }
+  // Pix gerado dentro da plataforma (mesmo caminho da Orientação Técnica) — o paciente não sai do site.
   const { data, error } = await supabase.functions.invoke("mp-checkout", {
-    body: { appointmentId, sku, triageId, returnUrl: `${window.location.origin}/telemedicina?appointment=${encodeURIComponent(appointmentId)}` },
+    body: { appointmentId, sku, triageId, payment_method: "pix" },
   });
-  if (error || !data?.init_point) throw new Error("Não foi possível gerar o pagamento. Sua consulta continua aguardando pagamento.");
-  return { appointmentId, paymentUrl: String(data.init_point) };
+  if (error || !data?.qr_code || !data?.qr_code_base64) throw new Error("Não foi possível gerar o Pix. Sua consulta continua aguardando pagamento. Tente de novo.");
+  return {
+    appointmentId: appointmentId as string,
+    pix: {
+      qr_code: String(data.qr_code),
+      qr_code_base64: String(data.qr_code_base64),
+      description: typeof data.description === "string" ? data.description : undefined,
+      amount: Number(data.amount ?? SERVICES[sku].price),
+    },
+  };
 }
+
+export type ConsultationPix = Awaited<ReturnType<typeof createConsultationCheckout>>["pix"];
 
 export async function isConsultationPaid(appointmentId: string): Promise<boolean> {
   const { data: sessionData } = await supabase.auth.getSession();

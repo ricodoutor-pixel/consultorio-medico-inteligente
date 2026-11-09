@@ -13,7 +13,9 @@
 - Navegador no site oficial confirmou requisições exclusivamente à fonte operacional autorizada, sem trocar arquivos gerados ou variáveis.
 
 ## Publicação
-Publicação solicitada para `https://www.plantayraiz.com.br`. O agendamento não é prova de conclusão; a conferência posterior do site será registrada separadamente.
+Publicação solicitada para `https://www.plantayraiz.com.br`. Conferência posterior às 00:00 UTC de 09/11 (21:00 de 08/11 em São Paulo): domínio redirecionou para a versão sem www e `/payment-success` ainda mostrou 404 da versão anterior. A atualização oficial não foi comprovada; não declarar publicação concluída. A fonte operacional foi conferida antes da solicitação e era a autorizada.
+
+Teste adicional real PubMed aprovado; total nesta entrega: 90 regressões e 1 consulta bibliográfica real. Botão do aviso de pagamento preexistente levou ao endereço canônico da Orientação, sem reabrir sala encerrada.
 
 ## Bloqueios que permanecem
 1. Hostinger: sem acesso SSH/SFTP utilizável e sem alternativa verificada para atualizar/reiniciar o responder. Nenhuma alteração remota feita. O operador deve seguir `WHATSAPP_ENVIO_UNICO_HOSTINGER_2026-11-08.md`, aplicar os arquivos, manter um único emissor e reiniciar somente o responder identificado, preservando configurações/históricos.

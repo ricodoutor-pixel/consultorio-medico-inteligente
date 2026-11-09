@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Ativação automática do VIP médico — 09/11/2026
+- [ ] Encerrar benefícios no vencimento, enviar oferta de renovação e analisar recorrência autorizada no Mercado Pago sem cobrança automática não consentida
 - [ ] Reconciliar pagamento confirmado de Milton e identificar a segunda assinatura real, preservando vigência e KYC
 - [ ] Unificar ativação automática e reconhecimento VIP no painel, vitrine, prontuário e copiloto
 - [ ] Enviar boas-vindas com benefícios ao médico e aviso administrativo uma única vez

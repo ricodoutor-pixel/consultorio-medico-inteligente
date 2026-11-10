@@ -113,6 +113,13 @@
       "when": 1794118462907,
       "tag": "0015_brisa_atomic_inbound_claim",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794251718194,
+      "tag": "0016_release_doctor_payout_on_rating",
+      "breakpoints": true
     }
   ]
 }

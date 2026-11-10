@@ -21,7 +21,7 @@ export async function createConsultationCheckout(mode: ConsultationMode, triageI
       amount: SERVICES[sku].price,
       status: "scheduled",
       payment_status: "pending",
-      notes: `Triagem: ${triageId}`,
+      notes: triageId ? `Triagem: ${triageId}` : "Triagem: pendente (após pagamento)",
     }).select("id").single();
     if (error || !data?.id) throw new Error("Não foi possível registrar a consulta.");
     appointmentId = data.id;

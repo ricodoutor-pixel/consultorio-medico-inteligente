@@ -1164,6 +1164,10 @@ Deno.serve(async (req) => {
             }
 
             console.log(`📩 Doctor ${doctorRecord.user_id} notified — payout R$ ${doctorPayout.toFixed(2)}`);
+            // Convite com prazo de 5 min; sem aceite, o sweep transfere (assinante → online) e avisa o paciente.
+            try {
+              await supabase.functions.invoke("consultation-offer", { body: { action: "dispatch", appointment_id: appointmentId } });
+            } catch (err) { console.error("[consultation-offer] dispatch", err); }
           }
 
           // 6. Schedule NPS — create a pending notification for after consultation

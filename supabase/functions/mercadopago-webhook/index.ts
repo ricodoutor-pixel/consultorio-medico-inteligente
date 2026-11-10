@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { canEnterOrientation } from "../_shared/orientation-triage.ts";
-import { notifyPaymentConfirmedOnce, notifyRecipientOnce, buildDoctorConsultationMessage } from "../_shared/payment-notify.ts";
+import { notifyPaymentConfirmedOnce, notifyRecipientOnce, notifyRecipientEmailOnce, buildDoctorConsultationMessage } from "../_shared/payment-notify.ts";
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {

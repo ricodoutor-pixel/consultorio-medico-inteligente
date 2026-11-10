@@ -104,7 +104,7 @@ function suggestProfile(answers: Record<string, string>): Profile {
     ratio: "CBD dominante 10:1 (avaliação personalizada)",
     spectrum: "Full-Spectrum",
     rationale:
-      "Sua condição requer avaliação individual. A Orientação Técnica do Dr. Edilson cruza seus dados com 40k+ estudos para definir o protocolo exato.",
+      "Sua condição requer avaliação individual. A Orientação Técnica do Dr. Edilson cruza seus dados com estudos conferidos no PubMed para orientar o próximo passo.",
     cta: "Quero a Orientação Técnica completa",
   };
 }
@@ -332,7 +332,7 @@ export function ProtocolCalculator() {
                   </div>
                   <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">
                     ⚖️ <strong>Aviso:</strong> Esta é uma <strong>prévia educativa</strong>. O
-                    protocolo definitivo exige <strong>Orientação Técnica</strong> com o Dr. Edilson Bezerra (CRM 10963 - Sta Cruz BO), que cruza seus dados com 40k+ estudos PubMed e
+                    protocolo definitivo exige <strong>Orientação Técnica</strong> com o Dr. Edilson Bezerra (CRM 10963 - Sta Cruz BO), que cruza seus dados com estudos conferidos no PubMed e
                     entrega relatório PDF assinado digitalmente.
                   </div>
 

@@ -306,7 +306,7 @@ export default function MonitoramentoSaude() {
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-black text-primary">2</div>
                       <div>
                         <p className="text-xs font-bold text-foreground">Análise IA</p>
-                        <p className="text-[11px] text-muted-foreground">O Gemini 2.5 Flash cruza seus dados com nosso banco de patologias e +40k estudos científicos.</p>
+                        <p className="text-[11px] text-muted-foreground">O Gemini 2.5 Flash cruza seus dados com nosso banco de patologias e estudos científicos conferidos no PubMed.</p>
                       </div>
                     </div>
                     <div className="flex gap-3">

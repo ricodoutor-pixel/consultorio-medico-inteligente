@@ -174,7 +174,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
                     <h3 className="text-sm font-bold leading-tight">Dr. Edilson Bezerra</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight flex items-center gap-1">
                       <Sparkles className="h-2.5 w-2.5" />
-                      Apoio clínico • 40k+ estudos
+                      Apoio clínico • estudos conferidos no PubMed
                     </p>
                   </div>
                 </div>

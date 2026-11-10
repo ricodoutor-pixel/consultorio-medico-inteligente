@@ -115,15 +115,26 @@ Deno.serve(async (req) => {
   }
 
   // 3. Notificação no painel interno (sem dados de saúde)
-  await admin.from("notifications").insert([
-    {
-      user_id: doctor.user_id,
-      title: "Consulta agora na Planta y Raiz",
-      message: alertMessage,
-      type: "appointment",
-      action_url: `/consultorio?appointment=${appt.id}`,
-    },
-  ]);
+  // Uma única notificação por consulta, mesmo se a página do paciente for reaberta.
+  const actionUrl = `/consultorio?appointment=${appt.id}`;
+  const { data: existingNotice } = await admin
+    .from("notifications")
+    .select("id")
+    .eq("user_id", doctor.user_id)
+    .eq("action_url", actionUrl)
+    .eq("title", "Consulta agora na Planta y Raiz")
+    .limit(1);
+  if (!testMode && !(existingNotice && existingNotice.length)) {
+    await admin.from("notifications").insert([
+      {
+        user_id: doctor.user_id,
+        title: "Consulta agora na Planta y Raiz",
+        message: alertMessage,
+        type: "appointment",
+        action_url: actionUrl,
+      },
+    ]);
+  }
 
   // 4. Garante que o convite com contador de 5 minutos (janela da triagem) está ativo
   try {

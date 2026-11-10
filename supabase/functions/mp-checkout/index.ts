@@ -483,6 +483,7 @@ Deno.serve(async (req) => {
         external_reference: externalReference,
         amount,
         description: title,
+        receiver_name: "Planta y Raiz Ltda",
         split: splitDetails,
       });
     }

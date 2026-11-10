@@ -152,6 +152,8 @@ export default function OrientacaoTecnicaAgente() {
     qr_code_base64: string;
     payment_id: string | number;
     description?: string;
+    amount?: number;
+    receiver_name?: string;
   } | null>(null);
   const [copiedPix, setCopiedPix] = useState(false);
   const [awaitingSince, setAwaitingSince] = useState<number>(Date.now());
@@ -558,8 +560,9 @@ export default function OrientacaoTecnicaAgente() {
     }
     method === "pix" ? setCreatingPix(true) : setCreatingCheckout(true);
     try {
+      const requestedSku = searchParams.get("sku") || "orientacao_tecnica";
       const { data, error } = await supabase.functions.invoke("mp-checkout", { body: {
-        sku: "orientacao_tecnica", payment_method: method,
+        sku: requestedSku, payment_method: method,
         returnUrl: `${window.location.origin}/orientacao-tecnica?paid=1`,
       } });
       if (error || data?.error) throw error || new Error(data.error);
@@ -571,7 +574,7 @@ export default function OrientacaoTecnicaAgente() {
         window.history.replaceState(null, "", url);
       }
       if (method === "pix" && data.qr_code && data.qr_code_base64) {
-        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id, description: data.description });
+        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id, description: data.description, amount: data.amount, receiver_name: data.receiver_name || "Planta y Raiz Ltda" });
         setAwaitingSince(Date.now());
         setPhase("awaiting");
       } else if (data.init_point) window.location.href = data.init_point;
@@ -1211,11 +1214,11 @@ export default function OrientacaoTecnicaAgente() {
                   <>
                     <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-display font-black text-lg">
                       <QrCode size={24} />
-                      <h2>Pagamento Pix — R$ 30,00</h2>
+                      <h2>Pagamento Pix — R$ {Number(pixData?.amount || 30).toFixed(2).replace('.', ',')}</h2>
                     </div>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                      Pagamento: <strong>{formatPaymentName(pixData.description || "Orientação Técnica")}</strong> · R$ 30,00
+                      Pagamento: <strong>{formatPaymentName(pixData.description || "Orientação Técnica")}</strong> · R$ {Number(pixData.amount || 30).toFixed(2).replace('.', ',')} · Recebedor: <strong>{pixData.receiver_name || "Planta y Raiz Ltda"}</strong>
                     </p>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -1561,13 +1564,58 @@ export default function OrientacaoTecnicaAgente() {
                         {rating && <p role="status" className="text-sm text-primary">Obrigado pela avaliação! {rating === 3 ? "Satisfeito" : rating === 2 ? "Neutro" : "Insatisfeito"} ({rating}/3)</p>}
                         <p className="text-xs text-neutral-600">Seu histórico e seu relatório continuam disponíveis nesta página.</p>
                         <div className="flex flex-col items-center gap-2 max-w-sm mx-auto">
-                          {downloadableReport && (
-                            <Button asChild className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white">
-                              <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
-                                <FileText size={14} className="mr-1" /> Baixar relatório
-                              </Link>
-                            </Button>
-                          )}
+                          {/* Bloco Relatório Individual Permanente (sempre visível sem F5) */}
+                          <div className="w-full rounded-xl border border-neutral-200 bg-white p-3 text-center space-y-2">
+                            <div className="flex items-center justify-between text-left">
+                              <p className="text-xs font-black text-neutral-800 flex items-center gap-1">
+                                <FileText size={14} className="text-[#075E54]" /> Relatório individual
+                              </p>
+                              {downloadableReport && (
+                                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                                  Pronto para download
+                                </span>
+                              )}
+                            </div>
+
+                            {downloadableReport ? (
+                              <Button asChild className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white">
+                                <Link to={`/orientacao-tecnica/relatorio/${downloadableReport.id}`}>
+                                  <FileText size={14} className="mr-1" /> Baixar relatório / Baixar PDF
+                                </Link>
+                              </Button>
+                            ) : generatingReport ? (
+                              <div className="space-y-1 py-1">
+                                <p className="text-xs text-neutral-700 font-bold flex items-center justify-center gap-1">
+                                  <Loader2 size={13} className="animate-spin text-[#075E54]" />
+                                  Gerando seu relatório… {reportWait}s
+                                </p>
+                                {reportWait >= 60 && (
+                                  <Button variant="outline" size="sm" onClick={() => void loadReports()} className="text-[11px] h-7">
+                                    Verificar relatório
+                                  </Button>
+                                )}
+                              </div>
+                            ) : reportError ? (
+                              <div className="space-y-1">
+                                <p className="text-xs text-destructive font-medium">{reportError}</p>
+                                <Button
+                                  onClick={() => void generateReport()}
+                                  variant="outline"
+                                  className="w-full rounded-xl font-bold border-destructive text-destructive hover:bg-destructive/10 text-xs"
+                                >
+                                  Tentar de novo
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                onClick={() => void generateReport()}
+                                disabled={generatingReport || !messages.some(m => m.role === "patient")}
+                                className="w-full rounded-xl font-black bg-[#075E54] hover:bg-[#064e46] text-white"
+                              >
+                                <FileText size={14} className="mr-1" /> Gerar relatório
+                              </Button>
+                            )}
+                          </div>
                           <Button onClick={() => navigate("/profissionais")} variant="outline" className="w-full rounded-xl font-bold bg-white text-neutral-900">
                             Falar com um médico agora (Chat R$ 100 · Vídeo R$ 150) <ArrowRight size={14} className="ml-1" />
                           </Button>

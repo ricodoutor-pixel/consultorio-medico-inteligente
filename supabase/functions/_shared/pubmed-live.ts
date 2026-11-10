@@ -1,3 +1,14 @@
+export function formatCheckedAtPtBR(date = new Date()): string {
+  const formatter = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${formatter.format(date)} (horário de São Paulo)`;
+}
 import { XMLParser } from "npm:fast-xml-parser@5.12.0";
 
 export interface PubMedArticle {
@@ -106,7 +117,7 @@ export function parsePubMedArticles(xml: string): PubMedArticle[] {
 
 export async function searchLivePubMed(text: string, limit = 3): Promise<PubMedSearchResult> {
   const query = buildPrivatePubMedQuery(text);
-  const checkedAt = new Date().toISOString();
+  const checkedAt = formatCheckedAtPtBR(new Date());
   if (!query) return { query: "", total: null, checkedAt, status: "no_clinical_terms", articles: [] };
   const studyFiltered = /\[Publication Type\]/.test(query);
   const boundedLimit = studyFiltered ? 5 : Math.max(1, Math.min(5, Math.floor(limit) || 3));

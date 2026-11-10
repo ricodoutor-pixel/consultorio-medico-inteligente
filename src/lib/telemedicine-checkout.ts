@@ -40,6 +40,7 @@ export async function createConsultationCheckout(mode: ConsultationMode, triageI
       qr_code_base64: String(data.qr_code_base64),
       description: typeof data.description === "string" ? data.description : undefined,
       amount: Number(data.amount ?? SERVICES[sku].price),
+      receiver_name: String(data.receiver_name || "Planta y Raiz Ltda"),
     },
   };
 }

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { requireCheckoutUrl } from "@/lib/payment-checkout-result";
+import { isConsultationPaid, type ConsultationPix } from "@/lib/telemedicine-checkout";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
+import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";

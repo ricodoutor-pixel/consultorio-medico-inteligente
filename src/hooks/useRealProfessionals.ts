@@ -8,6 +8,7 @@ import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
 import { isPublicProfessionalVisible } from "@/lib/public-professional-visibility";
+import { evaluateDoctorPresence } from "@/lib/doctor-presence";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 
@@ -36,6 +37,8 @@ interface DoctorRow {
   council_type?: string | null;
   council_number?: string | null;
   kyc_docs_count?: number | null;
+  last_seen_online?: string | null;
+  in_consultation?: boolean | null;
 }
 
 /**

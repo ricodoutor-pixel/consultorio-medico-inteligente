@@ -95,7 +95,7 @@ describe("real consultation rules — Etapa A (pagamento padronizado)", () => {
       expectedAmount: 150,
     });
     expect(dup.ok).toBe(false);
-    if (!dup.ok) expect(dup.reason).toBe("duplicate_payment");
+    if (!dup.ok) expect((dup as { reason: string }).reason).toBe("duplicate_payment");
 
     // 2. Médico errado
     const wrongDoc = validateConsultationPaymentGuard({
@@ -105,7 +105,7 @@ describe("real consultation rules — Etapa A (pagamento padronizado)", () => {
       expectedAmount: 150,
     });
     expect(wrongDoc.ok).toBe(false);
-    if (!wrongDoc.ok) expect(wrongDoc.reason).toBe("wrong_doctor");
+    if (!wrongDoc.ok) expect((wrongDoc as { reason: string }).reason).toBe("wrong_doctor");
 
     // 3. Valor diferente da tabela
     const badPrice = validateConsultationPaymentGuard({
@@ -114,7 +114,7 @@ describe("real consultation rules — Etapa A (pagamento padronizado)", () => {
       expectedAmount: 150,
     });
     expect(badPrice.ok).toBe(false);
-    if (!badPrice.ok) expect(badPrice.reason).toBe("price_mismatch");
+    if (!badPrice.ok) expect((badPrice as { reason: string }).reason).toBe("price_mismatch");
 
     await expect(
       createConsultationCheckout("consulta_video", "", null, "31613ce7-6116-4eee-9d58-3c699282b670", {

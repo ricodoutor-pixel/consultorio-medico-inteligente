@@ -36,6 +36,9 @@ function saoPauloNow(): { data: string; hora: string } {
   return { data: `${get("day")}/${get("month")}/${get("year")}`, hora: `${get("hour")}:${get("minute")}` };
 }
 
+// Tipagem mínima para quando este módulo é importado pelos testes do site.
+declare const Deno: { env: { get(name: string): string | undefined } };
+
 function evolutionConfig() {
   let url = (Deno.env.get("EVOLUTION_API_URL") || "").trim().replace(/\/+$/, "");
   if (url && !/^https?:\/\//i.test(url)) url = `https://${url}`;

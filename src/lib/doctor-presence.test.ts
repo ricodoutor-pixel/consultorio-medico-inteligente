@@ -54,7 +54,6 @@ describe("Fluxo padronizado de consultas — Testes de Aceitação (Itens 1 a 10
     const msg = buildDoctorConsultationMessage({
       doctorName: "Dr. Victor Henrique Bueno da Fonseca",
       modality: "consulta_video",
-      scheduledAtIso: "2026-04-19T15:00:00Z",
     });
     expect(msg).toBe(
       "Dr(a). Victor Henrique Bueno da Fonseca, o senhor(a) tem uma consulta agora na Planta y Raiz. Entre em Consultório Médico.",

@@ -1,3 +1,4 @@
+import type { Json } from "@/integrations/supabase/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -185,7 +186,7 @@ export default function ConsultaMedica() {
         name: local.name,
         photo: local.imageUrl || null,
         crm: local.crm || null,
-        specialty: local.specialty || local.category || null,
+        specialty: (local as any).specialty || local.category || null,
         premiumPrice: local.premiumPrice ?? null,
       });
     }
@@ -384,7 +385,7 @@ export default function ConsultaMedica() {
         .insert({
           patient_id: userId,
           symptoms: triage.queixa.trim().slice(0, 500),
-          patient_info: { triage },
+          patient_info: { triage } as unknown as Json,
           triage_result: text,
           category: "Cannabis Medicinal",
           urgency: triage.intensidade >= 8 ? "Alta" : "Moderada",
@@ -520,7 +521,7 @@ export default function ConsultaMedica() {
           .eq("id", appt.doctor_id)
           .maybeSingle();
         if (docRow?.user_id) {
-          await supabase.from("messages").insert({
+          await (supabase as any).from("messages").insert({
             sender_id: userId,
             receiver_id: docRow.user_id,
             content: text,
@@ -566,10 +567,10 @@ export default function ConsultaMedica() {
       // "Pagamento disponível para saque na Planta y Raiz."
       try {
         await supabase.from("consultation_ratings").insert({
-          appointment_id: appt.id,
+          consultation_id: appt.id,
           patient_id: userId,
-          doctor_id: appt.doctor_id,
-          rating: starRating,
+          professional_id: appt.doctor_id,
+          stars: starRating,
           comment: comment.trim() || null,
         });
       } catch {

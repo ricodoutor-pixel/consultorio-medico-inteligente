@@ -1,3 +1,4 @@
+import type { Json } from "@/integrations/supabase/types";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -140,8 +141,8 @@ export function ConsultationObservabilityPanel() {
           .limit(20),
         supabase
           .from("payment_notify_log")
-          .select("event_key, channel, status, attempts, updated_at, last_error")
-          .order("updated_at", { ascending: false })
+          .select("external_reference, channel, status, attempts, last_attempt_at, created_at, error")
+          .order("created_at", { ascending: false })
           .limit(100),
         supabase
           .from("consultation_offers")
@@ -155,17 +156,17 @@ export function ConsultationObservabilityPanel() {
           .limit(60),
         supabase
           .from("consultation_credit_audit")
-          .select("appointment_id, doctor_id, net_amount, status, released_at")
+          .select("consultation_id, professional_id, amount, status, payout_status, reviewed_at, created_at")
           .order("created_at", { ascending: false })
           .limit(60),
         supabase
           .from("withdrawal_requests")
-          .select("doctor_id, amount, status, created_at")
+          .select("user_id, amount, status, created_at")
           .order("created_at", { ascending: false })
           .limit(40),
         supabase
           .from("audit_log")
-          .select("id, action, details, created_at")
+          .select("id, action, new_data, created_at")
           .in("action", [
             "payment_anomaly_blocked",
             "doctor_presence_enter",
@@ -175,7 +176,7 @@ export function ConsultationObservabilityPanel() {
           ])
           .order("created_at", { ascending: false })
           .limit(80),
-        supabase
+        (supabase as any)
           .from("analytics_events")
           .select("id", { count: "exact", head: true })
           .gte("created_at", thirtyMinAgoIso),
@@ -212,10 +213,10 @@ export function ConsultationObservabilityPanel() {
 
       // Carrega configuração editável da fila se existir
       const latestConfigRow = auditRows.find((r: any) => r.action === "consultation_queue_config_updated");
-      if (latestConfigRow?.details && typeof latestConfigRow.details === "object") {
+      if (latestConfigRow?.new_data && typeof latestConfigRow.new_data === "object") {
         setQueueConfig({
           ...DEFAULT_QUEUE_ROUTING_CONFIG,
-          ...(latestConfigRow.details as Partial<QueueRoutingConfig>),
+          ...(latestConfigRow.new_data as unknown as Partial<QueueRoutingConfig>),
         });
       }
 
@@ -238,7 +239,7 @@ export function ConsultationObservabilityPanel() {
       auditRows
         .filter((r: any) => r.action === "payment_anomaly_blocked")
         .forEach((r: any) => {
-          const det = (r.details || {}) as Record<string, unknown>;
+          const det = (r.new_data || {}) as Record<string, unknown>;
           computedAlerts.push({
             id: `anom-${r.id}`,
             type: String(det.anomaly_type || "anomalia_pagamento"),
@@ -249,7 +250,9 @@ export function ConsultationObservabilityPanel() {
         });
 
       const timelineRows: TimelineConsultation[] = (recentApptsRes.data || []).map((a: any) => {
-        const apptAlerts = notifyLogs.filter((l: any) => String(l.event_key || "").includes(a.id));
+        const apptAlerts = notifyLogs
+          .filter((l: any) => String(l.external_reference || "").includes(a.id))
+          .map((l: any) => ({ event_key: l.external_reference, channel: l.channel, status: l.status, attempts: l.attempts ?? 0, updated_at: l.last_attempt_at || l.created_at, last_error: l.error }));
         const apptOffers = offers
           .filter((o: any) => o.appointment_id === a.id)
           .map((o: any) => ({
@@ -257,8 +260,12 @@ export function ConsultationObservabilityPanel() {
             doctorName: nameByDoctorId.get(o.doctor_id) || o.doctor_id.slice(0, 8),
           }));
         const rating = npsList.find((n: any) => n.consultation_id === a.id) || null;
-        const payoutReleased = credits.find((c: any) => c.appointment_id === a.id) || null;
-        const withdrawal = withdrawals.find((w: any) => w.doctor_id === a.doctor_id) || null;
+        const creditRow: any = credits.find((c: any) => c.consultation_id === a.id) || null;
+        const payoutReleased = creditRow
+          ? { net_amount: Number(creditRow.amount ?? 0), status: creditRow.payout_status || creditRow.status, released_at: creditRow.reviewed_at || creditRow.created_at }
+          : null;
+        const doctorUserId = (doctorsRes.data || []).find((d: any) => d.id === a.doctor_id)?.user_id;
+        const withdrawal = (doctorUserId && withdrawals.find((w: any) => w.user_id === doctorUserId)) || null;
 
         const rowAnomalies: string[] = [];
 
@@ -376,10 +383,10 @@ export function ConsultationObservabilityPanel() {
       const { data: userRes } = await supabase.auth.getUser();
       await supabase.from("audit_log").insert({
         action: "consultation_queue_config_updated",
-        entity_type: "consultation_queue_routing",
-        entity_id: "global",
+        table_name: "consultation_queue_routing",
+        record_id: "global",
         user_id: userRes.user?.id || null,
-        details: queueConfig as unknown as Record<string, unknown>,
+        new_data: queueConfig as unknown as Json,
       });
       toast.success("Configuração da fila de médicos salva com sucesso!");
     } catch {

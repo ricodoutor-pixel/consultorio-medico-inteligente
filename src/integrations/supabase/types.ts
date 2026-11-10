@@ -6174,6 +6174,66 @@ export type Database = {
           },
         ]
       }
+      partner_importers: {
+        Row: {
+          anvisa_homologation_status: string
+          brand_name: string
+          catalog_url: string | null
+          cnpj: string | null
+          coa_document_urls: string[]
+          company_name: string
+          contract_signed: boolean
+          country_of_origin: string
+          created_at: string
+          gmp_certificate_url: string | null
+          id: string
+          representative_email: string
+          representative_name: string
+          representative_phone: string
+          sla_dispatch_days: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anvisa_homologation_status?: string
+          brand_name: string
+          catalog_url?: string | null
+          cnpj?: string | null
+          coa_document_urls?: string[]
+          company_name: string
+          contract_signed?: boolean
+          country_of_origin: string
+          created_at?: string
+          gmp_certificate_url?: string | null
+          id?: string
+          representative_email: string
+          representative_name: string
+          representative_phone: string
+          sla_dispatch_days?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anvisa_homologation_status?: string
+          brand_name?: string
+          catalog_url?: string | null
+          cnpj?: string | null
+          coa_document_urls?: string[]
+          company_name?: string
+          contract_signed?: boolean
+          country_of_origin?: string
+          created_at?: string
+          gmp_certificate_url?: string | null
+          id?: string
+          representative_email?: string
+          representative_name?: string
+          representative_phone?: string
+          sla_dispatch_days?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       patient_clinical_context: {
         Row: {
           created_at: string

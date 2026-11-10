@@ -63,7 +63,7 @@ export const COUNTRIES = [
 export type CountryCode = typeof COUNTRIES[number]["code"];
 export type LangCode = "PT" | "ES" | "EN";
 
-type UserType = "paciente" | "medico" | "farmacia" | null;
+type UserType = "paciente" | "medico" | "farmacia" | "importadora" | null;
 
 const STRINGS: Record<LangCode, Record<string, string>> = {
   PT: {
@@ -79,7 +79,7 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     patientDesc: "Busco consultas, receitas digitais ou tratamento canabinoide",
     doctorLabel: "Médico Prescritor",
     doctorDesc: "CRM ativo / Registro médico internacional",
-    pharmacyLabel: "Farmácia / Loja",
+    pharmacyLabel: "Farmácia",
     pharmacyDesc: "CNPJ / Licença sanitária internacional e ANVISA",
     changeProfile: "← Trocar perfil",
     googleLoginTitle: "Login rápido para",
@@ -121,7 +121,7 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     patientDesc: "Busco consultas, recetas digitales o tratamiento cannabinoide",
     doctorLabel: "Médico Prescriptor",
     doctorDesc: "Matrícula activa / Registro médico internacional",
-    pharmacyLabel: "Farmacia / Tienda",
+    pharmacyLabel: "Farmacia",
     pharmacyDesc: "Registro fiscal / Licencia sanitaria internacional",
     changeProfile: "← Cambiar perfil",
     googleLoginTitle: "Acceso rápido para",
@@ -286,7 +286,7 @@ const Cadastro = () => {
         return false;
       }
       const cnpj = formData.cnpj || "";
-      if (type === "farmacia" && cnpj && !validateCNPJ(cnpj)) {
+      if ((type === "farmacia" || type === "importadora") && cnpj && !validateCNPJ(cnpj)) {
         toast({ title: "CNPJ inválido", description: "Insira um CNPJ válido com 14 dígitos.", variant: "destructive" });
         return false;
       }
@@ -374,6 +374,29 @@ const Cadastro = () => {
               }
             : {}),
         }).eq("id", authData.user.id);
+
+        // 2a. Importadora: cadastro fica pendente até homologação manual pelo admin
+        if (type === "importadora") {
+          const coa = (formData.imp_coa || "").split(/[\s,]+/).map((u) => u.trim()).filter(Boolean);
+          const { error: impError } = await supabase.from("partner_importers").insert({
+            user_id: authData.user.id,
+            company_name: formData.imp_company || formData.nome,
+            brand_name: formData.imp_brand || formData.imp_company || formData.nome,
+            cnpj: formData.cnpj || null,
+            representative_name: formData.nome,
+            representative_email: formData.email.trim().toLowerCase(),
+            representative_phone: formData.telefone || "",
+            country_of_origin: formData.imp_origin || "",
+            catalog_url: formData.imp_catalog || null,
+            sla_dispatch_days: formData.imp_sla ? Number(formData.imp_sla) : 3,
+            coa_document_urls: coa,
+            gmp_certificate_url: formData.imp_gmp || null,
+          });
+          if (impError) {
+            console.warn("[partner_importers insert]", impError);
+            toast({ title: "Conta criada, importadora pendente", description: "Não foi possível gravar os dados da importadora. Fale com a equipe Planta y Raiz." });
+          }
+        }
 
         // 2b. Farmácia/Lojista: cria a loja já na fila de homologação (KYC pendente)
         if (type === "farmacia") {
@@ -501,7 +524,7 @@ const Cadastro = () => {
                   <Link to="/dashboard-paciente">🌿 Ir para Meu Painel de Paciente <ArrowRight size={16} className="ml-2" /></Link>
                 </Button>
                 <Button
-                  onClick={() => openGlobalTour(type || "paciente")}
+                  onClick={() => openGlobalTour(type === "importadora" ? "farmacia" : type || "paciente")}
                   variant="outline"
                   className="font-black rounded-2xl h-12 hover:scale-105 transition-all"
                 >
@@ -517,7 +540,7 @@ const Cadastro = () => {
             </motion.div>
           </div>
         </section>
-        <InteractiveTour3DModal initialRole={type || "paciente"} />
+        <InteractiveTour3DModal initialRole={type === "importadora" ? "farmacia" : type || "paciente"} />
         <Footer />
       </div>
     );
@@ -527,6 +550,7 @@ const Cadastro = () => {
     { id: "paciente" as UserType, label: t.patientLabel, icon: Users, desc: t.patientDesc, color: "green" },
     { id: "medico" as UserType, label: t.doctorLabel, icon: Stethoscope, desc: t.doctorDesc, color: "green" },
     { id: "farmacia" as UserType, label: t.pharmacyLabel, icon: Building2, desc: t.pharmacyDesc, color: "purple" },
+    { id: "importadora" as UserType, label: "Importadora", icon: Building2, desc: "Importadoras e representações internacionais · RDC 660/2022", color: "purple" },
   ];
 
   return (
@@ -858,6 +882,36 @@ const Cadastro = () => {
                         <Input value={formData.complemento || ""} onChange={(e) => handleChange("complemento", e.target.value)} placeholder="Apto / Sala" className="bg-muted border-border" />
                       </div>
                     </div>
+
+                    {type === "importadora" && (
+                      <div className="space-y-4 pt-2 border-t border-border/50">
+                        <p className="text-xs text-muted-foreground">Cadastro de importadora fica pendente até a homologação manual pela equipe Planta y Raiz (RDC 660/2022).</p>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          {([
+                            ["imp_company", "Razão social da importadora *", "Empresa Importadora Ltda", true],
+                            ["imp_brand", "Marca representada *", "Ex: Nuï Cannabis", true],
+                            ["cnpj", "CNPJ", "00.000.000/0000-00", false],
+                            ["imp_origin", "País de origem do produto *", "Ex: EUA, Uruguai", true],
+                            ["imp_catalog", "Link do catálogo", "https://", false],
+                            ["imp_sla", "Prazo de envio internacional (dias)", "3", false],
+                            ["imp_gmp", "Link do certificado de Boas Práticas (GMP)", "https://", false],
+                            ["imp_coa", "Links dos laudos (COA), separados por vírgula", "https://...", false],
+                          ] as const).map(([key, label, ph, req]) => (
+                            <div key={key}>
+                              <Label className="text-xs font-bold text-muted-foreground">{label}</Label>
+                              <Input
+                                value={formData[key] || ""}
+                                onChange={(e) => handleChange(key, key === "cnpj" && country === "BR" ? formatCNPJ(e.target.value) : e.target.value)}
+                                placeholder={ph}
+                                type={key === "imp_sla" ? "number" : "text"}
+                                className="bg-muted border-border"
+                                required={req}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Pharmacy fields & KYC Uploads */}
                     {type === "farmacia" && (

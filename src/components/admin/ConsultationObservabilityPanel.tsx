@@ -161,7 +161,7 @@ export function ConsultationObservabilityPanel() {
           .limit(60),
         supabase
           .from("withdrawal_requests")
-          .select("doctor_id, amount, status, created_at")
+          .select("user_id, amount, status, created_at")
           .order("created_at", { ascending: false })
           .limit(40),
         supabase
@@ -264,7 +264,8 @@ export function ConsultationObservabilityPanel() {
         const payoutReleased = creditRow
           ? { net_amount: Number(creditRow.amount ?? 0), status: creditRow.payout_status || creditRow.status, released_at: creditRow.reviewed_at || creditRow.created_at }
           : null;
-        const withdrawal = withdrawals.find((w: any) => w.doctor_id === a.doctor_id) || null;
+        const doctorUserId = (doctorsRes.data || []).find((d: any) => d.id === a.doctor_id)?.user_id;
+        const withdrawal = (doctorUserId && withdrawals.find((w: any) => w.user_id === doctorUserId)) || null;
 
         const rowAnomalies: string[] = [];
 

@@ -60,6 +60,9 @@ const Index = lazyWithRecovery(() => import("./pages/Index"), { sourceRef: "/" }
 const OnboardingFlow = lazyWithRecovery(() => import("./pages/OnboardingFlow").then(m => ({ default: m.OnboardingFlow })), { sourceRef: "/onboarding" });
 const ComoFunciona = lazyWithRecovery(() => import("./pages/ComoFunciona"), { sourceRef: "/como-funciona" });
 const Profissionais = lazyWithRecovery(() => import("./pages/Profissionais"), { sourceRef: "/profissionais" });
+const Advogados = lazyWithRecovery(() => import("./pages/Advogados"), { sourceRef: "/advogados" });
+const LawyerWorkspace = lazyWithRecovery(() => import("./pages/LawyerWorkspace"), { sourceRef: "/advogados/cadastro" });
+const AdminAdvogados = lazyWithRecovery(() => import("./pages/admin/AdminAdvogados"), { sourceRef: "/admin/advogados" });
 const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });
 const ComunidadeConteudoIA = lazyWithRecovery(() => import("./pages/ComunidadeConteudoIA"), { sourceRef: "/comunidade" });
 const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
@@ -325,6 +328,9 @@ const App = () => (
                 <Route path="/cadastro-completo" element={<OnboardingFlow />} />
                 <Route path="/como-funciona" element={<ComoFunciona />} />
                 <Route path="/profissionais" element={<Profissionais />} />
+                <Route path="/advogados" element={<Advogados />} />
+                <Route path="/advogados/cadastro" element={<LawyerWorkspace />} />
+                <Route path="/admin/advogados" element={<AdminRoute><AdminAdvogados /></AdminRoute>} />
                 <Route path="/profissionais/:id" element={<Profissionais />} />
                 <Route path="/shopping" element={<Shopping />} />
                 <Route path="/shopping/:id" element={<Shopping />} />

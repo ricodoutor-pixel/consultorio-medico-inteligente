@@ -120,6 +120,13 @@
       "when": 1794251718194,
       "tag": "0016_release_doctor_payout_on_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794283921579,
+      "tag": "0017_legal_professionals_and_private_agenda",
+      "breakpoints": true
     }
   ]
 }

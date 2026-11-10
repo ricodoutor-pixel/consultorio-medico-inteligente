@@ -286,3 +286,23 @@ describe("Fluxo padronizado de consultas — Testes de Aceitação (Itens 1 a 10
     expect(busyDoc.canReceiveOffers).toBe(false);
   });
 });
+
+describe("Médico online exige Consultório aberto (batimento recente)", () => {
+  it("botão ON antigo sem batimento não recebe consulta transferida", () => {
+    const nowMs = Date.parse("2026-11-10T16:00:00Z");
+    const decision = selectNextQueueStep({
+      chosenDoctorId: null,
+      candidates: [
+        { doctor_id: "sem-batimento", user_id: "u1", full_name: "Dr. A", phone: "5511999990001", plan_tier: "free", is_online: true, is_available: true, last_seen_online: null },
+        { doctor_id: "batimento-velho", user_id: "u2", full_name: "Dr. B", phone: "5511999990002", plan_tier: "free", is_online: true, is_available: true, last_seen_online: new Date(nowMs - 10 * 60_000).toISOString() },
+        { doctor_id: "consultorio-aberto", user_id: "u3", full_name: "Dr. C", phone: "5511999990003", plan_tier: "free", is_online: true, is_available: true, last_seen_online: new Date(nowMs - 30_000).toISOString() },
+      ] as QueueCandidate[],
+      triedDoctorIdsInCurrentCycle: [],
+      currentCycle: 1,
+      firstAttemptAtIso: new Date(nowMs).toISOString(),
+      nowMs,
+    });
+    expect(decision.action).toBe("offer_doctor");
+    expect((decision as { candidate: QueueCandidate }).candidate.doctor_id).toBe("consultorio-aberto");
+  });
+});

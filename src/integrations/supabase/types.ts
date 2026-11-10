@@ -4322,6 +4322,154 @@ export type Database = {
         }
         Relationships: []
       }
+      lawyer_appointments: {
+        Row: {
+          client_id: string
+          created_at: string
+          fee: number
+          id: string
+          lawyer_id: string
+          scope: string
+          slot_id: string
+          status: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          fee: number
+          id?: string
+          lawyer_id: string
+          scope: string
+          slot_id: string
+          status?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          fee?: number
+          id?: string
+          lawyer_id?: string
+          scope?: string
+          slot_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lawyer_appointments_lawyer_id_fkey"
+            columns: ["lawyer_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lawyer_appointments_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lawyer_profiles: {
+        Row: {
+          bio: string
+          city: string
+          created_at: string
+          full_name: string
+          id: string
+          oab_number: string
+          oab_state: string
+          status: string
+          user_id: string
+          verification_source: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          bio?: string
+          city?: string
+          created_at?: string
+          full_name: string
+          id?: string
+          oab_number: string
+          oab_state: string
+          status?: string
+          user_id: string
+          verification_source?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          bio?: string
+          city?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          oab_number?: string
+          oab_state?: string
+          status?: string
+          user_id?: string
+          verification_source?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      lawyer_slots: {
+        Row: {
+          ends_at: string
+          id: string
+          lawyer_id: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          ends_at: string
+          id?: string
+          lawyer_id: string
+          starts_at: string
+          status?: string
+        }
+        Update: {
+          ends_at?: string
+          id?: string
+          lawyer_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lawyer_slots_lawyer_id_fkey"
+            columns: ["lawyer_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lawyer_terms: {
+        Row: {
+          consultation_fee: number
+          lawyer_id: string
+          scope: string
+        }
+        Insert: {
+          consultation_fee: number
+          lawyer_id: string
+          scope?: string
+        }
+        Update: {
+          consultation_fee?: number
+          lawyer_id?: string
+          scope?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lawyer_terms_lawyer_id_fkey"
+            columns: ["lawyer_id"]
+            isOneToOne: true
+            referencedRelation: "lawyer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_status_history: {
         Row: {
           changed_by: string | null
@@ -9841,6 +9989,7 @@ export type Database = {
       }
       anonymize_old_ot_orders: { Args: never; Returns: undefined }
       auto_release_brisa_orientacao: { Args: never; Returns: Json }
+      book_lawyer_slot: { Args: { _slot_id: string }; Returns: string }
       book_paid_appointment_slot: {
         Args: { _appointment_id: string; _slot_id: string }
         Returns: Json
@@ -9865,6 +10014,10 @@ export type Database = {
         Returns: boolean
       }
       cleanup_http_logs: { Args: never; Returns: Json }
+      close_lawyer_appointment: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
+      }
       complete_brisa_orientacao: {
         Args: { _notes?: string; _payment_row_id: string }
         Returns: Json
@@ -9970,6 +10123,13 @@ export type Database = {
           rating: number
           specialty: string
           user_id: string
+        }[]
+      }
+      get_lawyer_private_quote: {
+        Args: { _lawyer_id: string }
+        Returns: {
+          consultation_fee: number
+          scope: string
         }[]
       }
       get_my_sv_renewal_history: {

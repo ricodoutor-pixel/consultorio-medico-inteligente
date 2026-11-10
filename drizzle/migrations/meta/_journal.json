@@ -127,6 +127,13 @@
       "when": 1794283921579,
       "tag": "0017_legal_professionals_and_private_agenda",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794284478977,
+      "tag": "0018_legal_explicit_least_privilege",
+      "breakpoints": true
     }
   ]
 }

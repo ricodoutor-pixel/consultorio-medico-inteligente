@@ -1,9 +1,11 @@
 # Roadmap
 
 ## Área jurídica — 10/11/2026
-- [ ] Criar categoria Advogados — Habeas corpus medicinal, cadastro OAB e aprovação manual, separada dos médicos
-- [ ] Disponibilizar agenda jurídica e honorários privados definidos pelo advogado, sem comissão automática
-- [ ] Conferir regras de acesso, reserva de horário e telas; não cadastrar profissionais ou casos fictícios
+- [x] Criar categoria Advogados — Habeas corpus medicinal, cadastro OAB e aprovação manual, separada dos médicos
+- [x] Disponibilizar agenda jurídica e honorários privados definidos pelo advogado, sem comissão automática
+- [x] Conferir permissões no Cloud, nove testes e telas pública/autenticada no computador e celular; compilação OK
+- [ ] Testar cadastro, revisão OAB e reserva com advogado participante real — depende do parceiro; nenhum cadastro ou caso fictício criado
+- [ ] Publicar nova categoria no site oficial — não publicado nesta entrega
 - [ ] Validar modelo comercial e publicidade com advogado responsável/OAB antes de habilitar cobranças jurídicas
 
 ## Vitrine — 09/11/2026

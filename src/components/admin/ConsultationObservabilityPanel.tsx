@@ -156,7 +156,7 @@ export function ConsultationObservabilityPanel() {
           .limit(60),
         supabase
           .from("consultation_credit_audit")
-          .select("appointment_id, doctor_id, net_amount, status, released_at")
+          .select("consultation_id, professional_id, amount, status, payout_status, reviewed_at, created_at")
           .order("created_at", { ascending: false })
           .limit(60),
         supabase
@@ -260,7 +260,10 @@ export function ConsultationObservabilityPanel() {
             doctorName: nameByDoctorId.get(o.doctor_id) || o.doctor_id.slice(0, 8),
           }));
         const rating = npsList.find((n: any) => n.consultation_id === a.id) || null;
-        const payoutReleased = credits.find((c: any) => c.appointment_id === a.id) || null;
+        const creditRow: any = credits.find((c: any) => c.consultation_id === a.id) || null;
+        const payoutReleased = creditRow
+          ? { net_amount: Number(creditRow.amount ?? 0), status: creditRow.payout_status || creditRow.status, released_at: creditRow.reviewed_at || creditRow.created_at }
+          : null;
         const withdrawal = withdrawals.find((w: any) => w.doctor_id === a.doctor_id) || null;
 
         const rowAnomalies: string[] = [];

@@ -52,7 +52,9 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization') || ''
   const token = authHeader.replace(/^Bearer\s+/i, '')
   const role = parseJwtRole(token)
-  if (role !== 'service_role') {
+  const serviceEnvKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+  const isServiceKey = !!serviceEnvKey && token === serviceEnvKey
+  if (role !== 'service_role' && !isServiceKey) {
     return new Response(
       JSON.stringify({ error: 'Forbidden: service_role required' }),
       {

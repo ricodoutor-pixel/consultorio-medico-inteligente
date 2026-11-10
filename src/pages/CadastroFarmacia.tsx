@@ -223,7 +223,7 @@ export default function CadastroFarmacia() {
             </Badge>
           </div>
           <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-3">
-            Credenciamento de <span className="text-gradient-green">Farmácias & Lojas</span>
+            Credenciamento de <span className="text-gradient-green">Farmácias & Importadoras</span>
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             Venda produtos canabinoides e receba receitas médicas em 1-clique com repasse automático de <strong>95% via Pix</strong>.

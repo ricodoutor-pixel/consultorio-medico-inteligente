@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { requireCheckoutUrl } from "@/lib/payment-checkout-result";
+import { isConsultationPaid, type ConsultationPix } from "@/lib/telemedicine-checkout";
+import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
+import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -92,6 +94,15 @@ const Agendamento = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [createdAppointment, setCreatedAppointment] = useState<any>(null);
+  const [apptPix, setApptPix] = useState<ConsultationPix | null>(null);
+  const [apptPaid, setApptPaid] = useState(false);
+  useEffect(() => {
+    if (!apptPix || apptPaid || !createdAppointment?.id) return;
+    const t = setInterval(() => {
+      isConsultationPaid(createdAppointment.id).then((ok) => { if (ok) setApptPaid(true); }).catch(() => {});
+    }, 5000);
+    return () => clearInterval(t);
+  }, [apptPix, apptPaid, createdAppointment?.id]);
 
   // Inicializa sessão e médico selecionado via URL
   useEffect(() => {
@@ -340,30 +351,19 @@ const Agendamento = () => {
         value: consultationPrice,
       }, { leadScore: 40, funnelStage: "conversion", category: "appointment" });
 
-      // 4. Cria preferência de pagamento Mercado Pago
-      try {
-        const { data: paymentData, error: paymentError } = await supabase.functions.invoke("create-payment", {
-          body: {
-            appointmentId: newAppt.id,
-            doctorName: selectedDoctor.name,
-            patientEmail: freshSession.session?.user?.email || "paciente@plantayraiz.com.br",
-            description: `${currentModalityObj.label} com ${selectedDoctor.name}`,
-            amount: consultationPrice,
-          },
-        });
-
-        const checkoutUrl = requireCheckoutUrl(paymentData, paymentError);
-        if (checkoutUrl) {
-          toast({
-            title: "Redirecionando para o pagamento seguro...",
-            description: "Você será direcionado ao Mercado Pago (PIX ou Cartão).",
-          });
-          window.location.href = checkoutUrl;
-          return;
-        }
-      } catch (payErr) {
-        throw payErr;
+      // 4. Pix gerado dentro da plataforma (mesmo caminho da Orientação Técnica)
+      const { data: pixData, error: pixError } = await supabase.functions.invoke("mp-checkout", {
+        body: { appointmentId: newAppt.id, payment_method: "pix" },
+      });
+      if (pixError || !pixData?.qr_code || !pixData?.qr_code_base64) {
+        throw new Error("Não foi possível gerar o Pix. Sua consulta continua aguardando pagamento. Tente de novo.");
       }
+      setApptPix({
+        qr_code: String(pixData.qr_code),
+        qr_code_base64: String(pixData.qr_code_base64),
+        description: typeof pixData.description === "string" ? pixData.description : undefined,
+        amount: Number(pixData.amount ?? consultationPrice),
+      });
 
     } catch (err: any) {
       toast({
@@ -914,7 +914,25 @@ const Agendamento = () => {
                   </CardContent>
                 </Card>
 
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                {apptPaid && (
+                  <PaymentConfirmedNotice pix label="Continuar" onContinue={() => setStep(5)} />
+                )}
+                {apptPix && !apptPaid && (
+                  <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
+                    <p className="text-sm text-foreground">
+                      Pagamento: <strong>{formatPaymentName(apptPix.description || currentModalityObj.label)}</strong> · R$ {apptPix.amount.toFixed(2).replace(".", ",")}
+                    </p>
+                    <img src={`data:image/png;base64,${apptPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2" />
+                    <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto">{apptPix.qr_code}</p>
+                    <Button variant="outline" className="w-full" onClick={async () => {
+                      try { await navigator.clipboard.writeText(apptPix.qr_code); toast({ title: "Código Pix copiado!" }); }
+                      catch { toast({ title: "Erro ao copiar", description: "Selecione o código e copie manualmente.", variant: "destructive" }); }
+                    }}>Copiar Código Pix (Copia e Cola)</Button>
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="animate-spin" size={14} /> Aguardando confirmação do banco…</p>
+                  </div>
+                )}
+
+                <div className={`flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 ${apptPix ? "hidden" : ""}`}>
                   <Button variant="outline" onClick={() => setStep(3)} className="w-full sm:w-auto rounded-2xl font-bold">
                     <ArrowLeft size={16} className="mr-1" /> Alterar Horário
                   </Button>

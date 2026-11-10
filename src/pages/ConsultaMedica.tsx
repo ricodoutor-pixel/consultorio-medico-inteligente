@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 import { createConsultationCheckout, type ConsultationMode, type ConsultationPix } from "@/lib/telemedicine-checkout";
-import { consultationStage, faceToScore, roomFromUrl, type ConsultationSnapshot } from "@/lib/consultation-stage";
+import { consultationStage, consultationRoomName, doctorJoined, faceToScore, type ConsultationSnapshot } from "@/lib/consultation-stage";
 import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { professionals } from "@/data/professionals";
 import { formatBRL, SERVICES } from "@/lib/pricing";
@@ -91,10 +91,10 @@ export default function ConsultaMedica() {
 
   const loadAppt = useCallback(async (id: string) => {
     const [{ data }, { data: nps }] = await Promise.all([
-      supabase.from("appointments").select("id, doctor_id, type, payment_status, status, notes, room_url").eq("id", id).maybeSingle(),
+      supabase.from("appointments").select("id, doctor_id, type, payment_status, status, notes").eq("id", id).maybeSingle(),
       supabase.from("nps_responses").select("id").eq("consultation_id", id).limit(1),
     ]);
-    if (data) setAppt(data as Appt);
+    if (data) setAppt(data as unknown as Appt);
     setRated(Boolean(nps && nps.length));
   }, []);
 
@@ -159,7 +159,7 @@ export default function ConsultaMedica() {
   };
 
   // Sala ---------------------------------------------------------------
-  const room = appt?.room_url ? roomFromUrl(appt.room_url) : null;
+  const room = appt && doctorJoined(appt) ? { domain: "meet.jit.si", roomName: consultationRoomName(appt.id) } : null;
   const waitStart = appt ? Number(localStorage.getItem(`pyr_consult_wait_${appt.id}`) || 0) : 0;
   const waitLeft = waitStart ? Math.max(0, WAIT_MINUTES * 60 - Math.floor((now - waitStart) / 1000)) : WAIT_MINUTES * 60;
   useEffect(() => {

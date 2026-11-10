@@ -133,8 +133,16 @@ const WorkspaceMedico = () => {
         setTreatmentPlan("Iniciar Óleo Full Spectrum CBD 10% (1 gota/kg/dia sublingual à noite). Acompanhamento de titulação em 15 dias.");
       }
       
+      const isRealAppointment = Boolean(appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId));
+      if (isRealAppointment && apptRes.data && !["in_progress", "completed", "cancelled"].includes(apptRes.data.status)) {
+        // Médico entrou: o paciente vê a sala abrir na página da consulta.
+        await supabase.from("appointments").update({ status: "in_progress", updated_at: new Date().toISOString() }).eq("id", appointmentId!);
+      }
       if (type === 'video') {
-        if (roomRes.data?.ok && roomRes.data?.roomName) {
+        if (isRealAppointment) {
+          // Mesma sala que o paciente abre na página única da consulta.
+          setRoomInfo({ roomName: `plantayraiz-consultorio-${appointmentId}`, domain: "meet.jit.si" });
+        } else if (roomRes.data?.ok && roomRes.data?.roomName) {
           setRoomInfo({
             roomName: roomRes.data.roomName,
             domain: roomRes.data.domain,

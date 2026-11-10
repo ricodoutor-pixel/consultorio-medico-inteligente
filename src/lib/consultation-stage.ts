@@ -8,7 +8,6 @@ export interface ConsultationSnapshot {
   payment_status: string | null;
   status: string | null;
   notes: string | null;
-  room_url: string | null;
 }
 
 const TRIAGE_LINK = /Triagem:\s*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -17,9 +16,14 @@ export function hasLinkedTriage(notes: string | null | undefined): boolean {
   return TRIAGE_LINK.test(notes || "");
 }
 
-/** A avaliação só abre depois que o médico abriu a sala; ela libera 93% ao médico. */
+/** O médico abriu a consulta no Consultório (status gravado pelo próprio médico). */
+export function doctorJoined(appt: ConsultationSnapshot): boolean {
+  return appt.status === "in_progress" || appt.status === "completed";
+}
+
+/** A avaliação só abre depois que o médico entrou; ela libera 93% ao médico. */
 export function canRateConsultation(appt: ConsultationSnapshot): boolean {
-  return appt.payment_status === "paid" && Boolean(appt.room_url);
+  return appt.payment_status === "paid" && doctorJoined(appt);
 }
 
 export function consultationStage(appt: ConsultationSnapshot | null, rated: boolean, patientEnded = false): ConsultationStage {
@@ -36,13 +40,7 @@ export function faceToScore(face: 1 | 2 | 3): number {
   return face === 3 ? 10 : face === 2 ? 7 : 3;
 }
 
-export function roomFromUrl(url: string): { domain: string; roomName: string } | null {
-  try {
-    const u = new URL(url);
-    const roomName = u.pathname.replace(/^\/+/, "").split("/").pop() || "";
-    if (!roomName) return null;
-    return { domain: u.host, roomName };
-  } catch {
-    return null;
-  }
+/** Mesma sala Jitsi que o médico abre no Consultório para esta consulta. */
+export function consultationRoomName(appointmentId: string): string {
+  return `plantayraiz-consultorio-${appointmentId}`;
 }

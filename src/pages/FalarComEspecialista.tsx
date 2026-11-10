@@ -90,20 +90,8 @@ const FalarComEspecialista = () => {
         
       if (apptErr) throw apptErr;
 
-      // Call Mercado Pago webhook
-      const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
-        body: {
-          appointmentId: appt.id,
-          doctorName: pro?.name,
-          patientEmail: form.email || session.user.email,
-          description: isReturn ? `Retorno 90 dias - ${pro?.name}` : `Orientação Técnica ${form.preferencia === "video" ? "Vídeo" : "Chat"} - ${pro?.name}`
-        }
-      });
-
-      if (payErr || !payData?.init_point) throw new Error("Erro ao gerar link de pagamento.");
-      
-      toast({ title: "Redirecionando...", description: "Você será levado ao Mercado Pago." });
-      window.location.href = payData.init_point;
+      // Pix dentro da plataforma: a página única conduz pagamento → triagem → sala → avaliação.
+      navigate(`/consulta/${appt.type === "chat" ? "consulta_chat" : "consulta_video"}?appt=${appt.id}`);
     } catch (err: any) {
       toast({ title: "Erro na solicitação", description: err.message || "Erro desconhecido.", variant: "destructive" });
       setLoading(false);

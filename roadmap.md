@@ -1,5 +1,11 @@
 # Roadmap
 
+## Área jurídica — 10/11/2026
+- [ ] Criar categoria Advogados — Habeas corpus medicinal, cadastro OAB e aprovação manual, separada dos médicos
+- [ ] Disponibilizar agenda jurídica e honorários privados definidos pelo advogado, sem comissão automática
+- [ ] Conferir regras de acesso, reserva de horário e telas; não cadastrar profissionais ou casos fictícios
+- [ ] Validar modelo comercial e publicidade com advogado responsável/OAB antes de habilitar cobranças jurídicas
+
 ## Vitrine — 09/11/2026
 - [x] Foto correta da Dra. Ana Karoliny; Dr. Milton 1º e Dr. Victor 2º; fotos dos médicos 20 MB → 1,2 MB
 - [ ] Publicar no site oficial

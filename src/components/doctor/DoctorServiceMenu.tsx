@@ -50,6 +50,17 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
       return;
     }
 
+    // Vídeo e chat: página única dentro da plataforma (Pix → triagem → sala → avaliação → indicação).
+    if ((item.sku === "consulta_video" || item.sku === "consulta_chat") && doctorId) {
+      navigate(`/consulta/${item.sku}?doctor=${encodeURIComponent(doctorId)}`);
+      return;
+    }
+    // Retorno e Premium: agendamento com Pix dentro da plataforma.
+    if (proId) {
+      navigate(`/agendamento?pro=${encodeURIComponent(proId)}`);
+      return;
+    }
+
     setLoadingSku(item.sku);
     try {
       const { data: { session } } = await supabase.auth.getSession();

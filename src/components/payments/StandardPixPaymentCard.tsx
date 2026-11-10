@@ -136,7 +136,7 @@ export function StandardPixPaymentCard({
                 type="button"
                 onClick={onGeneratePix}
                 disabled={busyPix || busyCard}
-                className="w-full h-14 rounded-2xl font-black text-base shadow-lg hover:shadow-xl transition-all bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2"
+                className="w-full h-auto min-h-14 py-3 px-4 rounded-2xl font-black text-sm sm:text-base leading-tight whitespace-normal text-center shadow-lg hover:shadow-xl transition-all bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2"
               >
                 {busyPix ? (
                   <>

@@ -295,7 +295,13 @@ const WorkspaceMedico = () => {
                  domain={roomInfo.domain}
                  jwt={roomInfo.jwt}
                  isDoctor={true}
-                 onClose={() => navigate("/dashboard-medico")}
+                 onClose={async () => {
+                   // Médico desligou: encerra a consulta para o paciente avaliar (libera o repasse).
+                   if (appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId)) {
+                     await supabase.from("appointments").update({ status: "completed", updated_at: new Date().toISOString() }).eq("id", appointmentId);
+                   }
+                   navigate("/dashboard-medico");
+                 }}
                />
              ) : (
                <div className="flex-1 flex flex-col items-center justify-center">

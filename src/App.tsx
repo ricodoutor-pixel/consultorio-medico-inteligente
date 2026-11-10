@@ -66,6 +66,7 @@ const AdminAdvogados = lazyWithRecovery(() => import("./pages/admin/AdminAdvogad
 const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });
 const ComunidadeConteudoIA = lazyWithRecovery(() => import("./pages/ComunidadeConteudoIA"), { sourceRef: "/comunidade" });
 const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
+const ConsultaMedica = lazyWithRecovery(() => import("./pages/ConsultaMedica"), { sourceRef: "/consulta" });
 const FAQ = lazyWithRecovery(() => import("./pages/FAQ"), { sourceRef: "/faq" });
 const Contato = lazyWithRecovery(() => import("./pages/Contato"), { sourceRef: "/contato" });
 const Pay = lazyWithRecovery(() => import("./pages/Pay"), { sourceRef: "/pay" });
@@ -414,6 +415,7 @@ const App = () => (
                 <Route path="/rastreio" element={<EntregadorGPS />} />
                 <Route path="/shopping/farmacia/:vendorId" element={<FarmaciaVitrine />} />
                 <Route path="/agendamento" element={<Agendamento />} />
+                <Route path="/consulta/:sku" element={<ConsultaMedica />} />
                 <Route path="/prontuario" element={<PrivateRoute><Prontuario /></PrivateRoute>} />
                 <Route path="/dashboard-executivo" element={<AdminRoute><DashboardExecutivo /></AdminRoute>} />
                 <Route path="/notificacoes" element={<Notificacoes />} />

@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import DoctorsNearMeMap from "@/components/doctors/DoctorsNearMeMap";
 import { DoctorServiceMenu } from "@/components/doctor/DoctorServiceMenu";
 import { SERVICE_MENU, PREMIUM_SUGGESTED_PRICE, formatBRL } from "@/lib/pricing";
+import { LawyerDirectory } from "@/components/legal/LawyerDirectory";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -497,10 +498,11 @@ const Profissionais = () => {
                 </button>
               );
             })}
+            <Button variant={activeCategory === "Advogados" ? "default" : "outline"} className="shrink-0" onClick={() => { setActiveCategory("Advogados"); setSearchQuery(""); }}>Advogados · Habeas corpus</Button>
           </div>
 
           {/* Cards - grid responsivo ou estado vazio */}
-          {filtered.length === 0 ? (
+          {activeCategory === "Advogados" && !searchQuery.trim() ? <LawyerDirectory /> : filtered.length === 0 ? (
             <div className="text-center py-16 px-4 bg-card/40 border border-border/70 rounded-3xl max-w-lg mx-auto my-8">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 border border-primary/20">
                 <Search className="w-7 h-7" />

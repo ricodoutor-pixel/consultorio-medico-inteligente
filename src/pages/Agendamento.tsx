@@ -363,6 +363,7 @@ const Agendamento = () => {
         qr_code_base64: String(pixData.qr_code_base64),
         description: typeof pixData.description === "string" ? pixData.description : undefined,
         amount: Number(pixData.amount ?? consultationPrice),
+        receiver_name: typeof pixData.receiver_name === "string" ? pixData.receiver_name : undefined,
       });
 
     } catch (err: any) {

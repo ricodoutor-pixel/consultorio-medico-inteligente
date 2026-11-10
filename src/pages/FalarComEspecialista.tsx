@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ const FalarComEspecialista = () => {
   const { professionals } = useRealProfessionals();
   const pro = proId ? professionals.find((p) => p.id === proId) : null;
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [step, setStep] = useState<"form" | "payment">("form");
   const [loading, setLoading] = useState(false);

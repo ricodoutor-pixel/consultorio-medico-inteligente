@@ -36,7 +36,7 @@ export interface ConsultationValidationInput {
 }
 
 export type ConsultationValidationResult =
-  | { ok: true; amount: number }
+  | { ok: true; amount: number; reason?: undefined; error?: undefined; status?: undefined }
   | {
       ok: false;
       reason: "duplicate_payment" | "wrong_doctor" | "price_mismatch" | "invalid_service";

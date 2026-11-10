@@ -236,7 +236,32 @@ const MonitoramentoSaude = lazyWithRecovery(() => import("./pages/MonitoramentoS
 const FeedbackNPS = lazyWithRecovery(() => import("./pages/FeedbackNPS"), { sourceRef: "/feedback" });
 const AdminIaAuditoria = lazyWithRecovery(() => import("./pages/admin/AdminIaAuditoria"), { sourceRef: "/admin/ia-auditoria" });
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 300_000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+if (typeof window !== "undefined") {
+  const preloadCoreRoutes = () => {
+    void import("./pages/Profissionais").catch(() => {});
+    void import("./pages/ConsultaMedica").catch(() => {});
+    void import("./pages/OrientacaoTecnicaAgente").catch(() => {});
+  };
+  const win = window as Window & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+  };
+  if (typeof win.requestIdleCallback === "function") {
+    win.requestIdleCallback(preloadCoreRoutes, { timeout: 2500 });
+  } else {
+    window.setTimeout(preloadCoreRoutes, 1200);
+  }
+}
 
 /**
  * Ruído de extensões do navegador (MetaMask/carteiras cripto, tradutores).

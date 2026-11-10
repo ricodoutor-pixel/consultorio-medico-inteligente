@@ -11,6 +11,7 @@ import { isPublicProfessionalVisible } from "@/lib/public-professional-visibilit
 import { evaluateDoctorPresence } from "@/lib/doctor-presence";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
+const DOCTORS_CACHE_KEY = "__pyr_doctors_cache_v1";
 
 interface DoctorRow {
   id: string;
@@ -30,6 +31,8 @@ interface DoctorRow {
   country?: string | null;
   city?: string | null;
   is_available?: boolean | null;
+  last_seen_online?: string | null;
+  in_consultation?: boolean | null;
   rqe: string | null;
   plan_tier: string | null;
   full_name?: string | null;
@@ -37,8 +40,6 @@ interface DoctorRow {
   council_type?: string | null;
   council_number?: string | null;
   kyc_docs_count?: number | null;
-  last_seen_online?: string | null;
-  in_consultation?: boolean | null;
 }
 
 /**
@@ -126,34 +127,67 @@ function extractPrimaryCrm(crmRaw?: string | null): string {
   return firstChunk.replace(/\D/g, "");
 }
 
+function readCachedDoctors(): DoctorRow[] {
+  try {
+    const raw = sessionStorage.getItem(DOCTORS_CACHE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export function useRealProfessionals(): { professionals: Professional[]; realCount: number; loading: boolean } {
-  const [dbDoctors, setDbDoctors] = useState<DoctorRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dbDoctors, setDbDoctors] = useState<DoctorRow[]>(() => readCachedDoctors());
+  // Como baseProfessionals está em memória, não bloqueamos a renderização inicial da vitrine
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     const fetchDoctors = async () => {
       try {
-        const [{ data: publicDocs, error }, { data: presenceRows }, { data: activeAppts }] = await Promise.all([
+        const [publicRes, presenceRes, activeApptsRes] = await Promise.allSettled([
           supabase.from("doctors_public" as never).select("*"),
           supabase.from("doctors").select("id, is_online, is_available, last_seen_online"),
           supabase.from("appointments").select("doctor_id").eq("status", "in_progress"),
         ]);
-        if (error) throw error;
         if (!active) return;
 
-        const presenceMap = new Map<string, { is_online?: boolean | null; is_available?: boolean | null; last_seen_online?: string | null }>();
-        for (const p of (presenceRows ?? []) as Array<{ id: string; is_online?: boolean | null; is_available?: boolean | null; last_seen_online?: string | null }>) {
+        const publicDocs =
+          publicRes.status === "fulfilled" && !publicRes.value.error
+            ? ((publicRes.value.data ?? []) as DoctorRow[])
+            : [];
+        if (publicDocs.length === 0) return;
+
+        const presenceRows =
+          presenceRes.status === "fulfilled" && !presenceRes.value.error
+            ? ((presenceRes.value.data ?? []) as Array<{
+                id: string;
+                is_online?: boolean | null;
+                is_available?: boolean | null;
+                last_seen_online?: string | null;
+              }>)
+            : [];
+
+        const activeAppts =
+          activeApptsRes.status === "fulfilled" && !activeApptsRes.value.error
+            ? ((activeApptsRes.value.data ?? []) as Array<{ doctor_id?: string | null }>)
+            : [];
+
+        const presenceMap = new Map<
+          string,
+          { is_online?: boolean | null; is_available?: boolean | null; last_seen_online?: string | null }
+        >();
+        for (const p of presenceRows) {
           presenceMap.set(p.id, p);
         }
         const busyIds = new Set<string>(
-          ((activeAppts ?? []) as Array<{ doctor_id?: string | null }>)
-            .map((a) => String(a.doctor_id ?? ""))
-            .filter(Boolean),
+          activeAppts.map((a) => String(a.doctor_id ?? "")).filter(Boolean),
         );
 
-        const mergedRows = ((publicDocs ?? []) as DoctorRow[]).map((doc) => {
+        const mergedRows: DoctorRow[] = publicDocs.map((doc) => {
           const pres = presenceMap.get(doc.id);
           return {
             ...doc,
@@ -164,6 +198,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
           };
         });
         setDbDoctors(mergedRows);
+        try {
+          sessionStorage.setItem(DOCTORS_CACHE_KEY, JSON.stringify(mergedRows));
+        } catch {
+          // ignore storage quota errors
+        }
       } catch (error) {
         console.warn("[useRealProfessionals] Fallback to base professionals:", error);
       } finally {

@@ -132,10 +132,35 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     const fetchDoctors = async () => {
       try {
-        const { data: publicDocs, error } = await supabase.from("doctors_public" as never).select("*");
+        const [{ data: publicDocs, error }, { data: presenceRows }, { data: activeAppts }] = await Promise.all([
+          supabase.from("doctors_public" as never).select("*"),
+          supabase.from("doctors").select("id, is_online, is_available, last_seen_online"),
+          supabase.from("appointments").select("doctor_id").eq("status", "in_progress"),
+        ]);
         if (error) throw error;
         if (!active) return;
-        setDbDoctors((publicDocs ?? []) as DoctorRow[]);
+
+        const presenceMap = new Map<string, { is_online?: boolean | null; is_available?: boolean | null; last_seen_online?: string | null }>();
+        for (const p of (presenceRows ?? []) as Array<{ id: string; is_online?: boolean | null; is_available?: boolean | null; last_seen_online?: string | null }>) {
+          presenceMap.set(p.id, p);
+        }
+        const busyIds = new Set<string>(
+          ((activeAppts ?? []) as Array<{ doctor_id?: string | null }>)
+            .map((a) => String(a.doctor_id ?? ""))
+            .filter(Boolean),
+        );
+
+        const mergedRows = ((publicDocs ?? []) as DoctorRow[]).map((doc) => {
+          const pres = presenceMap.get(doc.id);
+          return {
+            ...doc,
+            is_online: pres?.is_online !== undefined ? pres.is_online : doc.is_online,
+            is_available: pres?.is_available !== undefined ? pres.is_available : doc.is_available,
+            last_seen_online: pres?.last_seen_online ?? doc.last_seen_online ?? null,
+            in_consultation: busyIds.has(doc.id),
+          };
+        });
+        setDbDoctors(mergedRows);
       } catch (error) {
         console.warn("[useRealProfessionals] Fallback to base professionals:", error);
       } finally {
@@ -148,6 +173,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const channel = supabase
       .channel("public:doctors-status-real")
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, fetchDoctors)
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, fetchDoctors)
       .subscribe();
 
     return () => {
@@ -199,8 +225,12 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
       if (!matchedDb) {
         docsCountById.set(base.id, 0);
+        // Vitrine nunca mostra médico como online se não estiver logado com presença ativa no banco
         return {
           ...base,
+          online: false,
+          presenceState: "offline",
+          lastSeenOnline: null,
           crm: registration,
           imageUrl: treatedAvatar || base.imageUrl,
           cfmPrintUrl: cfmPrint,
@@ -211,6 +241,14 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       docsCountById.set(base.id, matchedDb.kyc_docs_count ?? 0);
 
       const priceValue = Number(matchedDb.price_video_chat ?? matchedDb.consultation_price ?? base.priceValue ?? 150) || 150;
+      const presence = evaluateDoctorPresence({
+        id: matchedDb.id,
+        user_id: matchedDb.user_id,
+        is_online: matchedDb.is_online,
+        is_available: matchedDb.is_available,
+        last_seen_online: matchedDb.last_seen_online,
+        in_consultation: matchedDb.in_consultation,
+      });
 
       // Enriquece com informações em tempo real do banco de dados
       return {
@@ -220,7 +258,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         imageUrl: treatedAvatar || base.imageUrl,
         cfmPrintUrl: cfmPrint,
         bio: (matchedDb.bio && matchedDb.bio.trim() !== "") ? matchedDb.bio.trim() : base.bio,
-        online: Boolean(matchedDb.is_online && (matchedDb.is_available ?? true)),
+        online: presence.isOnlineForVitrine,
+        presenceState: presence.state,
+        lastSeenOnline: matchedDb.last_seen_online ?? null,
         rating: matchedDb.rating ?? base.rating,
         consults: matchedDb.total_consultations ?? base.consults,
         price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
@@ -325,6 +365,14 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
       const priceValue = Number(doc.price_video_chat ?? doc.consultation_price ?? 150) || 150;
       const avatar = resolveDoctorAvatar(fullName, doc.crm || "", doc.avatar_url) || doc.avatar_url || "";
+      const docPresence = evaluateDoctorPresence({
+        id: doc.id,
+        user_id: doc.user_id,
+        is_online: doc.is_online,
+        is_available: doc.is_available,
+        last_seen_online: doc.last_seen_online,
+        in_consultation: doc.in_consultation,
+      });
 
       docsCountById.set(`db-${doc.id}`, doc.kyc_docs_count ?? 0);
 
@@ -353,7 +401,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         services: [],
         slots: [],
         reviews: [],
-        online: Boolean(doc.is_online && (doc.is_available ?? true)),
+        online: docPresence.isOnlineForVitrine,
+        presenceState: docPresence.state,
+        lastSeenOnline: doc.last_seen_online ?? null,
         premiumPrice: doc.price_video_chat,
         crm: registration,
         cfmPrintUrl: getDoctorCfmPrint(doc.crm || fullName),

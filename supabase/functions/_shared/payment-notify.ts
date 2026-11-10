@@ -165,18 +165,45 @@ export async function notifyOrientationEvent(sb: Sb, input: OrientationEventInpu
   }
 }
 
-/** Texto do aviso ao médico: consulta paga aguardando atendimento (sem dados de saúde). */
-export function buildDoctorConsultationMessage(i: { doctorName: string; patientFirstName: string; modality: string; amountBrl: number }): string {
-  return `Planta y Raiz — nova consulta paga.\n` +
-    `Olá, ${i.doctorName}! ${i.patientFirstName} pagou a ${i.modality} (R$ ${i.amountBrl.toFixed(2).replace(".", ",")}).\n` +
-    `Entre no Consultório Médico com o botão ON ativado para atender: https://www.plantayraiz.com.br/dashboard-medico`;
+/** Remove prefixos duplicados (Dr., Dra., Dr(a).) para exibir "Dr(a). [nome]". */
+export function cleanDoctorDisplayName(rawName?: string | null): string {
+  const cleaned = String(rawName ?? "")
+    .trim()
+    .replace(/^(dr\(a\)\.?|dra\.?|dr\.?)\s+/i, "")
+    .trim();
+  return cleaned || "Médico(a)";
 }
 
-/** Aviso único a um destinatário específico (dedup pela chave). Nunca lança exceção. */
-export async function notifyRecipientOnce(sb: Sb, input: { key: string; phone: string; text: string; service: string }, trigger = "auto"): Promise<boolean> {
+/**
+ * Texto oficial do aviso ao médico: consulta paga aguardando atendimento.
+ * Regra estrita: SEM nome do paciente e SEM dado de saúde no texto.
+ */
+export function buildDoctorConsultationMessage(i: {
+  doctorName?: string | null;
+  patientFirstName?: string;
+  modality?: string;
+  amountBrl?: number;
+}): string {
+  const name = cleanDoctorDisplayName(i.doctorName);
+  return `Dr(a). ${name}, o senhor(a) tem uma consulta agora na Planta y Raiz. Entre em Consultório Médico.`;
+}
+
+/** Texto oficial do aviso de repasse liberado após avaliação do paciente. */
+export function buildDoctorPayoutAvailableMessage(): string {
+  return "Pagamento disponível para saque na Planta y Raiz.";
+}
+
+/** Aviso único a um destinatário específico via WhatsApp (dedup pela chave). Nunca lança exceção. */
+export async function notifyRecipientOnce(
+  sb: Sb,
+  input: { key: string; phone: string; text: string; service: string; simulateOnly?: boolean },
+  trigger = "auto",
+): Promise<boolean> {
   const phone = input.phone.replace(/\D/g, "");
   if (phone.length < 10) return false;
-  const send = (t: string) => sendOnce(t, phone);
+  const send = input.simulateOnly
+    ? async () => ({ ok: true, http: 200, error: null, ms: 1, messageId: `sim-wa-${Date.now()}` })
+    : (t: string) => sendOnce(t, phone);
   try {
     const { data: claim } = await sb.from("payment_notify_log").insert({
       external_reference: input.key, recipient: phone, channel: "whatsapp", status: "pending", service: input.service,
@@ -191,3 +218,80 @@ export async function notifyRecipientOnce(sb: Sb, input: { key: string; phone: s
     return false;
   }
 }
+
+/** Aviso único por e-mail (Hostinger / transacional) com registro de tentativa e status em payment_notify_log/attempts. */
+export async function notifyRecipientEmailOnce(
+  sb: Sb,
+  input: {
+    key: string;
+    email: string;
+    doctorName?: string | null;
+    service: string;
+    consultorioUrl?: string;
+    simulateOnly?: boolean;
+    customSender?: (text: string) => Promise<{ ok: boolean; http: number | null; error: string | null; ms: number; messageId?: string | null }>;
+  },
+  trigger = "auto",
+): Promise<boolean> {
+  const recipient = String(input.email ?? "").trim().toLowerCase();
+  if (!recipient.includes("@")) return false;
+  const text = buildDoctorConsultationMessage({ doctorName: input.doctorName });
+  const send = input.customSender
+    ? input.customSender
+    : input.simulateOnly
+    ? async () => ({ ok: true, http: 200, error: null, ms: 1, messageId: `sim-email-${Date.now()}` })
+    : async (bodyText: string) => {
+        const t0 = Date.now();
+        const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+        if (!supabaseUrl || !serviceKey) {
+          return { ok: false, http: 400, error: "email_not_configured", ms: 0 };
+        }
+        try {
+          const res = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${serviceKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              templateName: "nova-consulta-medico",
+              recipientEmail: recipient,
+              templateData: {
+                doctorName: cleanDoctorDisplayName(input.doctorName),
+                message: bodyText,
+                consultorioUrl: input.consultorioUrl || "https://www.plantayraiz.com.br/consultorio",
+              },
+            }),
+          });
+          return {
+            ok: res.ok,
+            http: res.status,
+            error: res.ok ? null : `email_http_${res.status}`,
+            ms: Date.now() - t0,
+            messageId: res.ok ? `email-${Date.now()}` : null,
+          };
+        } catch (err) {
+          return { ok: false, http: null, error: (err as Error).message.slice(0, 300), ms: Date.now() - t0 };
+        }
+      };
+
+  try {
+    const { data: claim } = await sb.from("payment_notify_log").insert({
+      external_reference: input.key,
+      recipient,
+      channel: "email",
+      status: "pending",
+      service: input.service,
+    }).select("id, attempts").maybeSingle();
+    if (claim) return await deliverNotice(sb, claim.id, text, input.key, trigger, 0, send);
+    const { data: retry } = await sb.from("payment_notify_log").update({ status: "pending" })
+      .eq("external_reference", input.key).eq("status", "failed").select("id, attempts").maybeSingle();
+    if (!retry) return false;
+    return await deliverNotice(sb, retry.id, text, input.key, trigger, retry.attempts ?? 0, send);
+  } catch (e) {
+    console.error("[payment-notify] email destinatário erro", (e as Error).message);
+    return false;
+  }
+}
+

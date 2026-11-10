@@ -12,6 +12,7 @@ import { RegistrationStatsPanel } from "@/components/admin/RegistrationStatsPane
 import { AppDownloadsCounter } from "@/components/admin/AppDownloadsCounter";
 import { LiveAppAnalytics } from "@/components/admin/LiveAppAnalytics";
 import { ManusCEOKPIPanel } from "@/components/admin/ManusCEOKPIPanel";
+import { ConsultationObservabilityPanel } from "@/components/admin/ConsultationObservabilityPanel";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -298,6 +299,9 @@ const AdminDashboard = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Observabilidade de Consultas e Presença Plataforma x Analytics (Itens 6, 7 e 8) */}
+          <ConsultationObservabilityPanel />
 
           {/* LTV & MRR Metrics */}
           <LTVMetricsPanel />

@@ -128,7 +128,7 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
 
     const aiLogs = [
       'Conectando ao banco de 31 patologias oftalmológicas...',
-      'Cruzando achados com +40.000 estudos publicados...',
+      'Cruzando achados com literatura científica indexada no PubMed/NCBI...',
       'Aplicando modelo de IA (Gemini 3.5 Flash)...',
       'Analisando correlações com doenças sistêmicas...',
       'Avaliando conexões com cannabis medicinal...',

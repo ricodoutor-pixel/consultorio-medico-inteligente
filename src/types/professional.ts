@@ -18,6 +18,8 @@ export type Professional = {
   slots: string[];
   reviews: { name: string; rating: number; text: string }[];
   online?: boolean;
+  presenceState?: "online" | "em_consulta" | "offline";
+  lastSeenOnline?: string | null;
   dbId?: string;
   premiumPrice?: number;
   crm?: string;

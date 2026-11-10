@@ -12,8 +12,14 @@ import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
 import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
 import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
 import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
+import { ConsultationOfferBanner } from "@/components/doctor/ConsultationOfferBanner";
+import { DoctorCashOutModal } from "@/components/doctor/DoctorCashOutModal";
+import {
+  sendDoctorPresenceHeartbeat,
+  DOCTOR_PRESENCE_HEARTBEAT_INTERVAL_MS,
+} from "@/lib/doctor-presence";
 
-import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2, FolderUp, CalendarRange } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2, FolderUp, CalendarRange, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +42,9 @@ const Consultorio = () => {
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showProntuarioModal, setShowProntuarioModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showCashOutModal, setShowCashOutModal] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [walletPixKey, setWalletPixKey] = useState<string>("");
 
   const fetchData = async () => {
     try {
@@ -139,6 +148,19 @@ const Consultorio = () => {
           .maybeSingle();
         
         setNextAppointment(nextAppt);
+
+        const { data: walletData } = await supabase
+          .from('doctor_wallets')
+          .select('balance, pix_key')
+          .eq('doctor_id', doctorData.id)
+          .maybeSingle();
+        if (walletData) {
+          setWalletBalance(Number(walletData.balance || 0));
+          setWalletPixKey(walletData.pix_key || doctorData.pix_key || "");
+        } else {
+          setWalletBalance(0);
+          setWalletPixKey(doctorData.pix_key || "");
+        }
       }
     } catch (err) {
       console.error(err);
@@ -211,6 +233,46 @@ const Consultorio = () => {
     };
   }, [doctor?.id, doctor?.user_id]);
 
+  // Item 7: Batimento de presença (~30 segundos) enquanto o médico está logado em /consultorio com ON ativo.
+  // Sem batimento por 2 minutos (aba fechada ou desconectado), a vitrine mostra offline automaticamente.
+  useEffect(() => {
+    if (!doctor?.id || !isOnline) return;
+
+    sendDoctorPresenceHeartbeat(supabase, {
+      doctorId: doctor.id,
+      userId: doctor.user_id,
+      isOnline: true,
+      event: "doctor_presence_enter",
+    }).catch(() => {});
+
+    const hbTimer = setInterval(() => {
+      sendDoctorPresenceHeartbeat(supabase, {
+        doctorId: doctor.id,
+        userId: doctor.user_id,
+        isOnline: true,
+        event: "doctor_presence_heartbeat",
+      }).catch(() => {});
+    }, DOCTOR_PRESENCE_HEARTBEAT_INTERVAL_MS);
+
+    const handlePageUnload = () => {
+      sendDoctorPresenceHeartbeat(supabase, {
+        doctorId: doctor.id,
+        userId: doctor.user_id,
+        isOnline: false,
+        event: "doctor_presence_exit",
+      }).catch(() => {});
+    };
+
+    window.addEventListener("pagehide", handlePageUnload);
+    window.addEventListener("beforeunload", handlePageUnload);
+
+    return () => {
+      clearInterval(hbTimer);
+      window.removeEventListener("pagehide", handlePageUnload);
+      window.removeEventListener("beforeunload", handlePageUnload);
+    };
+  }, [doctor?.id, doctor?.user_id, isOnline]);
+
   const toggleOnlineStatus = async () => {
     try {
       setUpdatingStatus(true);
@@ -221,16 +283,15 @@ const Consultorio = () => {
       if (doctor?.id) {
         localStorage.setItem(`doctor_online_status_${doctor.id}`, String(newStatus));
       }
-      localStorage.setItem('doctor_online_status_med-3', String(newStatus));
-      localStorage.setItem('doctor_online_status_med-joao-pedro', String(newStatus));
 
-      // Attempt Supabase update
+      // Attempt Supabase update + presence log
       if (doctor?.id) {
-        const { error: dbError } = await supabase
-          .from('doctors')
-          .update({ is_online: newStatus, is_available: newStatus })
-          .eq('id', doctor.id);
-        if (dbError) console.warn("[online status db update]", dbError);
+        await sendDoctorPresenceHeartbeat(supabase, {
+          doctorId: doctor.id,
+          userId: doctor.user_id,
+          isOnline: newStatus,
+          event: newStatus ? "doctor_presence_enter" : "doctor_presence_exit",
+        });
       }
 
       // Ao ficar ONLINE, pedimos a localização do médico (1x) para cruzar pacientes próximos.
@@ -314,6 +375,15 @@ const Consultorio = () => {
               title="Escolher Horários de Atendimento para Pacientes Agendados e Consulta por Vídeo"
             >
               <CalendarRange size={15} /> 📅 Escolher Horários & Vídeo
+            </button>
+
+            <button
+              onClick={() => setShowCashOutModal(true)}
+              data-testid="doctor-sacar-button"
+              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-amber-500 to-emerald-600 text-black hover:scale-105 border border-amber-300/60"
+              title="Sacar saldo disponível via Pix (com confirmação de chave mascarada)"
+            >
+              <Wallet size={15} /> 💸 Sacar {walletBalance > 0 ? `(R$ ${walletBalance.toFixed(2).replace(".", ",")})` : ""}
             </button>
           </div>
 
@@ -430,6 +500,11 @@ const Consultorio = () => {
       )}
 
       <div className="flex-1 container mx-auto py-6">
+        {doctor?.id && (
+          <div className="mb-5">
+            <ConsultationOfferBanner doctorId={doctor.id} />
+          </div>
+        )}
         {doctor && profile && (
           <div className="mb-5">
             <PendingDocsNotice userId={doctor.user_id} profile={profile} doctorName={profile.full_name} />
@@ -534,6 +609,13 @@ const Consultorio = () => {
         open={showScheduleModal}
         onOpenChange={setShowScheduleModal}
         doctorId={doctor?.id}
+      />
+      <DoctorCashOutModal
+        open={showCashOutModal}
+        onOpenChange={setShowCashOutModal}
+        availableBalance={walletBalance}
+        pixKey={walletPixKey}
+        onSuccess={fetchData}
       />
       <InteractiveTour3DModal initialRole="medico" autoOpen={true} />
     </div>

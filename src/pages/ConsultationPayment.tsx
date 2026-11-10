@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -17,21 +17,31 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 
 const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const proId = searchParams.get("pro");
+  const skuParam = searchParams.get("sku") || "consulta_video";
   const appointmentId = searchParams.get("appointment") || null;
   const agenticOrderId = searchParams.get("agentic_order_id") || null;
   const { professionals, loading: professionalsLoading } = useRealProfessionals();
-  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
+  const pro = professionals.find((p) => p.id === proId || p.dbId === proId) ?? professionals[0];
   const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
   const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { toast } = useToast();
-  const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
+  const { price: dynamicPrice, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
   // Comércio Agêntico (UCP/MCP): valor sempre validado server-side
   const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string; items?: { name: string }[] } | null>(null);
+
+  // Consultas médicas padronizadas permanecem dentro da plataforma em /consulta/:sku (Pix na tela, sem sair do site).
+  useEffect(() => {
+    if (agenticOrderId || professionalsLoading || !pro) return;
+    const qs = new URLSearchParams({ doctor: pro.dbId || pro.id, pro: pro.id });
+    if (appointmentId) qs.set("appt", appointmentId);
+    navigate(`/consulta/${encodeURIComponent(skuParam)}?${qs.toString()}`, { replace: true });
+  }, [agenticOrderId, professionalsLoading, pro, appointmentId, skuParam, navigate]);
 
   // Busca detalhes do pedido agêntico se informado
   useEffect(() => {
@@ -73,44 +83,37 @@ const ConsultationPayment = () => {
   const commission = basePrice * feeRate;
   const total = basePrice + commission;
 
-  // Create payment preference on mount or when dynamic price is ready
+  // Create payment preference on mount only for agentic orders
   useEffect(() => {
-    if (!loadingGateway && !professionalsLoading && (agenticOrder || pro) && (!agenticOrderId || agenticOrder)) {
+    if (agenticOrderId && !loadingGateway && !professionalsLoading && agenticOrder) {
       createPayment();
     }
-  }, [loadingGateway, professionalsLoading, agenticOrderId, agenticOrder, pro]);
+  }, [loadingGateway, professionalsLoading, agenticOrderId, agenticOrder]);
 
   const createPayment = async () => {
-    if (!agenticOrder && !pro) return;
+    if (!agenticOrder) return;
     setStatus("loading");
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const paymentDescription = agenticOrder
-        ? `Pedido Agêntico UCP: ${agenticOrder.items?.[0]?.name || "Medicamento Prescrito"}`
-        : `Orientação Técnica com ${pro?.name ?? "especialista"} - Planta & Raiz`;
+      const paymentDescription = `Pedido Agêntico UCP: ${agenticOrder.items?.[0]?.name || "Medicamento Prescrito"}`;
 
       const data = await createGatewayPayment({
-        appointmentId,
-        doctorName: agenticOrder ? "Farmácia Dispensary Planta y Raíz" : pro?.name ?? "Especialista",
+        appointmentId: appointmentId ?? undefined,
+        doctorName: "Farmácia Dispensary Planta y Raíz",
         patientEmail: session?.user?.email || "",
         description: paymentDescription,
       });
-
 
       if (data?.init_point || data?.url) {
         setCheckoutUrl(data.init_point || data.url);
         setStatus("pending");
       } else {
-        // Fallback to static link
-        setCheckoutUrl(pro?.paymentLink || null);
-        setStatus("pending");
+        setStatus("rejected");
       }
     } catch (err) {
       console.error("Payment creation error:", err);
-      // Fallback to static link
-      setCheckoutUrl(pro?.paymentLink || null);
-      setStatus("pending");
-      toast({ title: "Usando link de pagamento direto", description: "Link alternativo disponível." });
+      setStatus("rejected");
+      toast({ title: "Não foi possível gerar o pagamento", description: "Tente de novo em instantes.", variant: "destructive" });
     }
   };
 

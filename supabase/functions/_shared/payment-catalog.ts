@@ -110,3 +110,33 @@ export function resolveDisplayName(catalog: Record<string, PaymentService>, code
   console.warn(`[payment-catalog] ATENÇÃO ADMIN: serviço sem nome cadastrado na tabela payment_services: "${code}" — usando nome genérico.`);
   return formatPaymentName("Serviço");
 }
+
+export const OFFICIAL_RECEIVER_NAME = "Planta y Raiz Ltda";
+
+/** Garante que o recebedor exibido na tela do Pix seja Planta y Raiz Ltda (nunca "Doutor Rico Ltda"). */
+export function normalizeReceiverName(raw: unknown): string {
+  const val = String(raw ?? "").trim();
+  if (!val || /doutor\s*rico|rico\s*doutor/i.test(val)) {
+    return OFFICIAL_RECEIVER_NAME;
+  }
+  return val;
+}
+
+const CONSULTATION_SKU_MAP: Record<string, string> = {
+  video: "consulta_video",
+  consulta_video: "consulta_video",
+  chat: "consulta_chat",
+  consulta_chat: "consulta_chat",
+  retorno: "retorno_consulta",
+  renovacao: "retorno_consulta",
+  retorno_consulta: "retorno_consulta",
+  premium: "consulta_premium",
+  consulta_premium: "consulta_premium",
+};
+
+/** Converte modalidade ou código em SKU oficial da tabela payment_services. */
+export function resolveConsultationSku(typeOrSku: unknown): string | null {
+  const key = String(typeOrSku ?? "").trim().toLowerCase();
+  return CONSULTATION_SKU_MAP[key] ?? null;
+}
+

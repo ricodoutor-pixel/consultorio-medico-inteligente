@@ -1145,22 +1145,33 @@ Deno.serve(async (req) => {
               action_url: "/dashboard-medico",
             });
 
-            // 5b. WhatsApp único ao médico (sem dados de saúde)
+            // 5b. WhatsApp e E-mail (Hostinger) imediatos ao médico escolhido (sem nome do paciente nem dado de saúde)
             const { data: docProfile } = await supabase.from("profiles").select("full_name, phone").eq("id", doctorRecord.user_id).maybeSingle();
             const docPhone = String((docProfile as any)?.phone || "");
-            const apptType = String((appt as any).type || "");
-            const modality = /chat/i.test(apptType) ? "consulta por chat" : /retorno/i.test(apptType) ? "consulta de retorno" : "consulta por vídeo";
+            const docName = (docProfile as any)?.full_name || "Doutor(a)";
+            const doctorMsg = buildDoctorConsultationMessage({ doctorName: docName });
             if (docPhone) {
               await notifyRecipientOnce(supabase, {
-                key: `appointment:${appointmentId}:doctor`,
+                key: `appointment:${appointmentId}:doctor:${appt.doctor_id}:whatsapp`,
                 phone: docPhone,
-                service: "Aviso ao médico — consulta paga",
-                text: buildDoctorConsultationMessage({
-                  doctorName: (docProfile as any)?.full_name || "Doutor(a)",
-                  patientFirstName: patientName.split(" ")[0] || "Paciente",
-                  modality, amountBrl: totalAmount,
-                }),
+                service: "Aviso ao médico (WhatsApp) — consulta paga",
+                text: doctorMsg,
               });
+            }
+            try {
+              const { data: docAuth } = await supabase.auth.admin.getUserById(doctorRecord.user_id);
+              const docEmail = docAuth?.user?.email || "";
+              if (docEmail) {
+                await notifyRecipientEmailOnce(supabase, {
+                  key: `appointment:${appointmentId}:doctor:${appt.doctor_id}:email`,
+                  email: docEmail,
+                  doctorName: docName,
+                  service: "Aviso ao médico (E-mail Hostinger) — consulta paga",
+                  consultorioUrl: `https://www.plantayraiz.com.br/consultorio?appointment=${appointmentId}`,
+                });
+              }
+            } catch (emailErr) {
+              console.error("[mercadopago-webhook] doctor email notify", emailErr);
             }
 
             console.log(`📩 Doctor ${doctorRecord.user_id} notified — payout R$ ${doctorPayout.toFixed(2)}`);

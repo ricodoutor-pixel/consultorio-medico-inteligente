@@ -921,7 +921,7 @@ const Agendamento = () => {
                 {apptPix && !apptPaid && (
                   <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
                     <p className="text-sm text-foreground">
-                      Pagamento: <strong>{formatPaymentName(apptPix.description || currentModalityObj.label)}</strong> · R$ {apptPix.amount.toFixed(2).replace(".", ",")}
+                      Pagamento: <strong>{formatPaymentName(apptPix.description || currentModalityObj.label)}</strong> · R$ {apptPix.amount.toFixed(2).replace(".", ",")} · Recebedor: <strong>{normalizeReceiverName(apptPix.receiver_name)}</strong>
                     </p>
                     <img src={`data:image/png;base64,${apptPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2" />
                     <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto">{apptPix.qr_code}</p>

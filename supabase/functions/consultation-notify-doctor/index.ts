@@ -1,9 +1,14 @@
-// consultation-notify-doctor — avisa o profissional de plantão (e-mail + WhatsApp)
-// sobre um novo atendimento contratado pelo paciente.
-// Segurança: exige JWT do paciente dono do agendamento (ou service_role).
+// consultation-notify-doctor — avisa o profissional escolhido (WhatsApp + e-mail Hostinger)
+// no instante em que o pagamento é reconhecido, SEM nome do paciente e SEM dado de saúde.
+// Registra horário, canal, status (aceito, entregue, falhou) e tentativas em payment_notify_log / payment_notify_attempts.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { sendWhatsAppAlert } from "../_shared/waha.ts";
+import {
+  buildDoctorConsultationMessage,
+  cleanDoctorDisplayName,
+  notifyRecipientEmailOnce,
+  notifyRecipientOnce,
+} from "../_shared/payment-notify.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
 
@@ -12,20 +17,6 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
-}
-
-function fmtBRL(value: unknown): string {
-  const n = Number(value ?? 0);
-  return n > 0 ? `R$ ${n.toFixed(2).replace(".", ",")}` : "—";
-}
-
-function fmtDate(iso: string | null): string {
-  if (!iso) return "A confirmar";
-  try {
-    return new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-  } catch {
-    return iso;
-  }
 }
 
 Deno.serve(async (req) => {
@@ -53,13 +44,14 @@ Deno.serve(async (req) => {
     callerId = userData.user.id;
   }
 
-  let payload: { appointmentId?: string } = {};
+  let payload: { appointmentId?: string; test_mode?: boolean } = {};
   try {
     payload = await req.json();
   } catch {
     return json({ error: "invalid_json" }, 400);
   }
   const appointmentId = (payload.appointmentId || "").trim();
+  const testMode = Boolean(payload.test_mode);
   if (!/^[0-9a-f-]{36}$/i.test(appointmentId)) return json({ error: "invalid_appointment" }, 400);
 
   const { data: appt } = await admin
@@ -70,6 +62,7 @@ Deno.serve(async (req) => {
 
   if (!appt) return json({ error: "appointment_not_found" }, 404);
   if (!isService && appt.patient_id !== callerId) return json({ error: "forbidden" }, 403);
+  if (appt.payment_status !== "paid") return json({ error: "payment_not_confirmed" }, 402);
 
   const { data: doctor } = await admin
     .from("doctors")
@@ -84,98 +77,70 @@ Deno.serve(async (req) => {
     .eq("id", doctor.user_id)
     .maybeSingle();
 
-  const { data: patientProfile } = await admin
-    .from("profiles")
-    .select("full_name, phone")
-    .eq("id", appt.patient_id)
-    .maybeSingle();
-
-  const doctorName = docProfile?.full_name || `CRM ${doctor.crm}/${doctor.crm_state}`;
-  const patientName = patientProfile?.full_name || "Paciente da plataforma";
-  const when = fmtDate(appt.scheduled_at as string | null);
-  const modality = String(appt.type || "video");
-  const amount = fmtBRL(appt.amount);
-
+  const rawDoctorName = docProfile?.full_name || `CRM ${doctor.crm}/${doctor.crm_state}`;
+  const cleanName = cleanDoctorDisplayName(rawDoctorName);
   const doctorRoomUrl = `${SITE}/consultorio?appointment=${appt.id}`;
-  const patientRoomUrl = `${SITE}/orientacao-video?appointment=${appt.id}`;
+  const alertMessage = buildDoctorConsultationMessage({ doctorName: cleanName });
 
-  // --- WhatsApp (canal Enfª Brisa / WAHA) ---
-  let whatsapp: { ok: boolean; error?: string } = { ok: false, error: "sem telefone cadastrado" };
+  // 1. WhatsApp (registrado em payment_notify_log + payment_notify_attempts, sem nome do paciente nem dado de saúde)
+  let whatsappSent = false;
   if (docProfile?.phone) {
-    const message =
-      `🌱 *Planta y Raiz — novo atendimento*\n\n` +
-      `*Paciente:* ${patientName}\n` +
-      `*Data:* ${when}\n` +
-      `*Modalidade:* ${modality}\n` +
-      `*Valor:* ${amount}\n\n` +
-      `O paciente passa pela triagem da Enfª Brisa e segue para o seu consultório virtual.\n` +
-      `Entrar no consultório: ${doctorRoomUrl}`;
-    whatsapp = await sendWhatsAppAlert(docProfile.phone, message);
+    whatsappSent = await notifyRecipientOnce(admin, {
+      key: `appointment:${appt.id}:doctor:${doctor.id}:whatsapp`,
+      phone: String(docProfile.phone),
+      service: "Aviso ao médico (WhatsApp) — consulta paga",
+      text: alertMessage,
+      simulateOnly: testMode,
+    });
   }
 
-  let whatsappPatient: { ok: boolean; error?: string } = { ok: false, error: "sem telefone cadastrado" };
-  if (patientProfile?.phone) {
-    const message =
-      `🌱 *Planta y Raiz — sua consulta está confirmada*\n\n` +
-      `*Profissional:* ${doctorName}\n` +
-      `*Data:* ${when}\n` +
-      `*Modalidade:* ${modality}\n\n` +
-      `No horário marcado, entre pelo link abaixo:\n${patientRoomUrl}\n\n` +
-      `Qualquer dúvida, responda aqui — sou a Enfª Brisa. 💚`;
-    whatsappPatient = await sendWhatsAppAlert(patientProfile.phone, message);
-  }
-
-  // --- E-mail ---
-  let email: { ok: boolean; error?: string } = { ok: false };
+  // 2. E-mail Hostinger (registrado em payment_notify_log + payment_notify_attempts, sem nome do paciente nem dado de saúde)
+  let emailSent = false;
+  let doctorEmail = "";
   try {
     const { data: authUser } = await admin.auth.admin.getUserById(doctor.user_id);
-    const to = authUser?.user?.email;
-    if (!to) {
-      email = { ok: false, error: "sem e-mail cadastrado" };
-    } else {
-      const res = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${serviceKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          templateName: "nova-consulta-medico",
-          recipientEmail: to,
-          templateData: {
-            doctorName,
-            patientName,
-            scheduledAt: when,
-            modality,
-            amount,
-            consultorioUrl: doctorRoomUrl,
-          },
-        }),
-      });
-      email = res.ok
-        ? { ok: true }
-        : { ok: false, error: (await res.text().catch(() => "")).slice(0, 300) };
-    }
-  } catch (e) {
-    email = { ok: false, error: e instanceof Error ? e.message : String(e) };
+    doctorEmail = authUser?.user?.email || "";
+  } catch {
+    doctorEmail = "";
+  }
+  if (doctorEmail) {
+    emailSent = await notifyRecipientEmailOnce(admin, {
+      key: `appointment:${appt.id}:doctor:${doctor.id}:email`,
+      email: doctorEmail,
+      doctorName: cleanName,
+      service: "Aviso ao médico (E-mail Hostinger) — consulta paga",
+      consultorioUrl: doctorRoomUrl,
+      simulateOnly: testMode,
+    });
   }
 
+  // 3. Notificação no painel interno (sem dados de saúde)
   await admin.from("notifications").insert([
     {
       user_id: doctor.user_id,
-      title: "Novo atendimento direcionado a você",
-      message: `${patientName} · ${when} · ${modality} · ${amount}`,
+      title: "Consulta agora na Planta y Raiz",
+      message: alertMessage,
       type: "appointment",
       action_url: `/consultorio?appointment=${appt.id}`,
     },
-    {
-      user_id: appt.patient_id,
-      title: "Consulta confirmada",
-      message: `${doctorName} · ${when} · ${modality}`,
-      type: "appointment",
-      action_url: `/orientacao-video?appointment=${appt.id}`,
-    },
   ]);
 
-  return json({ ok: true, doctor: doctorName, whatsapp, whatsappPatient, email });
+  // 4. Garante que o convite com contador de 5 minutos (janela da triagem) está ativo
+  try {
+    await admin.functions.invoke("consultation-offer", {
+      body: { action: "dispatch", appointment_id: appt.id, test_mode: testMode },
+    });
+  } catch {
+    /* idempotente */
+  }
+
+  return json({
+    ok: true,
+    doctor: `Dr(a). ${cleanName}`,
+    message: alertMessage,
+    whatsapp: { ok: whatsappSent },
+    email: { ok: emailSent },
+    simulated: testMode,
+  });
 });
+

@@ -5,7 +5,7 @@ import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import "@/styles/orientation-room.css";
 import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
 import { loadPermanentReferralCode } from "@/lib/referral-code";
-import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
+import { formatPaymentName, normalizeReceiverName } from "../../supabase/functions/_shared/payment-catalog";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { orientationPaymentConfirmed } from "@/lib/payment-confirmation";
 // 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
@@ -574,7 +574,7 @@ export default function OrientacaoTecnicaAgente() {
         window.history.replaceState(null, "", url);
       }
       if (method === "pix" && data.qr_code && data.qr_code_base64) {
-        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id, description: data.description, amount: data.amount, receiver_name: data.receiver_name || "Planta y Raiz Ltda" });
+        setPixData({ qr_code: data.qr_code, qr_code_base64: data.qr_code_base64, payment_id: data.payment_id, description: data.description, amount: data.amount, receiver_name: normalizeReceiverName(data.receiver_name) });
         setAwaitingSince(Date.now());
         setPhase("awaiting");
       } else if (data.init_point) window.location.href = data.init_point;
@@ -583,7 +583,12 @@ export default function OrientacaoTecnicaAgente() {
       toast({ title: method === "pix" ? "Não foi possível gerar o Pix agora. Tente de novo em instantes." : "Não foi possível abrir o pagamento agora. Tente de novo em instantes.", variant: "destructive" });
     } finally { setCreatingPix(false); setCreatingCheckout(false); }
   };
-  const startCheckout = () => generateCheckout("card");
+  const startCheckout = () => {
+    const ok = window.confirm(
+      "Aviso: para pagar com Cartão de Crédito, você será direcionado ao ambiente seguro do Mercado Pago e voltará automaticamente após a aprovação.\n\nNo Pix você paga aqui mesmo na tela, sem sair do site.\n\nDeseja continuar para o Cartão de Crédito?",
+    );
+    if (ok) void generateCheckout("card");
+  };
   const startPixCheckout = () => generateCheckout("pix");
 
   const copyPixCode = async () => {
@@ -1218,7 +1223,7 @@ export default function OrientacaoTecnicaAgente() {
                     </div>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                      Pagamento: <strong>{formatPaymentName(pixData.description || "Orientação Técnica")}</strong> · R$ {Number(pixData.amount || 30).toFixed(2).replace('.', ',')} · Recebedor: <strong>{pixData.receiver_name || "Planta y Raiz Ltda"}</strong>
+                      Pagamento: <strong>{formatPaymentName(pixData.description || "Orientação Técnica")}</strong> · R$ {Number(pixData.amount || 30).toFixed(2).replace('.', ',')} · Recebedor: <strong>{normalizeReceiverName(pixData.receiver_name)}</strong>
                     </p>
 
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">

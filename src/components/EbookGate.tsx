@@ -109,7 +109,7 @@ export function EbookGate() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
-                  Protocolos baseados em 40.000+ estudos PubMed
+                  Protocolos baseados em evidências científicas indexadas no PubMed/NCBI
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />

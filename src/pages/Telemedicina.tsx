@@ -964,7 +964,7 @@ const Telemedicina = () => {
                     {/* Link para Orientação Técnica em Nuvem (Dr. Edilson On - R$ 30) */}
                     <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                       <div className="text-xs text-muted-foreground leading-relaxed">
-                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra On (ambiente virtual em nuvem com 40.000 estudos)?</span>
+                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra On (consulta em tempo real ao acervo PubMed/NCBI)?</span>
                       </div>
                       <Link to="/orientacao-tecnica">
                         <Button variant="outline" size="sm" className="text-xs font-black border-primary text-primary hover:bg-primary/10 gap-1 rounded-xl shrink-0">
@@ -1073,7 +1073,7 @@ const Telemedicina = () => {
                     ⚕️ CRM Bolívia 10963 · Formado em 2018
                   </Badge>
                   <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 font-bold text-xs">
-                    📚 40.000 Estudos Clínicos
+                    📚 Evidências Publicadas (PubMed)
                   </Badge>
                 </div>
                 <h3 className="text-2xl sm:text-4xl font-display font-black text-foreground">

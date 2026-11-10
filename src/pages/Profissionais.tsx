@@ -571,13 +571,13 @@ const Profissionais = () => {
                               <p className="text-xs text-primary font-bold">
                                 {p.specialty || (p.tags && p.tags[0]) || p.category}
                               </p>
-                              <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide ${p.online ? 'text-green-300' : 'text-red-400'}`}>
+                              <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide ${p.presenceState === 'em_consulta' ? 'text-amber-400' : p.online ? 'text-green-300' : 'text-red-400'}`}>
                                 <span className="relative flex items-center justify-center w-6 h-6">
-                                  <span className={`absolute inset-0 rounded-full animate-ping ${p.online ? 'bg-green-400/60' : 'bg-red-500/50'}`} style={{ animationDuration: '1.2s' }} />
-                                  <span className={`absolute w-5 h-5 rounded-full animate-pulse ${p.online ? 'bg-green-400/40' : 'bg-red-500/35'}`} style={{ animationDuration: '0.8s' }} />
-                                  <span className={`relative w-3.5 h-3.5 rounded-full animate-pulse ${p.online ? 'bg-green-400 shadow-[0_0_8px_2px_rgba(74,222,128,0.9),0_0_20px_6px_rgba(74,222,128,0.5),0_0_30px_10px_rgba(74,222,128,0.25)]' : 'bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.9),0_0_20px_6px_rgba(239,68,68,0.5),0_0_30px_10px_rgba(239,68,68,0.25)]'}`} style={{ animationDuration: '0.8s' }} />
+                                  <span className={`absolute inset-0 rounded-full animate-ping ${p.presenceState === 'em_consulta' ? 'bg-amber-400/60' : p.online ? 'bg-green-400/60' : 'bg-red-500/50'}`} style={{ animationDuration: '1.2s' }} />
+                                  <span className={`absolute w-5 h-5 rounded-full animate-pulse ${p.presenceState === 'em_consulta' ? 'bg-amber-400/40' : p.online ? 'bg-green-400/40' : 'bg-red-500/35'}`} style={{ animationDuration: '0.8s' }} />
+                                  <span className={`relative w-3.5 h-3.5 rounded-full animate-pulse ${p.presenceState === 'em_consulta' ? 'bg-amber-400 shadow-[0_0_8px_2px_rgba(251,191,36,0.9)]' : p.online ? 'bg-green-400 shadow-[0_0_8px_2px_rgba(74,222,128,0.9),0_0_20px_6px_rgba(74,222,128,0.5),0_0_30px_10px_rgba(74,222,128,0.25)]' : 'bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.9),0_0_20px_6px_rgba(239,68,68,0.5),0_0_30px_10px_rgba(239,68,68,0.25)]'}`} style={{ animationDuration: '0.8s' }} />
                                 </span>
-                                {p.online ? 'Online' : 'Offline'}
+                                {p.presenceState === 'em_consulta' ? 'Em consulta' : p.online ? 'Online' : 'Offline'}
                               </span>
                             </div>
                             {p.crm && (

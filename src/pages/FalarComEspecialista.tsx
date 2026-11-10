@@ -271,32 +271,13 @@ const FalarComEspecialista = () => {
                         <p className="text-3xl font-display font-black text-gradient-green">{pro.price}</p>
                       </div>
 
-                      {/* Link copia e cola */}
-                      <div className="mb-4">
-                        <label className="text-xs font-bold text-muted-foreground mb-2 block">Link de pagamento (Copia e Cola)</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            readOnly
-                            value={pro.paymentLink}
-                            className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-xs text-foreground font-mono"
-                          />
-                          <Button variant="outline" size="sm" className="rounded-xl border-primary/30 text-primary" onClick={() => {
-                            navigator.clipboard.writeText(pro.paymentLink);
-                            toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
-                          }}>
-                            <Copy size={14} className="mr-1" /> Copiar
-                          </Button>
-                        </div>
-                      </div>
-
                       <Button className="w-full font-black bg-primary text-primary-foreground h-12 text-lg rounded-2xl" asChild>
-                        <a href={pro.paymentLink} target="_blank" rel="noopener noreferrer">
-                          <CreditCard size={20} className="mr-2" /> Pagar Agora <ArrowRight size={18} className="ml-2" />
-                        </a>
+                        <Link to={`/consulta/consulta_video?doctor=${encodeURIComponent(pro.dbId || pro.id)}&pro=${encodeURIComponent(pro.id)}`}>
+                          <CreditCard size={20} className="mr-2" /> Pagar na Plataforma (Pix ou Cartão) <ArrowRight size={18} className="ml-2" />
+                        </Link>
                       </Button>
                       <p className="text-xs text-muted-foreground mt-4">
-                        Pagamento seguro via Mercado Pago. Atendimento liberado automaticamente.
+                        Pagamento seguro na plataforma (sem sair do site). Atendimento liberado automaticamente.
                       </p>
                     </CardContent>
                   </Card>

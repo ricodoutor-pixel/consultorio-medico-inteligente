@@ -51,14 +51,13 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
       return;
     }
 
-    // Vídeo e chat: página única dentro da plataforma (Pix → triagem → sala → avaliação → indicação).
-    if ((item.sku === "consulta_video" || item.sku === "consulta_chat") && doctorId) {
-      navigate(`/consulta/${item.sku}?doctor=${encodeURIComponent(doctorId)}`);
-      return;
-    }
-    // Retorno e Premium: agendamento com Pix dentro da plataforma.
-    if (proId) {
-      navigate(`/agendamento?pro=${encodeURIComponent(proId)}`);
+    // Todas as modalidades de consulta (chat R$ 100, vídeo R$ 150, retorno R$ 90, premium):
+    // página única dentro da plataforma (Pix na tela → triagem → sala → avaliação → indicação), sem sair do site.
+    const targetDoctor = doctorId || proId;
+    if (targetDoctor) {
+      const qs = new URLSearchParams({ doctor: targetDoctor });
+      if (proId && proId !== targetDoctor) qs.set("pro", proId);
+      navigate(`/consulta/${item.sku}?${qs.toString()}`);
       return;
     }
 
@@ -135,9 +134,9 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
       </p>
       <p className="text-[11px] text-muted-foreground">
         <strong className="text-foreground">Orientação Técnica</strong> é modalidade exclusiva do{" "}
-        <strong className="text-foreground">Dr. Edilson Bezerra On</strong> (agente em nuvem com mais de
-        40.000 estudos científicos), que orienta tecnicamente e encaminha ao especialista. Nenhum outro
-        profissional da vitrine realiza essa modalidade.
+        <strong className="text-foreground">Dr. Edilson Bezerra On</strong> (assistente de IA apoiado em
+        evidências científicas publicadas no PubMed e supervisionado em tempo real pelo Dr. Edilson Bezerra),
+        que orienta tecnicamente e encaminha ao especialista. Nenhum outro profissional da vitrine realiza essa modalidade.
       </p>
     </div>
   );

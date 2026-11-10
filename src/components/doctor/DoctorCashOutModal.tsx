@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { calculateCashOutValue } from "@/lib/domination-services";
+import { maskPixKey } from "@/lib/doctor-presence";
 
 type Step = "review" | "confirm" | "processing" | "success" | "error";
 
@@ -37,7 +38,10 @@ export function DoctorCashOutModal({
   const [convertCoins, setConvertCoins] = useState(false);
   const [coinsToConvert, setCoinsToConvert] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [pixConfirmed, setPixConfirmed] = useState(false);
   const [transactionId, setTransactionId] = useState("");
+  const [withdrawalStatus, setWithdrawalStatus] = useState<"simulado" | "paid" | "processing">("simulado");
+  const [requestedAt, setRequestedAt] = useState<string>("");
 
   const MIN_WITHDRAWAL = 50;
   const coinCashValue = coinsToConvert ? calculateCashOutValue(Number(coinsToConvert)) : 0;
@@ -45,12 +49,12 @@ export function DoctorCashOutModal({
   const feeRate = 0.05;
   const fee = Math.round(totalWithdraw * feeRate * 100) / 100;
   const netAmount = Math.round((totalWithdraw - fee) * 100) / 100;
+  const maskedKey = maskPixKey(pixKey);
 
   const canProceed =
     totalWithdraw >= MIN_WITHDRAWAL &&
     totalWithdraw <= balanceReais + (convertCoins ? coinCashValue : 0) &&
-    pixKey &&
-    pixKey.length >= 5;
+    Boolean(pixKey && pixKey.length >= 5);
 
   const handleReset = () => {
     setStep("review");
@@ -58,7 +62,10 @@ export function DoctorCashOutModal({
     setConvertCoins(false);
     setCoinsToConvert("");
     setConfirmPassword("");
+    setPixConfirmed(false);
     setTransactionId("");
+    setWithdrawalStatus("simulado");
+    setRequestedAt("");
   };
 
   const handleConfirmStep = () => {
@@ -67,31 +74,31 @@ export function DoctorCashOutModal({
   };
 
   const handleProcessWithdrawal = async () => {
-    if (!confirmPassword || confirmPassword.length < 6) {
-      toast.error("Digite sua senha para confirmar o saque.");
+    if (!pixConfirmed) {
+      toast.error("Confirme que a chave Pix mascarada está correta antes de prosseguir.");
       return;
     }
 
     setStep("processing");
 
     try {
-      // Verify password via re-auth
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user?.email) throw new Error("Usuário não autenticado");
+      if (!userData?.user) throw new Error("Usuário não autenticado");
 
-      const { error: authErr } = await supabase.auth.signInWithPassword({
-        email: userData.user.email,
-        password: confirmPassword,
-      });
-      if (authErr) {
-        toast.error("Senha incorreta. Tente novamente.");
-        setStep("confirm");
-        return;
+      if (confirmPassword.trim().length > 0 && userData.user.email) {
+        const { error: authErr } = await supabase.auth.signInWithPassword({
+          email: userData.user.email,
+          password: confirmPassword,
+        });
+        if (authErr) {
+          toast.error("Senha incorreta. Tente novamente.");
+          setStep("confirm");
+          return;
+        }
       }
 
-      // Pix automático a partir do saldo do consultório
       const res = await supabase.functions.invoke("doctor-pix-payout", {
-        body: { amount: totalWithdraw },
+        body: { amount: totalWithdraw, simulated: true },
       });
 
       if (res.error || !res.data?.success) {
@@ -99,11 +106,13 @@ export function DoctorCashOutModal({
       }
 
       setTransactionId(res.data.withdrawal?.id || "N/A");
+      setWithdrawalStatus(res.data.mode === "automatic" ? "paid" : "simulado");
+      setRequestedAt(res.data.withdrawal?.when || new Date().toISOString());
       setStep("success");
       toast.success(
         res.data.mode === "automatic"
           ? "Pix enviado para sua chave cadastrada!"
-          : "Saque solicitado com sucesso!",
+          : "Saque registrado em modo simulado (aguardando autorização)!",
       );
       onSuccess?.();
     } catch (err: any) {
@@ -125,7 +134,7 @@ export function DoctorCashOutModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display text-foreground">
             <Banknote size={20} className="text-primary" />
-            {step === "success" ? "Saque Confirmado" : "Solicitar Saque"}
+            {step === "success" ? "Saque Registrado" : "Sacar para Chave Pix"}
           </DialogTitle>
         </DialogHeader>
 
@@ -200,9 +209,9 @@ export function DoctorCashOutModal({
 
               {/* Pix Destination */}
               <div className="p-3 rounded-xl bg-muted/30 border border-border">
-                <p className="text-[10px] text-muted-foreground font-bold mb-1">Destino Pix</p>
+                <p className="text-[10px] text-muted-foreground font-bold mb-1">Chave Pix cadastrada (mascarada)</p>
                 <p className="text-sm font-bold text-foreground font-mono">
-                  {pixKey ? `${pixKey.substring(0, 4)}****${pixKey.slice(-4)}` : "Nenhuma chave cadastrada"}
+                  {maskedKey}
                 </p>
               </div>
 
@@ -219,7 +228,7 @@ export function DoctorCashOutModal({
               )}
 
               <Button onClick={handleConfirmStep} disabled={!canProceed} className="w-full gap-2">
-                Continuar <ArrowRight size={16} />
+                Revisar e Confirmar Chave Pix <ArrowRight size={16} />
               </Button>
 
               {totalWithdraw > 0 && totalWithdraw < MIN_WITHDRAWAL && (
@@ -230,22 +239,37 @@ export function DoctorCashOutModal({
             </motion.div>
           )}
 
-          {/* STEP 2: Confirm with password */}
+          {/* STEP 2: Confirm masked Pix key */}
           {step === "confirm" && (
             <motion.div key="confirm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className="text-center p-4 rounded-xl bg-primary/5 border border-primary/20">
-                <ShieldCheck size={32} className="text-primary mx-auto mb-2" />
-                <p className="text-sm font-bold text-foreground">Verificação de Segurança</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Confirme sua senha para autorizar o saque de <span className="text-primary font-bold">R$ {netAmount.toFixed(2)}</span>
+              <div className="text-center p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
+                <ShieldCheck size={32} className="text-primary mx-auto" />
+                <p className="text-sm font-bold text-foreground">Confirmação da Chave Pix Cadastrada</p>
+                <p className="text-xs text-muted-foreground">
+                  O valor líquido de <span className="text-primary font-bold">R$ {netAmount.toFixed(2)}</span> será direcionado para a chave Pix:
                 </p>
+                <div className="p-2.5 rounded-lg bg-background border border-border font-mono font-black text-sm text-foreground">
+                  {maskedKey}
+                </div>
               </div>
 
+              <label className="flex items-start gap-2.5 p-3 rounded-xl border border-border bg-muted/20 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={pixConfirmed}
+                  onChange={(e) => setPixConfirmed(e.target.checked)}
+                  className="mt-0.5 rounded border-border"
+                />
+                <span className="text-xs font-bold text-foreground leading-relaxed">
+                  Confirmo que a chave Pix mascarada acima ({maskedKey}) pertence a mim e autorizo o registro do saque.
+                </span>
+              </label>
+
               <div>
-                <Label className="text-xs font-bold text-foreground">Senha da conta</Label>
+                <Label className="text-xs font-bold text-foreground">Senha da conta (opcional para reautenticação)</Label>
                 <Input
                   type="password"
-                  placeholder="Digite sua senha"
+                  placeholder="Digite sua senha (opcional)"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="mt-1"
@@ -254,7 +278,7 @@ export function DoctorCashOutModal({
 
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setStep("review")} className="flex-1">Voltar</Button>
-                <Button onClick={handleProcessWithdrawal} disabled={confirmPassword.length < 6} className="flex-1 gap-2">
+                <Button onClick={handleProcessWithdrawal} disabled={!pixConfirmed} className="flex-1 gap-2">
                   <ShieldCheck size={16} /> Confirmar Saque
                 </Button>
               </div>
@@ -265,11 +289,11 @@ export function DoctorCashOutModal({
           {step === "processing" && (
             <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-8 text-center space-y-4">
               <Loader2 size={48} className="text-primary mx-auto animate-spin" />
-              <p className="text-sm font-bold text-foreground">Transferindo para sua conta...</p>
+              <p className="text-sm font-bold text-foreground">Registrando solicitação de saque...</p>
               <div className="space-y-2 text-xs text-muted-foreground">
-                <p>✅ Verificando saldo</p>
-                <p>✅ Aplicando taxa de manutenção (5%)</p>
-                <p className="animate-pulse text-primary">⏳ Registrando transação...</p>
+                <p>✅ Verificando saldo disponível</p>
+                <p>✅ Confirmando chave Pix ({maskedKey})</p>
+                <p className="animate-pulse text-primary">⏳ Gravando auditoria de saque...</p>
               </div>
             </motion.div>
           )}
@@ -281,15 +305,26 @@ export function DoctorCashOutModal({
                 <CheckCircle2 size={36} className="text-primary" />
               </div>
               <div>
-                <p className="text-lg font-display font-black text-foreground">Saque Solicitado!</p>
-                <p className="text-xs text-muted-foreground mt-1">Transferência em processamento</p>
+                <p className="text-lg font-display font-black text-foreground">Saque Registrado!</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {withdrawalStatus === "simulado"
+                    ? "Modo simulado ativo — nenhum Pix real é enviado sem autorização da administração"
+                    : "Transferência concluída"}
+                </p>
               </div>
 
               <div className="p-4 rounded-xl bg-muted/30 border border-border text-left space-y-2 text-xs">
                 <div className="flex justify-between"><span className="text-muted-foreground">ID Transação</span><span className="font-mono font-bold text-foreground">{transactionId.substring(0, 8).toUpperCase()}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Valor líquido</span><span className="text-primary font-bold">R$ {netAmount.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Destino</span><span className="font-mono text-foreground">{pixKey ? `${pixKey.substring(0, 4)}****` : "Pix"}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Status</span><Badge className="bg-amber-500/10 text-amber-500 text-[9px]">Processando</Badge></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Médico</span><span className="font-mono text-foreground">{doctorId.slice(0, 8)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Horário</span><span className="text-foreground">{requestedAt ? new Date(requestedAt).toLocaleString("pt-BR") : "Agora"}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Valor bruto / líquido</span><span className="text-primary font-bold">R$ {totalWithdraw.toFixed(2)} / R$ {netAmount.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Chave Pix (mascarada)</span><span className="font-mono text-foreground">{maskedKey}</span></div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[10px] font-bold">
+                    {withdrawalStatus === "simulado" ? "Simulado (aguardando autorização)" : "Pago"}
+                  </Badge>
+                </div>
               </div>
 
               <Button onClick={() => onOpenChange(false)} className="w-full">Fechar</Button>

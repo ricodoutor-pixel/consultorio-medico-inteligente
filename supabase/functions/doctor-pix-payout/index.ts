@@ -65,17 +65,23 @@ Deno.serve(async (req) => {
 
     const fee = Number(payout.fee ?? Math.round(amount * FEE_RATE * 100) / 100);
     const net = Number(payout.net_amount ?? amount - fee);
+    const rawKey = String(payout.pix_key ?? "");
+    const maskedPixKey =
+      rawKey.length >= 8
+        ? `${rawKey.slice(0, 4)}****${rawKey.slice(-4)}`
+        : rawKey.length >= 4
+        ? `${rawKey.slice(0, 2)}****`
+        : "****";
 
     // 2. Pagamento automático via Mercado Pago (Pix out)
     const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
-    let mode = "manual";
+    let mode = "simulado";
     let mpId: string | null = null;
     let failure: string | null = null;
 
-    // O envio automático exige a API "Money Out" do Mercado Pago habilitada na conta
-    // (MP_MONEY_OUT_ENABLED=true). O antigo POST /v1/payments criava uma COBRANÇA Pix,
-    // não um envio — por isso fica desligado até a habilitação ser confirmada.
-    const MONEY_OUT_READY = false; // ligar só após integrar /v1/transaction-intents com a conta habilitada
+    // Regra de segurança absoluta: nenhum Pix de saque real é enviado sem ordem escrita do proprietário.
+    // O saque fica em "simulado" até autorização explícita.
+    const MONEY_OUT_READY = false;
     if (mpToken && MONEY_OUT_READY) {
       try {
         const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
@@ -121,22 +127,39 @@ Deno.serve(async (req) => {
       return json({ error: `Não foi possível enviar o Pix: ${failure}` }, 502);
     }
 
-    if (mode === "manual") {
+    const requestedAt = new Date().toISOString();
+    await admin.from("audit_log").insert({
+      user_id: userData.user.id,
+      action: mode === "simulado" ? "doctor_payout_simulado" : "doctor_payout_automatic",
+      table_name: "withdrawal_requests",
+      record_id: payout.withdrawal_id,
+      new_data: {
+        who: userData.user.id,
+        email: userData.user.email ?? null,
+        when: requestedAt,
+        amount,
+        fee,
+        net_amount: net,
+        masked_pix_key: maskedPixKey,
+        status: mode === "simulado" ? "simulado" : "paid",
+      },
+    });
+
+    if (mode === "simulado") {
       const { data: admins } = await admin.from("user_roles").select("user_id").eq("role", "admin");
       if (admins?.length) {
         await admin.from("notifications").insert(admins.map((r: { user_id: string }) => ({
           user_id: r.user_id,
-          title: "Saque de médico para enviar",
-          message: `Enviar Pix de R$ ${net.toFixed(2)} para a chave cadastrada (pedido ${payout.withdrawal_id.slice(0, 8)}).`,
+          title: "Saque de médico registrado (Simulado)",
+          message: `Pedido ${payout.withdrawal_id.slice(0, 8)} · R$ ${net.toFixed(2)} para Pix ${maskedPixKey} · Status: simulado (aguardando autorização).`,
           type: "withdrawal_admin",
           action_url: "/admin",
         })));
       }
-      // Sem gateway configurado: pedido fica em fila para liquidação pelo financeiro
       await admin.from("notifications").insert({
         user_id: userData.user.id,
-        title: "📤 Saque em processamento",
-        message: `Seu saque de R$ ${amount.toFixed(2)} (líquido R$ ${net.toFixed(2)}) foi registrado e será enviado ao seu Pix.`,
+        title: "📤 Saque registrado (modo simulado)",
+        message: `Seu saque de R$ ${amount.toFixed(2)} (líquido R$ ${net.toFixed(2)}) para a chave ${maskedPixKey} foi registrado com status simulado até autorização de envio.`,
         type: "withdrawal",
         action_url: "/consultorio",
       });
@@ -144,7 +167,7 @@ Deno.serve(async (req) => {
       await admin.from("notifications").insert({
         user_id: userData.user.id,
         title: "✅ Pix enviado",
-        message: `Pix de R$ ${net.toFixed(2)} enviado para sua chave cadastrada. Taxa de manutenção: R$ ${fee.toFixed(2)} (5%).`,
+        message: `Pix de R$ ${net.toFixed(2)} enviado para sua chave cadastrada (${maskedPixKey}). Taxa de manutenção: R$ ${fee.toFixed(2)} (5%).`,
         type: "withdrawal",
         action_url: "/consultorio",
       });
@@ -153,11 +176,16 @@ Deno.serve(async (req) => {
     return json({
       success: true,
       mode,
+      status: mode === "simulado" ? "simulado" : "paid",
       withdrawal: {
         id: payout.withdrawal_id,
+        who: userData.user.id,
+        when: requestedAt,
         amount,
         fee,
         net_amount: net,
+        masked_pix_key: maskedPixKey,
+        status: mode === "simulado" ? "simulado" : "paid",
         mp_payment_id: mpId,
         remaining_balance: Number(payout.remaining_balance ?? 0),
       },

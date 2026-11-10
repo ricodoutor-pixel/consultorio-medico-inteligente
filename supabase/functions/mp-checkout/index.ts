@@ -1,10 +1,16 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
+import {
+  expectedConsultationPrice,
+  fixedConsultationPrice,
+  validateConsultationPaymentGuard,
+} from "../_shared/consultation-price.ts";
 import { paymentOrderName } from "../_shared/payment-order-name.ts";
 import {
   FALLBACK_DESCRIPTOR,
   formatPaymentName,
   getPaymentServices,
+  OFFICIAL_RECEIVER_NAME,
+  resolveConsultationSku,
   resolveDisplayName,
   type PaymentService,
 } from "../_shared/payment-catalog.ts";
@@ -208,36 +214,71 @@ Deno.serve(async (req) => {
     } else if (appointmentId && typeof appointmentId === "string") {
       const { data: appt } = await supabase
         .from("appointments")
-        .select("id, amount, patient_id, doctor_id, status, type")
+        .select("id, amount, patient_id, doctor_id, status, type, payment_status")
         .eq("id", appointmentId)
         .maybeSingle();
       if (!appt) return json({ error: "Consulta não encontrada" }, 404, req);
       if (appt.patient_id !== userId) return json({ error: "Forbidden" }, 403, req);
-      const fixedPrice = fixedConsultationPrice(appt.type);
-      amount = fixedPrice ?? round2(Number(appt.amount || 0));
+
+      let docCustomPremium: number | null = null;
+      if (appt.doctor_id) {
+        const { data: doc } = await supabase
+          .from("doctors")
+          .select("mp_collector_id, price_video_chat")
+          .eq("id", appt.doctor_id)
+          .maybeSingle();
+        collectorId = (doc as any)?.mp_collector_id ?? null;
+        docCustomPremium = Number((doc as any)?.price_video_chat || 0) || null;
+      }
+
+      const consultSku = resolveConsultationSku(sku || appt.type);
+      const fixedPrice = fixedConsultationPrice(appt.type, catalog);
+      const expectedPrice = expectedConsultationPrice(consultSku || appt.type, docCustomPremium, catalog) ?? fixedPrice;
+
+      const guard = validateConsultationPaymentGuard({
+        paymentStatus: (appt as any).payment_status,
+        appointmentStatus: appt.status,
+        appointmentDoctorId: appt.doctor_id,
+        requestedDoctorId: typeof doctorId === "string" ? doctorId : null,
+        appointmentAmount: appt.amount !== null && appt.amount !== undefined ? Number(appt.amount) : null,
+        requestedAmount: directAmount !== undefined ? Number(directAmount) : null,
+        expectedAmount: expectedPrice,
+      });
+
+      if (!guard.ok) {
+        await supabase.from("audit_log").insert({
+          user_id: userId,
+          action: `payment_blocked_${guard.reason}`,
+          table_name: "appointments",
+          record_id: String(appt.id),
+          new_data: {
+            reason: guard.reason,
+            error: guard.error,
+            appointment_id: appt.id,
+            doctor_id: appt.doctor_id,
+            requested_doctor_id: doctorId ?? null,
+            appointment_amount: appt.amount,
+            requested_amount: directAmount ?? null,
+            expected_amount: expectedPrice,
+          },
+        });
+        return json({ error: guard.error, reason: guard.reason }, guard.status, req);
+      }
+
+      amount = guard.amount;
       if (fixedPrice !== null && Number(appt.amount) !== fixedPrice) {
         const { error: priceError } = await supabase.from("appointments")
           .update({ amount: fixedPrice }).eq("id", appt.id).eq("payment_status", "pending");
         if (priceError) return json({ error: "Não foi possível registrar o valor da consulta" }, 500, req);
       }
-      if (!(amount > 0)) return json({ error: "Consulta sem valor válido" }, 400, req);
-      title = appt.type === "video"
-        ? resolveDisplayName(catalog, "consulta_video")
-        : appt.type === "chat"
-        ? resolveDisplayName(catalog, "consulta_chat")
-        : "Consulta médica — Planta y Raiz";
+
+      const catalogCode = consultSku || "consulta_video";
+      title = resolveDisplayName(catalog, catalogCode);
+      descriptor = catalog[catalogCode]?.descriptor || FALLBACK_DESCRIPTOR;
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
 
       marketplaceFee = round2(amount * FEE_TELEMEDICINE);
-      if (appt.doctor_id) {
-        const { data: doc } = await supabase
-          .from("doctors")
-          .select("mp_collector_id")
-          .eq("id", appt.doctor_id)
-          .maybeSingle();
-        collectorId = (doc as any)?.mp_collector_id ?? null;
-      }
       splitDetails = {
         model: "telemedicine_93_7",
         gross_amount: amount,
@@ -262,6 +303,16 @@ Deno.serve(async (req) => {
           .maybeSingle();
         const custom = Number(doc?.price_video_chat || 0);
         if (custom >= 100 && custom <= 2000) amount = round2(custom);
+      }
+      if (directAmount !== undefined && directAmount !== null && Math.abs(Number(directAmount) - amount) > 0.009) {
+        await supabase.from("audit_log").insert({
+          user_id: userId,
+          action: "payment_blocked_price_mismatch",
+          table_name: "payment_services",
+          record_id: String(sku),
+          new_data: { sku, requested_amount: directAmount, expected_amount: amount },
+        });
+        return json({ error: `Valor divergente da tabela oficial de serviços (esperado R$ ${amount}).`, reason: "price_mismatch" }, 400, req);
       }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";
@@ -483,7 +534,7 @@ Deno.serve(async (req) => {
         external_reference: externalReference,
         amount,
         description: title,
-        receiver_name: "Planta y Raiz Ltda",
+        receiver_name: OFFICIAL_RECEIVER_NAME,
         split: splitDetails,
       });
     }

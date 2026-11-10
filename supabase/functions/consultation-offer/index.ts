@@ -1,30 +1,31 @@
-// 🌿 Planta y Raiz — Convite de consulta com aceite em 5 minutos.
-// Regra oficial (2026-09): paciente paga → triagem → consulta.
-// O profissional recebe aviso da Enfª Brisa ("pode atender? SIM / NÃO").
-// Se responder NÃO ou passar de 60 segundos, a consulta é repassada
-// automaticamente ao próximo profissional online com KYC 100% verde.
-//
-// Ações:
-//  - dispatch (service-role): cria o convite para o próximo profissional apto
-//  - respond  (link do WhatsApp, autenticado por token): SIM / NÃO
-//  - status   (JWT do paciente): estado atual do convite
-//  - sweep    (cron/service-role): expira convites vencidos e repassa
+// 🌿 Planta y Raiz — Convite de consulta com aceite em 5 minutos e fila automática.
+// Regra oficial:
+// 1. Médico escolhido recebe WhatsApp + E-mail (Hostinger):
+//    "Dr(a). [nome], o senhor(a) tem uma consulta agora na Planta y Raiz. Entre em Consultório Médico."
+//    (Zero nome do paciente ou dado de saúde no aviso).
+// 2. Se não atender em 5 minutos -> próximo médico assinante disponível (5 min, repete entre assinantes).
+// 3. Se nenhum assinante atender -> próximo médico online no Consultório Médico com ON ativo e batimento <= 2 min (5 min).
+// 4. Se nenhum atender no Ciclo 1 -> reagenda automaticamente para +1h após o 1º atendimento com aviso na tela.
+// 5. Se após o reinício de 1h (Ciclo 2) nenhum atender -> encaminha o paciente para Orientação Técnica gratuita
+//    (avisado antes) e entrega o relatório da orientação ao médico escolhido.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
-import { sendWhatsAppAlert } from "../_shared/waha.ts";
+import {
+  buildDoctorConsultationMessage,
+  cleanDoctorDisplayName,
+  notifyRecipientEmailOnce,
+  notifyRecipientOnce,
+} from "../_shared/payment-notify.ts";
+import {
+  DEFAULT_QUEUE_ROUTING_CONFIG,
+  PATIENT_FREE_OT_NOTICE_MESSAGE,
+  PATIENT_URGENCY_RESCHEDULE_MESSAGE,
+  selectNextQueueStep,
+  type QueueCandidate,
+  type QueueRoutingConfig,
+} from "../_shared/consultation-queue.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
-const OFFER_SECONDS = 300; // 5 minutos para o médico aceitar
-
-type Pool = {
-  doctor_id: string;
-  user_id: string;
-  full_name: string | null;
-  phone: string | null;
-  is_online: boolean;
-  kyc_green: boolean;
-  specialty: string | null;
-};
 
 function svcClient() {
   return createClient(
@@ -47,17 +48,51 @@ a{display:inline-block;background:#1B4332;color:#fff;text-decoration:none;font-w
   );
 }
 
-/** Cria o convite para o próximo profissional apto (ou devolve motivo). */
+async function loadEditableQueueConfig(svc: ReturnType<typeof svcClient>): Promise<QueueRoutingConfig> {
+  try {
+    const { data } = await svc
+      .from("audit_log")
+      .select("new_data")
+      .eq("action", "queue_routing_config_updated")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const custom = (data?.new_data ?? null) as Partial<QueueRoutingConfig> | null;
+    if (custom && typeof custom === "object") {
+      return { ...DEFAULT_QUEUE_ROUTING_CONFIG, ...custom };
+    }
+  } catch {
+    /* fallback to default config */
+  }
+  return DEFAULT_QUEUE_ROUTING_CONFIG;
+}
+
+/** Cria o convite para o próximo profissional apto (ou executa o fallback da fila). */
 async function dispatchOffer(
   svc: ReturnType<typeof svcClient>,
   appointmentId: string,
-): Promise<{ ok: boolean; reason?: string; doctor?: string; offer_id?: string }> {
+  options?: { testMode?: boolean; forceCycle?: number },
+): Promise<{
+  ok: boolean;
+  reason?: string;
+  action?: string;
+  doctor?: string;
+  offer_id?: string;
+  cycle?: number;
+  rescheduled_for?: string;
+  free_ot_reference?: string;
+  patient_message?: string;
+}> {
+  const testMode = Boolean(options?.testMode);
   const { data: appt } = await svc
     .from("appointments")
-    .select("id, patient_id, doctor_id, type, amount, status, notes")
+    .select("id, patient_id, doctor_id, type, amount, status, payment_status, notes, scheduled_at, created_at")
     .eq("id", appointmentId)
     .maybeSingle();
   if (!appt) return { ok: false, reason: "appointment_not_found" };
+  if (appt.payment_status !== "paid") {
+    return { ok: false, reason: "payment_not_confirmed" };
+  }
   if (appt.status === "cancelled" || appt.status === "completed") {
     return { ok: false, reason: "appointment_closed" };
   }
@@ -65,46 +100,243 @@ async function dispatchOffer(
   // Já existe convite aceito ou pendente válido?
   const { data: offers } = await svc
     .from("consultation_offers")
-    .select("id, doctor_id, status, expires_at, attempt")
+    .select("id, doctor_id, status, expires_at, attempt, created_at, payload")
     .eq("appointment_id", appointmentId)
     .order("created_at", { ascending: true });
 
   const list = offers ?? [];
-  if (list.some((o) => o.status === "accepted")) return { ok: false, reason: "already_accepted" };
+  if (list.some((o) => o.status === "accepted") || appt.status === "in_progress") {
+    return { ok: false, reason: "already_accepted" };
+  }
   const live = list.find(
     (o) => o.status === "pending" && new Date(o.expires_at as string).getTime() > Date.now(),
   );
   if (live) return { ok: true, offer_id: live.id as string, reason: "offer_already_live" };
 
-  const tried = new Set(list.map((o) => String(o.doctor_id)));
+  const config = await loadEditableQueueConfig(svc);
 
-  const { data: pool, error: poolErr } = await svc.rpc("consultation_doctor_pool", {
-    _specialty: null,
-  });
+  // Determina o ciclo atual (Ciclo 1 = tentativa original; Ciclo 2 = após reagendamento de 1h)
+  const highestRecordedCycle = list.reduce((max, o) => {
+    const c = Number((o.payload as Record<string, unknown> | null)?.cycle ?? 1);
+    return Math.max(max, Number.isFinite(c) ? c : 1);
+  }, 1);
+  const hasRescheduledMarker = String(appt.notes ?? "").includes("[FILA_REAGENDADA_1H]");
+  const currentCycle = options?.forceCycle ?? (hasRescheduledMarker ? Math.max(2, highestRecordedCycle) : highestRecordedCycle);
+
+  // Médicos já tentados no ciclo atual
+  const triedInCurrentCycle = list
+    .filter((o) => Number((o.payload as Record<string, unknown> | null)?.cycle ?? 1) === currentCycle)
+    .map((o) => String(o.doctor_id));
+
+  // médico escolhido originalmente (preservado no 1º convite ou no próprio agendamento)
+  const chosenDoctorId = String(
+    (list[0]?.payload as Record<string, unknown> | null)?.chosen_doctor_id ??
+      appt.doctor_id ??
+      "",
+  ) || null;
+
+  // Consulta médicos em atendimento ativo para marcar como "em consulta" (não recebem novos avisos)
+  const { data: activeAppts } = await svc
+    .from("appointments")
+    .select("doctor_id")
+    .eq("status", "in_progress")
+    .neq("id", appointmentId);
+  const busyDoctorIds = new Set((activeAppts ?? []).map((a) => String(a.doctor_id)));
+
+  // Carrega pool de médicos + dados extras de presença e assinatura
+  const [{ data: pool, error: poolErr }, { data: doctorRows }] = await Promise.all([
+    svc.rpc("consultation_doctor_pool", { _specialty: null }),
+    svc
+      .from("doctors")
+      .select("id, user_id, crm, crm_state, specialty, is_online, is_available, last_seen_online, plan_tier, rating, total_consultations"),
+  ]);
   if (poolErr) {
     console.error("[consultation-offer] pool", poolErr.message);
     return { ok: false, reason: "pool_failed" };
   }
 
-  const candidates = ((pool ?? []) as Pool[]).filter((d) => !tried.has(d.doctor_id));
-  // Ordem: 1) médico escolhido pelo paciente; 2) assinantes ativos online; 3) demais médicos online.
-  const preferred = list.length === 0 ? candidates.find((d) => d.doctor_id === appt.doctor_id) : undefined;
-  let next: Pool | undefined = preferred;
-  if (!next) {
-    const online = candidates.filter((d) => d.is_online);
-    const subs = await Promise.all(online.map(async (d) => {
-      const { data } = await svc.rpc("has_active_subscription", { user_uuid: d.user_id, check_env: "live" });
-      return data === true;
-    }));
-    next = online.find((_, i) => subs[i]) ?? online[0];
-  }
-  if (!next) {
-    if (list.length > 0) await notifyPatientTransfer(svc, appt.patient_id as string, null, null);
-    return { ok: false, reason: "no_doctor_available" };
+  const docMetaById = new Map<string, Record<string, unknown>>();
+  for (const d of doctorRows ?? []) {
+    docMetaById.set(String(d.id), d as Record<string, unknown>);
   }
 
+  const rawPool = (pool ?? []) as Array<Record<string, unknown>>;
+  const candidates: QueueCandidate[] = await Promise.all(
+    rawPool.map(async (p) => {
+      const docId = String(p.doctor_id);
+      const userId = String(p.user_id);
+      const meta = docMetaById.get(docId) ?? {};
+      let activeSub = false;
+      try {
+        const { data: subData } = await svc.rpc("has_active_subscription", {
+          user_uuid: userId,
+          check_env: "live",
+        });
+        activeSub = subData === true;
+      } catch {
+        activeSub = false;
+      }
+      return {
+        doctor_id: docId,
+        user_id: userId,
+        full_name: (p.full_name as string | null) ?? null,
+        phone: (p.phone as string | null) ?? null,
+        crm: (p.crm as string | null) ?? (meta.crm as string | null) ?? null,
+        crm_state: (p.crm_state as string | null) ?? (meta.crm_state as string | null) ?? null,
+        specialty: (p.specialty as string | null) ?? (meta.specialty as string | null) ?? null,
+        is_online: Boolean(meta.is_online ?? p.is_online),
+        is_available: (meta.is_available as boolean | null) ?? true,
+        last_seen_online: (meta.last_seen_online as string | null) ?? null,
+        in_consultation: busyDoctorIds.has(docId),
+        is_subscriber: activeSub,
+        plan_tier: (meta.plan_tier as string | null) ?? null,
+        rating: (meta.rating as number | null) ?? null,
+        total_consultations: (meta.total_consultations as number | null) ?? null,
+        kyc_green: Boolean(p.kyc_green),
+      };
+    }),
+  );
+
+  const firstAttemptAtIso = (list[0]?.created_at as string | undefined) ?? (appt.created_at as string | undefined) ?? new Date().toISOString();
+
+  const decision = selectNextQueueStep({
+    chosenDoctorId,
+    candidates,
+    triedDoctorIdsInCurrentCycle: triedInCurrentCycle,
+    currentCycle,
+    firstAttemptAtIso,
+    nowMs: Date.now(),
+    testMode,
+    config,
+  });
+
+  // ── Caso 4: Nenhum médico atendeu no Ciclo 1 -> Reagenda automaticamente para +1 hora ──
+  if (decision.action === "reschedule_1h") {
+    const updatedNotes = `${String(appt.notes ?? "").trim()}\n[FILA_REAGENDADA_1H:${decision.rescheduledForIso}]`.trim();
+    await svc
+      .from("appointments")
+      .update({
+        scheduled_at: decision.rescheduledForIso,
+        notes: updatedNotes.slice(0, 4000),
+      })
+      .eq("id", appt.id);
+
+    await svc.from("notifications").insert({
+      user_id: appt.patient_id,
+      title: "Consulta reagendada automaticamente (+1h)",
+      message: decision.messageToPatient,
+      type: "consultation_rescheduled_1h",
+      action_url: `/consulta/consulta_video?appt=${appt.id}`,
+    });
+
+    await svc.from("audit_log").insert({
+      user_id: appt.patient_id,
+      action: "consultation_queue_rescheduled_1h",
+      table_name: "appointments",
+      record_id: appt.id,
+      new_data: {
+        appointment_id: appt.id,
+        chosen_doctor_id: chosenDoctorId,
+        rescheduled_for: decision.rescheduledForIso,
+        patient_message: decision.messageToPatient,
+        cycle: decision.cycle,
+        test_mode: testMode,
+      },
+    });
+
+    return {
+      ok: false,
+      reason: "rescheduled_1h",
+      action: "reschedule_1h",
+      cycle: decision.cycle,
+      rescheduled_for: decision.rescheduledForIso,
+      patient_message: decision.messageToPatient,
+    };
+  }
+
+  // ── Caso 5: Nenhum médico atendeu após reinício de 1h -> Orientação Técnica gratuita + relatório ao médico escolhido ──
+  if (decision.action === "forward_free_ot") {
+    const freeRef = `orientacao_tecnica:free:${appt.patient_id}:${appt.id}`;
+    await svc.from("orientacao_tecnica_orders").upsert(
+      {
+        external_reference: freeRef,
+        user_id: appt.patient_id,
+        amount: 0,
+        status: "approved",
+        flow_status: "ready",
+        mp_payment_id: `free-fallback-${appt.id}`,
+        triage: {
+          red_flags: "nenhum",
+          queixa: String(appt.notes ?? "Encaminhado da fila de consulta médica").slice(0, 1000),
+          tempo: "1 a 6 meses",
+          intensidade: "5",
+          medicamentos: "Conforme triagem da consulta",
+          objetivo: `Relatório compartilhado com médico escolhido (${chosenDoctorId ?? "plantão"})`,
+          forwarded_from_appointment_id: appt.id,
+          chosen_doctor_id: chosenDoctorId,
+        },
+      },
+      { onConflict: "external_reference" },
+    );
+
+    const updatedNotes = `${String(appt.notes ?? "").trim()}\n[ENCAMINHADO_OT_GRATUITA:${freeRef}]`.trim();
+    await svc
+      .from("appointments")
+      .update({ notes: updatedNotes.slice(0, 4000) })
+      .eq("id", appt.id);
+
+    await svc.from("notifications").insert({
+      user_id: appt.patient_id,
+      title: "Orientação Técnica gratuita liberada",
+      message: decision.messageToPatient,
+      type: "consultation_forwarded_free_ot",
+      action_url: `/orientacao-tecnica?ref=${encodeURIComponent(freeRef)}&from_appt=${appt.id}&doctor=${chosenDoctorId ?? ""}`,
+    });
+
+    // Avisa o médico escolhido que o paciente foi encaminhado para a Orientação Técnica gratuita e que o relatório está vinculado a ele
+    if (chosenDoctorId) {
+      const { data: chosenDoc } = await svc.from("doctors").select("user_id").eq("id", chosenDoctorId).maybeSingle();
+      if (chosenDoc?.user_id) {
+        await svc.from("notifications").insert({
+          user_id: chosenDoc.user_id,
+          title: "Relatório de Orientação Técnica vinculado à sua consulta",
+          message: "Seu paciente recebeu uma Orientação Técnica gratuita enquanto aguardava. O relatório ficará disponível no seu Consultório Médico.",
+          type: "ot_report_shared_with_doctor",
+          action_url: `/consultorio?appointment=${appt.id}&ot_ref=${encodeURIComponent(freeRef)}`,
+        });
+      }
+    }
+
+    await svc.from("audit_log").insert({
+      user_id: appt.patient_id,
+      action: "consultation_queue_forwarded_free_ot",
+      table_name: "appointments",
+      record_id: appt.id,
+      new_data: {
+        appointment_id: appt.id,
+        chosen_doctor_id: chosenDoctorId,
+        free_ot_reference: freeRef,
+        patient_message: decision.messageToPatient,
+        cycle: decision.cycle,
+        test_mode: testMode,
+      },
+    });
+
+    return {
+      ok: false,
+      reason: "forwarded_free_ot",
+      action: "forward_free_ot",
+      cycle: decision.cycle,
+      free_ot_reference: freeRef,
+      patient_message: decision.messageToPatient,
+    };
+  }
+
+  // ── Caso 1/2/3: Envia convite ao médico selecionado (escolhido / assinante / online) ──
+  const next = decision.candidate;
+  const waitSeconds = decision.waitSeconds;
   const token = crypto.randomUUID().replace(/-/g, "");
-  const expiresAt = new Date(Date.now() + OFFER_SECONDS * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + waitSeconds * 1000).toISOString();
 
   const { data: offer, error: offErr } = await svc
     .from("consultation_offers")
@@ -118,7 +350,15 @@ async function dispatchOffer(
       expires_at: expiresAt,
       attempt: list.length + 1,
       response_token: token,
-      payload: { doctor_user_id: next.user_id, kyc_green: next.kyc_green },
+      payload: {
+        doctor_user_id: next.user_id,
+        kyc_green: next.kyc_green,
+        role: decision.role,
+        cycle: decision.cycle,
+        chosen_doctor_id: chosenDoctorId,
+        wait_seconds: waitSeconds,
+        test_mode: testMode,
+      },
     })
     .select("id")
     .single();
@@ -128,73 +368,86 @@ async function dispatchOffer(
     return { ok: false, reason: "offer_insert_failed" };
   }
 
-  const base = `${Deno.env.get("SUPABASE_URL")}/functions/v1/consultation-offer?action=respond&offer=${offer.id}&token=${token}`;
-  const doctorName = next.full_name ? `Dr(a). ${next.full_name}` : "Doutor(a)";
-  const { data: patient } = await svc
-    .from("profiles")
-    .select("full_name")
-    .eq("id", appt.patient_id)
-    .maybeSingle();
+  const cleanName = cleanDoctorDisplayName(next.full_name);
+  const privacySafeAlert = buildDoctorConsultationMessage({ doctorName: cleanName });
+  const consultorioUrl = `${SITE}/consultorio?appointment=${appt.id}&offer=${offer.id}`;
 
-  const message =
-    `🌱 *Planta y Raiz — consulta agora*\n\n` +
-    `${doctorName}, você tem uma consulta agora na plataforma Planta y Raiz.\n\n` +
-    `*Paciente:* ${patient?.full_name ?? "Paciente"}\n` +
-    `*Modalidade:* ${String(appt.type ?? "video")}\n` +
-    `*Pagamento:* confirmado\n\n` +
-    `*Pode atender?* Você tem 5 minutos para responder:\n` +
-    `✅ SIM → ${base}&reply=yes\n` +
-    `❌ NÃO → ${base}&reply=no\n\n` +
-    `Sem resposta em 5 minutos, a consulta passa automaticamente ao próximo profissional de plantão. — Enfª Brisa 💚`;
-
+  // 1) Aviso por WhatsApp registrado em payment_notify_log + payment_notify_attempts (sem nome do paciente nem dado de saúde)
   if (next.phone) {
-    try {
-      await sendWhatsAppAlert(next.phone, message);
-    } catch (e) {
-      console.error("[consultation-offer] whatsapp", e);
-    }
+    await notifyRecipientOnce(svc, {
+      key: `offer:${offer.id}:doctor:${next.doctor_id}:whatsapp`,
+      phone: next.phone,
+      service: `Aviso ao médico (${decision.role}) — WhatsApp`,
+      text: privacySafeAlert,
+      simulateOnly: testMode,
+    });
   }
 
+  // 2) Aviso por E-mail Hostinger registrado em payment_notify_log + payment_notify_attempts (sem nome do paciente nem dado de saúde)
+  let doctorEmail = next.email || "";
+  if (!doctorEmail) {
+    try {
+      const { data: authUser } = await svc.auth.admin.getUserById(next.user_id);
+      doctorEmail = authUser?.user?.email || "";
+    } catch {
+      doctorEmail = "";
+    }
+  }
+  if (doctorEmail) {
+    await notifyRecipientEmailOnce(svc, {
+      key: `offer:${offer.id}:doctor:${next.doctor_id}:email`,
+      email: doctorEmail,
+      doctorName: cleanName,
+      service: `Aviso ao médico (${decision.role}) — E-mail Hostinger`,
+      consultorioUrl,
+      simulateOnly: testMode,
+    });
+  }
+
+  // 3) Notificação interna no Consultório Médico
   await svc.from("notifications").insert({
     user_id: next.user_id,
-    title: "Consulta agora — pode atender?",
-    message: `${patient?.full_name ?? "Paciente"} aguarda. Responda em 5 minutos.`,
+    title: "Consulta agora na Planta y Raiz",
+    message: privacySafeAlert,
     type: "consultation_offer",
-    action_url: `/dashboard-medico?offer=${offer.id}`,
+    action_url: `/consultorio?appointment=${appt.id}&offer=${offer.id}`,
+  });
+
+  // 4) Registra cadeia completa de auditoria
+  await svc.from("audit_log").insert({
+    user_id: next.user_id,
+    action: "consultation_offer_dispatched",
+    table_name: "consultation_offers",
+    record_id: offer.id,
+    new_data: {
+      appointment_id: appt.id,
+      offer_id: offer.id,
+      doctor_id: next.doctor_id,
+      doctor_name: `Dr(a). ${cleanName}`,
+      role: decision.role,
+      attempt: list.length + 1,
+      cycle: decision.cycle,
+      wait_seconds: waitSeconds,
+      expires_at: expiresAt,
+      test_mode: testMode,
+    },
   });
 
   if (list.length > 0) {
-    // Transferência: remarca para agora + prazo de aceite e avisa o paciente com o novo horário.
-    const newTime = new Date(Date.now() + OFFER_SECONDS * 1000);
-    await svc.from("appointments").update({ scheduled_at: newTime.toISOString() }).eq("id", appt.id);
-    await notifyPatientTransfer(svc, appt.patient_id as string, next.full_name, newTime);
+    const newTime = new Date(Date.now() + waitSeconds * 1000);
+    await svc
+      .from("appointments")
+      .update({ doctor_id: next.doctor_id, scheduled_at: newTime.toISOString() })
+      .eq("id", appt.id);
   }
 
-  return { ok: true, offer_id: offer.id as string, doctor: next.full_name ?? next.doctor_id };
-}
-
-async function notifyPatientTransfer(
-  svc: ReturnType<typeof svcClient>,
-  patientId: string,
-  doctorName: string | null,
-  newTime: Date | null,
-) {
-  const hour = newTime?.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
-  const text = doctorName && hour
-    ? `O médico escolhido não pôde atender agora. Sua consulta paga foi transferida para Dr(a). ${doctorName}. Novo horário: até ${hour} (Brasília).`
-    : "Nenhum médico conseguiu atender agora. Seu pagamento continua como crédito e nossa equipe vai remarcar sua consulta.";
-  await svc.from("notifications").insert({
-    user_id: patientId,
-    title: doctorName ? "Consulta transferida" : "Consulta será remarcada",
-    message: text,
-    type: "consultation",
-    action_url: "/consultas",
-  });
-  const { data: p } = await svc.from("profiles").select("phone").eq("id", patientId).maybeSingle();
-  if (p?.phone) {
-    try { await sendWhatsAppAlert(p.phone, `🌱 *Planta y Raiz*\n\n${text}\n\nAcompanhe: ${SITE}/consultas\n\n— Enfª Brisa 💚`); }
-    catch (e) { console.error("[consultation-offer] patient whatsapp", e); }
-  }
+  return {
+    ok: true,
+    action: "offer_doctor",
+    offer_id: offer.id as string,
+    doctor: `Dr(a). ${cleanName}`,
+    cycle: decision.cycle,
+  };
 }
 
 Deno.serve(async (req) => {
@@ -211,7 +464,8 @@ Deno.serve(async (req) => {
   const svc = svcClient();
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const bearer = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-  const isService = bearer === serviceKey ||
+  const isService =
+    bearer === serviceKey ||
     req.headers.get("x-cron-secret") === Deno.env.get("BRISA_CEO_SECRET_KEY");
 
   let body: Record<string, unknown> = {};
@@ -219,7 +473,7 @@ Deno.serve(async (req) => {
   const action = String(url.searchParams.get("action") ?? body.action ?? "");
 
   try {
-    // ── Resposta do profissional (link do WhatsApp) ───────────────────────
+    // ── Resposta do profissional (link ou banner do Consultório Médico) ──
     if (action === "respond") {
       const offerId = String(url.searchParams.get("offer") ?? body.offer ?? "");
       const token = String(url.searchParams.get("token") ?? body.token ?? "");
@@ -238,11 +492,13 @@ Deno.serve(async (req) => {
       if (offer.status !== "pending") {
         return htmlPageCors(
           "Convite encerrado",
-          `<p>Esta consulta já foi ${offer.status === "accepted" ? "aceita" : "repassada a outro profissional"}.</p>
-           <a href="${SITE}/dashboard-medico">Abrir meu painel</a>`,
+          `<p>Esta consulta já foi ${offer.status === "accepted" ? "aceita por um médico" : "repassada a outro profissional"}.</p>
+           <a href="${SITE}/consultorio">Abrir Consultório Médico</a>`,
         );
       }
       const expired = new Date(offer.expires_at as string).getTime() < Date.now();
+      const offerPayload = (offer.payload ?? {}) as Record<string, unknown>;
+      const testMode = Boolean(offerPayload.test_mode);
 
       if (reply === "no" || expired) {
         await svc
@@ -252,17 +508,41 @@ Deno.serve(async (req) => {
             declined_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
-          .eq("id", offer.id);
-        const next = await dispatchOffer(svc, String(offer.appointment_id));
+          .eq("id", offer.id)
+          .eq("status", "pending");
+
+        await svc.from("audit_log").insert({
+          action: expired ? "consultation_offer_expired" : "consultation_offer_declined",
+          table_name: "consultation_offers",
+          record_id: offer.id,
+          new_data: {
+            appointment_id: offer.appointment_id,
+            doctor_id: offer.doctor_id,
+            test_mode: testMode,
+          },
+        });
+
+        const next = await dispatchOffer(svc, String(offer.appointment_id), { testMode });
         return htmlPageCors(
           expired ? "Tempo esgotado" : "Consulta repassada",
           `<p>${expired ? "O prazo de 5 minutos expirou." : "Tudo bem, obrigado pela resposta."} ${
-            next.ok ? "A consulta foi encaminhada ao próximo profissional de plantão." : "Nossa equipe foi avisada."
-          }</p><a href="${SITE}/dashboard-medico">Abrir meu painel</a>`,
+            next.ok ? "A consulta foi encaminhada ao próximo profissional de plantão." : "O fluxo automático de contingência foi acionado."
+          }</p><a href="${SITE}/consultorio">Abrir Consultório Médico</a>`,
         );
       }
 
-      // Aceite
+      // Bloqueio de concorrência: verifica se outro médico já aceitou esta mesma consulta
+      const { data: alreadyAccepted } = await svc
+        .from("consultation_offers")
+        .select("id, doctor_id")
+        .eq("appointment_id", offer.appointment_id)
+        .eq("status", "accepted")
+        .limit(1);
+      if (alreadyAccepted && alreadyAccepted.length > 0) {
+        return htmlPageCors("Convite encerrado", "<p>Outro médico já assumiu este atendimento.</p>");
+      }
+
+      // Aceite atômico (status = 'pending')
       const { data: accepted } = await svc
         .from("consultation_offers")
         .update({
@@ -279,8 +559,23 @@ Deno.serve(async (req) => {
 
       await svc
         .from("appointments")
-        .update({ doctor_id: accepted.doctor_id, status: "in_progress" })
+        .update({
+          doctor_id: accepted.doctor_id,
+          status: "in_progress",
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", accepted.appointment_id);
+
+      await svc.from("audit_log").insert({
+        action: "consultation_offer_accepted",
+        table_name: "consultation_offers",
+        record_id: accepted.id,
+        new_data: {
+          appointment_id: accepted.appointment_id,
+          doctor_id: accepted.doctor_id,
+          accepted_at: new Date().toISOString(),
+        },
+      });
 
       const { data: appt } = await svc
         .from("appointments")
@@ -289,67 +584,80 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (appt?.patient_id) {
-        const patientUrl = appt.type === "chat"
-          ? `/consultorio?appointment=${accepted.appointment_id}`
-          : `/orientacao-video?appointment=${accepted.appointment_id}`;
+        const patientUrl = `/consulta/consulta_${appt.type === "chat" ? "chat" : "video"}?appt=${accepted.appointment_id}`;
         await svc.from("notifications").insert({
           user_id: appt.patient_id,
-          title: "Profissional confirmou seu atendimento",
-          message: "Entre na sala agora — o profissional já está te aguardando.",
+          title: "Médico na sala ao vivo",
+          message: "O médico aceitou sua consulta e já está na sala ao vivo.",
           type: "consultation",
           action_url: patientUrl,
         });
-        const { data: pProfile } = await svc
-          .from("profiles")
-          .select("phone")
-          .eq("id", appt.patient_id)
-          .maybeSingle();
-        if (pProfile?.phone) {
-          try {
-            await sendWhatsAppAlert(
-              pProfile.phone,
-              `🌱 *Planta y Raiz*\n\nSeu profissional confirmou o atendimento e já está na sala.\n\nEntre agora: ${SITE}${patientUrl}\n\n— Enfª Brisa 💚`,
-            );
-          } catch { /* best-effort */ }
-        }
       }
 
       return htmlPageCors(
         "Consulta confirmada ✅",
-        `<p>Obrigado! O paciente já foi avisado. Entre no consultório virtual para iniciar o atendimento.</p>
-         <a href="${SITE}/consultorio?appointment=${accepted.appointment_id}">Entrar no consultório</a>`,
+        `<p>Obrigado! O paciente já está na sala ao vivo. Entre em Consultório Médico para atender.</p>
+         <a href="${SITE}/consultorio?appointment=${accepted.appointment_id}">Entrar em Consultório Médico</a>`,
       );
     }
 
-    // ── Estado do convite (paciente ou serviço) ───────────────────────────
+    // ── Estado do convite e da fila (paciente ou serviço) ─────────────────
     if (action === "status") {
       const appointmentId = String(url.searchParams.get("appointment") ?? body.appointment_id ?? "");
       if (!appointmentId) return json({ error: "appointment_id obrigatório" }, 400);
-      const { data } = await svc
-        .from("consultation_offers")
-        .select("id, doctor_id, status, expires_at, attempt")
-        .eq("appointment_id", appointmentId)
-        .order("created_at", { ascending: false })
-        .limit(5);
-      return json({ ok: true, offers: data ?? [] });
+      const [{ data: offers }, { data: appt }] = await Promise.all([
+        svc
+          .from("consultation_offers")
+          .select("id, doctor_id, status, expires_at, attempt, accepted_at, declined_at, created_at, payload")
+          .eq("appointment_id", appointmentId)
+          .order("created_at", { ascending: false })
+          .limit(20),
+        svc
+          .from("appointments")
+          .select("id, doctor_id, status, scheduled_at, notes")
+          .eq("id", appointmentId)
+          .maybeSingle(),
+      ]);
+      const notes = String(appt?.notes ?? "");
+      const rescheduledMatch = notes.match(/\[FILA_REAGENDADA_1H:([^\]]+)\]/);
+      const freeOtMatch = notes.match(/\[ENCAMINHADO_OT_GRATUITA:([^\]]+)\]/);
+      return json({
+        ok: true,
+        offers: offers ?? [],
+        queue_state: freeOtMatch
+          ? "forwarded_free_ot"
+          : rescheduledMatch
+          ? "rescheduled_1h"
+          : appt?.status === "in_progress"
+          ? "in_progress"
+          : "waiting",
+        rescheduled_for: rescheduledMatch?.[1] ?? null,
+        free_ot_reference: freeOtMatch?.[1] ?? null,
+        patient_message: freeOtMatch
+          ? PATIENT_FREE_OT_NOTICE_MESSAGE
+          : rescheduledMatch
+          ? PATIENT_URGENCY_RESCHEDULE_MESSAGE
+          : null,
+      });
     }
 
-    // ── Sweep: só processa convites já vencidos, então é seguro sem segredo
-    // (o segredo do cron estava divergente e travava as transferências).
-    // ── Dispatch: apenas service-role ─────────────────────────────────────
     if (action !== "sweep" && !isService) return json({ error: "Unauthorized" }, 401);
 
     if (action === "dispatch") {
       const appointmentId = String(body.appointment_id ?? "");
       if (!appointmentId) return json({ error: "appointment_id obrigatório" }, 400);
-      const res = await dispatchOffer(svc, appointmentId);
+      const res = await dispatchOffer(svc, appointmentId, {
+        testMode: Boolean(body.test_mode),
+        forceCycle: typeof body.force_cycle === "number" ? body.force_cycle : undefined,
+      });
       return json(res);
     }
 
     if (action === "sweep") {
+      // 1. Expira convites vencidos (> 5 min) e transfere para o próximo da fila
       const { data: stale } = await svc
         .from("consultation_offers")
-        .select("id, appointment_id")
+        .select("id, appointment_id, doctor_id, payload")
         .eq("status", "pending")
         .lt("expires_at", new Date().toISOString())
         .limit(50);
@@ -361,10 +669,48 @@ Deno.serve(async (req) => {
           .update({ status: "expired", updated_at: new Date().toISOString() })
           .eq("id", offer.id)
           .eq("status", "pending");
-        const next = await dispatchOffer(svc, String(offer.appointment_id));
+
+        const offerPayload = (offer.payload ?? {}) as Record<string, unknown>;
+        await svc.from("audit_log").insert({
+          action: "consultation_offer_expired",
+          table_name: "consultation_offers",
+          record_id: offer.id,
+          new_data: {
+            appointment_id: offer.appointment_id,
+            doctor_id: offer.doctor_id,
+            cycle: offerPayload.cycle ?? 1,
+          },
+        });
+
+        const next = await dispatchOffer(svc, String(offer.appointment_id), {
+          testMode: Boolean(offerPayload.test_mode),
+        });
         if (next.ok) reassigned++;
       }
-      return json({ ok: true, expired: stale?.length ?? 0, reassigned });
+
+      // 2. Reinicia automaticamente as consultas reagendadas para +1h cujo horário já chegou (Ciclo 2)
+      const { data: dueRescheduled } = await svc
+        .from("appointments")
+        .select("id, notes, scheduled_at")
+        .eq("status", "scheduled")
+        .eq("payment_status", "paid")
+        .lte("scheduled_at", new Date().toISOString())
+        .ilike("notes", "%[FILA_REAGENDADA_1H:%")
+        .limit(25);
+
+      let restartedAfter1h = 0;
+      for (const appt of dueRescheduled ?? []) {
+        if (String(appt.notes ?? "").includes("[ENCAMINHADO_OT_GRATUITA:")) continue;
+        const next = await dispatchOffer(svc, String(appt.id), { forceCycle: 2 });
+        if (next.ok || next.action === "forward_free_ot") restartedAfter1h++;
+      }
+
+      return json({
+        ok: true,
+        expired: stale?.length ?? 0,
+        reassigned,
+        restarted_after_1h: restartedAfter1h,
+      });
     }
 
     return json({ error: "action inválida" }, 400);

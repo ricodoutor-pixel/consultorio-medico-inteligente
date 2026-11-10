@@ -240,7 +240,8 @@ Deno.serve(async (req) => {
         appointmentStatus: appt.status,
         appointmentDoctorId: appt.doctor_id,
         requestedDoctorId: typeof doctorId === "string" ? doctorId : null,
-        appointmentAmount: appt.amount !== null && appt.amount !== undefined ? Number(appt.amount) : null,
+        // Valor gravado no pedido pendente é corrigido abaixo para o da tabela; só o valor pedido na chamada bloqueia.
+        appointmentAmount: null,
         requestedAmount: directAmount !== undefined ? Number(directAmount) : null,
         expectedAmount: expectedPrice,
       });
@@ -266,9 +267,9 @@ Deno.serve(async (req) => {
       }
 
       amount = guard.amount;
-      if (fixedPrice !== null && Number(appt.amount) !== fixedPrice) {
+      if (Number(appt.amount) !== amount) {
         const { error: priceError } = await supabase.from("appointments")
-          .update({ amount: fixedPrice }).eq("id", appt.id).eq("payment_status", "pending");
+          .update({ amount }).eq("id", appt.id).eq("payment_status", "pending");
         if (priceError) return json({ error: "Não foi possível registrar o valor da consulta" }, 500, req);
       }
 

@@ -195,7 +195,7 @@ export default function ConsultaMedica() {
       if (!resolvedUuid || cancelled) return;
       const { data } = await supabase
         .from("doctors_public")
-        .select("full_name, avatar_url, specialty, crm, crm_state")
+        .select("full_name, avatar_url, specialty, crm, crm_state, price_video_chat")
         .eq("id", resolvedUuid)
         .maybeSingle();
       if (cancelled) return;
@@ -205,7 +205,8 @@ export default function ConsultaMedica() {
           photo: local?.imageUrl || data?.avatar_url || null,
           crm: local?.crm || (data?.crm ? `CRM ${data.crm}${data.crm_state ? `/${data.crm_state}` : ""}` : null),
           specialty: data?.specialty || local?.category || null,
-          premiumPrice: local?.premiumPrice ?? null,
+          // Consulta Premium: o valor do cadastro do médico é o mesmo que o servidor cobra.
+          premiumPrice: Number((data as { price_video_chat?: number | null } | null)?.price_video_chat || 0) || local?.premiumPrice || null,
         });
       }
     })();

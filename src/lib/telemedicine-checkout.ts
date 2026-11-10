@@ -121,7 +121,7 @@ export async function createConsultationCheckout(
           expectedAmount: catalogInfo.price,
         });
         if (!guard.ok) {
-          throw new Error(guard.error);
+          throw new Error((guard as { error: string }).error);
         }
       }
     } catch (e) {
@@ -138,7 +138,7 @@ export async function createConsultationCheckout(
       requestedAmount: options?.requestedAmount ?? null,
       expectedAmount: catalogInfo.price,
     });
-    if (!preGuard.ok) throw new Error(preGuard.error);
+    if (!preGuard.ok) throw new Error((preGuard as { error: string }).error);
 
     // Médico escolhido no cartão tem prioridade; sem escolha, o servidor indica um cadastro real.
     const doctorId = resolvedChosenDoctor || (await resolveRoutingDoctor())?.doctor_id;

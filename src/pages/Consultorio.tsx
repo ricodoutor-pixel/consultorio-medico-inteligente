@@ -156,10 +156,10 @@ const Consultorio = () => {
           .maybeSingle();
         if (walletData) {
           setWalletBalance(Number(walletData.balance || 0));
-          setWalletPixKey(walletData.pix_key || doctorData.pix_key || "");
+          setWalletPixKey(walletData.pix_key || (doctorData as any).pix_key || "");
         } else {
           setWalletBalance(0);
-          setWalletPixKey(doctorData.pix_key || "");
+          setWalletPixKey((doctorData as any).pix_key || "");
         }
       }
     } catch (err) {
@@ -613,7 +613,9 @@ const Consultorio = () => {
       <DoctorCashOutModal
         open={showCashOutModal}
         onOpenChange={setShowCashOutModal}
-        availableBalance={walletBalance}
+        balanceReais={walletBalance}
+        plantaCoinBalance={0}
+        doctorId={doctor?.id || ""}
         pixKey={walletPixKey}
         onSuccess={fetchData}
       />

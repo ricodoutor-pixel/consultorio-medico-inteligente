@@ -154,17 +154,19 @@ Deno.serve(async (req) => {
             .eq("id", doc.user_id)
             .maybeSingle();
 
-          // 4. Dispara notificação de expiração no WhatsApp com frase obrigatória
-          await supabase.functions.invoke("send-doctor-welcome-whatsapp", {
-            body: {
-              phone: profile?.phone,
-              fullName: profile?.full_name || "Doutor(a)",
-              crm: doc.crm,
-              planTier: medSub.plan_tier,
-              actionType: "vip_expired",
-              renewalLink: "https://plantayraiz.com.br/precos",
-            },
-          });
+          // 4. Dispara notificação de expiração no WhatsApp apenas para médicos com telefone cadastrado
+          if (profile?.phone && String(profile.phone).trim().length >= 8) {
+            await supabase.functions.invoke("send-doctor-welcome-whatsapp", {
+              body: {
+                phone: profile.phone,
+                fullName: profile?.full_name || "Doutor(a)",
+                crm: doc.crm,
+                planTier: medSub.plan_tier,
+                actionType: "vip_expired",
+                renewalLink: "https://plantayraiz.com.br/precos",
+              },
+            });
+          }
         }
 
         results.push({

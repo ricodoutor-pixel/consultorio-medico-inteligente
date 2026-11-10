@@ -107,9 +107,9 @@ Privilégios liberados: Taxa 0%, Vitrine Topo, Prontuário Eletrônico e Copilot
       doctorDispatch = await sendWhatsApp(phone, doctorMsg);
     }
 
-    // 2. Envia WhatsApp no celular do Dr. Edilson / Admin
+    // 2. Envia WhatsApp no celular do Dr. Edilson / Admin apenas se houver telefone real do médico notificado
     let adminDispatch = null;
-    if (ADMIN_PHONE) {
+    if (ADMIN_PHONE && phone && String(phone).trim().length >= 8) {
       adminDispatch = await sendWhatsApp(ADMIN_PHONE, adminMsg);
     }
 

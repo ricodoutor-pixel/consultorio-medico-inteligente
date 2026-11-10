@@ -174,7 +174,36 @@ function getCanonicalContactId(jid, altJid = '') {
 const lastRepliedAt = new Map();
 
 // 2. Histórico de textos enviados nas últimas 24h para anti-repetição rígida (<80% similaridade)
-const recentSentHistory = new Map();
+const RECENT_SENT_FILE = path.join(__dirname, 'brisa_recent_sent_history.json');
+
+function loadRecentSentHistory() {
+  const map = new Map();
+  try {
+    if (fs.existsSync(RECENT_SENT_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(RECENT_SENT_FILE, 'utf8'));
+      const now = Date.now();
+      for (const [k, v] of Object.entries(raw)) {
+        if (Array.isArray(v)) {
+          const fresh = v.filter(item => (now - item.time) < 24 * 60 * 60 * 1000);
+          if (fresh.length > 0) map.set(k, fresh);
+        }
+      }
+    }
+  } catch (e) {}
+  return map;
+}
+
+function saveRecentSentHistory(map) {
+  try {
+    const obj = {};
+    for (const [k, v] of map.entries()) {
+      if (Array.isArray(v) && v.length > 0) obj[k] = v.slice(-20);
+    }
+    fs.writeFileSync(RECENT_SENT_FILE, JSON.stringify(obj, null, 2));
+  } catch (e) {}
+}
+
+const recentSentHistory = loadRecentSentHistory();
 
 // 🔒 Fila única e trava por conversa (in-flight lock) para evitar 2 ou 3 mensagens no mesmo minuto
 const inFlightChats = new Set();
@@ -199,6 +228,7 @@ function hasRecentlySent(target, text) {
 
   const filtered = history.filter(item => (now - item.time) < 24 * 60 * 60 * 1000).slice(-20);
   recentSentHistory.set(canonical, filtered);
+  saveRecentSentHistory(recentSentHistory);
 
   return false;
 }
@@ -817,6 +847,7 @@ async function sendWhatsApp(recipient, text) {
   const canonical = getCanonicalContactId(recipient);
   const sent = recentSentHistory.get(canonical) || [];
   recentSentHistory.set(canonical, [...sent, { text, time: Date.now() }].slice(-20));
+  saveRecentSentHistory(recentSentHistory);
   log(`✅ Mensagem enviada com sucesso para ${targetNumber}`);
 
   // Atualiza histórico e controle de repetição
@@ -1656,7 +1687,7 @@ async function loop() {
               const messages = msgsData?.messages?.records || msgsData?.records || (Array.isArray(msgsData) ? msgsData : []);
 
               // 🛡️ DETECÇÃO DE INTERVENÇÃO HUMANA / ASSUMIU HUMANO:
-              // Toda mensagem enviada pela equipe pelo celular ou WhatsApp Web (fromMe sem ser a Brisa)
+              // Toda mensagem enviada manualmente pela equipe (fromMe sem ser automação/convite/relatório)
               // pausa a IA nesta conversa por 24 horas para evitar respostas concorrentes.
               for (const msg of messages) {
                 if (msg.key?.fromMe) {
@@ -1664,15 +1695,23 @@ async function loop() {
                   if (!text) continue;
 
                   const mem = getContactMemory(jid);
-                  const isBrisaSent = (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || text.includes('assistente virtual');
+                  const isBotOrAutomation = 
+                    (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || 
+                    text.includes('assistente virtual') ||
+                    text.includes('Médicos Prescritores Sócios') ||
+                    text.includes('Relatório Diário') ||
+                    text.includes('AVISO PLANO VENCIDO') ||
+                    text.includes('Plano Médico VIP') ||
+                    text.includes('WeCann Planta y Raíz') ||
+                    text.includes('Enfª Brisa');
                   
-                  if (!isBrisaSent) {
+                  if (!isBotOrAutomation && !humanLocked.has(canonical) && !humanLocked.has(jid)) {
                     registerHumanTakeover(jid, true, false);
                     registerHumanTakeover(canonical, true, false);
                     humanLocked.add(jid);
                     humanLocked.add(canonical);
                     saveHumanLocked(humanLocked);
-                    log(`🛑 [ASSUMIU HUMANO 24H] Mensagem enviada pela equipe no chat ${canonical}. IA silenciada por 24h.`);
+                    log(`🛑 [ASSUMIU HUMANO 24H] Mensagem manual enviada pela equipe no chat ${canonical}. IA silenciada por 24h.`);
                   }
                 }
               }
@@ -1704,6 +1743,15 @@ async function loop() {
 
               const firstMsg = newInbounds[0];
               const senderName = firstMsg.pushName || chat.pushName || 'Contato';
+
+              // 🔗 Vínculo dinâmico imediato LID <-> Telefone se disponível na mensagem
+              const msgAltJid = firstMsg.key?.remoteJidAlt || firstMsg.participant || chat.remoteJidAlt || '';
+              if (jid.includes('@lid') && msgAltJid && msgAltJid.includes('@s.whatsapp.net')) {
+                const phoneDigits = msgAltJid.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+                if (phoneDigits.length >= 10) {
+                  recordLidPhonePair(jid, phoneDigits);
+                }
+              }
 
               // Identificar destinatário canônico (suporta @lid e @s.whatsapp.net)
               let recipient = jid.includes('@lid') ? jid : jid.replace('@s.whatsapp.net', '').replace(/\D/g, '');

@@ -524,7 +524,7 @@ const Cadastro = () => {
                   <Link to="/dashboard-paciente">🌿 Ir para Meu Painel de Paciente <ArrowRight size={16} className="ml-2" /></Link>
                 </Button>
                 <Button
-                  onClick={() => openGlobalTour(type || "paciente")}
+                  onClick={() => openGlobalTour(type === "importadora" ? "farmacia" : type || "paciente")}
                   variant="outline"
                   className="font-black rounded-2xl h-12 hover:scale-105 transition-all"
                 >
@@ -540,7 +540,7 @@ const Cadastro = () => {
             </motion.div>
           </div>
         </section>
-        <InteractiveTour3DModal initialRole={type || "paciente"} />
+        <InteractiveTour3DModal initialRole={type === "importadora" ? "farmacia" : type || "paciente"} />
         <Footer />
       </div>
     );

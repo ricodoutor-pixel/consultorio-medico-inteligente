@@ -290,7 +290,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">💳 Serviços & Valores</h2>
-              <DoctorServiceMenu doctorName={pro.name} doctorId={pro.dbId ?? undefined} premiumPrice={pro.premiumPrice} />
+              <DoctorServiceMenu doctorName={pro.name} doctorId={pro.dbId ?? undefined} premiumPrice={pro.premiumPrice} proId={pro.id} />
             </CardContent>
           </Card>
 

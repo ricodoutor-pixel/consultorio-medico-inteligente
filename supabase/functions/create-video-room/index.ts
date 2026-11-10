@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
     // 2. Confirma que e um medico verificado
     const { data: doctor, error: doctorError } = await admin
       .from("doctors")
-      .select("user_id, is_verified")
+      .select("id, user_id, is_verified")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -91,7 +91,8 @@ Deno.serve(async (req: Request) => {
         headers: { ...cors, "Content-Type": "application/json" },
       });
     }
-    if (appointment.doctor_id !== user.id) {
+    // appointments.doctor_id guarda doctors.id (diferente do id da conta do médico).
+    if (appointment.doctor_id !== doctor.id && appointment.doctor_id !== user.id) {
       return new Response(
         JSON.stringify({ ok: false, error: "Esta consulta nao pertence a este medico" }),
         { status: 403, headers: { ...cors, "Content-Type": "application/json" } },

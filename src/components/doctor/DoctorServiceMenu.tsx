@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Video, Zap, Crown, Stethoscope, Loader2, FileText, Lock } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   SERVICE_MENU,
@@ -27,21 +26,23 @@ interface DoctorServiceMenuProps {
   doctorId?: string;
   /** Preço da Consulta Premium definido pelo profissional. */
   premiumPrice?: number;
+  /** Identificador do cartão na vitrine (para a agenda). */
+  proId?: string;
 }
 
 /**
  * Vitrine padronizada de serviços do profissional.
- * Fluxo: Pagamento (Mercado Pago) → Triagem Brisa → Consulta.
+ * Fluxo dentro da plataforma: Pix → Triagem Brisa → Consulta → Avaliação → Indicação.
  * Orientação Técnica (R$ 30) é sempre direcionada ao Dr. Edilson Bezerra ON.
  */
-export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: DoctorServiceMenuProps) {
+export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }: DoctorServiceMenuProps) {
   const navigate = useNavigate();
-  const [loadingSku, setLoadingSku] = useState<string | null>(null);
+  const [loadingSku] = useState<string | null>(null);
 
   const priceOf = (item: ServiceMenuItem) =>
     item.sku === "consulta_premium" ? premiumPrice || PREMIUM_SUGGESTED_PRICE : item.price;
 
-  const handleSelect = async (item: ServiceMenuItem) => {
+  const handleSelect = (item: ServiceMenuItem) => {
     // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
     // leva à página única, que conduz pagamento → triagem → sala.
     // Não exige sessão aqui — a própria página trata login.
@@ -50,44 +51,18 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
       return;
     }
 
-    setLoadingSku(item.sku);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Faça seu cadastro para contratar um serviço.", {
-          action: { label: "Cadastro", onClick: () => navigate("/cadastro") },
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke("mp-checkout", {
-        body: {
-          sku: item.sku,
-          doctorId,
-          returnUrl: `https://www.plantayraiz.com.br/atendimento?paid=1&sku=${item.sku}${doctorId ? `&doctorId=${doctorId}` : ""}`,
-        },
-      });
-      if (error) throw error;
-
-      if (data?.init_point) {
-        // O pagamento vem SEMPRE primeiro: guardamos a referência para o
-        // servidor confirmar a cobrança antes de abrir triagem e consulta.
-        if (data?.external_reference) {
-          localStorage.setItem("pyr_consulta_external_reference", data.external_reference);
-        }
-        localStorage.setItem("pyr_consulta_sku", item.sku);
-        if (doctorId) localStorage.setItem("pyr_consulta_doctor", doctorId);
-        toast.success("Redirecionando para o Mercado Pago…");
-        window.location.href = data.init_point;
-      } else {
-        toast.error(data?.error || "Erro ao gerar link de pagamento");
-      }
-    } catch (err) {
-      console.error("[DoctorServiceMenu]", err);
-      toast.error("Erro ao processar pagamento. Tente novamente.");
-    } finally {
-      setLoadingSku(null);
+    // Vídeo e chat: página única dentro da plataforma (Pix → triagem → sala → avaliação → indicação).
+    if ((item.sku === "consulta_video" || item.sku === "consulta_chat") && doctorId) {
+      navigate(`/consulta/${item.sku}?doctor=${encodeURIComponent(doctorId)}`);
+      return;
     }
+    // Retorno e Premium: agendamento com Pix dentro da plataforma.
+    if (proId) {
+      navigate(`/agendamento?pro=${encodeURIComponent(proId)}`);
+      return;
+    }
+
+    toast.error("Abra o perfil do médico na vitrine para contratar este serviço.");
   };
 
   return (

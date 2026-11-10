@@ -277,24 +277,10 @@ const DashboardPaciente = () => {
   const awaitingPaymentAppts = appointments.filter(a => a.payment_status === "pending" || a.payment_status === "awaiting_payment");
   const totalSpent = appointments.reduce((sum, a) => sum + Number(a.amount || 0), 0);
 
-  const handleCompletePayment = async (appointmentId: string) => {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke("create-payment", {
-        body: {
-          appointmentId,
-          patientEmail: session?.session?.user?.email || "",
-          description: "Orientação Técnica Planta y Raiz — Pagamento Pendente",
-        },
-      });
-      if (error || !data?.init_point) {
-        toast({ title: "Erro ao gerar pagamento", description: "Tente novamente em instantes.", variant: "destructive" });
-        return;
-      }
-      window.location.href = data.init_point;
-    } catch (err) {
-      toast({ title: "Erro", description: (err as Error).message, variant: "destructive" });
-    }
+  const handleCompletePayment = (appointmentId: string) => {
+    // Pix dentro da plataforma, na mesma página única da consulta.
+    const appt = appointments.find((a) => a.id === appointmentId);
+    navigate(`/consulta/${appt?.type === "chat" ? "consulta_chat" : "consulta_video"}?appt=${appointmentId}`);
   };
 
   const handleDownloadPrescriptionPdf = (rx: any) => {

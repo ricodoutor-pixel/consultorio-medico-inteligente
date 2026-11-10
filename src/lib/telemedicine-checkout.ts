@@ -4,18 +4,24 @@ import { resolveRoutingDoctor } from "@/lib/consultation-routing";
 
 export type ConsultationMode = "video" | "chat";
 
-export async function createConsultationCheckout(mode: ConsultationMode, triageId: string, existingId?: string | null) {
+export async function createConsultationCheckout(
+  mode: ConsultationMode,
+  triageId: string,
+  existingId?: string | null,
+  chosenDoctorId?: string | null,
+) {
   const { data: sessionData } = await supabase.auth.getSession();
   const user = sessionData.session?.user;
   if (!user) throw new Error("Entre na sua conta para pagar a consulta.");
   const sku = mode === "video" ? "consulta_video" : "consulta_chat";
   let appointmentId = existingId;
   if (!appointmentId) {
-    const doctor = await resolveRoutingDoctor();
-    if (!doctor) throw new Error("Não há médico disponível para receber a consulta. Tente novamente mais tarde.");
+    // Médico escolhido no cartão tem prioridade; sem escolha, o servidor indica um cadastro real.
+    const doctorId = chosenDoctorId || (await resolveRoutingDoctor())?.doctor_id;
+    if (!doctorId) throw new Error("Não há médico disponível para receber a consulta. Tente novamente mais tarde.");
     const { data, error } = await supabase.from("appointments").insert({
       patient_id: user.id,
-      doctor_id: doctor.doctor_id,
+      doctor_id: doctorId,
       scheduled_at: new Date().toISOString(),
       type: mode,
       amount: SERVICES[sku].price,

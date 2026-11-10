@@ -134,6 +134,13 @@
       "when": 1794284478977,
       "tag": "0018_legal_explicit_least_privilege",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794322280379,
+      "tag": "0019_partner_importers",
+      "breakpoints": true
     }
   ]
 }

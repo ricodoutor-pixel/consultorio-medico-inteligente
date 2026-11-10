@@ -45,10 +45,12 @@ export default function LawyerWorkspace() {
     const f = new FormData(event.currentTarget);
     const parsed = lawyerRegistrationSchema.safeParse(Object.fromEntries(f));
     if (!parsed.success) { toast.error("Confira nome, número e UF da OAB e os limites dos campos."); return; }
+    const { full_name, oab_number, oab_state } = parsed.data;
+    if (!full_name || !oab_number || !oab_state) return;
     setBusy(true);
     const result = profile.data
       ? await supabase.from("lawyer_profiles").update(parsed.data).eq("id", profile.data.id)
-      : await supabase.from("lawyer_profiles").insert({ ...parsed.data, user_id: user.id });
+      : await supabase.from("lawyer_profiles").insert({ ...parsed.data, full_name, oab_number, oab_state, user_id: user.id });
     setBusy(false);
     if (result.error) { toast.error("Não foi possível salvar. Confira se esta OAB já possui cadastro."); return; }
     toast.success("Cadastro salvo para revisão manual da OAB.");

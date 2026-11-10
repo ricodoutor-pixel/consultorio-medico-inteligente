@@ -1,7 +1,7 @@
 // 🌿 Planta y Raiz — Fluxo oficial: PAGAMENTO → TRIAGEM → CONSULTA
 // Vale para Consulta por Chat, Vídeo, Retorno e Consulta Premium (valor do médico).
 // A Orientação Técnica tem página própria (/orientacao-tecnica) e é exclusiva
-// do Dr. Edilson Bezerra On (agente de IA com mais de 40.000 estudos).
+// do Dr. Edilson Bezerra On (agente de IA apoiado em estudos conferidos no PubMed).
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";

@@ -183,7 +183,7 @@ const DashboardExecutivo = () => {
                       { msg: "Taxa de conversão abaixo da meta (12% vs 15%)", type: "warning" },
                       { msg: "Brisa-CEO: 450 protocolos ANVISA gerados hoje", type: "success" },
                       { msg: "Evolution API: Custo zero de mensagens ativo ✅", type: "success" },
-                      { msg: "RAG Científico: 40k artigos indexados via pgvector", type: "success" },
+                      { msg: "RAG Científico: biblioteca interna + PubMed em tempo real", type: "success" },
                       { msg: "Conformidade CRM-PR 49354: 100% Blindado", type: "success" },
                     ].map((alert, i) => (
                       <div key={i} className={`p-3 rounded-xl border text-xs font-bold ${alert.type === "warning" ? "border-[hsl(var(--gold))]/30 bg-[hsl(var(--gold))]/5 text-[hsl(var(--gold))]" : alert.type === "success" ? "border-primary/30 bg-primary/5 text-primary" : "border-secondary/30 bg-secondary/5 text-secondary"}`}>

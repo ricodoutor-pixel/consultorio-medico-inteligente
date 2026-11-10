@@ -57,46 +57,61 @@ export function buildPatientPmidBlock(lookup: PmidLookup, ids: string[]): string
 }
 
 /**
- * Extrai população e desfecho fielmente do título e do resumo do PubMed.
+ * Extrai população e desfecho do título (prioridade) e do resumo real do PubMed.
+ * Nunca usa um desfecho genérico: sem medida identificável, manda conferir o artigo.
  */
+const POPULATION_RULES: Array<[RegExp, string]> = [
+  [/generali[sz]ed anxiety disorder|ansiedade generalizada/i, "pacientes com transtorno de ansiedade generalizada (TAG)"],
+  [/breast cancer|c[âa]ncer de mama/i, "mulheres com câncer de mama avançado e ansiedade antes de exame de imagem"],
+  [/social anxiety|social phobia|fobia social/i, "indivíduos com transtorno de ansiedade social (fobia social)"],
+  [/test anxiety|ansiedade de prova/i, "estudantes universitários com ansiedade de prova"],
+  [/college students?|university students?|undergraduates?/i, "estudantes universitários"],
+  [/public speaking|\bspst\b/i, "voluntários sob teste de estresse de falar em público"],
+  [/mild to moderate anxiety|moderate anxiety/i, "adultos com transtorno de ansiedade leve a moderado"],
+  [/worr(?:y|iers?)/i, "adultos com preocupação elevada (traço de preocupação)"],
+  [/healthy (?:volunteers?|subjects?|participants?|controls?|adults?)/i, "voluntários saudáveis"],
+];
+
+const OUTCOME_RULES: Array<[RegExp, string]> = [
+  [/\bGAD-7\b/i, "escala GAD-7"],
+  [/\bHAM-A\b|hamilton anxiety/i, "escala de Hamilton para ansiedade (HAM-A)"],
+  [/\bVAMS\b|visual analog(?:ue)? mood scale/i, "escala analógica visual de humor (VAMS)"],
+  [/\bSTAI\b|state-trait anxiety/i, "inventário de ansiedade traço-estado (STAI)"],
+  [/worry severity|\bPSWQ\b/i, "gravidade da preocupação"],
+  [/test anxiety/i, "ansiedade de prova autorrelatada"],
+  [/emotional faces|functional magnetic resonance|\bfMRI\b/i, "respostas cerebrais a faces emocionais (ressonância magnética funcional)"],
+  [/cerebral blood flow|\bSPECT\b/i, "fluxo sanguíneo cerebral regional (SPECT)"],
+  [/anxiety symptoms|general anxiety|induced anxiety|anxiety (?:levels|scores)/i, "sintomas de ansiedade"],
+  [/\bPSQI\b|sleep quality/i, "qualidade do sono (PSQI)"],
+];
+
+function pickPopulation(a: PubMedArticle): string {
+  for (const source of [a.title, a.abstract]) {
+    for (const [re, label] of POPULATION_RULES) if (re.test(source || "")) return label;
+  }
+  return "população não detalhada no resumo do PubMed — conferir o artigo";
+}
+
+function measuresIn(text: string): string[] {
+  return OUTCOME_RULES.filter(([re]) => re.test(text)).map(([, label]) => label);
+}
+
+export function isGeneralizedAnxietyStudy(a: PubMedArticle): boolean {
+  return pickPopulation(a).includes("(TAG)");
+}
+
 export function extractStudyPopulationAndOutcome(a: PubMedArticle): string {
-  const combined = `${a.title} ${a.abstract}`.toLowerCase();
-  let population = "";
-  let outcome = "";
-
-  // 1. População
-  if (combined.includes("breast cancer") || combined.includes("mammograph") || combined.includes("biopsy")) {
-    population = "mulheres antes de biópsia ou exame de imagem em câncer de mama";
-  } else if (combined.includes("social anxiety disorder") || combined.includes("social phobia") || combined.includes("sad")) {
-    population = "indivíduos com transtorno de ansiedade social (fobia social)";
-  } else if (combined.includes("public speaking") || combined.includes("spst") || combined.includes("speech")) {
-    population = "voluntários sob teste de estresse de falar em público";
-  } else if (combined.includes("mild to moderate anxiety") || combined.includes("moderate anxiety")) {
-    population = "adultos com ansiedade leve a moderada";
-  } else if (combined.includes("worry") || combined.includes("non-clinical")) {
-    population = "adultos com preocupação excessiva e ansiedade não clínica";
-  } else if (combined.includes("healthy volunteer") || combined.includes("healthy subject") || combined.includes("healthy participant")) {
-    population = "voluntários saudáveis sob modelo experimental de estresse";
-  } else if (combined.includes("generalized anxiety") || combined.includes("ansiedade generalizada")) {
-    population = "pacientes com transtorno de ansiedade generalizada (TAG)";
-  } else {
-    population = "participantes adultos avaliados no ensaio clínico";
+  const population = pickPopulation(a);
+  const abstract = a.abstract || "";
+  const primary = abstract.match(/primary\s*(?:outcomes?|end\s*-?\s*points?|\()([\s\S]{0,260})/i);
+  if (primary) {
+    const segment = primary[1].split(/secondary|exploratory/i)[0];
+    const found = measuresIn(segment);
+    if (found.length) return `população: ${population}; desfecho primário: ${found.join("; ")}`;
   }
-
-  // 2. Desfecho
-  if (combined.includes("brain") || combined.includes("fmri") || combined.includes("spect") || combined.includes("cerebral blood flow") || combined.includes("neural")) {
-    outcome = "fluxo sanguíneo cerebral regional e escores de ansiedade";
-  } else if (combined.includes("vams") || combined.includes("visual analogue mood scale")) {
-    outcome = "escala analógica visual de humor (VAMS)";
-  } else if (combined.includes("stai") || combined.includes("state-trait")) {
-    outcome = "inventário de ansiedade traço-estado (STAI)";
-  } else if (combined.includes("ham-a") || combined.includes("hamilton")) {
-    outcome = "escala de ansiedade de Hamilton (HAM-A)";
-  } else {
-    outcome = "escala de ansiedade e sintomas clínicos";
-  }
-
-  return `população: ${population}; desfecho primário: ${outcome}`;
+  const found = measuresIn(`${a.title} ${abstract}`);
+  if (found.length) return `população: ${population}; desfechos avaliados: ${found.join("; ")}`;
+  return `população: ${population}; desfecho: não detalhado no resumo do PubMed — conferir o artigo`;
 }
 
 const fmt = (a: PubMedArticle, inLibrary: boolean) =>
@@ -119,11 +134,28 @@ export function applyCitationVerification(text: string, lookup: PmidLookup, libr
   const ids = extractPmids(sanitizedText);
   if (!ids.length) return sanitizedText;
 
-  // Descarta parágrafos com citações escritos pelo modelo para evitar alucinação
-  let body = sanitizedText.split(/\n\s*\n/).filter(paragraph =>
-    !extractPmids(paragraph).length &&
-    !/\blink confirmado\b|\bet al\.?\s*\(?\d{4}/i.test(paragraph)
-  ).join("\n\n").replace(/\s*\[(?:Biblioteca interna|PubMed)\]/gi, "").trim();
+  // Descarta parágrafos com citações escritos pelo modelo para evitar alucinação.
+  // Parágrafo que anuncia uma lista (termina em ":") cuja lista foi descartada
+  // recebe a lista conferida logo abaixo, para o corpo nunca ficar vazio.
+  const LIST_SLOT = "\u0000LISTA_CONFERIDA\u0000";
+  const paragraphs = sanitizedText.split(/\n\s*\n/);
+  const isCitationParagraph = (p: string) => extractPmids(p).length > 0 || /\blink confirmado\b|\bet al\.?\s*\(?\d{4}/i.test(p);
+  const kept: string[] = [];
+  let slotPlaced = false;
+  paragraphs.forEach((paragraph, i) => {
+    if (isCitationParagraph(paragraph)) return;
+    const dangling = /:\s*$/.test(paragraph.trim()) && i + 1 < paragraphs.length && isCitationParagraph(paragraphs[i + 1]);
+    if (dangling && !slotPlaced) {
+      kept.push(paragraph.trim().replace(/:\s*$/, " (estudos conferidos no PubMed):"));
+      kept.push(LIST_SLOT);
+      slotPlaced = true;
+    } else if (dangling) {
+      kept.push(paragraph.trim().replace(/:\s*$/, "."));
+    } else {
+      kept.push(paragraph);
+    }
+  });
+  let body = kept.join("\n\n").replace(/\s*\[(?:Biblioteca interna|PubMed)\]/gi, "").trim();
 
   // Remove qualquer frase introdutória que prometa lista ('destaco os seguintes:', 'a seguir:', etc.)
   body = body
@@ -131,6 +163,7 @@ export function applyCitationVerification(text: string, lookup: PmidLookup, libr
     .trim();
 
   if (lookup.status !== "ok") {
+    body = body.replace(LIST_SLOT, "").replace(/\(estudos conferidos no PubMed\):/, ":").replace(/\n{3,}/g, "\n\n").trim();
     return `${body}\n\n⚠️ Não consegui conferir agora no PubMed os PMIDs citados (${ids.join(", ")}). Considere essas referências NÃO verificadas até nova conferência.`;
   }
 
@@ -159,17 +192,23 @@ export function applyCitationVerification(text: string, lookup: PmidLookup, libr
   let tagNotice = "";
   const isAnxietyQuery = /ansiedade|anxiety|transtorno\s+de\s+ansiedade|\btag\b|gad\b/i.test(question);
   if (isAnxietyQuery && foundArticles.length > 0) {
-    const hasTagTrial = foundArticles.some(a =>
-      /generalized\s+anxiety|ansiedade\s+generalizada|\btag\b|\bgad\b/i.test(`${a.title} ${a.abstract}`)
-    );
+    // Escalas como GAD-7 no resumo não tornam o estudo específico de TAG: decide pela população.
+    const hasTagTrial = foundArticles.some(isGeneralizedAnxietyStudy);
     if (!hasTagTrial) {
-      tagNotice = "⚠️ Observação clínica: nenhum destes ensaios clínicos é específico de Transtorno de Ansiedade Generalizada (TAG); as populações avaliadas foram outras formas de ansiedade situacional, teste de fala pública, fobia social ou ansiedade leve a moderada.";
+      tagNotice = "⚠️ Observação clínica: nenhum destes ensaios clínicos é específico de Transtorno de Ansiedade Generalizada (TAG); as populações avaliadas foram outras (veja a população de cada estudo na lista).";
     }
   }
 
-  return [
-    noEvidence || body,
-    tagNotice,
-    refs.length ? `📚 Referências conferidas agora no registro do PubMed (título, autor, revista e ano copiados do registro):\n${refs.join("\n")}` : ""
-  ].filter(Boolean).join("\n\n");
+  const refsBlock = refs.length
+    ? `📚 Referências conferidas agora no registro do PubMed (título, autor, revista e ano copiados do registro):\n${refs.join("\n")}`
+    : "";
+  const listBlock = [tagNotice, refsBlock].filter(Boolean).join("\n\n");
+
+  if (noEvidence) return [noEvidence, listBlock].filter(Boolean).join("\n\n");
+  if (body.includes(LIST_SLOT)) {
+    return listBlock
+      ? body.replace(LIST_SLOT, listBlock)
+      : body.replace(LIST_SLOT, "").replace(/\(estudos conferidos no PubMed\):/, ".").replace(/\n{3,}/g, "\n\n").trim();
+  }
+  return [body, listBlock].filter(Boolean).join("\n\n");
 }

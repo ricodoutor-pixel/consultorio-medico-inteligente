@@ -526,7 +526,7 @@ const Index = () => {
       {/* FAQ Home com Schema.org FAQPage para rich snippets do Google */}
       <HomeFAQ />
 
-      {/* Showcase da Biblioteca Científica (40k+ estudos PubMed) */}
+      {/* Showcase da Biblioteca Científica (biblioteca interna + PubMed em tempo real) */}
       <ScientificBadge />
 
       {/* Ebook Gate — lead capture Nome + WhatsApp (Item F auditoria) */}

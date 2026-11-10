@@ -396,7 +396,7 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
               </div>
               <div className="bg-white p-3 rounded-xl border shadow-sm">
                 <Database className="w-5 h-5 text-blue-500 mb-1" />
-                <p className="text-[11px] text-slate-600 leading-tight">Cruzado com +40k estudos globais via IA</p>
+                <p className="text-[11px] text-slate-600 leading-tight">Cruzado com estudos científicos conferidos no PubMed</p>
               </div>
               <div className="bg-white p-3 rounded-xl border shadow-sm">
                 <Brain className="w-5 h-5 text-violet-500 mb-1" />

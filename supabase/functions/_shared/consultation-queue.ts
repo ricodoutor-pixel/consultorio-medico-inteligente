@@ -265,13 +265,8 @@ export function selectNextQueueStep(params: {
   }
 
   // 3. Próximo médico ONLINE na plataforma (Consultório Médico aberto + botão ON + batimento <= 2 min)
-  const onlineDoctors = available.filter((c) => {
-    const hasExplicitTimestamp = c.last_seen_online !== undefined && c.last_seen_online !== null;
-    if (hasExplicitTimestamp) {
-      return evaluateDoctorPresence(c, nowMs, timeoutMs).canReceiveOffers;
-    }
-    return Boolean(c.is_online && (c.is_available ?? true));
-  });
+  // Sem batimento registrado não há prova de Consultório aberto: botão ON antigo não basta.
+  const onlineDoctors = available.filter((c) => evaluateDoctorPresence(c, nowMs, timeoutMs).canReceiveOffers);
   if (onlineDoctors.length > 0) {
     return {
       action: "offer_doctor",

@@ -1,3 +1,4 @@
+import { requireAdminOrService } from "../_shared/admin-auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -138,6 +139,7 @@ serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: getCorsHeaders(req) });
   }
+  { const denied = await requireAdminOrService(req, getCorsHeaders(req)); if (denied) return denied; }
 
   try {
     const body: RawLeadInput = await req.json().catch(() => ({}));

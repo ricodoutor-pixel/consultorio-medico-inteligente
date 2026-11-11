@@ -148,9 +148,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     const fetchDoctors = async () => {
       try {
-        const [publicRes, presenceRes, activeApptsRes] = await Promise.allSettled([
+        const [publicRes, activeApptsRes] = await Promise.allSettled([
           supabase.from("doctors_public" as never).select("*"),
-          supabase.from("doctors").select("id, is_online, is_available, last_seen_online"),
           supabase.from("appointments").select("doctor_id").eq("status", "in_progress"),
         ]);
         if (!active) return;
@@ -161,42 +160,19 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
             : [];
         if (publicDocs.length === 0) return;
 
-        const presenceRows =
-          presenceRes.status === "fulfilled" && !presenceRes.value.error
-            ? ((presenceRes.value.data ?? []) as Array<{
-                id: string;
-                is_online?: boolean | null;
-                is_available?: boolean | null;
-                last_seen_online?: string | null;
-              }>)
-            : [];
-
         const activeAppts =
           activeApptsRes.status === "fulfilled" && !activeApptsRes.value.error
             ? ((activeApptsRes.value.data ?? []) as Array<{ doctor_id?: string | null }>)
             : [];
 
-        const presenceMap = new Map<
-          string,
-          { is_online?: boolean | null; is_available?: boolean | null; last_seen_online?: string | null }
-        >();
-        for (const p of presenceRows) {
-          presenceMap.set(p.id, p);
-        }
         const busyIds = new Set<string>(
           activeAppts.map((a) => String(a.doctor_id ?? "")).filter(Boolean),
         );
 
-        const mergedRows: DoctorRow[] = publicDocs.map((doc) => {
-          const pres = presenceMap.get(doc.id);
-          return {
-            ...doc,
-            is_online: pres?.is_online !== undefined ? pres.is_online : doc.is_online,
-            is_available: pres?.is_available !== undefined ? pres.is_available : doc.is_available,
-            last_seen_online: pres?.last_seen_online ?? doc.last_seen_online ?? null,
-            in_consultation: busyIds.has(doc.id),
-          };
-        });
+        const mergedRows: DoctorRow[] = publicDocs.map((doc) => ({
+          ...doc,
+          in_consultation: busyIds.has(doc.id),
+        }));
         setDbDoctors(mergedRows);
         try {
           sessionStorage.setItem(DOCTORS_CACHE_KEY, JSON.stringify(mergedRows));

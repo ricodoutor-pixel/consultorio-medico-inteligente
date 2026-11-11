@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Disponibilidade diária dos médicos — 11/11/2026
-- [ ] Enviar aviso único de disponibilidade aos médicos participantes, assinantes primeiro, sem alegar consulta existente
+- [x] WhatsApp: 20 avisos personalizados aceitos pelo provedor, cinco assinantes primeiro; entrega/leitura ainda não confirmadas
+- [ ] Aviso de Luiz Roberto Medina — WhatsApp recusou o contato (HTTP 400); precisa de número válido
 - [ ] Enviar por e-mail Hostinger — depende de canal de e-mail Hostinger disponível; não usar app emails para campanha coletiva
 - [ ] Confirmar cinco médicos disponíveis diariamente — depende da adesão dos médicos; Analytics não identifica disponibilidade profissional
 

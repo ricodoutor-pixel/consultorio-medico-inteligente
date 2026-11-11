@@ -1,5 +1,9 @@
 # Roadmap
 
+## Presença pública dos médicos — 11/11/2026
+- [ ] Publicar somente o batimento de presença no catálogo seguro e retirar a leitura privada da vitrine
+- [ ] Conferir permissões, regressões e lista pública sem alterar presença real dos médicos
+
 ## Disponibilidade diária dos médicos — 11/11/2026
 - [x] WhatsApp: 20 avisos personalizados aceitos pelo provedor, cinco assinantes primeiro; entrega/leitura ainda não confirmadas
 - [ ] Aviso de Luiz Roberto Medina — WhatsApp recusou o contato (HTTP 400); precisa de número válido

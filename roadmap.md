@@ -1,5 +1,10 @@
 # Roadmap
 
+## Disponibilidade diária dos médicos — 11/11/2026
+- [ ] Enviar aviso único de disponibilidade aos médicos participantes, assinantes primeiro, sem alegar consulta existente
+- [ ] Enviar por e-mail Hostinger — depende de canal de e-mail Hostinger disponível; não usar app emails para campanha coletiva
+- [ ] Confirmar cinco médicos disponíveis diariamente — depende da adesão dos médicos; Analytics não identifica disponibilidade profissional
+
 ## Área jurídica — 10/11/2026
 - [x] Criar categoria Advogados — Habeas corpus medicinal, cadastro OAB e aprovação manual, separada dos médicos
 - [x] Disponibilizar agenda jurídica e honorários privados definidos pelo advogado, sem comissão automática

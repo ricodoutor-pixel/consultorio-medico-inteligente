@@ -32,6 +32,7 @@
 
 - The Orientation flow creates a payment-first order in the existing orientation ledger, persists post-payment question progress there, and unlocks sessions only after webhook approval and valid non-emergency triage; this preserves administrative history without duplicate order stores.
 - Public medical listings maintain base professional profiles from src/data/professionals.ts as the baseline and enrich with real-time status from approved backend records, ensuring vitrine doctors never disappear during network or backend desyncs.
+- Public listings read heartbeat timestamps from the safe doctors_public catalog, synchronized after doctor writes; never query private doctors for patient-visible presence, because RLS hides other doctors from patients.
 - Explicitly withdrawn public professionals are filtered by the shared visibility predicate across merged listings, without deleting clinical records; this prevents backend enrichment from republishing withdrawn cards.
 - Appointment routing uses the real server-returned doctor or the selected public record, and availability uses persisted slots only; synthetic identifiers cannot satisfy appointment foreign keys.
 - Telemedicine checkout records a pending appointment and uses mp-checkout with server-enforced modality prices; access proceeds only after reading the patient's paid appointment, never from a receipt button or payment error.

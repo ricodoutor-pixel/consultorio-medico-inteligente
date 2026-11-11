@@ -141,6 +141,13 @@
       "when": 1794322280379,
       "tag": "0019_partner_importers",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794379577262,
+      "tag": "0020_public_doctor_presence_heartbeat",
+      "breakpoints": true
     }
   ]
 }

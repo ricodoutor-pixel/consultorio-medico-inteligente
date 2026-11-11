@@ -5,6 +5,8 @@
 - [x] Conferir sincronização e proteção dos cadastros; 12 testes aprovados e lista pública conferida em computador/celular, sem alterar presença real (zero batimentos recentes nesta verificação)
 
 ## Disponibilidade diária dos médicos — 11/11/2026
+- [x] Pedido 06:53 UTC: desligar ON antigos sem presença ou atendimento ativo; conferidos zero ON e zero presença recente
+- [ ] Conferir destinatários da vitrine ainda não avisados e envio sem repetir os 20 avisos já aceitos hoje
 - [x] WhatsApp: 20 avisos personalizados aceitos pelo provedor, cinco assinantes primeiro; entrega/leitura ainda não confirmadas
 - [ ] Aviso de Luiz Roberto Medina — WhatsApp recusou o contato (HTTP 400); precisa de número válido
 - [ ] Enviar por e-mail Hostinger — depende de canal de e-mail Hostinger disponível; não usar app emails para campanha coletiva

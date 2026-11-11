@@ -2969,6 +2969,7 @@ export type Database = {
           is_online: boolean
           is_verified: boolean
           kyc_docs_count: number
+          last_seen_online: string | null
           plan_tier: string
           price_chat_only: number
           price_return: number
@@ -2996,6 +2997,7 @@ export type Database = {
           is_online: boolean
           is_verified: boolean
           kyc_docs_count?: number
+          last_seen_online?: string | null
           plan_tier: string
           price_chat_only: number
           price_return: number
@@ -3023,6 +3025,7 @@ export type Database = {
           is_online?: boolean
           is_verified?: boolean
           kyc_docs_count?: number
+          last_seen_online?: string | null
           plan_tier?: string
           price_chat_only?: number
           price_return?: number

@@ -1,3 +1,4 @@
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 // Avisa o médico por WhatsApp (uma única vez) que o pagamento da consulta foi liberado.
 // Chamado pelo banco logo após a avaliação do paciente; só age sobre registros já liberados.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -9,6 +10,7 @@ const json = (b: unknown, s = 200) =>
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  { const denied = requireServiceAuth(req, corsHeaders); if (denied) return denied; }
   const body = await req.json().catch(() => ({}));
   const auditId = String(body?.audit_id ?? "");
   const testMode = Boolean(body?.test_mode);

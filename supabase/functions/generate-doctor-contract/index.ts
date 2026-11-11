@@ -1,3 +1,5 @@
+import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -73,6 +75,15 @@ serve(async (req) => {
         JSON.stringify({ error: "Parâmetros obrigatórios ausentes: doctor_id e user_id" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Only the signing doctor (or an admin / internal caller) may generate this contract.
+    if (requireServiceAuth(req, corsHeaders) !== null) {
+      const callerId = await getCallerUserId(req);
+      if (!callerId || (callerId !== user_id && !(await isAdmin(callerId)))) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
     }
 
     // 1. Busca dados do médico e perfil se não fornecidos

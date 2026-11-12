@@ -60,6 +60,19 @@ function normalizePhone(raw: string) {
   return digits.length <= 13 ? digits : digits.slice(0, 13);
 }
 
+
+async function signId(id: string): Promise<string> {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode("category-chat:" + id)));
+  return Array.from(sig.slice(0, 16)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function verifyContactToken(tok: unknown): Promise<string | null> {
+  if (typeof tok !== "string") return null;
+  const [id, sig] = tok.split(".");
+  if (!id || !sig || !/^[0-9a-f-]{36}$/i.test(id)) return null;
+  return (await signId(id)) === sig ? id : null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
@@ -109,7 +122,7 @@ serve(async (req) => {
     }
 
     // 1) Contato — cria ou reaproveita
-    let contactId = rawContactId || null;
+    let contactId = await verifyContactToken(rawContactId);
     if (!contactId) {
       const cleanName = String(name || "").trim().slice(0, 120);
       const cleanPhone = normalizePhone(phone || "");
@@ -168,7 +181,7 @@ serve(async (req) => {
         role: "assistant",
         content: fallback,
       });
-      return new Response(JSON.stringify({ contactId, reply: fallback, provider: "fallback" }), {
+      return new Response(JSON.stringify({ contactId: `${contactId}.${await signId(contactId!)}`, reply: fallback, provider: "fallback" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -225,7 +238,7 @@ serve(async (req) => {
       .eq("id", contactId);
 
     return new Response(
-      JSON.stringify({ contactId, reply, provider, category }),
+      JSON.stringify({ contactId: `${contactId}.${await signId(contactId!)}`, reply, provider, category }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {

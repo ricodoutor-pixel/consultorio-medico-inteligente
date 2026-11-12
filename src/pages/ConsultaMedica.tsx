@@ -8,18 +8,15 @@ import {
   CheckCircle2,
   Clock,
   Crown,
-  FileText,
   Gift,
   Loader2,
   MessageSquare,
-  Paperclip,
   Phone,
   Send,
   ShieldCheck,
   Sparkles,
   Stethoscope,
   Video,
-  X,
   Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +51,7 @@ import {
 } from "@/lib/doctor-presence";
 import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { userChannel } from "@/lib/realtime-channels";
+import { useConsultationChat } from "@/hooks/useConsultationChat";
 import { professionals } from "@/data/professionals";
 import { formatBRL } from "@/lib/pricing";
 
@@ -89,7 +87,6 @@ type LiveChatMessage = {
   id: string;
   sender: "patient" | "doctor" | "system";
   content: string;
-  attachmentName?: string;
   createdAt: string;
 };
 
@@ -129,11 +126,9 @@ export default function ConsultaMedica() {
   const doctorAlertSentRef = useRef<Set<string>>(new Set());
 
   // Etapa D: Sala ao vivo no estilo da Orientação Técnica (45 min, vídeo/chat/arquivos)
-  const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>([]);
+  const [roomWelcome, setRoomWelcome] = useState<LiveChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
-  const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
   const [showVideoPanel, setShowVideoPanel] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Etapa E: Estado da fila de médicos
   const [queueState, setQueueState] = useState<string>("waiting");
@@ -424,6 +419,12 @@ export default function ConsultaMedica() {
 
   // Sala & Fila (Etapas D & E) ------------------------------------------
   const room = appt && doctorJoined(appt) ? { domain: "meet.jit.si", roomName: consultationRoomName(appt.id) } : null;
+  const { messages: liveChat, send: sendChat, sending: chatSending } = useConsultationChat(
+    appt?.id,
+    userId,
+    "patient",
+    !!room,
+  );
   const waitStart = appt ? Number(localStorage.getItem(`pyr_consult_wait_${appt.id}`) || 0) : 0;
   const waitLeft = waitStart ? Math.max(0, WAIT_MINUTES * 60 - Math.floor((now - waitStart) / 1000)) : WAIT_MINUTES * 60;
 
@@ -474,7 +475,7 @@ export default function ConsultaMedica() {
   useEffect(() => {
     if (room && appt && !localStorage.getItem(`pyr_consult_start_${appt.id}`)) {
       localStorage.setItem(`pyr_consult_start_${appt.id}`, String(Date.now()));
-      setChatMessages([
+      setRoomWelcome([
         {
           id: "welcome-room",
           sender: "system",
@@ -496,40 +497,28 @@ export default function ConsultaMedica() {
     }
   }, [room, consultStart, consultLeft]);
 
+  // Mensagens gravadas no servidor e entregues ao médico em tempo real (mesma sala nos dois lados).
+  const chatMessages = useMemo<LiveChatMessage[]>(
+    () => [
+      ...roomWelcome,
+      ...liveChat.map((m) => ({
+        id: m.id,
+        sender: m.sender_type,
+        content: m.content,
+        createdAt: new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      })),
+    ],
+    [roomWelcome, liveChat],
+  );
+
   const sendLiveMessage = async () => {
-    if (!chatInput.trim() && !attachedFileName) return;
-    const text = attachedFileName
-      ? `${chatInput.trim() ? `${chatInput.trim()} ` : ""}[Arquivo anexado: ${attachedFileName}]`
-      : chatInput.trim();
-
-    const newMsg: LiveChatMessage = {
-      id: `msg-${Date.now()}`,
-      sender: "patient",
-      content: text,
-      attachmentName: attachedFileName || undefined,
-      createdAt: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-    };
-    setChatMessages((prev) => [...prev, newMsg]);
-    setChatInput("");
-    setAttachedFileName(null);
-
-    if (userId && appt?.doctor_id) {
-      try {
-        const { data: docRow } = await supabase
-          .from("doctors")
-          .select("user_id")
-          .eq("id", appt.doctor_id)
-          .maybeSingle();
-        if (docRow?.user_id) {
-          await (supabase as any).from("messages").insert({
-            sender_id: userId,
-            receiver_id: docRow.user_id,
-            content: text,
-          });
-        }
-      } catch {
-        // Mensagem mantida na sessão ao vivo
-      }
+    const text = chatInput.trim();
+    if (!text || chatSending) return;
+    const ok = await sendChat(text);
+    if (ok) {
+      setChatInput("");
+    } else {
+      toast.error("Mensagem não enviada. Confira a conexão e tente de novo.");
     }
   };
 
@@ -1030,41 +1019,9 @@ export default function ConsultaMedica() {
                 ))}
               </div>
 
-              {/* Barra de ferramentas (anexo de exames/receitas + mensagem) */}
+              {/* Barra de mensagem. Anexos voltam quando houver envio real de arquivos ao médico. */}
               <div className="bg-[#F0F0F0] p-2.5 border-t border-slate-300 space-y-1.5">
-                {attachedFileName && (
-                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-1 text-xs text-slate-700 border">
-                    <span className="inline-flex items-center gap-1.5 truncate">
-                      <FileText size={13} className="text-emerald-600" /> {attachedFileName}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setAttachedFileName(null)}
-                      className="text-slate-400 hover:text-slate-700"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                )}
                 <div className="flex items-center gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    accept="image/*,.pdf"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) setAttachedFileName(f.name);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="p-2.5 rounded-full bg-white text-slate-700 hover:bg-slate-100 border border-slate-300"
-                    title="Anexar exame, receita ou imagem"
-                  >
-                    <Paperclip size={16} />
-                  </button>
                   <input
                     type="text"
                     value={chatInput}
@@ -1081,7 +1038,8 @@ export default function ConsultaMedica() {
                   <button
                     type="button"
                     onClick={() => void sendLiveMessage()}
-                    className="p-2.5 rounded-full bg-[#075E54] text-white hover:bg-[#064e46]"
+                    disabled={chatSending}
+                    className="p-2.5 rounded-full bg-[#075E54] text-white hover:bg-[#064e46] disabled:opacity-60"
                     title="Enviar mensagem"
                   >
                     <Send size={15} />

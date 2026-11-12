@@ -16,6 +16,8 @@ import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { ConsultationChatPanel } from "@/components/consultation/ConsultationChatPanel";
+import { isConsultationAppointmentId } from "@/lib/consultation-chat";
 import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 import { ManualMedicoModal } from "@/components/medico/ManualMedicoModal";
 import { loadDoctorPatientRecords } from "@/components/doctor/DoctorProntuarioImportExportModal";
@@ -36,6 +38,7 @@ const WorkspaceMedico = () => {
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(false);
   const [doctorId, setDoctorId] = useState<string | null>(null);
+  const [doctorUserId, setDoctorUserId] = useState<string | null>(null);
 
   // EMR state
   const [notes, setNotes] = useState("");
@@ -71,6 +74,7 @@ const WorkspaceMedico = () => {
            .select("id")
            .eq("user_id", session.user.id)
            .maybeSingle();
+         setDoctorUserId(session.user.id);
          const docId = realDoc?.id || session.user.id;
          setDoctorId(docId);
          setIsOnline(localStorage.getItem(`doctor_online_${docId}`) === "true");
@@ -96,26 +100,19 @@ const WorkspaceMedico = () => {
           whatsapp: importedMatch?.phone || "",
         });
       } else {
-        // Fallback robusto para paciente teste ou primeiro atendimento
-        setPatient({
-          id: patientId || "paciente-teste-id",
-          full_name: "Paciente Teste (Simulação IA - PAGO)",
-          cpf: "123.456.789-00",
-          email: "paciente.teste@plantayraiz.com.br",
-          whatsapp: "5511999998888",
-          date_of_birth: "1986-04-12",
-        });
+        // Nunca inventar paciente: mostra que os dados não foram carregados.
+        setPatient({ id: patientId, full_name: "Paciente (dados não carregados)" });
       }
 
       if (apptRes.data) {
         setAppointment(apptRes.data);
       } else {
         setAppointment({
-          id: appointmentId || "appt-sim-01",
-          patient_id: patientId || "paciente-teste-id",
-          type: "video",
-          status: "scheduled",
-          notes: importedMatch?.clinicalNotes || "Queixa: Insônia refratária crônica e dor neuropática há 6 meses. Buscou alternativas após reações adversas a hipnóticos convencionais.",
+          id: appointmentId,
+          patient_id: patientId,
+          type,
+          status: "unknown",
+          notes: importedMatch?.clinicalNotes || "",
         });
       }
 
@@ -127,16 +124,14 @@ const WorkspaceMedico = () => {
         setNotes(importedMatch.clinicalNotes || "");
         setDiagnosis(importedMatch.diagnosisCid || "");
         setTreatmentPlan(importedMatch.treatmentPlan || "");
-      } else {
-        setNotes("Paciente 38 anos, histórico de insônia inicial e dor crônica moderada. Sem alergias medicamentosas relatadas.");
-        setDiagnosis("F51.0 Insônia não-orgânica / G89.2 Dor crônica");
-        setTreatmentPlan("Iniciar Óleo Full Spectrum CBD 10% (1 gota/kg/dia sublingual à noite). Acompanhamento de titulação em 15 dias.");
       }
+      // Sem prontuário: campos começam vazios — nunca preencher dados clínicos de exemplo.
       
       const isRealAppointment = Boolean(appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId));
       if (isRealAppointment && apptRes.data && !["in_progress", "completed", "cancelled"].includes(apptRes.data.status)) {
         // Médico entrou: o paciente vê a sala abrir na página da consulta.
-        await supabase.from("appointments").update({ status: "in_progress", updated_at: new Date().toISOString() }).eq("id", appointmentId!);
+        const { error: joinErr } = await supabase.from("appointments").update({ status: "in_progress", updated_at: new Date().toISOString() }).eq("id", appointmentId!);
+        if (!joinErr) setAppointment({ ...apptRes.data, status: "in_progress" });
       }
       if (type === 'video') {
         if (isRealAppointment) {
@@ -158,16 +153,12 @@ const WorkspaceMedico = () => {
       }
     } catch (e) {
       console.error(e);
-      // Garante paciente e sala mesmo em erro de rede
-      setPatient({
-        id: patientId || "paciente-teste-id",
-        full_name: "Paciente Teste (Simulação IA - PAGO)",
-        cpf: "123.456.789-00",
-      });
-      setRoomInfo({
-        roomName: `plantayraiz-consultorio-${appointmentId || 'sim-01'}`,
-        domain: "meet.jit.si",
-      });
+      // Erro de rede: não inventa paciente; mantém a sala da consulta real para não interromper o atendimento.
+      setPatient((prev: Record<string, unknown> | null) => prev ?? { id: patientId, full_name: "Paciente (dados não carregados)" });
+      toast({ title: "Falha ao carregar a consulta", description: "Verifique a conexão e recarregue a página.", variant: "destructive" });
+      if (appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId)) {
+        setRoomInfo({ roomName: `plantayraiz-consultorio-${appointmentId}`, domain: "meet.jit.si" });
+      }
     } finally {
       setLoading(false);
     }
@@ -244,6 +235,25 @@ const WorkspaceMedico = () => {
     }
   };
 
+  const isRealAppointment = isConsultationAppointmentId(appointmentId);
+  const consultationLive =
+    isRealAppointment && appointment?.payment_status === "paid" && appointment?.status === "in_progress";
+
+  // Médico encerra (vídeo ou chat): o paciente passa para a avaliação, que libera o repasse.
+  const endConsultation = async () => {
+    if (isRealAppointment) {
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "completed", updated_at: new Date().toISOString() })
+        .eq("id", appointmentId!);
+      if (error) {
+        toast({ title: "Não foi possível encerrar", description: "Tente de novo.", variant: "destructive" });
+        return;
+      }
+    }
+    navigate("/dashboard-medico");
+  };
+
   if (loading) return <div className="flex h-dvh items-center justify-center">Carregando Workspace...</div>;
 
   return (
@@ -291,7 +301,8 @@ const WorkspaceMedico = () => {
       <div className="flex flex-1 overflow-hidden">
         
         {/* Left Side: Video/Chat iframe */}
-        <div className="w-1/2 border-r border-border bg-black/5 flex flex-col relative">
+        <div className="w-1/2 border-r border-border bg-black/5 flex flex-col relative min-h-0">
+           <div className={type === 'video' ? "flex-1 min-h-0 flex flex-col" : "hidden"}>
            {type === 'video' ? (
              roomError ? (
                <div className="flex-1 flex items-center justify-center text-red-500 font-bold p-6 text-center">
@@ -303,13 +314,7 @@ const WorkspaceMedico = () => {
                  domain={roomInfo.domain}
                  jwt={roomInfo.jwt}
                  isDoctor={true}
-                 onClose={async () => {
-                   // Médico desligou: encerra a consulta para o paciente avaliar (libera o repasse).
-                   if (appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId)) {
-                     await supabase.from("appointments").update({ status: "completed", updated_at: new Date().toISOString() }).eq("id", appointmentId);
-                   }
-                   navigate("/dashboard-medico");
-                 }}
+                 onClose={() => void endConsultation()}
                />
              ) : (
                <div className="flex-1 flex flex-col items-center justify-center">
@@ -317,13 +322,26 @@ const WorkspaceMedico = () => {
                  <p className="text-muted-foreground font-bold">Iniciando sala criptografada...</p>
                </div>
              )
-           ) : (
-             <div className="flex items-center justify-center h-full flex-col text-muted-foreground">
-               <MessageSquare size={48} className="mb-4 opacity-50" />
-               <p>Chat Seguro Integrado (Em breve nesta aba)</p>
-               {/* This would be the chat component */}
+           ) : null}
+           </div>
+
+           {/* Chat ao vivo com o paciente (mesmas mensagens da tela do paciente) */}
+           {isRealAppointment && doctorUserId ? (
+             <div className={type === 'video' ? "h-[40%] min-h-[220px] border-t border-border" : "flex-1 min-h-0"}>
+               <ConsultationChatPanel
+                 appointmentId={appointmentId!}
+                 doctorUserId={doctorUserId}
+                 patientName={patient?.full_name}
+                 live={consultationLive}
+                 onEnd={type === 'video' ? undefined : () => void endConsultation()}
+               />
              </div>
-           )}
+           ) : type !== 'video' ? (
+             <div className="flex items-center justify-center h-full flex-col text-muted-foreground p-6 text-center">
+               <MessageSquare size={48} className="mb-4 opacity-50" />
+               <p>O chat abre apenas em uma consulta real paga.</p>
+             </div>
+           ) : null}
         </div>
 
         {/* Right Side: EMR & Tools */}

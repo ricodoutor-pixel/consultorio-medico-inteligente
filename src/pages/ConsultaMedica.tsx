@@ -425,6 +425,30 @@ export default function ConsultaMedica() {
     "patient",
     !!room,
   );
+
+  // Vídeo: o servidor devolve a sala (Jitsi próprio com token, quando configurado) só a participantes.
+  const [videoAccess, setVideoAccess] = useState<{ domain: string; roomName: string; jwt?: string } | null>(null);
+  const roomOpen = !!room;
+  useEffect(() => {
+    if (!roomOpen || !appt?.id || !(mode === "video" || mode === "premium")) return;
+    let cancelled = false;
+    supabase.functions
+      .invoke("consultation-video-token", { body: { appointmentId: appt.id } })
+      .then(({ data }) => {
+        if (cancelled) return;
+        setVideoAccess(
+          data?.ok
+            ? { domain: data.domain, roomName: data.roomName, jwt: data.jwt ?? undefined }
+            : { domain: "meet.jit.si", roomName: consultationRoomName(appt.id) },
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setVideoAccess({ domain: "meet.jit.si", roomName: consultationRoomName(appt.id) });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [roomOpen, appt?.id, mode]);
   const waitStart = appt ? Number(localStorage.getItem(`pyr_consult_wait_${appt.id}`) || 0) : 0;
   const waitLeft = waitStart ? Math.max(0, WAIT_MINUTES * 60 - Math.floor((now - waitStart) / 1000)) : WAIT_MINUTES * 60;
 
@@ -981,12 +1005,19 @@ export default function ConsultaMedica() {
               {/* Ferramenta de Vídeo ao vivo quando a modalidade inclui vídeo */}
               {(mode === "video" || mode === "premium") && showVideoPanel && (
                 <div className="h-[46dvh] min-h-[300px] bg-black border-b border-emerald-900/20">
+                  {videoAccess ? (
                   <JitsiRoom
-                    roomName={room.roomName}
-                    domain={room.domain}
+                    roomName={videoAccess.roomName}
+                    domain={videoAccess.domain}
+                    jwt={videoAccess.jwt}
                     displayName="Paciente"
                     onClose={() => void endConsultationNow()}
                   />
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-emerald-100 text-sm gap-2">
+                      <Loader2 size={16} className="animate-spin" /> Abrindo vídeo seguro...
+                    </div>
+                  )}
                 </div>
               )}
 

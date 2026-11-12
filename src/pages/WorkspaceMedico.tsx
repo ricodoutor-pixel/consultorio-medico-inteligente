@@ -84,7 +84,10 @@ const WorkspaceMedico = () => {
         supabase.from("profiles").select("*").eq("id", patientId).maybeSingle(),
         supabase.from("appointments").select("*").eq("id", appointmentId).maybeSingle(),
         supabase.from("medical_records").select("*").eq("appointment_id", appointmentId).maybeSingle(),
-        type === 'video' ? supabase.functions.invoke("create-video-room", { body: { appointmentId } }) : Promise.resolve({ data: null, error: null })
+        // Consulta real usa consultation-video-token (abaixo); create-video-room alteraria o status da consulta.
+        type === 'video' && !isConsultationAppointmentId(appointmentId)
+          ? supabase.functions.invoke("create-video-room", { body: { appointmentId } })
+          : Promise.resolve({ data: null, error: null })
       ]);
 
       const importedMatch = loadDoctorPatientRecords().find((r) => r.id === patientId);
@@ -135,8 +138,13 @@ const WorkspaceMedico = () => {
       }
       if (type === 'video') {
         if (isRealAppointment) {
-          // Mesma sala que o paciente abre na página única da consulta.
-          setRoomInfo({ roomName: `plantayraiz-consultorio-${appointmentId}`, domain: "meet.jit.si" });
+          // Mesma sala que o paciente abre (Jitsi próprio com token quando configurado no servidor).
+          const { data: video } = await supabase.functions.invoke("consultation-video-token", { body: { appointmentId } });
+          setRoomInfo(
+            video?.ok
+              ? { roomName: video.roomName, domain: video.domain, jwt: video.jwt ?? undefined }
+              : { roomName: `plantayraiz-consultorio-${appointmentId}`, domain: "meet.jit.si" },
+          );
         } else if (roomRes.data?.ok && roomRes.data?.roomName) {
           setRoomInfo({
             roomName: roomRes.data.roomName,

@@ -1,0 +1,94 @@
+# Jitsi próprio da Planta y Raiz (vídeo das consultas) — roda na VPS Hostinger ao lado da stack de infra/vps-traefik.
+# - Web atrás do Traefik existente (rede externa "proxy"), HTTPS em meet.plantayraiz.com.br.
+# - Só entra quem tem token JWT emitido pela função consultation-video-token (sem convidados anônimos).
+# - Mídia (JVB) usa UDP 10000 direto: liberar essa porta no firewall da VPS/painel Hostinger.
+# Uso: cp .env.example .env && preencher && docker compose up -d   (ver README.md)
+
+networks:
+  proxy:
+    external: true
+  meet.jitsi:
+
+x-jitsi-env: &jitsi-env
+  TZ: America/Sao_Paulo
+  PUBLIC_URL: https://${JITSI_DOMAIN}
+  XMPP_DOMAIN: meet.jitsi
+  XMPP_AUTH_DOMAIN: auth.meet.jitsi
+  XMPP_GUEST_DOMAIN: guest.meet.jitsi
+  XMPP_MUC_DOMAIN: muc.meet.jitsi
+  XMPP_INTERNAL_MUC_DOMAIN: internal-muc.meet.jitsi
+  XMPP_SERVER: xmpp.meet.jitsi
+  ENABLE_AUTH: "1"
+  AUTH_TYPE: jwt
+  ENABLE_GUESTS: "0"
+  JWT_APP_ID: ${JITSI_APP_ID}
+  JWT_APP_SECRET: ${JITSI_APP_SECRET}
+  JWT_ACCEPTED_ISSUERS: ${JITSI_APP_ID}
+  JWT_ACCEPTED_AUDIENCES: jitsi
+  JICOFO_AUTH_PASSWORD: ${JICOFO_AUTH_PASSWORD}
+  JVB_AUTH_PASSWORD: ${JVB_AUTH_PASSWORD}
+  ENABLE_RECORDING: "0"
+  ENABLE_LOBBY: "0"
+  ENABLE_PREJOIN_PAGE: "0"
+  ENABLE_WELCOME_PAGE: "0"
+  DEFAULT_LANGUAGE: ptBR
+
+services:
+  web:
+    image: jitsi/web:${JITSI_IMAGE_VERSION}
+    restart: unless-stopped
+    environment:
+      <<: *jitsi-env
+      DISABLE_HTTPS: "1"
+      ENABLE_HTTP_REDIRECT: "0"
+      ENABLE_LETSENCRYPT: "0"
+    volumes:
+      - ./data/web:/config
+    networks:
+      proxy:
+      meet.jitsi:
+        aliases: [meet.jitsi]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.jitsi.rule=Host(`${JITSI_DOMAIN}`)
+      - traefik.http.routers.jitsi.entrypoints=websecure
+      - traefik.http.routers.jitsi.tls.certresolver=le
+      - traefik.http.services.jitsi.loadbalancer.server.port=80
+
+  prosody:
+    image: jitsi/prosody:${JITSI_IMAGE_VERSION}
+    restart: unless-stopped
+    expose: ["5222", "5280"]
+    environment:
+      <<: *jitsi-env
+    volumes:
+      - ./data/prosody/config:/config
+      - ./data/prosody/plugins-custom:/prosody-plugins-custom
+    networks:
+      meet.jitsi:
+        aliases: [xmpp.meet.jitsi]
+
+  jicofo:
+    image: jitsi/jicofo:${JITSI_IMAGE_VERSION}
+    restart: unless-stopped
+    depends_on: [prosody]
+    environment:
+      <<: *jitsi-env
+    volumes:
+      - ./data/jicofo:/config
+    networks: [meet.jitsi]
+
+  jvb:
+    image: jitsi/jvb:${JITSI_IMAGE_VERSION}
+    restart: unless-stopped
+    depends_on: [prosody]
+    ports:
+      - "10000:10000/udp"
+    environment:
+      <<: *jitsi-env
+      JVB_ADVERTISE_IPS: ${VPS_PUBLIC_IP}
+      JVB_PORT: "10000"
+    volumes:
+      - ./data/jvb:/config
+    networks: [meet.jitsi]

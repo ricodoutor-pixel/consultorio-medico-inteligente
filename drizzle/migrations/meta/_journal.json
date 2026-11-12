@@ -281,6 +281,13 @@
       "when": 1794503257555,
       "tag": "0039_doctor_finance_summary",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1794503457555,
+      "tag": "0040_consultation_waitlist",
+      "breakpoints": true
     }
   ]
 }

@@ -46,6 +46,7 @@ import {
   type AvailableSlot,
   type AvailableDayInfo
 } from "@/lib/doctor-schedule";
+import { WaitlistCard } from "@/components/agenda/WaitlistCard";
 
 const fadeUp = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
@@ -660,6 +661,16 @@ const Agendamento = () => {
                     Apenas os dias com horários livres configurados na agenda do médico estão habilitados.
                   </p>
                 </div>
+
+                {/* Sem vaga: lista de espera com aviso único no WhatsApp */}
+                {!loadingDays && !nextAvailableDay && selectedDoctor?.dbId && /^[0-9a-f-]{36}$/i.test(selectedDoctor.dbId) && (
+                  <WaitlistCard
+                    doctorDbId={selectedDoctor.dbId}
+                    doctorName={selectedDoctor.name}
+                    modality={selectedModality}
+                    userId={userId}
+                  />
+                )}
 
                 {/* Card de Atalho para o Próximo Horário Livre */}
                 {nextAvailableDay && (

@@ -80,7 +80,7 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
     {
       icon: Clock,
       title: "Lembretes automáticos no WhatsApp",
-      text: "Paciente recebe aviso 24 h e 1 h antes da consulta e convite de retorno em 30 dias.",
+      text: "Paciente: aviso 24 h e 1 h antes, retorno em 30 dias e lista de espera. Você: resumo do dia às 7 h.",
       badge: "incluído",
       tab: "atendimentos",
     },

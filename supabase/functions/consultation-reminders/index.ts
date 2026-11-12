@@ -10,11 +10,17 @@ import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
 import { notifyRecipientOnce } from "../_shared/payment-notify.ts";
 import { resolveConsultationSku } from "../_shared/payment-catalog.ts";
 import {
+  brasiliaParts,
+  dailyAgendaDue,
+  dailyAgendaKey,
+  dailyAgendaText,
   reminderKey,
   reminderText,
   returnReminderDue,
   scheduledReminderDue,
   type ReminderKind,
+  waitlistKey,
+  waitlistText,
 } from "../_shared/consultation-reminders.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
@@ -116,5 +122,104 @@ Deno.serve(async (req) => {
     if (ok) sent++;
   }
 
-  return json({ ok: errors.length === 0, checked_at: now.toISOString(), due: due.length, sent, skipped, errors });
+  // Lista de espera: avisa uma vez quando a agenda real do médico tem horário livre (este mês ou o próximo).
+  const parts = brasiliaParts(now);
+  let waitlistSent = 0;
+  const { data: waiting, error: waitErr } = await sb
+    .from("consultation_waitlist")
+    .select("id, patient_id, doctor_id, modality")
+    .eq("status", "waiting")
+    .gte("created_at", new Date(now.getTime() - 60 * 24 * 3_600_000).toISOString())
+    .order("created_at", { ascending: true })
+    .limit(200);
+  if (waitErr) errors.push(`waitlist: ${waitErr.message}`);
+  const openByDoctor = new Map<string, boolean>();
+  for (const w of (waiting ?? []) as { id: string; patient_id: string; doctor_id: string; modality: string }[]) {
+    const cacheKey = `${w.doctor_id}:${w.modality}`;
+    if (!openByDoctor.has(cacheKey)) {
+      let open = false;
+      for (const month of [parts.month, parts.nextMonth]) {
+        const { data: days } = await sb.rpc("get_available_days", { p_doctor_id: w.doctor_id, p_month: month, p_modality: w.modality });
+        if ((days ?? []).some((d: { has_available_slots?: boolean }) => d.has_available_slots)) {
+          open = true;
+          break;
+        }
+      }
+      openByDoctor.set(cacheKey, open);
+    }
+    if (!openByDoctor.get(cacheKey)) continue;
+    const [{ data: profile }, { data: doctor }] = await Promise.all([
+      sb.from("profiles").select("phone").eq("id", w.patient_id).maybeSingle(),
+      sb.from("doctors").select("user_id").eq("id", w.doctor_id).maybeSingle(),
+    ]);
+    const phone = String(profile?.phone ?? "");
+    if (phone.replace(/\D/g, "").length < 10) continue;
+    const { data: docProfile } = doctor?.user_id
+      ? await sb.from("profiles").select("full_name").eq("id", doctor.user_id).maybeSingle()
+      : { data: null };
+    const ok = await notifyRecipientOnce(sb, {
+      key: waitlistKey(w.id),
+      phone,
+      text: waitlistText(`${SITE}/agendamento?pro=${w.doctor_id}`, docProfile?.full_name ?? null),
+      service: "consulta_paciente",
+    });
+    if (ok) waitlistSent++;
+    await sb
+      .from("consultation_waitlist")
+      .update({ status: "notified", notified_at: now.toISOString() })
+      .eq("id", w.id)
+      .eq("status", "waiting");
+  }
+
+  // Resumo diário do médico às 7 h (Brasília): horários das consultas pagas de hoje, sem dados de pacientes.
+  let agendaSent = 0;
+  if (dailyAgendaDue(now)) {
+    const dayStart = new Date(`${parts.date}T03:00:00.000Z`);
+    const dayEnd = new Date(dayStart.getTime() + 24 * 3_600_000);
+    const { data: today, error: todayErr } = await sb
+      .from("appointments")
+      .select("doctor_id, scheduled_at")
+      .eq("payment_status", "paid")
+      .in("status", ["scheduled", "confirmed"])
+      .gte("scheduled_at", dayStart.toISOString())
+      .lt("scheduled_at", dayEnd.toISOString())
+      .not("doctor_id", "is", null)
+      .order("scheduled_at", { ascending: true })
+      .limit(500);
+    if (todayErr) errors.push(`agenda: ${todayErr.message}`);
+    const byDoctor = new Map<string, string[]>();
+    for (const a of (today ?? []) as { doctor_id: string; scheduled_at: string }[]) {
+      const time = new Date(a.scheduled_at).toLocaleTimeString("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      byDoctor.set(a.doctor_id, [...(byDoctor.get(a.doctor_id) ?? []), time]);
+    }
+    for (const [doctorId, times] of byDoctor) {
+      const { data: doctor } = await sb.from("doctors").select("user_id").eq("id", doctorId).maybeSingle();
+      if (!doctor?.user_id) continue;
+      const { data: docProfile } = await sb.from("profiles").select("phone, full_name").eq("id", doctor.user_id).maybeSingle();
+      const phone = String(docProfile?.phone ?? "");
+      if (phone.replace(/\D/g, "").length < 10) continue;
+      const ok = await notifyRecipientOnce(sb, {
+        key: dailyAgendaKey(doctorId, parts.date),
+        phone,
+        text: dailyAgendaText(times, `${SITE}/consultorio`, docProfile?.full_name ?? null),
+        service: "consulta_medico",
+      });
+      if (ok) agendaSent++;
+    }
+  }
+
+  return json({
+    ok: errors.length === 0,
+    checked_at: now.toISOString(),
+    due: due.length,
+    sent,
+    skipped,
+    waitlist_sent: waitlistSent,
+    agenda_sent: agendaSent,
+    errors,
+  });
 });

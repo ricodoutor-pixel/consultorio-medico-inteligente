@@ -51,3 +51,38 @@ describe("financeiro do consultório", () => {
     expect(financeTotals([]).currentMonth).toBe(0);
   });
 });
+
+import {
+  brasiliaParts,
+  dailyAgendaDue,
+  dailyAgendaKey,
+  dailyAgendaText,
+  waitlistKey,
+  waitlistText,
+} from "../../supabase/functions/_shared/consultation-reminders";
+
+describe("lista de espera e agenda do dia", () => {
+  it("usa a data e a hora de Brasília", () => {
+    expect(brasiliaParts(new Date("2026-11-13T02:30:00Z"))).toEqual({
+      date: "2026-11-12",
+      hour: 23,
+      month: "2026-11",
+      nextMonth: "2026-12",
+    });
+    expect(brasiliaParts(new Date("2026-12-31T12:00:00Z")).nextMonth).toBe("2027-01");
+  });
+
+  it("envia o resumo do médico só na janela das 7 h", () => {
+    expect(dailyAgendaDue(new Date("2026-11-12T10:05:00Z"))).toBe(true);
+    expect(dailyAgendaDue(new Date("2026-11-12T11:00:00Z"))).toBe(false);
+    expect(dailyAgendaKey("doc", "2026-11-12")).toBe("medico:doc:agenda:2026-11-12");
+  });
+
+  it("monta as mensagens sem dados de pacientes", () => {
+    const agenda = dailyAgendaText(["09:00", "14:30"], "https://x/consultorio", "Dra. Ana");
+    expect(agenda).toContain("2 teleconsulta(s)");
+    expect(agenda).toContain("09:00, 14:30");
+    expect(waitlistText("https://x/agendamento", "Dr. João")).toContain("lista de espera");
+    expect(waitlistKey("w1")).toBe("lista-espera:w1");
+  });
+});

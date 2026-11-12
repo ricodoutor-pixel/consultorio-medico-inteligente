@@ -29,11 +29,12 @@ Migração: `0038_doctor_ai_usage.sql` (uso das ferramentas de IA, para limites 
 | **Financeiro do consultório** | Consultório → Financeiro | Saldo, repasses do mês e de 12 meses, consultas liberadas, saques, taxas, gráfico mensal e CSV para o contador. Usa a função segura `doctor_finance_monthly` (migração 0039), que mostra só os números do próprio médico. |
 | Perfil público no Google | `/profissionais/:id` | Já existia: dados estruturados Physician (CRM, especialidade) e presença no sitemap. Não foi alterado, por ser vitrine. |
 
+| **Lista de espera** | Agendamento (quando o médico não tem horário livre) | Botão "Avise-me quando abrir". O cron confere a agenda real do médico (`get_available_days`, este mês e o próximo) e manda um único WhatsApp quando abre vaga. Não reserva horário: a vaga fica com quem agendar primeiro. Migração 0040. |
+| **Resumo do dia para o médico** | WhatsApp às 7 h (Brasília) | Quantidade e horários das consultas pagas do dia, sem dados de pacientes, mais o lembrete de ligar o ON. Uma vez por dia. |
+
 ## Próximas (código)
 
 1. Avaliações públicas no perfil (nota média real e número de avaliações), com aprovação do Dr. Edilson, porque mexe na vitrine.
-2. Lista de espera para preencher horários vagos.
-3. Lembrete ao médico das consultas do dia (resumo às 7 h).
 
 ## Parte 3 — dependem de contrato ou decisão
 

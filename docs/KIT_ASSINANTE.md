@@ -18,13 +18,22 @@ Plano pago = qualquer `doctors.plan_tier` diferente de `free` (VIP R$ 99 em dian
 
 Migração: `0038_doctor_ai_usage.sql` (uso das ferramentas de IA, para limites e auditoria).
 
-## Parte 2 — próximas (código, sem depender de terceiros)
+## Parte 2 — pronta (12/11/2026, aguardando o Lovable aplicar e publicar)
 
-1. **Modelos de anamnese** por especialidade (incluindo cannabis medicinal), alergias e medicamentos sempre visíveis no topo do prontuário.
-2. **Gráfico de evolução** dos escores da triagem (dor e ansiedade, 0 a 10) por consulta.
-3. **Agenda que trabalha pelo médico:** confirmação e lembrete no WhatsApp 24 h e 1 h antes; retorno sugerido em 30 dias; lista de espera.
-4. **Financeiro do consultório:** ganhos do mês, saques e relatório para o carnê-leão.
-5. **Perfil público no Google:** página do médico com avaliações reais e dados estruturados, dentro das regras de publicidade do CFM.
+| Item | Onde | Observações |
+|---|---|---|
+| **Alertas fixos no topo do prontuário** | Workspace → Evolução | Medicamentos/alergias, queixa (com tempo) e intensidade da triagem. Intensidade 8 ou mais aparece em vermelho. |
+| **Modelos de anamnese** | Workspace → Evolução → "Modelos" | Primeira consulta, Cannabis (dor crônica), Cannabis (ansiedade/insônia) e Retorno. São só estrutura: o modelo é acrescentado ao texto, sem apagar nada. |
+| **Gráfico de evolução** | Workspace → Histórico | Intensidade (0 a 10) informada pelo paciente na triagem de cada consulta, com a variação desde a primeira. Aparece a partir de 2 consultas. |
+| **Lembretes no WhatsApp** | Função `consultation-reminders` (cron a cada 10 min) | 24 h e 1 h antes da consulta agendada e paga; convite de retorno 30 dias após a consulta concluída, com o mesmo médico. Cada aviso sai uma vez, sem dados clínicos. Consultas na sala de espera ficam de fora, porque têm avisos próprios. |
+| **Financeiro do consultório** | Consultório → Financeiro | Saldo, repasses do mês e de 12 meses, consultas liberadas, saques, taxas, gráfico mensal e CSV para o contador. Usa a função segura `doctor_finance_monthly` (migração 0039), que mostra só os números do próprio médico. |
+| Perfil público no Google | `/profissionais/:id` | Já existia: dados estruturados Physician (CRM, especialidade) e presença no sitemap. Não foi alterado, por ser vitrine. |
+
+## Próximas (código)
+
+1. Avaliações públicas no perfil (nota média real e número de avaliações), com aprovação do Dr. Edilson, porque mexe na vitrine.
+2. Lista de espera para preencher horários vagos.
+3. Lembrete ao médico das consultas do dia (resumo às 7 h).
 
 ## Parte 3 — dependem de contrato ou decisão
 

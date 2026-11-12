@@ -11,6 +11,7 @@ import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlanta
 import { CopilotoEvidencias } from "@/components/doctor/CopilotoEvidencias";
 import { AssistenteJuridico } from "@/components/doctor/AssistenteJuridico";
 import { MeuKitAssinante } from "@/components/doctor/MeuKitAssinante";
+import { DoctorFinancePanel } from "@/components/doctor/DoctorFinancePanel";
 import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
 import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
 import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
@@ -532,6 +533,9 @@ const Consultorio = () => {
             <TabsTrigger value="juridico" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-indigo-500/15 text-indigo-400 data-[state=active]:bg-indigo-600 data-[state=active]:text-white border border-indigo-500/30">
               ⚖️ Assistente Jurídico
             </TabsTrigger>
+            <TabsTrigger value="financeiro" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">
+              💰 Financeiro
+            </TabsTrigger>
             <TabsTrigger value="paciente-teste" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all bg-emerald-500/10 text-emerald-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
               🎭 Paciente Teste (Simulação 360°)
             </TabsTrigger>
@@ -573,6 +577,10 @@ const Consultorio = () => {
 
           <TabsContent value="juridico" className="mt-0 border-0 p-0">
             <AssistenteJuridico />
+          </TabsContent>
+
+          <TabsContent value="financeiro" className="mt-0 border-0 p-0">
+            {doctor?.id ? <DoctorFinancePanel doctorId={doctor.id} /> : null}
           </TabsContent>
 
           <TabsContent value="paciente-teste" className="mt-0 border-0 p-0">

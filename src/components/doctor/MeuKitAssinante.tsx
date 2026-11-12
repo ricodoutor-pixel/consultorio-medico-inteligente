@@ -52,7 +52,7 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
     {
       icon: Stethoscope,
       title: "Prontuário eletrônico",
-      text: "Linha do tempo do paciente, busca CID-10 oficial (DATASUS), evolução e documentos.",
+      text: "Linha do tempo, CID-10 oficial (DATASUS), modelos de anamnese, alergias no topo e gráfico de evolução.",
       badge: "no Workspace",
       tab: "prontuarios-pacientes",
     },
@@ -73,7 +73,14 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
     {
       icon: Wallet,
       title: "Repasse de 93% e saque Pix",
-      text: "Liberado após a avaliação do paciente; saque para sua chave Pix.",
+      text: "Liberado após a avaliação do paciente; saque Pix e relatório mensal para o contador.",
+      badge: "incluído",
+      tab: "financeiro",
+    },
+    {
+      icon: Clock,
+      title: "Lembretes automáticos no WhatsApp",
+      text: "Paciente recebe aviso 24 h e 1 h antes da consulta e convite de retorno em 30 dias.",
       badge: "incluído",
       tab: "atendimentos",
     },
@@ -89,7 +96,6 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
   const next = [
     "Escriba de IA: a consulta vira rascunho do SOAP (com consentimento do paciente)",
     "Assinatura ICP-Brasil em 1 clique (BirdID/VIDaaS), inclusive controle especial",
-    "Agenda com confirmação e lembrete no WhatsApp e retorno automático",
   ];
 
   return (

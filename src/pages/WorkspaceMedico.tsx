@@ -23,6 +23,9 @@ import { generatePrescriptionPDF } from "@/lib/prescriptionPDF";
 import { loadDoctorSignatureImageUrl } from "@/lib/kyc-docs";
 import { Cid10Search } from "@/components/doctor/Cid10Search";
 import { PatientTimeline } from "@/components/doctor/PatientTimeline";
+import { PatientEvolutionChart } from "@/components/doctor/PatientEvolutionChart";
+import { ClinicalAlertsBar } from "@/components/doctor/ClinicalAlertsBar";
+import { AnamnesisTemplatePicker } from "@/components/doctor/AnamnesisTemplatePicker";
 import { APP_CONFIG } from "@/lib/app-config";
 import { ageOn, CONSULTATION_DOCUMENTS, type ConsultationDocumentKind, parsePrescriptionText } from "@/lib/consultation-prescription";
 import type { Json } from "@/integrations/supabase/types";
@@ -468,6 +471,7 @@ const WorkspaceMedico = () => {
               </TabsList>
               
               <TabsContent value="evolution" className="space-y-4">
+                <ClinicalAlertsBar notes={typeof appointment?.notes === "string" ? appointment.notes : null} />
                 <div className="space-y-2">
                   <Label>Diagnóstico / Hipótese (CID-10)</Label>
                   <Cid10Search
@@ -482,10 +486,13 @@ const WorkspaceMedico = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-end mb-1">
                     <Label>Evolução / Notas Clínicas</Label>
+                    <div className="flex gap-2">
+                    <AnamnesisTemplatePicker notes={notes} onChange={setNotes} />
                     <Button variant="outline" size="sm" className="h-7 text-xs bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 hover:text-purple-800" onClick={() => handleCopilotAction("format_soap")} disabled={copilotLoading || !notes}>
                       {copilotLoading ? <Loader2 size={12} className="mr-1 animate-spin" /> : <Sparkles size={12} className="mr-1" />}
                       Formatar em SOAP
                     </Button>
+                    </div>
                   </div>
                   <Textarea className="min-h-[150px]" placeholder="Paciente relata melhora no quadro álgico após início de CBD 20%..." value={notes} onChange={e => setNotes(e.target.value)} />
                 </div>
@@ -570,7 +577,12 @@ const WorkspaceMedico = () => {
               </TabsContent>
 
               <TabsContent value="history">
-                {patientId ? <PatientTimeline patientId={patientId} /> : null}
+                {patientId ? (
+                  <>
+                    <PatientEvolutionChart patientId={patientId} />
+                    <PatientTimeline patientId={patientId} />
+                  </>
+                ) : null}
               </TabsContent>
             </Tabs>
           </div>

@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const user = 'contato@plantayraiz.com.br';
-const pass = 'a3da008aa3e5b42f6684bb528086c343701ce123d58ee6e3ae2b4a37dc6e952f';
+const pass = process.env.SMTP_PASS || '';
 
 async function testTokenPass() {
   console.log(`🧪 Testando SMTP Hostinger com o Token/API Key como Senha...`);

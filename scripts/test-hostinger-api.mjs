@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const API_KEY = process.env.HOSTINGER_API_KEY || 'a3da008aa3e5b42f6684bb528086c343701ce123d58ee6e3ae2b4a37dc6e952f';
+const API_KEY = process.env.HOSTINGER_API_KEY || '';
 
 async function testHostingerAPI() {
   console.log("🧪 Testando envio via Hostinger API / Resend API com a chave fornecida...");

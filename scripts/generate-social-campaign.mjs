@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const API_KEY = "sk-28-ikQgSJAMhIEkYwH2LIR8X7PNeSHIjzs6ZCXqE";
+const API_KEY = process.env.OPUS_API_KEY || "";
 const PROJECT_ID = "P3082818t1c0";
 
 async function buildCampaign() {

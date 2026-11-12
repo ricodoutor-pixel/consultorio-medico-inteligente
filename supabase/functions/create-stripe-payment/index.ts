@@ -1,3 +1,4 @@
+import { safeOrigin, safeReturnUrl } from "../_shared/safe-return.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -53,7 +54,7 @@ Deno.serve(async (req) => {
     const env: StripeEnv = (environment === "live" ? "live" : "sandbox");
     const stripe = createStripeClient(env);
 
-    const origin = req.headers.get("origin") || "https://www.plantayraiz.com.br";
+    const origin = safeOrigin(req.headers.get("origin"));
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       ui_mode: "embedded_page",

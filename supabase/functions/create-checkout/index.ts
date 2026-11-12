@@ -1,3 +1,4 @@
+import { safeOrigin, safeReturnUrl } from "../_shared/safe-return.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
@@ -97,14 +98,14 @@ serve(async (req) => {
       const stripePrice = prices.data[0];
       const isRecurring = stripePrice.type === "recurring";
       mode = isRecurring ? "subscription" : "payment";
-      lineItems = [{ price: stripePrice.id, quantity: quantity || 1 }];
+      lineItems = [{ price: stripePrice.id, quantity: Math.min(10, Math.max(1, Math.floor(Number(quantity) || 1))) }];
     }
 
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode,
       ui_mode: "embedded",
-      return_url: returnUrl || `${req.headers.get("origin")}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: safeReturnUrl(returnUrl, `${safeOrigin(req.headers.get("origin"))}/checkout/return?session_id={CHECKOUT_SESSION_ID}`),
       ...(customerEmail && { customer_email: customerEmail }),
       metadata: { userId, ...(cartToken && { cartToken }) },
       ...(mode === "subscription" && { subscription_data: { metadata: { userId } } }),

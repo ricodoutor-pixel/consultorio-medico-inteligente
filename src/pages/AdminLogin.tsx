@@ -32,7 +32,7 @@ const AdminLogin = () => {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase() === "contato@plantayraiz.com.br" ? "admin@plantayraiz.com.br" : email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 

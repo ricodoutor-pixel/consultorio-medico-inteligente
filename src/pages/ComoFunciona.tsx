@@ -24,11 +24,10 @@ const ComoFunciona = () => {
     setDownloading(true);
     try {
       // Verify the file exists in storage
-      const { data: list, error: listError } = await supabase.storage
-        .from(EBOOK_BUCKET)
-        .list("", { search: EBOOK_FILE, limit: 1 });
+      const { data: probe } = supabase.storage.from(EBOOK_BUCKET).getPublicUrl(EBOOK_FILE);
+      const exists = await fetch(probe.publicUrl, { method: "HEAD" }).then((r) => r.ok).catch(() => false);
 
-      if (listError || !list || list.length === 0) {
+      if (!exists) {
         toast({
           title: "E-book em preparação 📚",
           description: "Nosso e-book ainda está sendo finalizado. Deixe seu WhatsApp na Enf. Brisa para receber em primeira mão!",

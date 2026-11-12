@@ -363,3 +363,13 @@ export function lastRescheduleIso(notes: string | null | undefined): string | nu
   const all = [...String(notes ?? "").matchAll(QUEUE_RESCHEDULE_MARKER)];
   return all.length ? all[all.length - 1][1] : null;
 }
+
+/** WhatsApp ao paciente (sem dado de saúde): sala de espera e médico na sala. */
+export function patientNoticeText(event: "waiting_room" | "doctor_joined", link: string, urgent: boolean): string {
+  if (event === "doctor_joined") {
+    return `🌿 Planta y Raiz: seu médico entrou na sala da consulta agora. Volte para a consulta por aqui: ${link}`;
+  }
+  return `🌿 Planta y Raiz: no momento todos os médicos estão em atendimento. Sua consulta está garantida e acontecerá em até ${
+    urgent ? "1 hora" : "12 horas"
+  }. Avisaremos por aqui quando o médico entrar. Acompanhe na sala de espera: ${link}`;
+}

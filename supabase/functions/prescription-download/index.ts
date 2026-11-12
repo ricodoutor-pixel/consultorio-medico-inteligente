@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
   const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const { data: rx } = await svc
     .from("prescriptions")
-    .select("id, patient_id, doctor_id, status, signed_pdf_path")
+    .select("id, patient_id, doctor_id, status, signed_pdf_path, prescription_type")
     .eq("id", prescriptionId)
     .maybeSingle();
   if (!rx) return json({ error: "Receita não encontrada" }, 404);
@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
   if (rx.status !== "signed" || !rx.signed_pdf_path) return json({ error: "Receita ainda não assinada" }, 409);
 
   const { data, error } = await svc.storage.from("prescriptions").createSignedUrl(rx.signed_pdf_path, 600, {
-    download: `receita-planta-y-raiz-${rx.id.slice(0, 8)}.pdf`,
+    download: `${rx.prescription_type === "atestado" ? "atestado" : rx.prescription_type === "solicitacao_exames" ? "exames" : "receita"}-planta-y-raiz-${rx.id.slice(0, 8)}.pdf`,
   });
   if (error || !data?.signedUrl) return json({ error: "Falha ao gerar o link" }, 500);
   return json({ ok: true, url: data.signedUrl, expiresIn: 600 });

@@ -2,6 +2,40 @@
  * Receita da consulta: o médico escreve a posologia (um item por linha), a plataforma gera o PDF timbrado,
  * o médico assina no gov.br (assinador ITI) e envia o PDF assinado; o paciente baixa na página da consulta.
  */
+/** Documentos da consulta: todos seguem o mesmo fluxo (PDF timbrado → assinatura gov.br → download pelo paciente). */
+export type ConsultationDocumentKind = "simples" | "atestado" | "solicitacao_exames";
+
+export const CONSULTATION_DOCUMENTS: Record<
+  ConsultationDocumentKind,
+  { label: string; title: string; section: string; placeholder: string; filePrefix: string }
+> = {
+  simples: {
+    label: "Receita",
+    title: "RECEITUÁRIO SIMPLES",
+    section: "PRESCRIÇÃO",
+    placeholder: "1. Óleo CBD 20% THC 1% (frasco 30 ml) — 5 gotas sublingual à noite...",
+    filePrefix: "receita",
+  },
+  atestado: {
+    label: "Atestado médico",
+    title: "ATESTADO MÉDICO",
+    section: "ATESTO",
+    placeholder: "Atesto, para os devidos fins, que o(a) paciente acima foi atendido(a) nesta data e necessita de ... dias de afastamento.",
+    filePrefix: "atestado",
+  },
+  solicitacao_exames: {
+    label: "Solicitação de exames",
+    title: "SOLICITAÇÃO DE EXAMES",
+    section: "SOLICITO",
+    placeholder: "1. Hemograma completo\n2. TGO, TGP, GGT\n3. Creatinina e ureia",
+    filePrefix: "exames",
+  },
+};
+
+export function consultationDocumentLabel(kind: string | null | undefined): string {
+  return CONSULTATION_DOCUMENTS[(kind ?? "simples") as ConsultationDocumentKind]?.label ?? "Receita";
+}
+
 export interface PrescriptionItem {
   name: string;
   dosage: string;

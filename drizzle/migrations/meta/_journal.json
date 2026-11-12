@@ -176,6 +176,20 @@
       "when": 1794461926385,
       "tag": "0024_consultation_queue_sweep_cron",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794462747492,
+      "tag": "0025_consultation_document_types",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794462836931,
+      "tag": "0026_consultation_chat_attachments",
+      "breakpoints": true
     }
   ]
 }

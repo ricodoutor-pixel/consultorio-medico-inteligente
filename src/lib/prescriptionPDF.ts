@@ -21,6 +21,12 @@ export interface PrescriptionData {
     instructions: string;
   }[];
   notes?: string;
+  /** Título do documento (padrão: "RECEITUÁRIO SIMPLES"). */
+  documentTitle?: string;
+  /** Subtítulo da seção (padrão: "USO CONTÍNUO"). */
+  sectionTitle?: string;
+  /** Texto livre do médico; quando presente, substitui a lista de medicamentos em duas colunas. */
+  bodyText?: string;
   signatureHash?: string;
   signatureUrl?: string; // Imagem da assinatura ICP-Brasil (Gov.br)
   date: Date;
@@ -50,7 +56,7 @@ export async function generatePrescriptionPDF(data: PrescriptionData): Promise<j
   // ─── CABEÇALHO (RECEITUÁRIO SIMPLES) ─────────────────────────────────────
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
-  doc.text("RECEITUÁRIO SIMPLES", pageWidth / 2, y, { align: "center" });
+  doc.text(data.documentTitle ?? "RECEITUÁRIO SIMPLES", pageWidth / 2, y, { align: "center" });
   
   y += 8;
   doc.setFontSize(12);
@@ -76,12 +82,31 @@ export async function generatePrescriptionPDF(data: PrescriptionData): Promise<j
   // ─── USO CONTÍNUO (CENTRALIZADO EM ITÁLICO) ─────────────────────────────
   doc.setFont("helvetica", "italic");
   doc.setFontSize(14);
-  doc.text("USO CONTÍNUO", pageWidth / 2, y, { align: "center" });
+  doc.text(data.sectionTitle ?? "USO CONTÍNUO", pageWidth / 2, y, { align: "center" });
 
   y += 15;
 
+  // ─── TEXTO LIVRE DO MÉDICO (consulta: receita, atestado, exames) ────────
+  // Escrito pelo médico, linha a linha, com quebra automática e sem quantidades presumidas.
+  if (data.bodyText) {
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    for (const paragraph of data.bodyText.split(/\r?\n/)) {
+      const lines = paragraph.trim() ? doc.splitTextToSize(paragraph.trim(), pageWidth - margin * 2) : [""];
+      for (const line of lines) {
+        if (y > 200) {
+          doc.addPage();
+          y = 30;
+        }
+        doc.text(line, margin, y);
+        y += 6;
+      }
+    }
+    y += 6;
+  }
+
   // ─── MEDICAMENTOS (DUAS COLUNAS) ────────────────────────────────────────
-  data.medications.forEach((med) => {
+  (data.bodyText ? [] : data.medications).forEach((med) => {
     // Esquerda: Medicamento e Posologia
     // Direita: Quantidade de frascos
     

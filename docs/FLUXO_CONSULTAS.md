@@ -63,14 +63,20 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 
 A sala da consulta já segue o cabeçalho e as bolhas da Orientação Técnica (#075E54). O Workspace do médico usa o mesmo estilo no chat. Regra: **todo novo serviço reutiliza esses componentes**, sem criar interfaces paralelas.
 
-## 7. Pendências que afetam o atendimento real
+## 7. Pendências (atualizado em 12/11/2026)
 
-1. **Assinatura ICP-Brasil qualificada** para receitas de controle especial (etapa 8). A receita simples já funciona com gov.br.
-2. **Saque automático** (seção 2). Depende da escolha de um provedor de transferência.
-3. **Aviso por WhatsApp ao paciente** na sala de espera (seção 3).
-4. **Jitsi próprio** (seção 4).
-5. **Botões que só mostram aviso**, sem ação real, no Workspace (`DoctorQuickActions`): "Atestado", "Solicitar exames" e "Enviar link de pagamento". Eles avisam que algo foi feito sem fazer. Precisam ser implementados ou escondidos.
-6. **Anexos no chat:** o paciente não consegue enviar exames ao médico durante a consulta. É preciso armazenamento privado por consulta.
+**Concluídos no código** (dependem do Lovable aplicar as migrações 0022 a 0026, implantar as funções e publicar o site):
+- Chat ao vivo nos dois sentidos, com **anexos de exames e fotos** (bucket privado `consultation-files`, até 10 MB, só durante a consulta).
+- **Documentos assinados da consulta:** receita, atestado e solicitação de exames. Todos usam o mesmo fluxo: PDF timbrado → assinatura gov.br → download pelo paciente.
+- Botões do Workspace sem ação real: "Atestado" e "Solicitar exames" agora emitem documentos de verdade, e "Cobrança extra" foi removido.
+- **WhatsApp ao paciente** quando entra na sala de espera e quando o médico entra (`consultation-patient-notify`, envio único por evento).
+- Rodízio com sala de espera (12 h, ou 1 h se urgente), sugestão de Orientação gratuita e cron a cada minuto.
+
+**Dependem do Dr. Edilson ou de terceiros:**
+1. **Assinatura ICP-Brasil qualificada** para receitas de controle especial (contratar VIDaaS, BirdID ou certificado A1/A3).
+2. **Saque com Pix automático** (escolher um provedor de transferência: Asaas, Efí, Banco Inter ou Stark Bank).
+3. **Jitsi próprio na VPS** (DNS, porta UDP 10000 e segredos; ver `infra/jitsi/README.md`).
+4. **Médico de teste aprovado** e **paciente de teste** para o teste ponta a ponta (seção 8).
 
 ## 8. Teste ponta a ponta (roteiro)
 

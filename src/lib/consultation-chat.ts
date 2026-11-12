@@ -12,6 +12,8 @@ export interface ConsultationChatRow {
   sender_id: string | null;
   content: string;
   created_at: string;
+  attachment_path?: string | null;
+  attachment_name?: string | null;
 }
 
 export const CONSULTATION_CHAT_MAX_LENGTH = 4000;
@@ -37,4 +39,20 @@ export function normalizeConsultationMessage(text: string): string | null {
 
 export function isConsultationAppointmentId(id: string | null | undefined): id is string {
   return !!id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+}
+
+export const CONSULTATION_FILE_MAX_BYTES = 10 * 1024 * 1024;
+export const CONSULTATION_FILE_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+/** Mensagem de erro para um anexo inválido, ou null se o arquivo pode ser enviado (mesmas regras do bucket). */
+export function consultationFileError(file: { type: string; size: number }): string | null {
+  if (!CONSULTATION_FILE_TYPES.includes(file.type)) return "Envie foto (JPG, PNG, WEBP) ou PDF.";
+  if (file.size > CONSULTATION_FILE_MAX_BYTES) return "O arquivo passa de 10 MB.";
+  return null;
+}
+
+/** Caminho no bucket privado: sempre dentro da pasta da consulta. */
+export function consultationFilePath(appointmentId: string, fileName: string, unique: string): string {
+  const safe = fileName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80);
+  return `${appointmentId}/${unique}-${safe || "arquivo"}`;
 }

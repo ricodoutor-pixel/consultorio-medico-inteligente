@@ -11,6 +11,7 @@ import {
   Gift,
   Loader2,
   MessageSquare,
+  Paperclip,
   Phone,
   Send,
   ShieldCheck,
@@ -54,6 +55,8 @@ import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { userChannel } from "@/lib/realtime-channels";
 import { useConsultationChat } from "@/hooks/useConsultationChat";
 import { ConsultationPrescriptionCard } from "@/components/consultation/ConsultationPrescriptionCard";
+import { ChatAttachmentButton } from "@/components/consultation/ChatAttachmentButton";
+import { consultationFileError } from "@/lib/consultation-chat";
 import { professionals } from "@/data/professionals";
 import { formatBRL } from "@/lib/pricing";
 
@@ -90,6 +93,8 @@ type LiveChatMessage = {
   sender: "patient" | "doctor" | "system";
   content: string;
   createdAt: string;
+  attachmentPath?: string | null;
+  attachmentName?: string | null;
 };
 
 const STEPS = ["Pagamento", "Triagem", "Consulta", "Avaliação", "Indicação"] as const;
@@ -130,6 +135,8 @@ export default function ConsultaMedica() {
   // Etapa D: Sala ao vivo no estilo da Orientação Técnica (45 min, vídeo/chat/arquivos)
   const [roomWelcome, setRoomWelcome] = useState<LiveChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
+  const [chatFile, setChatFile] = useState<File | null>(null);
+  const chatFileRef = useRef<HTMLInputElement>(null);
   const [showVideoPanel, setShowVideoPanel] = useState(true);
 
   // Etapa E: Estado da fila de médicos
@@ -448,7 +455,7 @@ export default function ConsultaMedica() {
 
   // Sala & Fila (Etapas D & E) ------------------------------------------
   const room = appt && doctorJoined(appt) ? { domain: "meet.jit.si", roomName: consultationRoomName(appt.id) } : null;
-  const { messages: liveChat, send: sendChat, sending: chatSending } = useConsultationChat(
+  const { messages: liveChat, send: sendChat, sending: chatSending, openAttachment } = useConsultationChat(
     appt?.id,
     userId,
     "patient",
@@ -557,6 +564,8 @@ export default function ConsultaMedica() {
         sender: m.sender_type,
         content: m.content,
         createdAt: new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        attachmentPath: m.attachment_path,
+        attachmentName: m.attachment_name,
       })),
     ],
     [roomWelcome, liveChat],
@@ -564,10 +573,11 @@ export default function ConsultaMedica() {
 
   const sendLiveMessage = async () => {
     const text = chatInput.trim();
-    if (!text || chatSending) return;
-    const ok = await sendChat(text);
+    if ((!text && !chatFile) || chatSending) return;
+    const ok = await sendChat(text, chatFile);
     if (ok) {
       setChatInput("");
+      setChatFile(null);
     } else {
       toast.error("Mensagem não enviada. Confira a conexão e tente de novo.");
     }
@@ -1071,15 +1081,56 @@ export default function ConsultaMedica() {
                       }`}
                     >
                       <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                      {m.attachmentPath && (
+                        <ChatAttachmentButton name={m.attachmentName} onOpen={() => openAttachment(m.attachmentPath!)} />
+                      )}
                       <span className="block text-[10px] text-slate-500 text-right mt-0.5">{m.createdAt}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Barra de mensagem. Anexos voltam quando houver envio real de arquivos ao médico. */}
+              {/* Barra de mensagem com anexo de exames/fotos (arquivo privado da consulta, até 10 MB) */}
               <div className="bg-[#F0F0F0] p-2.5 border-t border-slate-300 space-y-1.5">
+                {chatFile && (
+                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-1 text-xs text-slate-700 border">
+                    <span className="truncate">📎 {chatFile.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setChatFile(null)}
+                      className="text-slate-400 hover:text-slate-700 text-xs font-bold"
+                      aria-label="Remover anexo"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
+                  <input
+                    ref={chatFileRef}
+                    type="file"
+                    className="hidden"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      e.target.value = "";
+                      if (!f) return;
+                      const err = consultationFileError(f);
+                      if (err) {
+                        toast.error(err);
+                        return;
+                      }
+                      setChatFile(f);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => chatFileRef.current?.click()}
+                    className="p-2.5 rounded-full bg-white text-slate-700 hover:bg-slate-100 border border-slate-300"
+                    title="Anexar exame, receita ou foto (até 10 MB)"
+                  >
+                    <Paperclip size={16} />
+                  </button>
                   <input
                     type="text"
                     value={chatInput}

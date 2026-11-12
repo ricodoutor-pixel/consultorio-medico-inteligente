@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { doctorChannel, userChannel } from "@/lib/realtime-channels";
 import {
   type ConsultationChatRow,
+  consultationFileError,
+  consultationFilePath,
   isConsultationAppointmentId,
   mergeConsultationMessages,
   normalizeConsultationMessage,
@@ -29,7 +31,7 @@ export function useConsultationChat(
   const reload = useCallback(async () => {
     if (!active) return;
     const { data, error } = await chats()
-      .select("id, appointment_id, sender_type, sender_id, content, created_at")
+      .select("id, appointment_id, sender_type, sender_id, content, created_at, attachment_path, attachment_name")
       .eq("appointment_id", appointmentId)
       .order("created_at", { ascending: true })
       .limit(500);
@@ -67,16 +69,33 @@ export function useConsultationChat(
     };
   }, [active, appointmentId, userId, role, reload]);
 
-  /** Envia e devolve true se o servidor aceitou (consulta paga e em andamento). */
+  /** Envia (texto e/ou anexo) e devolve true se o servidor aceitou (consulta paga e em andamento). */
   const send = useCallback(
-    async (text: string): Promise<boolean> => {
-      const content = normalizeConsultationMessage(text);
+    async (text: string, file?: File | null): Promise<boolean> => {
+      const content = normalizeConsultationMessage(text) ?? (file ? `📎 ${file.name}` : null);
       if (!active || !content) return false;
+      if (file && consultationFileError(file)) return false;
       setSending(true);
       try {
+        let attachment_path: string | null = null;
+        if (file) {
+          const path = consultationFilePath(appointmentId!, file.name, crypto.randomUUID());
+          const { error: upErr } = await supabase.storage
+            .from("consultation-files")
+            .upload(path, file, { contentType: file.type, upsert: false });
+          if (upErr) return false;
+          attachment_path = path;
+        }
         const { data, error } = await chats()
-          .insert({ appointment_id: appointmentId, sender_type: role, sender_id: userId, content })
-          .select("id, appointment_id, sender_type, sender_id, content, created_at")
+          .insert({
+            appointment_id: appointmentId,
+            sender_type: role,
+            sender_id: userId,
+            content,
+            attachment_path,
+            attachment_name: file ? file.name.slice(0, 200) : null,
+          })
+          .select("id, appointment_id, sender_type, sender_id, content, created_at, attachment_path, attachment_name")
           .single();
         if (error || !data) return false;
         setMessages((prev) => mergeConsultationMessages(prev, [data as ConsultationChatRow]));
@@ -88,5 +107,13 @@ export function useConsultationChat(
     [active, appointmentId, role, userId],
   );
 
-  return { messages, send, sending, reload };
+  /** Abre o anexo por link temporário (5 min); só participantes da consulta conseguem gerar. */
+  const openAttachment = useCallback(async (path: string): Promise<boolean> => {
+    const { data, error } = await supabase.storage.from("consultation-files").createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) return false;
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    return true;
+  }, []);
+
+  return { messages, send, sending, reload, openAttachment };
 }

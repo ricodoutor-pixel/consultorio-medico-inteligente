@@ -268,6 +268,10 @@ async function dispatchOffer(
         type: "consultation_waiting_room",
         action_url: `/consulta/consulta_video?appt=${appt.id}`,
       });
+      // WhatsApp ao paciente (envio único por consulta).
+      await svc.functions
+        .invoke("consultation-patient-notify", { body: { appointment_id: appt.id, event: "waiting_room" } })
+        .catch((e) => console.error("[consultation-offer] patient notify", e));
     }
 
     await svc.from("audit_log").insert({

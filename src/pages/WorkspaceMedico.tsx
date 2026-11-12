@@ -21,7 +21,7 @@ import { isConsultationAppointmentId } from "@/lib/consultation-chat";
 import { FreeSignatureModal } from "@/components/prescription/FreeSignatureModal";
 import { generatePrescriptionPDF } from "@/lib/prescriptionPDF";
 import { APP_CONFIG } from "@/lib/app-config";
-import { ageOn, parsePrescriptionText } from "@/lib/consultation-prescription";
+import { ageOn, CONSULTATION_DOCUMENTS, type ConsultationDocumentKind, parsePrescriptionText } from "@/lib/consultation-prescription";
 import type { Json } from "@/integrations/supabase/types";
 import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 import { ManualMedicoModal } from "@/components/medico/ManualMedicoModal";
@@ -57,6 +57,15 @@ const WorkspaceMedico = () => {
     prescriptionId: string; base64: string; filename: string; doctorName: string; doctorCrm: string;
   } | null>(null);
   const [rxSignedUrl, setRxSignedUrl] = useState<string | null>(null);
+  const [docKind, setDocKind] = useState<ConsultationDocumentKind>("simples");
+  const [activeTab, setActiveTab] = useState("evolution");
+  // Atalhos do topo abrem a aba de documentos já no tipo escolhido.
+  const openDocument = (kind: ConsultationDocumentKind) => {
+    setDocKind(kind);
+    setPrescriptionText("");
+    setRxSignedUrl(null);
+    setActiveTab("prescription");
+  };
 
   // Copilot state
   const [copilotLoading, setCopilotLoading] = useState(false);
@@ -146,6 +155,12 @@ const WorkspaceMedico = () => {
         const { error: joinErr } = await supabase.from("appointments").update({ status: "in_progress", updated_at: new Date().toISOString() }).eq("id", appointmentId!);
         if (!joinErr) setAppointment({ ...apptRes.data, status: "in_progress" });
       }
+      if (isRealAppointment && apptRes.data?.payment_status === "paid" && !["completed", "cancelled"].includes(apptRes.data.status)) {
+        // Avisa o paciente por WhatsApp que o médico entrou (o servidor envia uma única vez por consulta).
+        void supabase.functions.invoke("consultation-patient-notify", {
+          body: { appointment_id: appointmentId, event: "doctor_joined" },
+        });
+      }
       if (type === 'video') {
         if (isRealAppointment) {
           // Mesma sala que o paciente abre (Jitsi próprio com token quando configurado no servidor).
@@ -226,9 +241,10 @@ const WorkspaceMedico = () => {
 
   // Receita: grava a prescrição, gera o PDF timbrado e abre a assinatura gov.br (ITI).
   const issuePrescription = async () => {
+    const docMeta = CONSULTATION_DOCUMENTS[docKind];
     const items = parsePrescriptionText(prescriptionText);
     if (!items.length) {
-      toast({ title: "Receita vazia", description: "Escreva ao menos um item na posologia.", variant: "destructive" });
+      toast({ title: "Documento vazio", description: "Escreva o conteúdo do documento.", variant: "destructive" });
       return;
     }
     if (!isConsultationAppointmentId(appointmentId) || !patientId || !doctorUserId) {
@@ -249,13 +265,14 @@ const WorkspaceMedico = () => {
           doctor_id: doc.id,
           patient_id: patientId,
           appointment_id: appointmentId,
-          medications: items as unknown as Json,
+          medications: (docKind === "simples" ? items : []) as unknown as Json,
           instructions: prescriptionText.trim(),
+          prescription_type: docKind,
           status: "draft",
         })
         .select("id")
         .single();
-      if (rxErr || !rx) throw new Error("Não foi possível registrar a receita.");
+      if (rxErr || !rx) throw new Error(`Não foi possível registrar o documento (${docMeta.label.toLowerCase()}).`);
 
       const pdf = await generatePrescriptionPDF({
         clinicName: APP_CONFIG.COMPANY.NAME,
@@ -267,12 +284,15 @@ const WorkspaceMedico = () => {
         patientCPF: patient?.cpf || "Não informado",
         patientAge: ageOn(patient?.date_of_birth),
         medications: items,
+        documentTitle: docMeta.title,
+        sectionTitle: docMeta.section,
+        bodyText: prescriptionText.trim(),
         date: new Date(),
       });
       setRxSigning({
         prescriptionId: rx.id,
         base64: pdf.output("datauristring").split(",")[1] ?? "",
-        filename: `receita_${rx.id.slice(0, 8)}.pdf`,
+        filename: `${docMeta.filePrefix}_${rx.id.slice(0, 8)}.pdf`,
         doctorName: docProfile?.full_name || "Médico(a)",
         doctorCrm: `${doc.crm}/${doc.crm_state}`,
       });
@@ -370,6 +390,8 @@ const WorkspaceMedico = () => {
             patientId={patientId || ""} 
             appointmentId={appointmentId || ""} 
             patientName={patient?.full_name || ""}
+            onOpenDocument={openDocument}
+            onEnd={() => void endConsultation()}
           />
         </div>
       </div>
@@ -429,7 +451,7 @@ const WorkspaceMedico = () => {
           </div>
 
           <div className="flex-1 overflow-auto p-4">
-            <Tabs defaultValue="evolution" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full grid grid-cols-3 mb-6 bg-background/50 border border-border">
                 <TabsTrigger value="evolution">Evolução (SOAP)</TabsTrigger>
                 <TabsTrigger value="prescription">Receituário</TabsTrigger>
@@ -473,14 +495,29 @@ const WorkspaceMedico = () => {
               </TabsContent>
               
               <TabsContent value="prescription" className="space-y-4">
-                <PrescriptionTemplates onSelectTemplate={(text) => setPrescriptionText(prev => prev ? prev + '\n\n' + text : text)} />
+                <div className="flex flex-wrap gap-2">
+                  {(Object.keys(CONSULTATION_DOCUMENTS) as ConsultationDocumentKind[]).map((k) => (
+                    <Button
+                      key={k}
+                      type="button"
+                      size="sm"
+                      variant={docKind === k ? "default" : "outline"}
+                      onClick={() => openDocument(k)}
+                    >
+                      {CONSULTATION_DOCUMENTS[k].label}
+                    </Button>
+                  ))}
+                </div>
+                {docKind === "simples" && (
+                  <PrescriptionTemplates onSelectTemplate={(text) => setPrescriptionText(prev => prev ? prev + '\n\n' + text : text)} />
+                )}
                 <div className="space-y-2 mt-4">
-                  <Label>Posologia (Receituário Simples/Azul)</Label>
-                  <Textarea 
-                    className="min-h-[200px] font-mono text-sm" 
-                    value={prescriptionText} 
-                    onChange={e => setPrescriptionText(e.target.value)} 
-                    placeholder="1. Óleo CBD 20% THC 1% (Vidro 30ml)..."
+                  <Label>{docKind === "simples" ? "Posologia (Receituário Simples)" : CONSULTATION_DOCUMENTS[docKind].label}</Label>
+                  <Textarea
+                    className="min-h-[200px] font-mono text-sm"
+                    value={prescriptionText}
+                    onChange={e => setPrescriptionText(e.target.value)}
+                    placeholder={CONSULTATION_DOCUMENTS[docKind].placeholder}
                   />
                 </div>
 
@@ -496,7 +533,9 @@ const WorkspaceMedico = () => {
                   disabled={issuingRx || rxSignedUrl !== null}
                 >
                   {issuingRx ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
-                  {rxSignedUrl ? "Receita assinada e entregue ao paciente" : "Emitir & Assinar Digitalmente (gov.br)"}
+                  {rxSignedUrl
+                    ? `${CONSULTATION_DOCUMENTS[docKind].label} assinado(a) e entregue ao paciente`
+                    : `Emitir & Assinar ${CONSULTATION_DOCUMENTS[docKind].label} (gov.br)`}
                 </Button>
                 {rxSigning && (
                   <FreeSignatureModal

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, MessageSquare, Send } from "lucide-react";
+import { Loader2, MessageSquare, Paperclip, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConsultationChat } from "@/hooks/useConsultationChat";
+import { consultationFileError } from "@/lib/consultation-chat";
+import { ChatAttachmentButton } from "@/components/consultation/ChatAttachmentButton";
 
 interface Props {
   appointmentId: string;
@@ -14,8 +16,10 @@ interface Props {
 
 /** Chat ao vivo do lado do médico, ligado às mesmas mensagens que o paciente vê. */
 export function ConsultationChatPanel({ appointmentId, doctorUserId, patientName, live, onEnd }: Props) {
-  const { messages, send, sending } = useConsultationChat(appointmentId, doctorUserId, "doctor");
+  const { messages, send, sending, openAttachment } = useConsultationChat(appointmentId, doctorUserId, "doctor");
   const [text, setText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [failed, setFailed] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -24,10 +28,13 @@ export function ConsultationChatPanel({ appointmentId, doctorUserId, patientName
   }, [messages.length]);
 
   const submit = async () => {
-    if (!text.trim() || sending) return;
-    const ok = await send(text);
+    if ((!text.trim() && !file) || sending) return;
+    const ok = await send(text, file);
     setFailed(!ok);
-    if (ok) setText("");
+    if (ok) {
+      setText("");
+      setFile(null);
+    }
   };
 
   return (
@@ -65,6 +72,9 @@ export function ConsultationChatPanel({ appointmentId, doctorUserId, patientName
               }`}
             >
               <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+              {m.attachment_path && (
+                <ChatAttachmentButton name={m.attachment_name} onOpen={() => openAttachment(m.attachment_path!)} />
+              )}
               <span className="block text-[10px] text-slate-500 text-right mt-0.5">
                 {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
               </span>
@@ -76,7 +86,42 @@ export function ConsultationChatPanel({ appointmentId, doctorUserId, patientName
 
       <div className="bg-[#F0F0F0] p-2 border-t border-slate-300 shrink-0 space-y-1">
         {failed && <p className="text-[11px] text-red-600 px-2">Mensagem não enviada. Confira a conexão e tente de novo.</p>}
+        {file && (
+          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-1 text-xs text-slate-700 border">
+            <span className="truncate">📎 {file.name}</span>
+            <button type="button" onClick={() => setFile(null)} className="text-slate-400 hover:text-slate-700" aria-label="Remover anexo">
+              <X size={14} />
+            </button>
+          </div>
+        )}
         <div className="flex items-center gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            className="hidden"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            onChange={(e) => {
+              const f = e.target.files?.[0] ?? null;
+              e.target.value = "";
+              if (!f) return;
+              const err = consultationFileError(f);
+              if (err) {
+                setFailed(true);
+                return;
+              }
+              setFailed(false);
+              setFile(f);
+            }}
+          />
+          <button
+            type="button"
+            disabled={!live}
+            onClick={() => fileRef.current?.click()}
+            className="p-2 rounded-full bg-white text-slate-700 hover:bg-slate-100 border border-slate-300 disabled:opacity-60"
+            title="Anexar imagem ou PDF (até 10 MB)"
+          >
+            <Paperclip size={15} />
+          </button>
           <input
             type="text"
             value={text}
@@ -95,7 +140,7 @@ export function ConsultationChatPanel({ appointmentId, doctorUserId, patientName
             type="button"
             size="icon"
             onClick={() => void submit()}
-            disabled={!live || sending}
+            disabled={!live || sending || (!text.trim() && !file)}
             className="rounded-full bg-[#075E54] hover:bg-[#064e46]"
             title="Enviar mensagem"
           >

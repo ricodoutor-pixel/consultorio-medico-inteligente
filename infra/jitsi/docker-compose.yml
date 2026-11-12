@@ -1,13 +1,13 @@
-# Jitsi próprio da Planta y Raiz (vídeo das consultas) — roda na VPS Hostinger ao lado da stack de infra/vps-traefik.
-# - Web atrás do Traefik existente (rede externa "proxy"), HTTPS em meet.plantayraiz.com.br.
+# Jitsi próprio da Planta y Raiz (vídeo das consultas) — roda na VPS Hostinger ao lado do Traefik existente.
+# - O Traefik da VPS roda em network_mode: host e lê labels do Docker (exposedbydefault=false). Ele alcança o
+#   container web pelo IP da rede "jitsi" (bridge local), por isso não há rede externa "proxy" aqui.
 # - Só entra quem tem token JWT emitido pela função consultation-video-token (sem convidados anônimos).
 # - Mídia (JVB) usa UDP 10000 direto: liberar essa porta no firewall da VPS/painel Hostinger.
 # Uso: cp .env.example .env && preencher && docker compose up -d   (ver README.md)
 
 networks:
-  proxy:
-    external: true
   meet.jitsi:
+    name: jitsi
 
 x-jitsi-env: &jitsi-env
   TZ: America/Sao_Paulo
@@ -45,15 +45,15 @@ services:
     volumes:
       - ./data/web:/config
     networks:
-      proxy:
       meet.jitsi:
         aliases: [meet.jitsi]
     labels:
       - traefik.enable=true
-      - traefik.docker.network=proxy
+      - traefik.docker.network=jitsi
       - traefik.http.routers.jitsi.rule=Host(`${JITSI_DOMAIN}`)
-      - traefik.http.routers.jitsi.entrypoints=websecure
-      - traefik.http.routers.jitsi.tls.certresolver=le
+      - traefik.http.routers.jitsi.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.jitsi.tls=true
+      - traefik.http.routers.jitsi.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
       - traefik.http.services.jitsi.loadbalancer.server.port=80
 
   prosody:

@@ -12,14 +12,14 @@ Substitui o `meet.jit.si` público, que derruba chamadas embutidas após poucos 
 ## Requisitos
 
 - VPS com pelo menos 2 vCPU e 4 GB de RAM livres. Cada consulta 1:1 usa pouco, mas o Jitsi reserva memória.
-- Stack `infra/vps-traefik` no ar, com a rede Docker `proxy` e o resolvedor de certificados `le`.
+- Traefik da VPS no ar lendo labels do Docker (na VPS atual ele roda em `network_mode: host`, sem rede `proxy`; o compose usa a rede local `jitsi`). Ajuste `TRAEFIK_ENTRYPOINT` e `TRAEFIK_CERTRESOLVER` no `.env` com os nomes reais do Traefik.
 - Registro DNS **A** `meet.plantayraiz.com.br` → IP público da VPS.
 - Porta **UDP 10000** liberada no firewall da VPS (painel Hostinger → VPS → Firewall).
 
 ## Instalação (na VPS, por SSH)
 
 ```bash
-cd /opt && git clone <repositório> plantayraiz && cd plantayraiz/infra/jitsi
+mkdir -p /opt/jitsi && git -C /opt/plantayraiz fetch origin main && git -C /opt/plantayraiz archive origin/main infra/jitsi | tar -x -C /opt/jitsi --strip-components=2 && cd /opt/jitsi
 cp .env.example .env
 nano .env   # preencher VPS_PUBLIC_IP, JITSI_APP_SECRET, JICOFO_AUTH_PASSWORD, JVB_AUTH_PASSWORD; fixar JITSI_IMAGE_VERSION
 mkdir -p data/{web,prosody/config,prosody/plugins-custom,jicofo,jvb}

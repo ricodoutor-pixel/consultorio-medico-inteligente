@@ -10,6 +10,7 @@
 //    (avisado antes) e entrega o relatório da orientação ao médico escolhido.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
 import {
   buildDoctorConsultationMessage,
   cleanDoctorDisplayName,
@@ -19,8 +20,13 @@ import {
 import {
   DEFAULT_QUEUE_ROUTING_CONFIG,
   PATIENT_FREE_OT_NOTICE_MESSAGE,
-  PATIENT_URGENCY_RESCHEDULE_MESSAGE,
+  PATIENT_FREE_OT_SUGGESTION_MESSAGE,
+  isUrgentConsultation,
+  lastRescheduleIso,
+  patientRescheduleMessage,
+  queueCycleFromNotes,
   selectNextQueueStep,
+  shouldSuggestFreeOt,
   type QueueCandidate,
   type QueueRoutingConfig,
 } from "../_shared/consultation-queue.ts";
@@ -68,6 +74,37 @@ async function loadEditableQueueConfig(svc: ReturnType<typeof svcClient>): Promi
 }
 
 /** Cria o convite para o próximo profissional apto (ou executa o fallback da fila). */
+/** Orientação Técnica gratuita ligada à consulta (idempotente por consulta). Não cancela a fila da consulta. */
+async function ensureFreeOtOrder(
+  svc: ReturnType<typeof svcClient>,
+  appt: { id: string; patient_id: string; notes: string | null },
+  chosenDoctorId: string | null,
+): Promise<string> {
+  const freeRef = `orientacao_tecnica:free:${appt.patient_id}:${appt.id}`;
+  await svc.from("orientacao_tecnica_orders").upsert(
+    {
+      external_reference: freeRef,
+      user_id: appt.patient_id,
+      amount: 0,
+      status: "approved",
+      flow_status: "ready",
+      mp_payment_id: `free-fallback-${appt.id}`,
+      triage: {
+        red_flags: "nenhum",
+        queixa: String(appt.notes ?? "Encaminhado da fila de consulta médica").slice(0, 1000),
+        tempo: "1 a 6 meses",
+        intensidade: "5",
+        medicamentos: "Conforme triagem da consulta",
+        objetivo: `Relatório compartilhado com médico escolhido (${chosenDoctorId ?? "plantão"})`,
+        forwarded_from_appointment_id: appt.id,
+        chosen_doctor_id: chosenDoctorId,
+      },
+    },
+    { onConflict: "external_reference", ignoreDuplicates: true },
+  );
+  return freeRef;
+}
+
 async function dispatchOffer(
   svc: ReturnType<typeof svcClient>,
   appointmentId: string,
@@ -115,13 +152,13 @@ async function dispatchOffer(
 
   const config = await loadEditableQueueConfig(svc);
 
-  // Determina o ciclo atual (Ciclo 1 = tentativa original; Ciclo 2 = após reagendamento de 1h)
+  // Ciclo atual = 1 + reagendamentos já feitos (cada reinício da fila volta a tentar escolhido -> assinantes -> online).
   const highestRecordedCycle = list.reduce((max, o) => {
     const c = Number((o.payload as Record<string, unknown> | null)?.cycle ?? 1);
     return Math.max(max, Number.isFinite(c) ? c : 1);
   }, 1);
-  const hasRescheduledMarker = String(appt.notes ?? "").includes("[FILA_REAGENDADA_1H]");
-  const currentCycle = options?.forceCycle ?? (hasRescheduledMarker ? Math.max(2, highestRecordedCycle) : highestRecordedCycle);
+  const currentCycle = options?.forceCycle ?? Math.max(highestRecordedCycle, queueCycleFromNotes(appt.notes));
+  const urgent = isUrgentConsultation(appt.notes);
 
   // Médicos já tentados no ciclo atual
   const triedInCurrentCycle = list
@@ -207,12 +244,13 @@ async function dispatchOffer(
     firstAttemptAtIso,
     nowMs: Date.now(),
     testMode,
+    urgent,
     config,
   });
 
-  // ── Caso 4: Nenhum médico atendeu no Ciclo 1 -> Reagenda automaticamente para +1 hora ──
-  if (decision.action === "reschedule_1h") {
-    const updatedNotes = `${String(appt.notes ?? "").trim()}\n[FILA_REAGENDADA_1H:${decision.rescheduledForIso}]`.trim();
+  // ── Caso 4: Ninguém atendeu neste ciclo -> sala de espera e reinício da fila até o prazo (12 h; 1 h urgente) ──
+  if (decision.action === "reschedule") {
+    const updatedNotes = `${String(appt.notes ?? "").trim()}\n[FILA_REAGENDADA:${decision.rescheduledForIso}]`.trim();
     await svc
       .from("appointments")
       .update({
@@ -221,23 +259,28 @@ async function dispatchOffer(
       })
       .eq("id", appt.id);
 
-    await svc.from("notifications").insert({
-      user_id: appt.patient_id,
-      title: "Consulta reagendada automaticamente (+1h)",
-      message: decision.messageToPatient,
-      type: "consultation_rescheduled_1h",
-      action_url: `/consulta/consulta_video?appt=${appt.id}`,
-    });
+    // Avisa o paciente só no 1º reagendamento (os reinícios seguintes acontecem na mesma sala de espera).
+    if (decision.cycle <= 1) {
+      await svc.from("notifications").insert({
+        user_id: appt.patient_id,
+        title: urgent ? "Sua consulta acontece em até 1 hora" : "Sua consulta acontece em até 12 horas",
+        message: decision.messageToPatient,
+        type: "consultation_waiting_room",
+        action_url: `/consulta/consulta_video?appt=${appt.id}`,
+      });
+    }
 
     await svc.from("audit_log").insert({
       user_id: appt.patient_id,
-      action: "consultation_queue_rescheduled_1h",
+      action: "consultation_queue_rescheduled",
       table_name: "appointments",
       record_id: appt.id,
       new_data: {
         appointment_id: appt.id,
         chosen_doctor_id: chosenDoctorId,
         rescheduled_for: decision.rescheduledForIso,
+        deadline: decision.deadlineIso,
+        urgent,
         patient_message: decision.messageToPatient,
         cycle: decision.cycle,
         test_mode: testMode,
@@ -246,38 +289,17 @@ async function dispatchOffer(
 
     return {
       ok: false,
-      reason: "rescheduled_1h",
-      action: "reschedule_1h",
+      reason: "rescheduled",
+      action: "reschedule",
       cycle: decision.cycle,
       rescheduled_for: decision.rescheduledForIso,
       patient_message: decision.messageToPatient,
     };
   }
 
-  // ── Caso 5: Nenhum médico atendeu após reinício de 1h -> Orientação Técnica gratuita + relatório ao médico escolhido ──
+  // ── Caso 5: Prazo esgotado sem médico -> Orientação Técnica gratuita + relatório ao médico escolhido ──
   if (decision.action === "forward_free_ot") {
-    const freeRef = `orientacao_tecnica:free:${appt.patient_id}:${appt.id}`;
-    await svc.from("orientacao_tecnica_orders").upsert(
-      {
-        external_reference: freeRef,
-        user_id: appt.patient_id,
-        amount: 0,
-        status: "approved",
-        flow_status: "ready",
-        mp_payment_id: `free-fallback-${appt.id}`,
-        triage: {
-          red_flags: "nenhum",
-          queixa: String(appt.notes ?? "Encaminhado da fila de consulta médica").slice(0, 1000),
-          tempo: "1 a 6 meses",
-          intensidade: "5",
-          medicamentos: "Conforme triagem da consulta",
-          objetivo: `Relatório compartilhado com médico escolhido (${chosenDoctorId ?? "plantão"})`,
-          forwarded_from_appointment_id: appt.id,
-          chosen_doctor_id: chosenDoctorId,
-        },
-      },
-      { onConflict: "external_reference" },
-    );
+    const freeRef = await ensureFreeOtOrder(svc, appt, chosenDoctorId);
 
     const updatedNotes = `${String(appt.notes ?? "").trim()}\n[ENCAMINHADO_OT_GRATUITA:${freeRef}]`.trim();
     await svc
@@ -602,42 +624,66 @@ Deno.serve(async (req) => {
     }
 
     // ── Estado do convite e da fila (paciente ou serviço) ─────────────────
-    if (action === "status") {
+    // ── Sala de espera do paciente: estado da fila e Orientação gratuita (só o paciente da consulta ou serviço) ──
+    if (action === "status" || action === "free_ot") {
       const appointmentId = String(url.searchParams.get("appointment") ?? body.appointment_id ?? "");
       if (!appointmentId) return json({ error: "appointment_id obrigatório" }, 400);
       const [{ data: offers }, { data: appt }] = await Promise.all([
         svc
           .from("consultation_offers")
-          .select("id, doctor_id, status, expires_at, attempt, accepted_at, declined_at, created_at, payload")
+          .select("id, doctor_id, status, expires_at, created_at, payload")
           .eq("appointment_id", appointmentId)
-          .order("created_at", { ascending: false })
-          .limit(20),
+          .order("created_at", { ascending: true })
+          .limit(100),
         svc
           .from("appointments")
-          .select("id, doctor_id, status, scheduled_at, notes")
+          .select("id, patient_id, doctor_id, status, payment_status, scheduled_at, notes")
           .eq("id", appointmentId)
           .maybeSingle(),
       ]);
-      const notes = String(appt?.notes ?? "");
-      const rescheduledMatch = notes.match(/\[FILA_REAGENDADA_1H:([^\]]+)\]/);
+      if (!appt) return json({ error: "Consulta não encontrada" }, 404);
+      if (!isService) {
+        const callerId = await getCallerUserId(req);
+        if (!callerId || (callerId !== appt.patient_id && !(await isAdmin(callerId)))) {
+          return json({ error: "Unauthorized" }, 401);
+        }
+      }
+
+      const list = offers ?? [];
+      const chosenDoctorId = String(
+        (list[0]?.payload as Record<string, unknown> | null)?.chosen_doctor_id ?? appt.doctor_id ?? "",
+      ) || null;
+      const notes = String(appt.notes ?? "");
       const freeOtMatch = notes.match(/\[ENCAMINHADO_OT_GRATUITA:([^\]]+)\]/);
+      const urgent = isUrgentConsultation(notes);
+      const rescheduledFor = lastRescheduleIso(notes);
+      const inProgress = appt.status === "in_progress" || appt.status === "completed";
+      const suggestFreeOt = !inProgress && !freeOtMatch && appt.payment_status === "paid" &&
+        shouldSuggestFreeOt(list.map((o) => ({ doctor_id: o.doctor_id as string | null, status: o.status as string | null })), chosenDoctorId);
+
+      if (action === "free_ot") {
+        // O paciente aceitou a sugestão: libera a Orientação gratuita sem cancelar a fila da consulta.
+        if (!suggestFreeOt) return json({ error: "Orientação gratuita indisponível neste momento" }, 409);
+        const ref = await ensureFreeOtOrder(svc, appt, chosenDoctorId);
+        return json({ ok: true, free_ot_reference: ref });
+      }
+
+      const queueState = freeOtMatch ? "forwarded_free_ot" : inProgress ? "in_progress" : rescheduledFor ? "rescheduled" : "waiting";
       return json({
         ok: true,
-        offers: offers ?? [],
-        queue_state: freeOtMatch
-          ? "forwarded_free_ot"
-          : rescheduledMatch
-          ? "rescheduled_1h"
-          : appt?.status === "in_progress"
-          ? "in_progress"
-          : "waiting",
-        rescheduled_for: rescheduledMatch?.[1] ?? null,
+        queue_state: queueState,
+        urgent,
+        rescheduled_for: rescheduledFor,
         free_ot_reference: freeOtMatch?.[1] ?? null,
+        suggest_free_ot: suggestFreeOt,
         patient_message: freeOtMatch
           ? PATIENT_FREE_OT_NOTICE_MESSAGE
-          : rescheduledMatch
-          ? PATIENT_URGENCY_RESCHEDULE_MESSAGE
+          : rescheduledFor
+          ? patientRescheduleMessage(urgent)
+          : suggestFreeOt
+          ? PATIENT_FREE_OT_SUGGESTION_MESSAGE
           : null,
+        current_offer: list.filter((o) => o.status === "pending").map((o) => ({ expires_at: o.expires_at })).pop() ?? null,
       });
     }
 
@@ -688,20 +734,21 @@ Deno.serve(async (req) => {
         if (next.ok) reassigned++;
       }
 
-      // 2. Reinicia automaticamente as consultas reagendadas para +1h cujo horário já chegou (Ciclo 2)
+      // 2. Reinicia a fila das consultas na sala de espera cujo horário de reinício chegou.
+      //    Consulta paga fica "confirmed" (webhook) ou "scheduled"; o ciclo vem das notas (1 + reagendamentos).
       const { data: dueRescheduled } = await svc
         .from("appointments")
         .select("id, notes, scheduled_at")
-        .eq("status", "scheduled")
+        .in("status", ["confirmed", "scheduled", "pending"])
         .eq("payment_status", "paid")
         .lte("scheduled_at", new Date().toISOString())
-        .ilike("notes", "%[FILA_REAGENDADA_1H:%")
+        .ilike("notes", "%[FILA_REAGENDADA%")
         .limit(25);
 
       let restartedAfter1h = 0;
       for (const appt of dueRescheduled ?? []) {
         if (String(appt.notes ?? "").includes("[ENCAMINHADO_OT_GRATUITA:")) continue;
-        const next = await dispatchOffer(svc, String(appt.id), { forceCycle: 2 });
+        const next = await dispatchOffer(svc, String(appt.id));
         if (next.ok || next.action === "forward_free_ot") restartedAfter1h++;
       }
 

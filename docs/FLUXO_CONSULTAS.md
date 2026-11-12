@@ -34,13 +34,18 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 4. Antes de procurar outros médicos, o paciente é avisado e recebe a sugestão de uma **Orientação Técnica gratuita** enquanto o sistema chama o médico de plantão.
 5. Sem nenhum médico, a consulta é **agendada** e o paciente é avisado de que ela acontece **em até 12 horas**, ou **em até 1 hora** em emergências. Esses pacientes ficam na **sala de espera**.
 
-**O que o código faz hoje** (`supabase/functions/consultation-offer`):
-1. Escolhido → assinantes → online (batimento ≤ 2 min). Cada um tem 5 minutos para aceitar. ✅
-2. Se ninguém aceita no 1º ciclo, reagenda para **+1 hora** com aviso na tela. ⚠️ Não há a regra de 12 horas, nem diferença entre caso comum e emergência.
-3. Se ninguém aceita no 2º ciclo, encaminha para a Orientação Técnica gratuita e entrega o relatório ao médico escolhido. ⚠️ Na regra pedida, a sugestão vem **antes**, em paralelo ao chamado do plantão, e não como último recurso.
-4. Sala de espera: existe a rota `/sala-espera`. ⚠️ Não está ligada ao reagendamento.
+**Como o código faz** (`supabase/functions/consultation-offer` + `_shared/consultation-queue.ts`, desde 12/11/2026):
+1. Médico escolhido → assinantes → online (Consultório aberto, botão ON e batimento ≤ 2 min). Cada um tem 5 minutos para aceitar e recebe WhatsApp e e-mail. ✅
+2. Assim que o escolhido recusa ou não responde, a sala de espera mostra: "Já estamos chamando o próximo médico… você pode fazer uma Orientação Técnica gratuita". O botão libera a Orientação gratuita **sem cancelar** a consulta. ✅
+3. Se ninguém aceita no ciclo, a consulta fica **garantida na sala de espera**:
+   - Caso comum: nova chamada aos médicos a cada **60 min**, com prazo de **12 h**.
+   - Caso **urgente**: nova chamada a cada **15 min**, com prazo de **1 h**.
+   - O paciente é avisado na tela e por notificação, uma única vez. ✅
+4. Se o prazo acaba sem nenhum médico, a consulta é encaminhada à Orientação Técnica gratuita, e o médico escolhido recebe o relatório. ✅
+5. **Urgente** quer dizer intensidade 8 ou mais na triagem, **sem** sinais de alarme. Sinais de alarme continuam bloqueando o atendimento e encaminhando ao SAMU ou pronto-socorro (decisão de 12/11/2026). ✅
+6. A fila avança sozinha a cada minuto pelo cron `consultation_queue_sweep` (migração 0024), mesmo com a página do paciente fechada. ✅
 
-**A fazer:** ajustar os passos 2 a 4 à regra pedida.
+**Ainda falta:** avisar o paciente por **WhatsApp** quando ele entra na sala de espera e quando o médico entra. Hoje o aviso aparece na tela e na notificação da plataforma.
 
 ## 4. Vídeo
 
@@ -62,7 +67,7 @@ A sala da consulta já segue o cabeçalho e as bolhas da Orientação Técnica (
 
 1. **Assinatura ICP-Brasil qualificada** para receitas de controle especial (etapa 8). A receita simples já funciona com gov.br.
 2. **Saque automático** (seção 2). Depende da escolha de um provedor de transferência.
-3. **Rodízio** conforme a seção 3.
+3. **Aviso por WhatsApp ao paciente** na sala de espera (seção 3).
 4. **Jitsi próprio** (seção 4).
 5. **Botões que só mostram aviso**, sem ação real, no Workspace (`DoctorQuickActions`): "Atestado", "Solicitar exames" e "Enviar link de pagamento". Eles avisam que algo foi feito sem fazer. Precisam ser implementados ou escondidos.
 6. **Anexos no chat:** o paciente não consegue enviar exames ao médico durante a consulta. É preciso armazenamento privado por consulta.

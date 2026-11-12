@@ -48,6 +48,7 @@ import {
 import {
   PATIENT_URGENCY_RESCHEDULE_MESSAGE,
   PATIENT_FREE_OT_NOTICE_MESSAGE,
+  PATIENT_FREE_OT_SUGGESTION_MESSAGE as PATIENT_FREE_OT_SUGGESTION,
 } from "@/lib/doctor-presence";
 import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { userChannel } from "@/lib/realtime-channels";
@@ -134,6 +135,29 @@ export default function ConsultaMedica() {
   // Etapa E: Estado da fila de médicos
   const [queueState, setQueueState] = useState<string>("waiting");
   const [queuePatientMessage, setQueuePatientMessage] = useState<string | null>(null);
+  const [suggestFreeOt, setSuggestFreeOt] = useState(false);
+  const [freeOtRef, setFreeOtRef] = useState<string | null>(null);
+  const [rescheduledFor, setRescheduledFor] = useState<string | null>(null);
+  const [startingFreeOt, setStartingFreeOt] = useState(false);
+
+  // Paciente aceita a Orientação gratuita enquanto a consulta segue garantida na fila.
+  const startFreeOt = async () => {
+    if (!apptId || startingFreeOt) return;
+    setStartingFreeOt(true);
+    try {
+      const ref = freeOtRef
+        ?? (await supabase.functions.invoke(
+          `consultation-offer?action=free_ot&appointment=${encodeURIComponent(apptId)}`,
+          { method: "POST", body: {} },
+        )).data?.free_ot_reference;
+      if (!ref) throw new Error();
+      navigate(`/orientacao-tecnica?ref=${encodeURIComponent(ref)}`);
+    } catch {
+      toast.error("Não foi possível abrir a Orientação gratuita agora. Tente de novo.");
+    } finally {
+      setStartingFreeOt(false);
+    }
+  };
 
   const [face, setFace] = useState<1 | 2 | 3 | null>(null);
   const [comment, setComment] = useState("");
@@ -393,9 +417,13 @@ export default function ConsultaMedica() {
       if (error || !data?.id) throw new Error("Não foi possível salvar a triagem.");
 
       const existingNotes = appt.notes || "";
-      const preservedTags = existingNotes
-        .split("\n")
-        .filter((line) => line.startsWith("["))
+      // Intensidade 8+ (sem sinais de alarme, que já foram barrados) marca o caso como urgente: prazo de 1 h na fila.
+      const urgentTag = triage.intensidade >= 8 && !existingNotes.includes("[URGENTE]") ? "[URGENTE]" : "";
+      const preservedTags = [
+        ...existingNotes.split("\n").filter((line) => line.startsWith("[")),
+        urgentTag,
+      ]
+        .filter(Boolean)
         .join("\n");
       const updatedNotes = [preservedTags, `Triagem: ${data.id}`, text].filter(Boolean).join("\n\n");
 
@@ -461,31 +489,29 @@ export default function ConsultaMedica() {
     if (notes.includes("[ENCAMINHADO_OT_GRATUITA:")) {
       setQueueState("forwarded_free_ot");
       setQueuePatientMessage(PATIENT_FREE_OT_NOTICE_MESSAGE);
-    } else if (notes.includes("[FILA_REAGENDADA_1H:")) {
-      setQueueState("rescheduled_1h");
+    } else if (notes.includes("[FILA_REAGENDADA")) {
+      setQueueState("rescheduled");
       setQueuePatientMessage(PATIENT_URGENCY_RESCHEDULE_MESSAGE);
     }
 
+    // Sala de espera: o servidor decide o estado da fila (o cron também avança a fila a cada minuto).
     const checkQueueStatus = async () => {
       try {
         const { data } = await supabase.functions.invoke(
           `consultation-offer?action=status&appointment=${encodeURIComponent(appt.id)}`,
-          { method: "GET" as any },
+          { method: "GET" },
         );
-        if (data?.queueState) {
-          setQueueState(data.queueState);
-        }
-        if (data?.patientMessage) {
-          setQueuePatientMessage(data.patientMessage);
-        }
-        if (data?.currentOffer?.expires_at) {
-          const expMs = new Date(data.currentOffer.expires_at).getTime();
-          if (Date.now() >= expMs) {
-            await supabase.functions.invoke("consultation-offer?action=sweep", {
-              body: {},
-            });
-            await loadAppt(appt.id);
-          }
+        if (!data?.ok) return;
+        setQueueState(data.queue_state ?? "waiting");
+        setQueuePatientMessage(data.patient_message ?? null);
+        setSuggestFreeOt(Boolean(data.suggest_free_ot));
+        setFreeOtRef(data.free_ot_reference ?? null);
+        setRescheduledFor(data.rescheduled_for ?? null);
+        const offerExpired = data.current_offer?.expires_at && Date.now() >= new Date(data.current_offer.expires_at).getTime();
+        const retryDue = data.queue_state === "rescheduled" && data.rescheduled_for && Date.now() >= new Date(data.rescheduled_for).getTime();
+        if (offerExpired || retryDue) {
+          await supabase.functions.invoke("consultation-offer?action=sweep", { body: {} });
+          await loadAppt(appt.id);
         }
       } catch {
         // Silencioso em segundo plano
@@ -1090,20 +1116,35 @@ export default function ConsultaMedica() {
                   />
                 )}
 
-                {queueState === "rescheduled_1h" ? (
+                {queueState === "rescheduled" ? (
                   <div
-                    data-testid="queue-rescheduled-1h-notice"
+                    data-testid="queue-waiting-room-notice"
                     className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 space-y-2"
                   >
                     <h2 className="font-black text-amber-600 dark:text-amber-300 text-base">
-                      Reagendamento Automático (+1 hora)
+                      Sala de espera — consulta garantida
                     </h2>
                     <p className="text-sm font-bold text-foreground">
                       {queuePatientMessage || PATIENT_URGENCY_RESCHEDULE_MESSAGE}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      O fluxo reiniciará automaticamente em 1 hora avisando os médicos novamente.
-                    </p>
+                    {rescheduledFor && (
+                      <p className="text-xs text-muted-foreground">
+                        Próxima chamada aos médicos às{" "}
+                        {new Date(rescheduledFor).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}. A
+                        sala abre aqui sozinha quando um médico aceitar.
+                      </p>
+                    )}
+                    {suggestFreeOt && (
+                      <Button
+                        variant="outline"
+                        className="w-full font-bold border-emerald-600 text-emerald-700"
+                        onClick={() => void startFreeOt()}
+                        disabled={startingFreeOt}
+                      >
+                        {startingFreeOt ? <Loader2 size={15} className="mr-2 animate-spin" /> : <Sparkles size={15} className="mr-2" />}
+                        Fazer Orientação Técnica gratuita enquanto espero
+                      </Button>
+                    )}
                   </div>
                 ) : queueState === "forwarded_free_ot" ? (
                   <div
@@ -1118,13 +1159,10 @@ export default function ConsultaMedica() {
                     </p>
                     <Button
                       className="w-full font-black bg-emerald-600 hover:bg-emerald-700 text-white"
-                      onClick={() =>
-                        navigate(
-                          `/orientacao-tecnica?free_from_appt=${encodeURIComponent(appt?.id || "")}&doctor=${encodeURIComponent(
-                            chosenDoctor || appt?.doctor_id || "",
-                          )}`,
-                        )
-                      }
+                      onClick={() => {
+                        if (freeOtRef) navigate(`/orientacao-tecnica?ref=${encodeURIComponent(freeOtRef)}`);
+                      }}
+                      disabled={!freeOtRef}
                     >
                       Iniciar Orientação Técnica Gratuita Agora
                     </Button>
@@ -1144,6 +1182,23 @@ export default function ConsultaMedica() {
                         ? "Tempo de espera: 5 minutos. Se o médico escolhido não puder atender, transferimos automaticamente para o próximo médico assinante ou médico online."
                         : "Transferindo automaticamente para o próximo médico disponível na fila..."}
                     </p>
+                    {suggestFreeOt && (
+                      <div
+                        data-testid="queue-free-ot-suggestion"
+                        className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 space-y-2 text-left"
+                      >
+                        <p className="text-sm text-foreground">{queuePatientMessage || PATIENT_FREE_OT_SUGGESTION}</p>
+                        <Button
+                          variant="outline"
+                          className="w-full font-bold border-emerald-600 text-emerald-700"
+                          onClick={() => void startFreeOt()}
+                          disabled={startingFreeOt}
+                        >
+                          {startingFreeOt ? <Loader2 size={15} className="mr-2 animate-spin" /> : <Sparkles size={15} className="mr-2" />}
+                          Fazer Orientação Técnica gratuita enquanto espero
+                        </Button>
+                      </div>
+                    )}
                   </>
                 )}
               </CardContent>

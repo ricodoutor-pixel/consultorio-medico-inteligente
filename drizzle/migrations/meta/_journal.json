@@ -169,6 +169,13 @@
       "when": 1794461258319,
       "tag": "0023_prescription_signed_pdf_path",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794461926385,
+      "tag": "0024_consultation_queue_sweep_cron",
+      "breakpoints": true
     }
   ]
 }

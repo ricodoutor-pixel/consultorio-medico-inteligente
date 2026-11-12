@@ -1,13 +1,27 @@
 // 🌿 Planta y Raiz — Regras editáveis de presença médica real e fila de transferência automática.
 // Fonte única para:
 // 1. Presença "online" real (logado + Consultório Médico aberto + botão ON ativo + batimento <= 2 min, sem estar em consulta).
-// 2. Fila de transferência (médico escolhido 5 min -> assinantes 5 min -> médicos online 5 min -> reagendamento +1h -> Orientação Técnica gratuita com acesso do médico escolhido ao relatório).
+// 2. Fila de transferência (docs/FLUXO_CONSULTAS.md, seção 3): médico escolhido 5 min -> assinantes 5 min -> médicos online 5 min.
+//    Assim que o escolhido não atende, o paciente é avisado e recebe a sugestão de Orientação Técnica gratuita enquanto a fila segue.
+//    Sem médico: a consulta fica agendada na sala de espera e a fila recomeça periodicamente até o prazo (12 h; 1 h se urgente).
+//    Prazo esgotado: Orientação Técnica gratuita com acesso do médico escolhido ao relatório.
 
 export const PRESENCE_HEARTBEAT_INTERVAL_MS = 30_000; // ~30 segundos
 export const PRESENCE_TIMEOUT_MS = 120_000; // 2 minutos sem batimento = offline automático
 
+/** Mensagem genérica (compatibilidade); use patientRescheduleMessage(urgent) para o texto da regra atual. */
 export const PATIENT_URGENCY_RESCHEDULE_MESSAGE =
-  "Todos os médicos estão em consulta de urgência. Sua consulta foi agendada automaticamente para uma hora depois do primeiro atendimento";
+  "No momento todos os médicos estão em atendimento. Sua consulta está garantida e acontecerá em até 12 horas. Fique nesta sala de espera: avisamos aqui assim que um médico entrar.";
+
+export function patientRescheduleMessage(urgent: boolean): string {
+  return urgent
+    ? "No momento todos os médicos estão em atendimento. Como seu caso foi marcado como urgente, sua consulta acontecerá em até 1 hora. Fique nesta sala de espera: avisamos aqui assim que um médico entrar."
+    : PATIENT_URGENCY_RESCHEDULE_MESSAGE;
+}
+
+/** Mostrada assim que o médico escolhido não atende, enquanto a fila chama o médico de plantão. */
+export const PATIENT_FREE_OT_SUGGESTION_MESSAGE =
+  "O médico escolhido não conseguiu entrar agora. Já estamos chamando o próximo médico disponível. Enquanto isso, se quiser, você pode fazer uma Orientação Técnica gratuita — sua consulta continua garantida.";
 
 export const PATIENT_FREE_OT_NOTICE_MESSAGE =
   "Nenhum médico conseguiu entrar agora. Para você não ficar esperando e dar mais tempo ao médico escolhido, vamos encaminhar você agora para uma Orientação Técnica gratuita. Assim que terminar, o médico escolhido recebe acesso ao relatório da sua orientação.";
@@ -19,8 +33,14 @@ export interface QueueRoutingConfig {
   testOfferWaitSeconds: number;
   /** Tempo sem batimento para considerar offline (padrão: 120s = 2 min). */
   heartbeatTimeoutSeconds: number;
-  /** Intervalo para reinício automático da fila quando nenhum médico atende no 1º ciclo (padrão: 60 min = 1 hora). */
+  /** Intervalo entre reinícios da fila quando nenhum médico atende (padrão: 60 min). */
   rescheduleDelayMinutes: number;
+  /** Intervalo entre reinícios para casos urgentes (padrão: 15 min). */
+  urgentRescheduleDelayMinutes: number;
+  /** Prazo máximo para a consulta acontecer desde o 1º convite (padrão: 12 h). */
+  deadlineMinutes: number;
+  /** Prazo máximo para casos urgentes (padrão: 1 h). */
+  urgentDeadlineMinutes: number;
   /** Planos considerados "médico assinante". */
   subscriberTiers: string[];
   /** Critério de ordenação entre assinantes ("priority_then_rotation" | "rotation" | "rating"). */
@@ -34,6 +54,9 @@ export const DEFAULT_QUEUE_ROUTING_CONFIG: QueueRoutingConfig = {
   testOfferWaitSeconds: 15,
   heartbeatTimeoutSeconds: 120,
   rescheduleDelayMinutes: 60,
+  urgentRescheduleDelayMinutes: 15,
+  deadlineMinutes: 720,
+  urgentDeadlineMinutes: 60,
   subscriberTiers: ["vip", "vip_prescritor", "premium", "basic", "assinante", "pro", "plano_medico"],
   subscriberOrder: "priority_then_rotation",
   prioritySubscriberCrms: ["58169", "206873"],
@@ -187,9 +210,10 @@ export type QueueStepDecision =
       cycle: number;
     }
   | {
-      action: "reschedule_1h";
+      action: "reschedule";
       messageToPatient: string;
       rescheduledForIso: string;
+      deadlineIso: string;
       cycle: number;
     }
   | {
@@ -215,6 +239,8 @@ export function selectNextQueueStep(params: {
   firstAttemptAtIso?: string | null;
   nowMs?: number;
   testMode?: boolean;
+  /** Caso urgente (não grave) marcado na triagem: prazo de 1 h em vez de 12 h. */
+  urgent?: boolean;
   config?: QueueRoutingConfig;
 }): QueueStepDecision {
   const {
@@ -225,6 +251,7 @@ export function selectNextQueueStep(params: {
     firstAttemptAtIso,
     nowMs = Date.now(),
     testMode = false,
+    urgent = false,
     config = DEFAULT_QUEUE_ROUTING_CONFIG,
   } = params;
 
@@ -282,25 +309,57 @@ export function selectNextQueueStep(params: {
     };
   }
 
-  // 4. Nenhum médico disponível / nenhum atendeu no Ciclo 1 -> Reagenda para +1h após o primeiro atendimento
-  if (currentCycle <= 1) {
-    const baseMs = firstAttemptAtIso ? new Date(firstAttemptAtIso).getTime() : nowMs;
-    const validBaseMs = Number.isFinite(baseMs) ? baseMs : nowMs;
-    const delayMs = config.rescheduleDelayMinutes * 60 * 1000;
-    const targetMs = Math.max(nowMs + 60_000, validBaseMs + delayMs);
+  // 4. Ninguém atendeu neste ciclo: agenda (sala de espera) e recomeça a fila até o prazo (12 h; 1 h se urgente).
+  const baseMs = firstAttemptAtIso ? new Date(firstAttemptAtIso).getTime() : nowMs;
+  const validBaseMs = Number.isFinite(baseMs) ? baseMs : nowMs;
+  const deadlineMs = validBaseMs + (urgent ? config.urgentDeadlineMinutes : config.deadlineMinutes) * 60_000;
+  const nextTryMs = nowMs + (urgent ? config.urgentRescheduleDelayMinutes : config.rescheduleDelayMinutes) * 60_000;
+  if (nextTryMs < deadlineMs) {
     return {
-      action: "reschedule_1h",
-      messageToPatient: PATIENT_URGENCY_RESCHEDULE_MESSAGE,
-      rescheduledForIso: new Date(targetMs).toISOString(),
-      cycle: 1,
+      action: "reschedule",
+      messageToPatient: patientRescheduleMessage(urgent),
+      rescheduledForIso: new Date(nextTryMs).toISOString(),
+      deadlineIso: new Date(deadlineMs).toISOString(),
+      cycle: currentCycle,
     };
   }
 
-  // 5. Ciclo 2 esgotado após 1h sem médico atender -> Encaminha para Orientação Técnica gratuita com acesso do médico escolhido ao relatório
+  // 5. Prazo esgotado sem médico: Orientação Técnica gratuita com acesso do médico escolhido ao relatório.
   return {
     action: "forward_free_ot",
     messageToPatient: PATIENT_FREE_OT_NOTICE_MESSAGE,
     chosenDoctorId,
     cycle: currentCycle,
   };
+}
+
+/** Marcadores gravados nas notas da consulta pela fila. */
+export const QUEUE_RESCHEDULE_MARKER = /\[FILA_REAGENDADA(?:_1H)?:([^\]]+)\]/g;
+export const URGENT_MARKER = "[URGENTE]";
+
+/** Ciclo atual = 1 + número de reagendamentos já feitos (formato novo e antigo). */
+export function queueCycleFromNotes(notes: string | null | undefined): number {
+  return 1 + (String(notes ?? "").match(QUEUE_RESCHEDULE_MARKER)?.length ?? 0);
+}
+
+export function isUrgentConsultation(notes: string | null | undefined): boolean {
+  return String(notes ?? "").includes(URGENT_MARKER);
+}
+
+/** O paciente vê a sugestão de Orientação gratuita assim que o médico escolhido deixou de atender. */
+export function shouldSuggestFreeOt(
+  offers: Array<{ doctor_id: string | null; status: string | null }>,
+  chosenDoctorId: string | null,
+): boolean {
+  return offers.some((o) => {
+    const toChosen = chosenDoctorId !== null && o.doctor_id === chosenDoctorId;
+    // O escolhido recusou/não respondeu, ou a fila já chamou outro médico.
+    return toChosen ? o.status === "expired" || o.status === "declined" : true;
+  });
+}
+
+/** Último horário de reinício gravado nas notas (para mostrar na sala de espera). */
+export function lastRescheduleIso(notes: string | null | undefined): string | null {
+  const all = [...String(notes ?? "").matchAll(QUEUE_RESCHEDULE_MARKER)];
+  return all.length ? all[all.length - 1][1] : null;
 }

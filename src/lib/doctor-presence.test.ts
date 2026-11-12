@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isUrgentConsultation, queueCycleFromNotes, shouldSuggestFreeOt } from "../../supabase/functions/_shared/consultation-queue";
 import {
   DOCTOR_PRESENCE_HEARTBEAT_INTERVAL_MS,
   DOCTOR_PRESENCE_STALE_TIMEOUT_MS,
@@ -187,7 +188,7 @@ describe("Fluxo padronizado de consultas — Testes de Aceitação (Itens 1 a 10
       expect(step4.waitSeconds).toBe(300);
     }
 
-    // 5º passo (nenhum médico atendeu no Ciclo 1): reagendamento automático para +1 hora com mensagem exata
+    // 5º passo (ninguém atendeu no ciclo): sala de espera, nova chamada em 60 min, prazo de 12 h
     const step5 = selectNextQueueStep({
       chosenDoctorId: "doc-escolhido",
       candidates,
@@ -202,19 +203,37 @@ describe("Fluxo padronizado de consultas — Testes de Aceitação (Itens 1 a 10
       nowMs,
     });
     expect(step5).toEqual({
-      action: "reschedule_1h",
-      messageToPatient:
-        "Todos os médicos estão em consulta de urgência. Sua consulta foi agendada automaticamente para uma hora depois do primeiro atendimento",
-      rescheduledForIso: new Date(
-        nowMs + DEFAULT_QUEUE_ROUTING_CONFIG.rescheduleDelayMinutes * 60_000,
-      ).toISOString(),
+      action: "reschedule",
+      messageToPatient: PATIENT_URGENCY_RESCHEDULE_MESSAGE,
+      rescheduledForIso: new Date(nowMs + 60 * 60_000).toISOString(),
+      deadlineIso: new Date(nowMs + 12 * 60 * 60_000).toISOString(),
       cycle: 1,
     });
-    expect(PATIENT_URGENCY_RESCHEDULE_MESSAGE).toBe(
-      "Todos os médicos estão em consulta de urgência. Sua consulta foi agendada automaticamente para uma hora depois do primeiro atendimento",
-    );
+    expect(PATIENT_URGENCY_RESCHEDULE_MESSAGE).toContain("até 12 horas");
 
-    // 6º passo (após o reinício de 1 hora no Ciclo 2, se ainda nenhum médico atender): encaminha à Orientação Técnica gratuita
+    // 5b. Caso urgente (não grave): nova chamada em 15 min e prazo de 1 h
+    const step5u = selectNextQueueStep({
+      chosenDoctorId: "doc-escolhido",
+      candidates,
+      triedDoctorIdsInCurrentCycle: [
+        "doc-escolhido",
+        "doc-assinante-1",
+        "doc-assinante-2",
+        "doc-online-1",
+      ],
+      currentCycle: 1,
+      firstAttemptAtIso: new Date(nowMs).toISOString(),
+      nowMs,
+      urgent: true,
+    });
+    expect(step5u.action).toBe("reschedule");
+    if (step5u.action === "reschedule") {
+      expect(step5u.rescheduledForIso).toBe(new Date(nowMs + 15 * 60_000).toISOString());
+      expect(step5u.deadlineIso).toBe(new Date(nowMs + 60 * 60_000).toISOString());
+      expect(step5u.messageToPatient).toContain("até 1 hora");
+    }
+
+    // 6º passo (prazo esgotado sem médico): encaminha à Orientação Técnica gratuita
     const step6 = selectNextQueueStep({
       chosenDoctorId: "doc-escolhido",
       candidates,
@@ -224,15 +243,26 @@ describe("Fluxo padronizado de consultas — Testes de Aceitação (Itens 1 a 10
         "doc-assinante-2",
         "doc-online-1",
       ],
-      currentCycle: 2,
+      currentCycle: 12,
+      firstAttemptAtIso: new Date(nowMs - 11.5 * 60 * 60_000).toISOString(),
       nowMs,
     });
     expect(step6).toEqual({
       action: "forward_free_ot",
       messageToPatient: PATIENT_FREE_OT_NOTICE_MESSAGE,
       chosenDoctorId: "doc-escolhido",
-      cycle: 2,
+      cycle: 12,
     });
+
+    // Ciclos e marcadores da sala de espera
+    expect(queueCycleFromNotes("Triagem: x")).toBe(1);
+    expect(queueCycleFromNotes("[FILA_REAGENDADA_1H:2026-11-12T10:00:00Z]\n[FILA_REAGENDADA:2026-11-12T11:00:00Z]")).toBe(3);
+    expect(isUrgentConsultation("[URGENTE]\nTriagem")).toBe(true);
+
+    // Sugestão de Orientação gratuita: só depois que o escolhido não atendeu ou a fila chamou outro médico
+    expect(shouldSuggestFreeOt([{ doctor_id: "doc-escolhido", status: "pending" }], "doc-escolhido")).toBe(false);
+    expect(shouldSuggestFreeOt([{ doctor_id: "doc-escolhido", status: "expired" }], "doc-escolhido")).toBe(true);
+    expect(shouldSuggestFreeOt([{ doctor_id: "doc-assinante-1", status: "pending" }], "doc-escolhido")).toBe(true);
   });
 
   it("Aceite 9: Médico 'online' de verdade (batimento ~30s, auto-offline em 2 min, 'em_consulta' bloqueia novos avisos)", () => {

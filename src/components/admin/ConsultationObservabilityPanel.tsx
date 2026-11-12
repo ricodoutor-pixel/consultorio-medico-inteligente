@@ -284,7 +284,7 @@ export function ConsultationObservabilityPanel() {
 
         // Nenhum médico atendeu
         const notes = a.notes || "";
-        if (notes.includes("[FILA_REAGENDADA_1H:") || notes.includes("[ENCAMINHADO_OT_GRATUITA:")) {
+        if (notes.includes("[FILA_REAGENDADA") || notes.includes("[ENCAMINHADO_OT_GRATUITA:")) {
           rowAnomalies.push("Nenhum médico atendeu na janela de 5 min");
           computedAlerts.push({
             id: `no-doc-${a.id}`,

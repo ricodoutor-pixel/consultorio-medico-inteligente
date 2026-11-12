@@ -3,6 +3,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 import { sendWhatsApp } from "../_shared/evolution.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
@@ -36,8 +37,9 @@ function htmlFor(name: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  const unauth = requireServiceAuth(req, corsHeaders);
-  if (unauth) return unauth;
+  let allowed = requireServiceAuth(req, corsHeaders) === null;
+  if (!allowed && Deno.env.get("LOVABLE_CRON_SECRET")) allowed = authenticateCronRequest(req) === null;
+  if (!allowed) return json({ error: "Unauthorized" }, 401);
   const { offset = 0, limit = 10, dry_run = false } = await req.json().catch(() => ({}));
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 

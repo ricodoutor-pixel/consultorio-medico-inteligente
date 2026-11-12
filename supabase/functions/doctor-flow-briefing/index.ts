@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     }
     await admin.from("notifications").insert({ user_id: d.user_id, title: "Prontidão para consultas reais",
       message: "Ligue o botão ON no Consultório quando estiver disponível. Assinantes online têm prioridade no rodízio.",
-      type: "system", action_url: "/consultorio" }).then(() => null, () => null);
+      type: "info", action_url: "/consultorio" }).then(() => null, () => null);
     out.push({ name, whatsapp: (wa as any).ok ?? false, wa_err: (wa as any).error, email: mail.ok, mail_err: mail.error });
     await new Promise((r) => setTimeout(r, 2500));
   }

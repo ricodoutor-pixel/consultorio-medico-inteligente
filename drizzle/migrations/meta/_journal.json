@@ -288,6 +288,13 @@
       "when": 1794503457555,
       "tag": "0040_consultation_waitlist",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1794503657555,
+      "tag": "0041_doctor_public_ratings",
+      "breakpoints": true
     }
   ]
 }

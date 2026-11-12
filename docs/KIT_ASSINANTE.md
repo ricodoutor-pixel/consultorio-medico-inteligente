@@ -32,9 +32,7 @@ Migração: `0038_doctor_ai_usage.sql` (uso das ferramentas de IA, para limites 
 | **Lista de espera** | Agendamento (quando o médico não tem horário livre) | Botão "Avise-me quando abrir". O cron confere a agenda real do médico (`get_available_days`, este mês e o próximo) e manda um único WhatsApp quando abre vaga. Não reserva horário: a vaga fica com quem agendar primeiro. Migração 0040. |
 | **Resumo do dia para o médico** | WhatsApp às 7 h (Brasília) | Quantidade e horários das consultas pagas do dia, sem dados de pacientes, mais o lembrete de ligar o ON. Uma vez por dia. |
 
-## Próximas (código)
-
-1. Avaliações públicas no perfil (nota média real e número de avaliações), com aprovação do Dr. Edilson, porque mexe na vitrine.
+| **Nota real no perfil público** | Vitrine e `/profissionais/:id` | Autorizada pelo Dr. Edilson em 12/11/2026. Média e número de avaliações de consultas pagas, avaliadas pelo próprio paciente (função `doctor_public_ratings`, migração 0041). Só aparece com 5 avaliações ou mais. Também vai para o Google (AggregateRating). Substituiu a nota 5,0 fixa no código e os depoimentos escritos à mão, que não eram avaliações reais. |
 
 ## Parte 3 — dependem de contrato ou decisão
 

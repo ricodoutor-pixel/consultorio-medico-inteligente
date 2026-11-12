@@ -10,6 +10,8 @@ export type Professional = {
   priceValue: number;
   whatsapp: string;
   rating: number | null;
+  /** Número de avaliações reais que formam a nota (só publicada com 5 ou mais). */
+  ratingCount?: number;
   consults: number;
   avatar: string;
   imageUrl: string;

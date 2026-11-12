@@ -183,6 +183,13 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
         "name": pro.councilLabel || (isVet ? "CRMV" : "CRM"),
         "value": pro.crm
       } : undefined,
+      "aggregateRating": pro.rating !== null && (pro.ratingCount ?? 0) >= 5 ? {
+        "@type": "AggregateRating",
+        "ratingValue": pro.rating,
+        "reviewCount": pro.ratingCount,
+        "bestRating": 5,
+        "worstRating": 1
+      } : undefined,
       "priceRange": "R$ 30 - R$ 150",
       "telephone": pro.whatsapp ? `+${pro.whatsapp}` : "+5511991363154",
       "address": {
@@ -260,7 +267,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
 
               {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
-                 {pro.rating === null ? <span className="text-xs text-muted-foreground">Ainda sem avaliações</span> : <><Star size={14} className="text-primary fill-primary" /><span className="text-sm font-black">{pro.rating}</span></>}
+                 {pro.rating === null ? <span className="text-xs text-muted-foreground">Ainda sem avaliações</span> : <><Star size={14} className="text-primary fill-primary" /><span className="text-sm font-black">{pro.rating.toFixed(1)}</span><span className="text-xs text-muted-foreground">({pro.ratingCount} avaliações)</span></>}
                  <span className="text-xs text-muted-foreground">• {pro.consults === 0 ? "Novo na plataforma" : `${pro.consults} consultas`}</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
@@ -301,22 +308,31 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               </h2>
               <NextRealSlots doctorId={pro.dbId ?? null} proId={pro.id} />
             </CardContent>
-          </Card> (feat(agendamento): reformulacao completa de agendamento por medico, grade Dr Anderson e Dr Jorge Luiz)
+          </Card>
 
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4">Avaliações</h2>
-              <div className="space-y-3">
-                {(pro.reviews || []).map((r, i) => (
-                  <div key={i} className="p-3 rounded-2xl bg-muted/30 border border-border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-black text-sm">{r.name}</span>
-                      <div className="flex">{Array.from({ length: r.rating }).map((_, j) => <Star key={j} size={12} className="text-primary fill-primary" />)}</div>
+              {pro.rating !== null ? (
+                <div className="flex items-center gap-4">
+                  <p className="text-4xl font-display font-black text-foreground">{pro.rating.toFixed(1)}</p>
+                  <div>
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} size={16} className={s <= Math.round(pro.rating ?? 0) ? "text-primary fill-primary" : "text-muted-foreground/30"} />
+                      ))}
                     </div>
-                    <p className="text-sm text-muted-foreground">"{r.text}"</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {pro.ratingCount} avaliações de pacientes após consultas pagas na plataforma
+                    </p>
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Ainda sem avaliações suficientes. A nota aparece aqui a partir de 5 avaliações de pacientes atendidos na
+                  plataforma.
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -587,7 +603,7 @@ const Profissionais = () => {
                             )}
 
                             <div className="flex items-center gap-1 mt-1">
-                               {p.rating === null ? <span className="text-[10px] text-muted-foreground">Ainda sem avaliações</span> : <><Star size={12} className="text-primary fill-primary" /><span className="text-xs font-black text-foreground">{p.rating}</span></>}
+                               {p.rating === null ? <span className="text-[10px] text-muted-foreground">Ainda sem avaliações</span> : <><Star size={12} className="text-primary fill-primary" /><span className="text-xs font-black text-foreground">{p.rating.toFixed(1)}</span><span className="text-[10px] text-muted-foreground">({p.ratingCount})</span></>}
                                <span className="text-[10px] text-muted-foreground">• {p.consults === 0 ? "Novo na plataforma" : `${p.consults} consultas`}</span>
                             </div>
                           </div>

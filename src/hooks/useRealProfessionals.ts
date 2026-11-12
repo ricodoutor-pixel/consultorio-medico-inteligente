@@ -140,6 +140,22 @@ function readCachedDoctors(): DoctorRow[] {
 
 export function useRealProfessionals(): { professionals: Professional[]; realCount: number; loading: boolean } {
   const [dbDoctors, setDbDoctors] = useState<DoctorRow[]>(() => readCachedDoctors());
+  // Nota pública real (migração 0041): só avaliações de consultas pagas, publicada com 5 ou mais.
+  const [realRatings, setRealRatings] = useState<Map<string, { avg: number; count: number }>>(new Map());
+
+  useEffect(() => {
+    let active = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- função nova ainda fora dos tipos gerados
+    void (supabase.rpc as any)("doctor_public_ratings").then(
+      ({ data }: { data: { doctor_id: string; rating_avg: number; rating_count: number }[] | null }) => {
+        if (!active || !data) return;
+        setRealRatings(new Map(data.map((r) => [r.doctor_id, { avg: Number(r.rating_avg), count: Number(r.rating_count) }])));
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
   // Como baseProfessionals está em memória, não bloqueamos a renderização inicial da vitrine
   const [loading, setLoading] = useState(false);
 
@@ -493,8 +509,13 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     if (victorDoc) medicos.unshift(victorDoc);
     if (miltonDoc) medicos.unshift(miltonDoc);
 
-    return [...medicos, ...nonMedicos];
-  }, [dbDoctors]);
+    // Nota exibida = só a nota real; sem avaliações suficientes, a vitrine mostra "Ainda sem avaliações".
+    const withRealRating = (p: Professional): Professional => {
+      const real = p.dbId ? realRatings.get(p.dbId) : undefined;
+      return { ...p, rating: real ? real.avg : null, ratingCount: real?.count ?? 0 };
+    };
+    return [...medicos, ...nonMedicos].map(withRealRating);
+  }, [dbDoctors, realRatings]);
 
   return { professionals, realCount: professionals.length, loading };
 }

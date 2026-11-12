@@ -12,9 +12,13 @@ vi.mock("react", async (importOriginal) => ({
   ...await importOriginal<typeof import("react")>(),
   useEffect: (effect: () => unknown) => { harness.effect = effect; },
   useMemo: (calculate: () => unknown) => calculate(),
-  useState: () => harness.stateIndex++ === 0
-    ? [harness.stored, (value: unknown[]) => { harness.stored = value; }]
-    : [false, vi.fn()],
+  useState: () => {
+    const index = harness.stateIndex++;
+    if (index === 0) return [harness.stored, (value: unknown[]) => { harness.stored = value; }];
+    // 2º estado: notas públicas reais (doctor_public_ratings), vazias no teste.
+    if (index === 1) return [new Map(), vi.fn()];
+    return [false, vi.fn()];
+  },
 }));
 vi.mock("@/lib/visible-interval", () => ({ setVisibleInterval: () => vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({

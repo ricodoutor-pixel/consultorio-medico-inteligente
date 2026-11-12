@@ -84,6 +84,14 @@ serve(async (req) => {
         return new Response(JSON.stringify({ error: "Unauthorized" }),
           { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
+      if (!(await isAdmin(callerId))) {
+        const { data: own } = await supabaseAdmin.from("doctors").select("id")
+          .eq("id", doctor_id).eq("user_id", callerId).maybeSingle();
+        if (!own) {
+          return new Response(JSON.stringify({ error: "Forbidden" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+      }
     }
 
     // 1. Busca dados do médico e perfil se não fornecidos

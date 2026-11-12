@@ -133,14 +133,20 @@ Deno.serve(async (req) => {
       });
     }
 
+    const { data: phoneOk } = await supabase.rpc("check_edge_rate_limit", {
+      p_bucket: "lead-invite-phone", p_key: phoneDigits, p_max_hits: 1, p_window_seconds: 30 * 86400,
+    });
+    if (phoneOk === false) {
+      return new Response(JSON.stringify({ ok: true, skipped: "already_sent" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const msg = inviteMessage(nome, categoria ?? null);
     const wa = await sendWhatsApp(phoneDigits, msg);
 
     // Marca o lead como já contatado pelo convite (idempotência).
-    if (leadRow?.id) {
-      const newTags = Array.from(new Set([...(leadRow.tags || []), "Convite_R30_Enviado"]));
-      await supabase.from("leads_contatos").update({ tags: newTags }).eq("id", leadRow.id);
-    }
+    // Lead tags are no longer changed by this public endpoint (dedup is per phone above).
 
     // Notifica Dr. Edilson sobre o novo lead (ver brisa-signup-alert).
     supabase.functions

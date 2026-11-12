@@ -20,6 +20,7 @@ import { ConsultationChatPanel } from "@/components/consultation/ConsultationCha
 import { isConsultationAppointmentId } from "@/lib/consultation-chat";
 import { FreeSignatureModal } from "@/components/prescription/FreeSignatureModal";
 import { generatePrescriptionPDF } from "@/lib/prescriptionPDF";
+import { loadDoctorSignatureImageUrl } from "@/lib/kyc-docs";
 import { APP_CONFIG } from "@/lib/app-config";
 import { ageOn, CONSULTATION_DOCUMENTS, type ConsultationDocumentKind, parsePrescriptionText } from "@/lib/consultation-prescription";
 import type { Json } from "@/integrations/supabase/types";
@@ -287,6 +288,7 @@ const WorkspaceMedico = () => {
         documentTitle: docMeta.title,
         sectionTitle: docMeta.section,
         bodyText: prescriptionText.trim(),
+        signatureUrl: (await loadDoctorSignatureImageUrl(doctorUserId).catch(() => null)) ?? undefined,
         date: new Date(),
       });
       setRxSigning({

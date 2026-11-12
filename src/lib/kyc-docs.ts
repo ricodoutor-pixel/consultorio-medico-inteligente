@@ -141,3 +141,33 @@ export async function fetchInlineAvatar(userId: string): Promise<string | null> 
   inlineAvatarCache.set(userId, url);
   return url;
 }
+
+const SIGNATURE_IMAGE_EXT = /\.(png|jpe?g|webp)(\?|$)/i;
+
+/** Só imagens viram carimbo visual; certificados (.pfx/.cer) e PDFs ficam fora do documento. */
+export function isSignatureImagePath(path: string | null | undefined): boolean {
+  return Boolean(path && SIGNATURE_IMAGE_EXT.test(path));
+}
+
+/**
+ * Imagem da assinatura do próprio médico (KYC "icp_brasil" ou signature_url do cadastro) para o
+ * receituário. É apenas um carimbo visual: a validade jurídica vem da assinatura digital gov.br/ICP-Brasil.
+ */
+export async function loadDoctorSignatureImageUrl(userId: string): Promise<string | null> {
+  const [{ data: kyc }, { data: doctor }] = await Promise.all([
+    supabase
+      .from("doctor_kyc_documents")
+      .select("storage_path")
+      .eq("doctor_user_id", userId)
+      .eq("document_kind", "icp_brasil")
+      .maybeSingle(),
+    supabase.from("doctors").select("signature_url").eq("user_id", userId).maybeSingle(),
+  ]);
+  const kycPath = (kyc as { storage_path?: string | null } | null)?.storage_path ?? null;
+  if (isSignatureImagePath(kycPath)) {
+    const url = await getKycSignedUrl(userId, "icp_brasil", kycPath);
+    if (url) return url;
+  }
+  const publicUrl = (doctor as { signature_url?: string | null } | null)?.signature_url ?? null;
+  return isSignatureImagePath(publicUrl) || publicUrl?.startsWith("data:image/") ? publicUrl : null;
+}

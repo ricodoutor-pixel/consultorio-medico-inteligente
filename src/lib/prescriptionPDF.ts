@@ -206,8 +206,8 @@ export async function generatePrescriptionPDF(data: PrescriptionData): Promise<j
   currentY += 8;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.text(`Digitally signed by ${data.doctorName.toUpperCase()}:${data.doctorCRM}`, margin, currentY);
-  doc.text(`Date: ${data.date.toISOString().replace("T", " ").substring(0, 19)} UTC`, margin, currentY + 4);
+  doc.text(`Signatário: ${data.doctorName.toUpperCase()} - CRM ${data.doctorCRM}/${data.doctorCRMState}`, margin, currentY);
+  doc.text(`Emitido em: ${data.date.toISOString().replace("T", " ").substring(0, 19)} UTC - assinatura digital gov.br/ICP-Brasil`, margin, currentY + 4);
 
   // Se o médico fez o upload da imagem da assinatura digital gov.br, insere aqui
   if (data.signatureUrl) {

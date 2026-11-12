@@ -15,7 +15,7 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 | 5 | Atendimento | O médico abre o Consultório. A consulta passa a "em andamento" e a sala abre para o paciente. A sala tem chat em tempo real nos dois sentidos, vídeo e limite de 45 minutos. | ✅ chat (`consultation_chats`, migração 0022) · ⚠️ vídeo no `meet.jit.si` até o Jitsi próprio (seção 4) |
 | 6 | Encerramento | O médico ou o paciente encerra. A consulta passa a "concluída". | ✅ |
 | 7 | Avaliação | O paciente avalia com as carinhas. A avaliação libera o repasse. | ✅ |
-| 8 | Receita | O paciente recebe a receita em PDF com assinatura digital do médico. | ✅ No Workspace, "Emitir & Assinar" grava a receita, gera o PDF timbrado e abre a assinatura gov.br (assinador.iti.br). O médico envia o PDF assinado, que só é aceito se tiver assinatura digital. O paciente baixa na página da consulta por link temporário (`prescription-download`) e recebe aviso por WhatsApp. ⚠️ A assinatura gov.br é **avançada**; receita de controle especial exige **ICP-Brasil qualificada** (certificado A1/A3 ou nuvem: VIDaaS, BirdID). |
+| 8 | Receita | O paciente recebe a receita em PDF com assinatura digital do médico. | ✅ No Workspace, "Emitir & Assinar" grava a receita, gera o PDF timbrado e abre a assinatura gov.br (assinador.iti.br). A imagem da assinatura do médico enviada no KYC (documento "Assinatura Digital") é carimbada no PDF como elemento visual; a validade vem da assinatura gov.br. O médico envia o PDF assinado, que só é aceito se tiver assinatura digital. O paciente baixa na página da consulta por link temporário (`prescription-download`) e recebe aviso por WhatsApp. ⚠️ A assinatura gov.br é **avançada**; receita de controle especial exige **ICP-Brasil qualificada** (certificado A1/A3 ou nuvem: VIDaaS, BirdID). |
 | 9 | Indicação | Ao final, o paciente recebe o código permanente de indicação. | ✅ |
 
 ## 2. Repasse e saque do médico
@@ -23,7 +23,7 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 | Etapa | Regra | Situação |
 |---|---|---|
 | Crédito | Com a avaliação, 93% do valor vai para o saldo do médico, com aviso no painel e no WhatsApp ("pagamento disponível"). | ✅ gatilho `release_appointment_payout_on_rating`. ⚠️ Confirmar que a migração 0021 foi aplicada. |
-| Saque em 1 clique | O médico clica em "Sacar" e o sistema transfere por Pix automaticamente. | ❌ **Hoje o saque é só registrado** ("simulado, aguardando autorização"). O envio está desligado de propósito (`MONEY_OUT_READY = false`). Além disso, o código usa `POST /v1/payments` do Mercado Pago, que **cria uma cobrança**, e não envia dinheiro. Para Pix automático é preciso um provedor com API de transferência (Asaas, Efí, Banco Inter, Stark Bank ou o Money Out do Mercado Pago, se aprovado para a conta). Até lá, o administrador paga manualmente. |
+| Saque em 1 clique | O médico clica em "Sacar" e o sistema transfere por Pix automaticamente. | ⚙️ **Código pronto com o Mercado Pago Payouts** (`POST /v1/transaction-intents/process`, `_shared/mp-pix-payout.ts`). Envio real **desligado** até o proprietário cadastrar o segredo `MP_PIX_PAYOUT_ENABLED=true`, depois que o Mercado Pago habilitar o Payouts na conta (painel de desenvolvedores → aplicação → transferências; em produção o Mercado Pago pode exigir a assinatura de requisição `X-Signature`). Recusa explícita do Mercado Pago devolve o valor ao saldo. Timeout ou erro 5xx **não** devolve: o saque fica "processing" para conferência no painel, evitando pagar duas vezes. Opcional: `MP_PIX_PAYOUT_NOTIFICATION_URL`. Chaves de telefone devem estar com `+55`. |
 
 ## 3. Rodízio quando o médico escolhido não atende
 
@@ -80,7 +80,7 @@ A sala da consulta já segue o cabeçalho e as bolhas da Orientação Técnica (
 
 **Dependem do Dr. Edilson ou de terceiros:**
 1. **Assinatura ICP-Brasil qualificada** para receitas de controle especial (contratar VIDaaS, BirdID ou certificado A1/A3).
-2. **Saque com Pix automático** (escolher um provedor de transferência: Asaas, Efí, Banco Inter ou Stark Bank).
+2. **Saque com Pix automático:** pedir ao Mercado Pago a habilitação do Payouts (Pix de saída) na conta e então cadastrar `MP_PIX_PAYOUT_ENABLED=true`.
 3. **Jitsi próprio na VPS** (DNS, porta UDP 10000 e segredos; ver `infra/jitsi/README.md`).
 4. **Médico de teste aprovado** e **paciente de teste** para o teste ponta a ponta (seção 8).
 

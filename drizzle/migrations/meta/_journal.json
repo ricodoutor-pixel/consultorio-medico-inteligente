@@ -302,6 +302,13 @@
       "when": 1794503857555,
       "tag": "0042_doctor_ai_usage_scribe",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1794516893068,
+      "tag": "0043_apply_0038_to_0042_marker",
+      "breakpoints": true
     }
   ]
 }

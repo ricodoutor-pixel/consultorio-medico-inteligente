@@ -253,6 +253,13 @@
       "when": 1794501901946,
       "tag": "0035_lock_wallet_contact_rpcs_and_doctor_plan_tier",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794502820461,
+      "tag": "0036_has_role_self_only_for_clients",
+      "breakpoints": true
     }
   ]
 }

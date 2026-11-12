@@ -1894,6 +1894,54 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_chats: {
+        Row: {
+          appointment_id: string
+          attachment_name: string | null
+          attachment_path: string | null
+          content: string
+          created_at: string
+          id: string
+          sender_id: string | null
+          sender_type: string
+        }
+        Insert: {
+          appointment_id: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          sender_type: string
+        }
+        Update: {
+          appointment_id?: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_chats_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_chats_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+        ]
+      }
       consultation_credit_audit: {
         Row: {
           amount: number | null
@@ -7121,6 +7169,7 @@ export type Database = {
           signature_date: string | null
           signature_hash: string | null
           signature_provider: string | null
+          signed_pdf_path: string | null
           signed_pdf_url: string | null
           status: string
           thc_percentage: number | null
@@ -7148,6 +7197,7 @@ export type Database = {
           signature_date?: string | null
           signature_hash?: string | null
           signature_provider?: string | null
+          signed_pdf_path?: string | null
           signed_pdf_url?: string | null
           status?: string
           thc_percentage?: number | null
@@ -7175,6 +7225,7 @@ export type Database = {
           signature_date?: string | null
           signature_hash?: string | null
           signature_provider?: string | null
+          signed_pdf_path?: string | null
           signed_pdf_url?: string | null
           status?: string
           thc_percentage?: number | null
@@ -10085,6 +10136,14 @@ export type Database = {
         Args: { _notes?: string; _payment_row_id: string }
         Returns: Json
       }
+      consultation_chat_is_live: {
+        Args: { _appointment_id: string }
+        Returns: boolean
+      }
+      consultation_chat_role: {
+        Args: { _appointment_id: string }
+        Returns: string
+      }
       consultation_doctor_pool: {
         Args: { _specialty?: string }
         Returns: {
@@ -10100,6 +10159,10 @@ export type Database = {
           specialty: string
           user_id: string
         }[]
+      }
+      consultation_file_appointment: {
+        Args: { _name: string }
+        Returns: string
       }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }

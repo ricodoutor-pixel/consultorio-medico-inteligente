@@ -190,6 +190,13 @@
       "when": 1794462836931,
       "tag": "0026_consultation_chat_attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794467253231,
+      "tag": "0027_payout_notify_cron_secret",
+      "breakpoints": true
     }
   ]
 }

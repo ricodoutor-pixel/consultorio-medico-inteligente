@@ -83,7 +83,7 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura e nada mais (sem blo
     }
 
     const aiResponseText = res.data.candidates[0].content.parts[0].text;
-    console.log("Gemini Response Text (Model:", res.usedModel, "):", aiResponseText);
+    console.log("Gemini response received (model:", res.usedModel, ")");
     
     let parsedResponse;
     try {

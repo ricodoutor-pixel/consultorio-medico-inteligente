@@ -62,12 +62,8 @@ const BibliotecaCientifica = () => {
   // Fetch persistent counter from database
   useEffect(() => {
     const fetchCount = async () => {
-      const { data } = await supabase
-        .from('site_counters' as any)
-        .select('count')
-        .eq('id', 'ebook_downloads')
-        .single();
-      if (data) setDownloadCount((data as any).count);
+      const { data } = await supabase.rpc('get_site_counter', { _counter_id: 'ebook_downloads' });
+      if (typeof data === 'number') setDownloadCount(data);
     };
     fetchCount();
   }, []);

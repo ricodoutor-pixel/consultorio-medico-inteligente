@@ -137,10 +137,9 @@ serve(async (req) => {
       await supabase.from("error_autohealing").update({
         occurrences: existing.occurrences + 1,
         last_seen_at: new Date().toISOString(),
-        status: existing.status === "resolved" ? "open" : existing.status,
-      }).eq("id", existing.id);
+      }).eq("id", existing.id).neq("status", "resolved");
 
-      return new Response(JSON.stringify({ ok: true, deduped: true, id: existing.id }), {
+      return new Response(JSON.stringify({ ok: true, deduped: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

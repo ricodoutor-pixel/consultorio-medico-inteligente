@@ -64,9 +64,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const normalizedEmail = email.trim().toLowerCase() === "contato@plantayraiz.com.br"
-        ? "admin@plantayraiz.com.br"
-        : email.trim();
+      const normalizedEmail = email.trim().toLowerCase();
       const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
 
       if (error) {

@@ -239,6 +239,13 @@
       "when": 1794500053486,
       "tag": "0033_consultation_guardian_comment",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794501459186,
+      "tag": "0034_tighten_public_reads_and_listing",
+      "breakpoints": true
     }
   ]
 }

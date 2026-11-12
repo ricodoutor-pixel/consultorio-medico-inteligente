@@ -10379,6 +10379,7 @@ export type Database = {
           whatsapp: string
         }[]
       }
+      get_site_counter: { Args: { _counter_id: string }; Returns: number }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean

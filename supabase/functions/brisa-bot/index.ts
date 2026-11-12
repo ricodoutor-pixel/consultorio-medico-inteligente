@@ -246,7 +246,7 @@ async function sendEvo(phone: string, text: string): Promise<boolean> {
       body: JSON.stringify({ number: phone, text, options: { delay: 800, presence: 'composing' } }),
       signal: AbortSignal.timeout(20_000),
     });
-    if (r.ok) { console.log(`[brisa][EVO] ✅ ${phone}`); return true; }
+    if (r.ok) { console.log(`[brisa][EVO] ✅ ***${String(phone).slice(-4)}`); return true; }
     console.error(`[brisa][EVO] HTTP ${r.status}`);
     return false;
   } catch (e: unknown) { console.error(`[brisa][EVO] ${(e as Error)?.message}`); return false; }

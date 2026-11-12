@@ -23,6 +23,11 @@ serve(async (req: Request) => {
     message: 'Muitas mensagens em pouco tempo. Aguarde 1 minuto e tente novamente. 🌿',
   });
   if (limited) return limited;
+  const dailyLimited = await rateLimit({
+    bucket: 'brisa_web_chat_day', key: clientIp(req), maxHits: 150, windowSeconds: 86400, cors,
+    message: 'Limite diário do chat atingido. Fale com a Brisa no WhatsApp +55 11 99136-3154. 🌿',
+  });
+  if (dailyLimited) return dailyLimited;
 
   try {
     const { messages, leadInfo } = await req.json();

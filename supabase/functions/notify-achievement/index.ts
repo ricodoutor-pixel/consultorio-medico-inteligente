@@ -108,7 +108,7 @@ Deno.serve(async (req: Request) => {
           }),
         });
         await mcResponse.text(); // consume body
-        console.log(`ManyChat notification sent to ${phone}`);
+        console.log(`ManyChat notification sent to ***${String(phone).slice(-4)}`);
       } catch (mcErr) {
         console.error("ManyChat notification failed:", mcErr);
         // Non-blocking: internal notification already sent
@@ -130,7 +130,7 @@ Deno.serve(async (req: Request) => {
             delay: 1200,
           }),
         });
-        console.log(`Evolution WhatsApp sent to ${phone}`);
+        console.log(`Evolution WhatsApp sent to ***${String(phone).slice(-4)}`);
       } catch (evoErr) {
         console.error("Evolution notification failed:", evoErr);
       }

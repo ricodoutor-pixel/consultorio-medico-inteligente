@@ -102,7 +102,7 @@ export async function processOutboundMessages() {
       await sleep(delay);
       
     } catch (err) {
-      console.error(`[CRM Engine] Erro ao enviar para ${lead.phone}:`, err.message);
+      console.error(`[CRM Engine] Erro ao enviar para ***${String(lead.phone).slice(-4)}:`, err.message);
     }
   }
 }
@@ -130,7 +130,7 @@ export function startWebhookServer() {
         const phone = message.from.split('@')[0];
         const text = message.body;
         
-        console.log(`[Webhook] Mensagem recebida de ${phone}: ${text}`);
+        console.log(`[Webhook] Mensagem recebida de ***${String(phone).slice(-4)}`);
         
         // Verifica se o número está no CRM
         const { data: lead } = await supabase
@@ -149,7 +149,7 @@ export function startWebhookServer() {
           }
           
           // Chama o Gemini para formular a resposta
-          console.log(`[Gemini] Gerando resposta para ${phone}...`);
+          console.log(`[Gemini] Gerando resposta para ***${String(phone).slice(-4)}...`);
           const chat = model.startChat();
           const result = await chat.sendMessage(text);
           const replyText = result.response.text();
@@ -198,7 +198,7 @@ export async function processFollowUps() {
   if (error || !leads) return;
   
   for (const lead of leads) {
-    console.log(`[CRM Engine] Enviando follow-up para ${lead.phone}...`);
+    console.log(`[CRM Engine] Enviando follow-up para lead ***${String(lead.phone).slice(-4)}...`);
     
     const followupMsg = `Olá Dr(a), Enfermeira Brisa passando aqui para saber se você conseguiu dar uma olhada no nosso convite VIP para a Plataforma Planta y Raíz! Ficou alguma dúvida sobre como funciona o repasse imediato via PIX ou a nossa taxa de apenas 7%? Estou à disposição!`;
     

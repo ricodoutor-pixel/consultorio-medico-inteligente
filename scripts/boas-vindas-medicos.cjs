@@ -102,7 +102,7 @@ async function run() {
       phone = phone.replace(/\\D/g, ''); // limpa tudo exceto números
       const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
       results.push({ nome, phone, waLink });
-      console.log(`📱 Link do WhatsApp gerado para: +${phone}`);
+      console.log(`📱 Link do WhatsApp gerado para: ***${String(phone).slice(-4)}`);
     } else {
       console.log(`⚠️ Médico não possui telefone cadastrado.`);
     }

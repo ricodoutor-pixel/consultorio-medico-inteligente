@@ -1,3 +1,4 @@
+import { safeOrigin, safeReturnUrl } from "../_shared/safe-return.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   expectedConsultationPrice,
@@ -344,10 +345,7 @@ Deno.serve(async (req) => {
     title = formatPaymentName(title);
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";
-    const isAllowedSuccess = typeof returnUrl === "string" && ALLOWED_ORIGINS.some((origin) => returnUrl.startsWith(origin));
-    const success = isAllowedSuccess
-      ? returnUrl
-      : `${siteUrl}/payment-success`;
+    const success = safeReturnUrl(returnUrl, `${siteUrl}/payment-success`);
 
     // Se o usuário logado for o próprio vendedor/admin da conta Mercado Pago (ex.: contato@plantayraiz.com.br),
     // omitimos o payer.email para que o Mercado Pago permita a qualquer usuário pagar sem erro de autofaturamento.

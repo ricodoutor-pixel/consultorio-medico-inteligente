@@ -26,13 +26,15 @@ Deno.serve(async (req) => {
   if (!UUID.test(appointmentId)) return json({ error: "appointment_id inválido" }, 400);
   if (event !== "waiting_room" && event !== "doctor_joined") return json({ error: "evento inválido" }, 400);
 
+  const preService = requireServiceAuth(req, cors) === null;
+  if (!preService && !(await getCallerUserId(req))) return json({ error: "Unauthorized" }, 401);
   const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const { data: appt } = await svc
     .from("appointments")
     .select("id, patient_id, doctor_id, type, status, payment_status, notes")
     .eq("id", appointmentId)
     .maybeSingle();
-  if (!appt) return json({ error: "Consulta não encontrada" }, 404);
+  if (!appt) return json({ error: preService ? "Consulta não encontrada" : "Forbidden" }, preService ? 404 : 403);
 
   const isService = requireServiceAuth(req, cors) === null;
   if (!isService) {

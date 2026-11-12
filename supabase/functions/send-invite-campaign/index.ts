@@ -186,7 +186,7 @@ serve(async (req) => {
           if (errBody.includes("duplicate_parameter")) {
             results.imported++;
           } else {
-            console.error(`Import error for ${email}:`, errBody);
+            console.error(`Import error for recipient:`, errBody);
           }
         }
 
@@ -220,7 +220,7 @@ serve(async (req) => {
             const sendErr = await sendRes.text();
             results.failed++;
             results.errors.push(`Send failed for ${email}: ${sendErr}`);
-            console.error(`Send error for ${email}:`, sendErr);
+            console.error(`Send error for recipient:`, sendErr);
           }
 
           // Rate limit: ~2 emails/sec to avoid Brevo throttling

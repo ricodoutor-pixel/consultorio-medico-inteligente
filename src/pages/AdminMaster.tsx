@@ -1,3 +1,4 @@
+import { csvCell } from "@/lib/admin-export";
 import { useAccount } from "@/contexts/AccountContext";
 import { AccountMenu } from "@/components/AccountMenu";
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -163,7 +164,7 @@ const fmtCurrency = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFrac
 const heatColor = (i: number) => i > 80 ? "#FF000099" : i > 60 ? "#FF6B3580" : i > 40 ? "#FFB80060" : "#39FF1430";
 
 const exportCSV = (headers: string[], rows: string[][], filename: string) => {
-  const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+  const csv = [headers.map(csvCell).join(","), ...rows.map(r => r.map(csvCell).join(","))].join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a"); a.href = url; a.download = `${filename}.csv`; a.click();

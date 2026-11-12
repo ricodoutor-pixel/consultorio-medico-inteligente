@@ -16,6 +16,7 @@ serve(async (req) => {
   // Aceitar service_role (chamadas internas de edge functions)
   const isServiceCall = jwt === serviceRoleKey;
 
+  let callerEmail: string | null = null;
   if (!isServiceCall) {
     if (!jwt) {
       return new Response(
@@ -37,12 +38,18 @@ serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    callerEmail = (user.email || "").toLowerCase();
   }
   // ── FIM DO AUTH GATE ──────────────────────────────────────────────────
 
   try {
     const body = await req.json().catch(() => ({}));
     const { email, nome, telefone, tags, categoria, origem } = body;
+    // Signed-in users may only sync their own contact record.
+    if (!isServiceCall && (typeof email !== "string" || email.trim().toLowerCase() !== callerEmail)) {
+      return new Response(JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return new Response(JSON.stringify({ error: "E-mail válido é obrigatório" }), {

@@ -98,7 +98,7 @@ async function startBrisaBot() {
 
       if (!text) continue;
 
-      console.log(`[${new Date().toLocaleTimeString('pt-BR')}] 📩 Mensagem de ${from.replace('@s.whatsapp.net', '')}: "${text}"`);
+      console.log(`[${new Date().toLocaleTimeString('pt-BR')}] 📩 Mensagem recebida (${String(text||"").length} caracteres)`);
 
       const replyText = await getBrisaReply(text);
 

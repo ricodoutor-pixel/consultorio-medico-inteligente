@@ -62,7 +62,7 @@ serve(async (req) => {
         }
       } else {
         console.log("Evolution API credentials or DOCTOR_WHATSAPP_NUMBER not set. Simulation mode:");
-        console.log("Would have sent message:", message);
+        console.log("Would have sent message (length):", String(message).length);
       }
     }
 

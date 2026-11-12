@@ -1,3 +1,4 @@
+import { csvCell } from "@/lib/admin-export";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +77,7 @@ export default function AdminLeadDetail() {
       lead.status, String(lead.lead_score),
       (lead.condition_interest ?? "").replace(/[",\n]/g, " "),
       lead.created_at,
-    ].map((c) => `"${c}"`).join(","));
+    ].map(csvCell).join(","));
 
     lines.push("");
     lines.push("# METADATA");
@@ -95,7 +96,7 @@ export default function AdminLeadDetail() {
         h.whatsapp_sent ? "sim" : "nao",
         (h.whatsapp_message ?? "").replace(/[",\n]/g, " "),
         (h.whatsapp_error ?? "").replace(/[",\n]/g, " "),
-      ].map((c) => `"${c}"`).join(","));
+      ].map(csvCell).join(","));
     });
 
     lines.push("");
@@ -105,7 +106,7 @@ export default function AdminLeadDetail() {
       lines.push([
         e.created_at, e.funnel, e.event_name,
         JSON.stringify(e.metadata ?? {}).replace(/"/g, "'"),
-      ].map((c) => `"${c}"`).join(","));
+      ].map(csvCell).join(","));
     });
 
     const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });

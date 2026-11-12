@@ -2,16 +2,18 @@ import jsPDF from "jspdf";
 
 const BRL = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+export function csvCell(v: unknown): string {
+  let s = v == null ? "" : String(v);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
 export function exportCSV(filename: string, rows: Record<string, any>[]) {
   if (!rows || rows.length === 0) {
     rows = [{ aviso: "sem dados" }];
   }
   const headers = Object.keys(rows[0]);
-  const escape = (v: any) => {
-    if (v == null) return "";
-    const s = String(v).replace(/"/g, '""');
-    return /[",\n;]/.test(s) ? `"${s}"` : s;
-  };
+  const escape = (v: any) => csvCell(v);
   const csv = [
     headers.join(","),
     ...rows.map((r) => headers.map((h) => escape(r[h])).join(",")),

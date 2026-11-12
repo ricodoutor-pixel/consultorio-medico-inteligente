@@ -63,7 +63,7 @@ serve(async (req) => {
       }
     }
 
-    console.log(`[VIP Lifecycle] action=${actionType} to ${fullName} (${phone}) - CRM: ${crm}`);
+    console.log(`[VIP Lifecycle] action=${actionType} sent`);
 
     let doctorMsg = "";
     let adminMsg = "";

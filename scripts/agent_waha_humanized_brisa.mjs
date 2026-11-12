@@ -190,7 +190,7 @@ async function handleIncomingMessage(msg, chat) {
     return;
   }
 
-  console.log(`\n💬 [Mensagem Recebida] de ${chat.name || rawPhone} (${chatId}): "${bodyText || (hasMedia ? '[MÍDIA/DOCUMENTO]' : '')}"`);
+  console.log(`\n💬 [Mensagem Recebida] de ***${String(rawPhone).slice(-4)}: "${hasMedia ? '[MÍDIA]' : '[texto]'}"`);
 
   let replyText = '';
   let category = 'Paciente Tráfego Pago';

@@ -135,9 +135,9 @@ async function runBot() {
           subject: "Bem-vindo à Planta y Raíz - Instruções para Iniciar",
           text: msg
         });
-        console.log(`📧 E-mail enviado com sucesso para ${doc.email}`);
+        console.log(`📧 E-mail enviado com sucesso para médico ${doc.id ?? ''}`);
       } catch (err) {
-        console.error(`❌ Erro no E-mail para ${doc.email}:`, err.message);
+        console.error(`❌ Erro no E-mail para médico ${doc.id ?? ''}:`, err.message);
       }
     }
 
@@ -154,10 +154,10 @@ async function runBot() {
         await page.waitForSelector('span[data-icon="send"]', { timeout: 30000 });
         await delay(2000);
         await page.click('span[data-icon="send"]');
-        console.log(`📱 WhatsApp enviado com sucesso para ${phone}`);
+        console.log(`📱 WhatsApp enviado com sucesso para ***${String(phone).slice(-4)}`);
         await delay(3000);
       } catch (err) {
-        console.log(`⚠️ Não foi possível enviar WhatsApp para ${phone} (Número sem WhatsApp?). Erro ignorado.`);
+        console.log(`⚠️ Não foi possível enviar WhatsApp para ***${String(phone).slice(-4)} (Número sem WhatsApp?). Erro ignorado.`);
       }
     }
 

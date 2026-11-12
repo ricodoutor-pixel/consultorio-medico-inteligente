@@ -57,7 +57,13 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 
 **Regra:** cada médico tem um link para enviar a pacientes e colegas. Com ele, o paciente se cadastra e é atendido pelo médico, e o colega se cadastra como médico. A ideia é dar mais consultas aos médicos mais populares.
 
-**Situação:** existem as telas `ConviteMedico` e `Indicacoes` e o cadastro canônico em `referral_links` / `ensure_referral_code`. ⚠️ Ainda não foi verificado de ponta a ponta se o link do médico leva o paciente direto à consulta com ele.
+**Situação:** ✅ No Consultório, aba **Perfil → "Meus links personalizados"**, o médico copia três links, todos com o código permanente de indicação (`ensure_referral_code`):
+- **Consulta por chat** e **consulta por vídeo** com ele já escolhido (`/consulta/<tipo>?doctor=<id>&ref=<código>`). Se ele não puder atender na hora, o paciente segue a fila oficial da seção 3.
+- **Convite a colegas** (`/cadastro-profissional?ref=<código>`). O cadastro de médico agora liga o colega à árvore de indicações, como já acontecia no cadastro de paciente.
+
+A página de indicações deixou de gerar código no navegador, um código que nunca era registrado e que ainda usava um domínio com erro de digitação.
+
+**Retorno de consulta:** usa a mesma página e o mesmo fluxo, por chat (`/consulta/retorno_consulta`).
 
 ## 6. Interface única (estilo WhatsApp)
 

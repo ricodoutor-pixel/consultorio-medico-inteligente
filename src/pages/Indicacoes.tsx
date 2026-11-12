@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { AffiliateWalletCard } from "@/components/affiliates/AffiliateWalletCard";
+import { loadPermanentReferralCode } from "@/lib/referral-code";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -136,10 +137,15 @@ const Indicacoes = () => {
       setTotalReferrals(refLink.total_referrals || 0);
       setTotalEarnings(refLink.total_earnings || 0);
     } else {
-      // Generate a new referral code if none exists
-      const newCode = "PLANTA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-      setReferralCode(newCode);
-      setReferralLink(`https://plantaeraiz.com.br/cadastro?ref=${newCode}`);
+      // Só um código gravado no servidor é compartilhável (ensure_referral_code); nunca gerar código no navegador.
+      try {
+        const code = await loadPermanentReferralCode(uid);
+        setReferralCode(code);
+        setReferralLink(`${window.location.origin}/cadastro?ref=${code}`);
+      } catch {
+        setReferralCode("");
+        setReferralLink("");
+      }
     }
 
     // Load commissions

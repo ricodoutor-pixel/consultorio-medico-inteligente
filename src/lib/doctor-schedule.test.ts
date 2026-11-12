@@ -72,7 +72,10 @@ describe("Doctor Schedule - Dr. Anderson Mikalauskas rules and booking", () => {
   });
 
   it("should return available days in the month correctly", async () => {
-    const days = await getDoctorAvailableDays(doctorSlug, "2026-11");
+    // Dias passados não têm horário livre: fixa "hoje" no início do mês para o teste não depender da data real.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-01T08:00:00-03:00"));
+    const days = await getDoctorAvailableDays(doctorSlug, "2026-11").finally(() => vi.useRealTimers());
     expect(Array.isArray(days)).toBe(true);
     expect(days.length).toBeGreaterThan(0);
 

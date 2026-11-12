@@ -64,3 +64,14 @@ describe("patient WhatsApp notices and consultation documents", () => {
     expect(Object.keys(CONSULTATION_DOCUMENTS)).toEqual(["simples", "atestado", "solicitacao_exames"]);
   });
 });
+
+import { doctorShareLinks } from "./doctor-share-links";
+
+describe("doctor personal links", () => {
+  it("open the consultation with the doctor pre-selected and carry the permanent referral code", () => {
+    const l = doctorShareLinks("https://www.plantayraiz.com.br/", "doc 1", "PRZ-AB12");
+    expect(l.chat).toBe("https://www.plantayraiz.com.br/consulta/consulta_chat?doctor=doc%201&ref=PRZ-AB12");
+    expect(l.video).toBe("https://www.plantayraiz.com.br/consulta/consulta_video?doctor=doc%201&ref=PRZ-AB12");
+    expect(l.colleague).toBe("https://www.plantayraiz.com.br/cadastro-profissional?ref=PRZ-AB12");
+  });
+});

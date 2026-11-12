@@ -29,6 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
+import { DoctorShareLinks } from "@/components/doctor/DoctorShareLinks";
 
 const Consultorio = () => {
   const [doctor, setDoctor] = useState<any>(null);
@@ -571,8 +572,9 @@ const Consultorio = () => {
           </TabsContent>
           
           <TabsContent value="perfil" className="mt-0">
+            {doctor?.id && doctor?.user_id && <DoctorShareLinks doctorId={doctor.id} userId={doctor.user_id} />}
             {doctor && profile ? (
-              <DoctorProfileSettings 
+              <DoctorProfileSettings
                 doctor={doctor} 
                 profile={profile} 
                 onUpdate={fetchData} 

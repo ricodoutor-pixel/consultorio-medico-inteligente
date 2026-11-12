@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle, Lock, Copy, Globe, CreditCard, DollarSign, Bitcoin, MapPin, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { linkReferralOnSignup } from "@/hooks/useReferralTracking";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
 import { categories, COUNCIL_CONFIG } from "@/data/professional-config";
@@ -512,6 +513,13 @@ const CadastroProfissional = () => {
       if (signUpErr) throw signUpErr;
       const userId = signUpData.user?.id;
       if (!userId) throw new Error("Falha ao criar usuário");
+
+      // Colega convidado pelo link de um médico: liga à árvore de indicações (mesmo fluxo do cadastro de paciente).
+      try {
+        await linkReferralOnSignup(userId);
+      } catch (e) {
+        console.warn("[CadastroProfissional] referral link", e);
+      }
 
       // 2) Registrar perfil e dados do profissional via RPC
       const { error: rpcErr } = await (supabase.rpc as any)("register_new_doctor", {

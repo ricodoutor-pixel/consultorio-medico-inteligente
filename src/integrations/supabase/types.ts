@@ -2233,6 +2233,44 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_waitlist: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          id: string
+          modality: string
+          notified_at: string | null
+          patient_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          id?: string
+          modality?: string
+          notified_at?: string | null
+          patient_id?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          modality?: string
+          notified_at?: string | null
+          patient_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_waitlist_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultations: {
         Row: {
           appointment_id: string | null
@@ -2550,6 +2588,33 @@ export type Database = {
           id?: string
           results?: Json | null
           risk_level?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      doctor_ai_usage: {
+        Row: {
+          answer: string | null
+          created_at: string
+          id: string
+          question: string | null
+          tool: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          created_at?: string
+          id?: string
+          question?: string | null
+          tool: string
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          created_at?: string
+          id?: string
+          question?: string | null
+          tool?: string
           user_id?: string
         }
         Relationships: []
@@ -10250,6 +10315,25 @@ export type Database = {
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
+      }
+      doctor_finance_monthly: {
+        Args: { _months?: number }
+        Returns: {
+          month: string
+          released_amount: number
+          released_count: number
+          withdrawals_pending: number
+          withdrawn_fee: number
+          withdrawn_net: number
+        }[]
+      }
+      doctor_public_ratings: {
+        Args: never
+        Returns: {
+          doctor_id: string
+          rating_avg: number
+          rating_count: number
+        }[]
       }
       email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {

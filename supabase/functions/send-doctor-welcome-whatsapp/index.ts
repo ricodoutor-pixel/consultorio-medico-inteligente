@@ -1,3 +1,6 @@
+import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -6,7 +9,7 @@ const corsHeaders = {
 };
 
 const EVO_URL = (Deno.env.get("EVOLUTION_API_URL") || Deno.env.get("EVOLUTION_URL_VPS") || "https://whatsapp.plantayraiz.com.br").replace(/\/$/, "");
-const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY") || Deno.env.get("EVOLUTION_API_KEY_VPS") || "39d3c0208169d52717027e27477cdc9f63d70fda54296c501fbe409c10562a59";
+const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY") || Deno.env.get("EVOLUTION_API_KEY_VPS") || "";
 const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || Deno.env.get("EVOLUTION_INSTANCE_NAME") || "plantayraiz";
 const ADMIN_PHONE = Deno.env.get("ADMIN_WHATSAPP") || "5511991363154"; // Dr. Edilson / Adm
 
@@ -37,7 +40,28 @@ serve(async (req) => {
 
   try {
     const payload = await req.json();
-    const { phone, fullName, email, crm, planTier = "vip", actionType = "welcome_vip", renewalLink } = payload;
+    let { phone, fullName, email, crm, planTier = "vip", actionType = "welcome_vip", renewalLink } = payload;
+    // Only service/admin callers may choose recipient/action; a signed-in doctor gets only their own welcome.
+    if (requireServiceAuth(req, corsHeaders) !== null) {
+      const uid = await getCallerUserId(req);
+      if (!uid) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (!(await isAdmin(uid))) {
+        const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+        const { data: prof } = await svc.from("profiles").select("phone, full_name").eq("id", uid).maybeSingle();
+        const { data: doc } = await svc.from("doctors").select("crm").eq("user_id", uid).maybeSingle();
+        if (!doc || !prof?.phone) {
+          return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        const { data: once } = await svc.rpc("check_edge_rate_limit", { p_bucket: "doctor-welcome", p_key: uid, p_max_hits: 1, p_window_seconds: 86400 });
+        if (once === false) {
+          return new Response(JSON.stringify({ ok: true, skipped: "already_sent" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        phone = prof.phone; fullName = prof.full_name || fullName; crm = doc.crm; email = undefined;
+        actionType = "welcome_vip"; planTier = "vip"; renewalLink = undefined;
+      }
+    }
 
     console.log(`[VIP Lifecycle] action=${actionType} to ${fullName} (${phone}) - CRM: ${crm}`);
 

@@ -73,7 +73,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { patientId, patientPhone, patientName, doctorName, items } = parsed.data
+    const { patientId, patientName, doctorName, items } = parsed.data
+    let patientPhone = parsed.data.patientPhone
 
     // If a doctor is calling (not service-role), verify they have an appointment with this patient
     if (callerDoctorUserId) {
@@ -90,6 +91,18 @@ Deno.serve(async (req) => {
           status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
+    }
+
+    if (callerDoctorUserId) {
+      const adminClient = createClient(supabaseUrl, serviceKey)
+      const { data: prof } = await adminClient.from('profiles').select('phone').eq('id', patientId).maybeSingle()
+      const stored = String(prof?.phone || '').replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '')
+      if (!stored) {
+        return new Response(JSON.stringify({ error: 'Patient has no registered phone' }), {
+          status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      patientPhone = stored
     }
 
     const checkoutUrl = `https://plantayraiz.com.br/checkout/fast-track?pid=${patientId}`

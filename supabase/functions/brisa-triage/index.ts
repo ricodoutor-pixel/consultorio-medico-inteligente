@@ -68,12 +68,12 @@ serve(async (req) => {
     const safeLang = ["pt", "en", "es"].includes(String(language)) ? language : "pt";
 
     let contexto_historico: { message: string; sender: string; timestamp: string }[] = [];
-    if (unifiedContactId) {
+    if (isServiceRole && unifiedContactId) {
       contexto_historico = await getRecentHistory(unifiedContactId, 12);
     }
 
     // Debug: Log the historical context being sent to Gemini
-    console.log("Contexto Histórico para Gemini:", contexto_historico);
+    console.log("Contexto Histórico itens:", contexto_historico.length);
 
     let welcomeMessage = "";
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);

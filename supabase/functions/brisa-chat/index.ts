@@ -98,6 +98,7 @@ async function executeAgenticTool(toolName: string, args: any, supabase: any, us
       .from("prescriptions")
       .select("id, medication, dosage, signature_hash, doctor_id, patient_id")
       .eq("id", prescription_id)
+      .eq("patient_id", userId ?? "00000000-0000-0000-0000-000000000000")
       .maybeSingle();
 
     if (!presc) {
@@ -269,7 +270,19 @@ serve(async (req) => {
 
     // Se a chamada for diretamente uma requisição de tool UCP/MCP:
     if (tool_call) {
-      const result = await executeAgenticTool(tool_call, tool_args || {}, supabase);
+      const authH = req.headers.get("Authorization") || "";
+      let callerId: string | undefined;
+      if (authH.toLowerCase().startsWith("bearer ")) {
+        const { data: cl } = await createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!)
+          .auth.getClaims(authH.slice(7).trim());
+        callerId = (cl?.claims?.sub as string) || undefined;
+      }
+      if (!callerId) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const result = await executeAgenticTool(tool_call, tool_args || {}, supabase, callerId);
       return new Response(JSON.stringify(result), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

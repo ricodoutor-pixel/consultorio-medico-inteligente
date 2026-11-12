@@ -6,7 +6,7 @@
  * modal de failover imediato para o WhatsApp institucional (+55 11 99136-3154).
  */
 import { useEffect, useRef, useState, useCallback } from "react";
-import { MessageCircle, RefreshCw, Radio } from "lucide-react";
+import { Maximize2, Minimize2, MessageCircle, PhoneOff, RefreshCw, Radio, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 declare global {
@@ -58,9 +58,38 @@ export function JitsiRoom({
 }: JitsiRoomProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<any>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const userInitiatedLeave = useRef(false);
   const [connectionFailed, setConnectionFailed] = useState(false);
+  // Desligou pelo botão do Jitsi: confirma antes de encerrar a consulta (evita encerrar por toque acidental).
+  const [leftCall, setLeftCall] = useState(false);
+  const [joinKey, setJoinKey] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const effectiveDomain = domain || DEFAULT_DOMAIN;
+  // Callbacks em ref: a página re-renderiza a cada segundo (cronômetro) e não pode recriar a chamada.
+  const onCloseRef = useRef(onClose);
+  const onReadyRef = useRef(onReady);
+  onCloseRef.current = onClose;
+  onReadyRef.current = onReady;
+
+  const setFullscreen = useCallback((on: boolean) => {
+    setExpanded(on);
+    const el = wrapperRef.current;
+    try {
+      if (on && el?.requestFullscreen && !document.fullscreenElement) void el.requestFullscreen().catch(() => {});
+      if (!on && document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    } catch {
+      /* iOS: fica no modo ampliado por CSS */
+    }
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      if (!document.fullscreenElement) setExpanded(false);
+    };
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
 
   const handleConnectionDrop = useCallback(() => {
     if (!userInitiatedLeave.current) {
@@ -73,6 +102,7 @@ export function JitsiRoom({
     let cancelled = false;
     userInitiatedLeave.current = false;
     setConnectionFailed(false);
+    setLeftCall(false);
 
     loadJitsiScript(effectiveDomain)
       .then(() => {
@@ -101,10 +131,11 @@ export function JitsiRoom({
           },
         });
 
-        apiRef.current.addListener("videoConferenceJoined", () => onReady?.());
+        apiRef.current.addListener("videoConferenceJoined", () => onReadyRef.current?.());
         apiRef.current.addListener("readyToClose", () => {
           userInitiatedLeave.current = true;
-          onClose?.();
+          setFullscreen(false);
+          if (onCloseRef.current) setLeftCall(true);
         });
 
         apiRef.current.addListener("videoConferenceLeft", () => {
@@ -139,7 +170,7 @@ export function JitsiRoom({
       }
       apiRef.current = null;
     };
-  }, [roomName, effectiveDomain, jwt, displayName, isDoctor, onClose, onReady, handleConnectionDrop]);
+  }, [roomName, effectiveDomain, jwt, displayName, isDoctor, handleConnectionDrop, setFullscreen, joinKey]);
 
   if (connectionFailed) {
     return (
@@ -168,7 +199,7 @@ export function JitsiRoom({
           <Button
             onClick={() => {
               setConnectionFailed(false);
-              window.location.reload();
+              setJoinKey((k) => k + 1);
             }}
             variant="outline"
             className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 rounded-xl"
@@ -181,7 +212,51 @@ export function JitsiRoom({
     );
   }
 
-  return <div ref={containerRef} className="w-full h-full min-h-[400px] bg-black rounded-xl overflow-hidden" />;
+  if (leftCall) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-[300px] gap-5 p-8 text-center bg-zinc-950 rounded-xl">
+        <PhoneOff className="w-10 h-10 text-red-400" />
+        <div className="space-y-1 max-w-sm">
+          <h2 className="text-lg font-bold text-white">Você saiu da chamada de vídeo</h2>
+          <p className="text-sm text-zinc-400">Deseja encerrar a consulta ou voltar para o vídeo?</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button onClick={() => { setLeftCall(false); setJoinKey((k) => k + 1); }} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl">
+            <Video className="w-4 h-4 mr-2" /> Voltar ao vídeo
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onCloseRef.current?.()}
+            className="border-red-500/40 text-red-300 hover:bg-red-950 rounded-xl"
+          >
+            <PhoneOff className="w-4 h-4 mr-2" /> Encerrar consulta
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={wrapperRef}
+      className={
+        expanded
+          ? "fixed inset-0 z-[100] bg-black"
+          : "relative w-full h-full min-h-[300px] bg-black rounded-xl overflow-hidden"
+      }
+    >
+      <div ref={containerRef} className="w-full h-full" />
+      <button
+        type="button"
+        data-testid="video-fullscreen-toggle"
+        onClick={() => setFullscreen(!expanded)}
+        className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/60 hover:bg-black/80 px-3 py-1.5 text-xs font-bold text-white"
+      >
+        {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+        {expanded ? "Sair da tela cheia" : "Tela cheia"}
+      </button>
+    </div>
+  );
 }
 
 export default JitsiRoom;

@@ -52,6 +52,9 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 - A função `consultation-video-token` entrega a sala só ao paciente e ao médico da consulta paga e em andamento.
 - Com o Jitsi próprio configurado, a função gera um token por pessoa (o médico entra como moderador). Sem ele, usa o `meet.jit.si`.
 - Para instalar o Jitsi próprio na VPS Hostinger, siga `infra/jitsi/README.md`. Depois, cadastre os segredos `JITSI_DOMAIN`, `JITSI_APP_ID` e `JITSI_APP_SECRET` no Lovable Cloud.
+- **Instalado em 12/11/2026** em `meet.plantayraiz.com.br` (VPS Hostinger, `/opt/jitsi`), com teste de dois participantes aprovado e acesso sem token bloqueado.
+- O vídeo abre **dentro da página da consulta**, com botão **Tela cheia**. Se alguém desligar a chamada, aparece "Voltar ao vídeo" ou "Encerrar consulta", para que um toque acidental não encerre a consulta. Ao encerrar, o paciente vai direto para a avaliação (3 carinhas), recebe os documentos assinados e o seu link de indicação, como na Orientação Técnica.
+- Vigia da VPS: `infra/jitsi/watchdog.sh` roda pelo cron a cada 2 minutos. Ele sobe serviços parados e reinicia o `web` após 3 falhas de HTTPS, mexendo só em `/opt/jitsi`.
 
 ## 5. Link personalizado do médico
 
@@ -93,3 +96,16 @@ A sala da consulta já segue o cabeçalho e as bolhas da Orientação Técnica (
 5. O médico abre a consulta. Trocar mensagens nos dois sentidos e, na consulta por vídeo, ficar mais de 10 minutos na chamada.
 6. O médico encerra. O paciente avalia. Conferir o saldo do médico (93%) e o WhatsApp "pagamento disponível".
 7. Registrar data, hora e resultado de cada passo no `roadmap.md`.
+
+## 9. Guardião das consultas (auditoria 24h)
+
+A função `consultation-guardian` roda pelo cron a cada 5 minutos (migração 0032). Cada problema vira **um** alerta em `consultation_guardian_events` e uma notificação para os administradores. O painel "Guardião das consultas" do /admin lista os alertas e tem os botões "Verificar agora" e "Resolvido".
+
+| Verificação | Ação |
+|---|---|
+| Servidor de vídeo próprio não responde | Alerta crítico (no máximo um por hora). O vigia da VPS reinicia sozinho. |
+| Consulta "em andamento" há mais de 3 h e sem conversa há 1 h | **Corrige sozinho**: encerra a consulta com a marca `[ENCERRADA_PELO_GUARDIAO]`. O paciente ainda avalia e o repasse continua dependendo da avaliação. |
+| Pagou e não foi atendido em 13 h (prazo da sala de espera + folga) | Alerta crítico para contato humano (atendimento, remarcação ou reembolso). |
+| Avaliou e o repasse de 93% não foi liberado em 15 min | Alerta para conferir a carteira do médico. |
+
+O guardião não altera dinheiro, receitas nem dados clínicos sozinho. Correções automáticas se limitam a casos seguros e ficam registradas para auditoria.

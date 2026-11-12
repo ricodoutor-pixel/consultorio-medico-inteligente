@@ -18,6 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 import { ConsultationChatPanel } from "@/components/consultation/ConsultationChatPanel";
 import { isConsultationAppointmentId } from "@/lib/consultation-chat";
+import { FreeSignatureModal } from "@/components/prescription/FreeSignatureModal";
+import { generatePrescriptionPDF } from "@/lib/prescriptionPDF";
+import { APP_CONFIG } from "@/lib/app-config";
+import { ageOn, parsePrescriptionText } from "@/lib/consultation-prescription";
+import type { Json } from "@/integrations/supabase/types";
 import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 import { ManualMedicoModal } from "@/components/medico/ManualMedicoModal";
 import { loadDoctorPatientRecords } from "@/components/doctor/DoctorProntuarioImportExportModal";
@@ -47,6 +52,11 @@ const WorkspaceMedico = () => {
   
   // Prescription state
   const [prescriptionText, setPrescriptionText] = useState("");
+  const [issuingRx, setIssuingRx] = useState(false);
+  const [rxSigning, setRxSigning] = useState<{
+    prescriptionId: string; base64: string; filename: string; doctorName: string; doctorCrm: string;
+  } | null>(null);
+  const [rxSignedUrl, setRxSignedUrl] = useState<string | null>(null);
 
   // Copilot state
   const [copilotLoading, setCopilotLoading] = useState(false);
@@ -211,6 +221,65 @@ const WorkspaceMedico = () => {
       toast({ title: "Salvo com sucesso", description: "Evolução registrada no prontuário." });
     } catch (error) {
       toast({ title: "Erro", description: "Não foi possível salvar.", variant: "destructive" });
+    }
+  };
+
+  // Receita: grava a prescrição, gera o PDF timbrado e abre a assinatura gov.br (ITI).
+  const issuePrescription = async () => {
+    const items = parsePrescriptionText(prescriptionText);
+    if (!items.length) {
+      toast({ title: "Receita vazia", description: "Escreva ao menos um item na posologia.", variant: "destructive" });
+      return;
+    }
+    if (!isConsultationAppointmentId(appointmentId) || !patientId || !doctorUserId) {
+      toast({ title: "Receita indisponível", description: "A receita só pode ser emitida numa consulta real.", variant: "destructive" });
+      return;
+    }
+    setIssuingRx(true);
+    try {
+      const [{ data: doc }, { data: docProfile }] = await Promise.all([
+        supabase.from("doctors").select("id, crm, crm_state, is_verified").eq("user_id", doctorUserId).maybeSingle(),
+        supabase.from("profiles").select("full_name").eq("id", doctorUserId).maybeSingle(),
+      ]);
+      if (!doc?.is_verified) throw new Error("Seu cadastro médico precisa estar aprovado para emitir receitas.");
+
+      const { data: rx, error: rxErr } = await supabase
+        .from("prescriptions")
+        .insert({
+          doctor_id: doc.id,
+          patient_id: patientId,
+          appointment_id: appointmentId,
+          medications: items as unknown as Json,
+          instructions: prescriptionText.trim(),
+          status: "draft",
+        })
+        .select("id")
+        .single();
+      if (rxErr || !rx) throw new Error("Não foi possível registrar a receita.");
+
+      const pdf = await generatePrescriptionPDF({
+        clinicName: APP_CONFIG.COMPANY.NAME,
+        clinicPhone: APP_CONFIG.COMPANY.PHONE,
+        doctorName: docProfile?.full_name || "Médico(a)",
+        doctorCRM: doc.crm,
+        doctorCRMState: doc.crm_state,
+        patientName: patient?.full_name || "Paciente",
+        patientCPF: patient?.cpf || "Não informado",
+        patientAge: ageOn(patient?.date_of_birth),
+        medications: items,
+        date: new Date(),
+      });
+      setRxSigning({
+        prescriptionId: rx.id,
+        base64: pdf.output("datauristring").split(",")[1] ?? "",
+        filename: `receita_${rx.id.slice(0, 8)}.pdf`,
+        doctorName: docProfile?.full_name || "Médico(a)",
+        doctorCrm: `${doc.crm}/${doc.crm_state}`,
+      });
+    } catch (e) {
+      toast({ title: "Erro na receita", description: e instanceof Error ? e.message : "Tente de novo.", variant: "destructive" });
+    } finally {
+      setIssuingRx(false);
     }
   };
 
@@ -421,7 +490,27 @@ const WorkspaceMedico = () => {
                   className="mt-2"
                 />
 
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">Emitir & Assinar Digitalmente</Button>
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  onClick={() => void issuePrescription()}
+                  disabled={issuingRx || rxSignedUrl !== null}
+                >
+                  {issuingRx ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+                  {rxSignedUrl ? "Receita assinada e entregue ao paciente" : "Emitir & Assinar Digitalmente (gov.br)"}
+                </Button>
+                {rxSigning && (
+                  <FreeSignatureModal
+                    open={!!rxSigning}
+                    onOpenChange={(v) => { if (!v) setRxSigning(null); }}
+                    prescriptionId={rxSigning.prescriptionId}
+                    unsignedPdfBase64={rxSigning.base64}
+                    filename={rxSigning.filename}
+                    patient={{ name: patient?.full_name || "Paciente", whatsapp: "" }}
+                    doctor={{ name: rxSigning.doctorName, crm: rxSigning.doctorCrm }}
+                    appointmentId={appointmentId || undefined}
+                    onCompleted={(url) => setRxSignedUrl(url)}
+                  />
+                )}
 
               </TabsContent>
 

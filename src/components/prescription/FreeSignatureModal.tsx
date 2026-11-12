@@ -58,7 +58,10 @@ export function FreeSignatureModal({
       return;
     }
     setDone(true);
-    toast({ title: "Receita assinada!", description: "Enfª Brisa enviou ao paciente." });
+    toast({
+      title: "Receita assinada!",
+      description: "Já está disponível para o paciente na plataforma; o aviso por WhatsApp segue em seguida.",
+    });
     onCompleted?.(res.signedUrl!);
   };
 
@@ -101,7 +104,7 @@ export function FreeSignatureModal({
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
             <div className="flex-1">
               <p className="font-medium">Envie o PDF assinado</p>
-              <p className="text-muted-foreground text-xs mb-2">A Enfª Brisa entrega ao paciente automaticamente.</p>
+              <p className="text-muted-foreground text-xs mb-2">Envie o arquivo baixado do assinador. O paciente recebe na plataforma e por WhatsApp.</p>
               <Input
                 type="file"
                 accept="application/pdf"

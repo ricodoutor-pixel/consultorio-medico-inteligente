@@ -182,7 +182,16 @@ export async function submitFreeSignedPdf(args: {
       },
     });
     if (error || !data?.success) {
-      return { success: false, error: data?.error || error?.message || "Falha upload" };
+      // Em erro HTTP, a mensagem do servidor (ex.: "PDF não assinado") vem no corpo da resposta.
+      let message = data?.error || error?.message || "Falha upload";
+      try {
+        const ctx = (error as { context?: Response } | null)?.context;
+        const parsed = ctx ? await ctx.json() : null;
+        if (parsed?.error) message = parsed.error;
+      } catch {
+        // mantém a mensagem padrão
+      }
+      return { success: false, error: message };
     }
     return { success: true, signedUrl: data.signed_pdf_url };
   } catch (err) {

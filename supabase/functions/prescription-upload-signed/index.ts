@@ -6,6 +6,7 @@
 // - Dispara Enfª Brisa (Evolution API) para o paciente
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { isSignedPdf } from "../_shared/signed-pdf.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,20 +49,37 @@ Deno.serve(async (req) => {
       });
     }
     const { data: rx } = await admin
-      .from("prescriptions").select("id, doctor_id").eq("id", prescriptionId).maybeSingle();
+      .from("prescriptions").select("id, doctor_id, status").eq("id", prescriptionId).maybeSingle();
     if (!rx || rx.doctor_id !== doc.id) {
       return new Response(JSON.stringify({ success: false, error: "Prescrição não pertence ao médico" }), {
         status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // Receita já assinada não é substituída (o documento entregue ao paciente é definitivo).
+    if (rx.status === "signed") {
+      return new Response(JSON.stringify({ success: false, error: "Esta receita já foi assinada" }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Hash do arquivo assinado (auditoria de integridade)
     const pdfBytes = Uint8Array.from(atob(contentBase64), (c) => c.charCodeAt(0));
+    // Aceita só PDF de até 10 MB que contenha um campo de assinatura digital (gerado pelo assinador ITI/gov.br).
+    const head = new TextDecoder("latin1").decode(pdfBytes.subarray(0, 5));
+    const body = new TextDecoder("latin1").decode(pdfBytes);
+    if (!isSignedPdf(head, body, pdfBytes.byteLength)) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "O arquivo não é um PDF assinado digitalmente. Assine no gov.br (assinador.iti.br) e envie o PDF baixado de lá.",
+      }), { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     const digest = await crypto.subtle.digest("SHA-256", pdfBytes);
     const hash = Array.from(new Uint8Array(digest))
       .map((b) => b.toString(16).padStart(2, "0")).join("");
 
-    const objectPath = `iti-free/${user.id}/${Date.now()}_${filename}`;
+    const safeName = String(filename).replace(/[^a-zA-Z0-9._-]/g, "_").slice(-120);
+    const objectPath = `iti-free/${user.id}/${Date.now()}_${safeName}`;
     const { error: upErr } = await admin.storage
       .from("prescriptions")
       .upload(objectPath, pdfBytes, { contentType: "application/pdf", upsert: false });
@@ -77,6 +95,7 @@ Deno.serve(async (req) => {
       signature_hash: hash,
       signature_provider: "iti_govbr_free",
       signed_pdf_url: signedPdfUrl,
+      signed_pdf_path: objectPath,
       status: "signed",
       signature_date: new Date().toISOString(),
     }).eq("id", prescriptionId);
@@ -84,14 +103,8 @@ Deno.serve(async (req) => {
     // Dispara Enfª Brisa (Evolution API) — chamada server-to-server
     try {
       await admin.functions.invoke("brisa-prescription-dispatch", {
-        body: {
-          patient_phone: patient?.whatsapp,
-          patient_name: patient?.name,
-          doctor_name: doctor?.name,
-          prescription_url: signedPdfUrl,
-          appointment_id: appointmentId,
-          prescription_id: prescriptionId,
-        },
+        // O telefone do paciente é lido no servidor pelo próprio dispatch, nunca do corpo desta requisição.
+        body: { prescription_id: prescriptionId },
       });
     } catch (e) {
       console.error("[prescription-upload-signed] brisa dispatch error:", e);
@@ -101,7 +114,7 @@ Deno.serve(async (req) => {
       ai_name: "manus_ceo",
       event_type: "free_signature",
       status: "completed",
-      input_data: { prescriptionId, doctorCRM: doctor?.crm, patientName: patient?.name },
+      input_data: { prescriptionId, doctorCRM: doctor?.crm },
       output_data: { hash: hash.substring(0, 16), bucket_path: objectPath },
     }).then(() => {}).catch(() => {});
 

@@ -15,7 +15,7 @@ A coluna **Situação** separa o que está pronto no código, o que existe mas d
 | 5 | Atendimento | O médico abre o Consultório. A consulta passa a "em andamento" e a sala abre para o paciente. A sala tem chat em tempo real nos dois sentidos, vídeo e limite de 45 minutos. | ✅ chat (`consultation_chats`, migração 0022) · ⚠️ vídeo no `meet.jit.si` até o Jitsi próprio (seção 4) |
 | 6 | Encerramento | O médico ou o paciente encerra. A consulta passa a "concluída". | ✅ |
 | 7 | Avaliação | O paciente avalia com as carinhas. A avaliação libera o repasse. | ✅ |
-| 8 | Receita | O paciente recebe a receita em PDF com assinatura digital do médico. | ❌ **Falta.** O botão "Emitir & Assinar Digitalmente" do Workspace não faz nada. Existem as funções `govbr-prescription-sign` e `prescription-upload-signed` e a tela `FreeSignatureModal`, mas nada disso está ligado à consulta. Receita de controle especial exige ICP-Brasil. |
+| 8 | Receita | O paciente recebe a receita em PDF com assinatura digital do médico. | ✅ No Workspace, "Emitir & Assinar" grava a receita, gera o PDF timbrado e abre a assinatura gov.br (assinador.iti.br). O médico envia o PDF assinado, que só é aceito se tiver assinatura digital. O paciente baixa na página da consulta por link temporário (`prescription-download`) e recebe aviso por WhatsApp. ⚠️ A assinatura gov.br é **avançada**; receita de controle especial exige **ICP-Brasil qualificada** (certificado A1/A3 ou nuvem: VIDaaS, BirdID). |
 | 9 | Indicação | Ao final, o paciente recebe o código permanente de indicação. | ✅ |
 
 ## 2. Repasse e saque do médico
@@ -60,7 +60,7 @@ A sala da consulta já segue o cabeçalho e as bolhas da Orientação Técnica (
 
 ## 7. Pendências que afetam o atendimento real
 
-1. **Receita em PDF assinada** (etapa 8), o item mais importante para a consulta ter valor clínico.
+1. **Assinatura ICP-Brasil qualificada** para receitas de controle especial (etapa 8). A receita simples já funciona com gov.br.
 2. **Saque automático** (seção 2). Depende da escolha de um provedor de transferência.
 3. **Rodízio** conforme a seção 3.
 4. **Jitsi próprio** (seção 4).

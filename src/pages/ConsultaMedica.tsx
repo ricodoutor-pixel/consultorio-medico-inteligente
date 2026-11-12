@@ -52,6 +52,7 @@ import {
 import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { userChannel } from "@/lib/realtime-channels";
 import { useConsultationChat } from "@/hooks/useConsultationChat";
+import { ConsultationPrescriptionCard } from "@/components/consultation/ConsultationPrescriptionCard";
 import { professionals } from "@/data/professionals";
 import { formatBRL } from "@/lib/pricing";
 
@@ -1148,6 +1149,10 @@ export default function ConsultaMedica() {
               </CardContent>
             </Card>
           ))}
+
+        {(stage === "rating" || stage === "referral") && appt?.id && userId && (
+          <ConsultationPrescriptionCard appointmentId={appt.id} patientId={userId} />
+        )}
 
         {stage === "rating" && (
           <Card>

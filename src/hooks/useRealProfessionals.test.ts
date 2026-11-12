@@ -24,6 +24,7 @@ vi.mock("@/lib/visible-interval", () => ({ setVisibleInterval: () => vi.fn() }))
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     from: harness.from,
+    rpc: () => Promise.resolve({ data: [], error: null }),
     channel: () => {
       const channel = { on: () => channel, subscribe: () => channel };
       return channel;
@@ -68,7 +69,7 @@ describe("Patient-visible medical presence", () => {
     const doctor = await loadList();
     expect(doctor?.online).toBe(true);
     expect(doctor?.presenceState).toBe("online");
-    expect(harness.from.mock.calls.map(([table]) => table)).toEqual(["doctors_public", "appointments"]);
+    expect(harness.from.mock.calls.map(([table]) => table)).toEqual(["doctors_public"]);
   });
 
   it("does not turn a stale ON flag into real availability", async () => {

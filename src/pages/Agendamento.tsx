@@ -47,6 +47,7 @@ import {
   type AvailableDayInfo
 } from "@/lib/doctor-schedule";
 import { WaitlistCard } from "@/components/agenda/WaitlistCard";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
@@ -72,6 +73,11 @@ const Agendamento = () => {
   // Passo ativo: 1 = Modalidade, 2 = Data, 3 = Horário, 4 = Confirmação, 5 = Sucesso
   const [step, setStep] = useState<number>(1);
   const [selectedDoctor, setSelectedDoctor] = useState<Professional | null>(null);
+  // Presença real (servidor): a lista fixa da vitrine não diz quem está online.
+  const { professionals: liveProfessionals } = useRealProfessionals();
+  const livePresence = selectedDoctor
+    ? liveProfessionals.find((p) => p.id === selectedDoctor.id || (!!selectedDoctor.dbId && p.dbId === selectedDoctor.dbId))
+    : undefined;
   const [searchDoctorQuery, setSearchDoctorQuery] = useState("");
 
   // Dados do agendamento
@@ -416,9 +422,11 @@ const Agendamento = () => {
                       {selectedDoctor.avatar}
                     </div>
                   )}
-                  {selectedDoctor.online && (
+                  {livePresence?.presenceState === "em_consulta" ? (
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-amber-400 border-2 border-card" title="Em consulta agora" />
+                  ) : livePresence?.online ? (
                     <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-card" title="Online agora" />
-                  )}
+                  ) : null}
                 </div>
 
                 <div>

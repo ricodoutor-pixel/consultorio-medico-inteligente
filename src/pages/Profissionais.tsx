@@ -49,22 +49,9 @@ function useRotatingOnline(base: Professional[]): Professional[] {
     // Filter out doctors blocked/turned OFF by admin
     const visibleDocs = base.filter((p) => Boolean(p) && cardOverrides[p.id] !== false);
 
-    return visibleDocs.map((p) => {
-      // Check direct online status set by doctor in /consultorio or admin in /admin/aprovacoes-medicas
-      const directStatus = localStorage.getItem(`doctor_online_status_${p.id}`) ??
-                           (p.dbId ? localStorage.getItem(`doctor_online_status_${p.dbId}`) : null);
-      if (directStatus !== null) {
-        return { ...p, online: directStatus === 'true' };
-      }
-      if (p.id === 'med-3' || p.id === 'med-joao-pedro') {
-        const joaoStatus = localStorage.getItem('doctor_online_status_med-3');
-        if (joaoStatus !== null) {
-          return { ...p, online: joaoStatus === 'true' };
-        }
-        return { ...p, online: true };
-      }
-      return p;
-    });
+    // Presença só do servidor (botão ON + batimento recente; amarelo = em consulta paga agora).
+    // Nada de status guardado no navegador nem médico forçado online.
+    return visibleDocs;
   }, [base, tick]);
 }
 
@@ -249,9 +236,14 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
                     {pro.avatar}
                   </div>
                 )}
-                <OnlineStatusIndicator online={pro.online} size="lg" className="absolute -bottom-1 -right-1" />
+                <OnlineStatusIndicator online={pro.online} presenceState={pro.presenceState} size="lg" className="absolute -bottom-1 -right-1" />
               </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
+              {pro.presenceState === "em_consulta" && (
+                <p className="mb-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
+                  🟡 Em consulta agora. Aguarde a luz ficar verde para chamar este médico ou entre na lista de espera da agenda.
+                </p>
+              )}
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className="text-sm text-muted-foreground">{pro.category}</p>
                 {isVipDoctor(pro) && <DoctorVIPSeal tier={getDoctorSealTier(pro)} />}

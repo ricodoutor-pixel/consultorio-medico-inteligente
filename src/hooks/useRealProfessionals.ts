@@ -166,7 +166,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       try {
         const [publicRes, activeApptsRes] = await Promise.allSettled([
           supabase.from("doctors_public" as never).select("*"),
-          supabase.from("appointments").select("doctor_id").eq("status", "in_progress"),
+          // Luz amarela: médicos atendendo agora (função pública 0044; visitantes não leem appointments).
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- função nova ainda fora dos tipos gerados
+          (supabase.rpc as any)("doctors_in_consultation"),
         ]);
         if (!active) return;
 

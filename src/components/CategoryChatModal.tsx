@@ -130,7 +130,7 @@ export function CategoryChatModal({ open, category, onClose }: Props) {
         },
       });
       if (fnErr) throw fnErr;
-      if (data?.contactId && !contactId) {
+      if (data?.contactId && data.contactId !== contactId) {
         setContactId(data.contactId);
         localStorage.setItem("pr_lead_contact_id", data.contactId);
       }

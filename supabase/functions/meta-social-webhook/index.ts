@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isValidMetaSignature } from "../_shared/meta-signature.ts";
+import { META_APP_SECRET } from "../_shared/meta-secrets.ts";
 
 const META_VERIFY_TOKEN = Deno.env.get("META_VERIFY_TOKEN") || "planta_meta_webhook_2026";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "https://shmbwdjuddvquszwkvuq.supabase.co";
@@ -30,7 +32,17 @@ serve(async (req: Request) => {
 
   // 3. POST: Ingestão de Directs e Comentários do Instagram/Facebook
   try {
-    const body = await req.json().catch(() => ({}));
+    // Only Meta-signed payloads may reach the service-role lead pipeline.
+    const rawBody = await req.text();
+    if (!(await isValidMetaSignature(rawBody, req.headers.get("x-hub-signature-256"), META_APP_SECRET))) {
+      console.warn("[meta-social-webhook] Assinatura Meta ausente ou inválida — payload recusado.");
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401,
+        headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
+      });
+    }
+    let body: any = {};
+    try { body = JSON.parse(rawBody); } catch { body = {}; }
     console.log("📥 Payload Meta Webhook recebido:", JSON.stringify(body).slice(0, 300));
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);

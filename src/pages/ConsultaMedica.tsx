@@ -577,12 +577,6 @@ export default function ConsultaMedica() {
         // Caso já exista registro para esta consulta
       }
 
-      supabase.functions
-        .invoke("doctor-payout-notify", {
-          body: { appointment_id: appt.id },
-        })
-        .catch(() => {});
-
       setRatingJustSubmitted(true);
       await loadAppt(appt.id);
       toast.success("Obrigado pela avaliação!");

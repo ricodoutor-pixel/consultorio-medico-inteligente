@@ -11,6 +11,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
+import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 import {
   buildDoctorConsultationMessage,
   cleanDoctorDisplayName,
@@ -488,11 +489,12 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
   const svc = svcClient();
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const bearer = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
   const isService =
-    bearer === serviceKey ||
-    req.headers.get("x-cron-secret") === Deno.env.get("BRISA_CEO_SECRET_KEY");
+    (Boolean(serviceKey) && bearer === serviceKey) ||
+    (Boolean(Deno.env.get("BRISA_CEO_SECRET_KEY")) && req.headers.get("x-cron-secret") === Deno.env.get("BRISA_CEO_SECRET_KEY")) ||
+    authenticateCronRequest(req) === null;
 
   let body: Record<string, unknown> = {};
   if (req.method === "POST") body = await req.json().catch(() => ({}));
@@ -691,7 +693,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action !== "sweep" && !isService) return json({ error: "Unauthorized" }, 401);
+    if (!isService) return json({ error: "Unauthorized" }, 401);
 
     if (action === "dispatch") {
       const appointmentId = String(body.appointment_id ?? "");

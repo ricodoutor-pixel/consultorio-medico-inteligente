@@ -44,16 +44,20 @@ Deno.serve(async (req) => {
   const { data: list } = await admin.from("doctors_public").select("id,user_id,full_name,is_verified")
     .eq("is_verified", true).order("full_name");
   const docs = (list || []).filter((d) => !WITHDRAWN.includes(norm(d.full_name || "")));
-  const slice = docs.slice(offset, offset + Math.min(limit, 15));
+  const slice = docs.slice(offset);
+  const max = Math.min(limit, 12);
+  let sentCount = 0;
   const resendKey = Deno.env.get("RESEND_API_KEY");
   const out: unknown[] = [];
 
   for (const d of slice) {
+    if (sentCount >= max) break;
     const rawName = (d.full_name || "").trim();
     const name = /^dr/i.test(rawName) ? rawName : `Dr(a). ${rawName}`;
-    if (dry_run) { out.push({ name }); continue; }
+    if (dry_run) { out.push({ name }); if (++sentCount >= max) break; continue; }
     const { data: first } = await admin.rpc("check_edge_rate_limit", { p_bucket: "doctor-flow-briefing-v1", p_key: d.id, p_max_hits: 1, p_window_seconds: 7 * 86400 });
-    if (first === false) { out.push({ name, skipped: "already_sent" }); continue; }
+    if (first === false) continue;
+    sentCount++;
     const { data: prof } = await admin.from("profiles").select("phone").eq("id", d.user_id).maybeSingle();
     const { data: au } = await admin.auth.admin.getUserById(d.user_id);
     const email = au?.user?.email || null;

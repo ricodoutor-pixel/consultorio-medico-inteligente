@@ -316,6 +316,13 @@
       "when": 1794517093068,
       "tag": "0044_doctors_in_consultation",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1794517293068,
+      "tag": "0045_doctor_free_alerts",
+      "breakpoints": true
     }
   ]
 }

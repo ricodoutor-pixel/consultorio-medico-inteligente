@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2, Search, X, Calendar } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
+import { DoctorFreeAlertButton } from "@/components/agenda/DoctorFreeAlertButton";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
 import { motion } from "framer-motion";
@@ -240,9 +241,12 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
               {pro.presenceState === "em_consulta" && (
-                <p className="mb-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-bold text-amber-700 dark:text-amber-300">
-                  🟡 Em consulta agora. Aguarde a luz ficar verde para chamar este médico ou entre na lista de espera da agenda.
-                </p>
+                <div className="mb-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5">
+                  <p className="text-xs font-bold text-amber-700 dark:text-amber-300">
+                    🟡 Em consulta agora. Aguarde a luz ficar verde para chamar este médico.
+                  </p>
+                  {pro.dbId && <DoctorFreeAlertButton doctorDbId={pro.dbId} />}
+                </div>
               )}
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className="text-sm text-muted-foreground">{pro.category}</p>

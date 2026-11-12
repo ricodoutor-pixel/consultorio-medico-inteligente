@@ -21,6 +21,8 @@ import { isConsultationAppointmentId } from "@/lib/consultation-chat";
 import { FreeSignatureModal } from "@/components/prescription/FreeSignatureModal";
 import { generatePrescriptionPDF } from "@/lib/prescriptionPDF";
 import { loadDoctorSignatureImageUrl } from "@/lib/kyc-docs";
+import { Cid10Search } from "@/components/doctor/Cid10Search";
+import { PatientTimeline } from "@/components/doctor/PatientTimeline";
 import { APP_CONFIG } from "@/lib/app-config";
 import { ageOn, CONSULTATION_DOCUMENTS, type ConsultationDocumentKind, parsePrescriptionText } from "@/lib/consultation-prescription";
 import type { Json } from "@/integrations/supabase/types";
@@ -49,6 +51,7 @@ const WorkspaceMedico = () => {
   // EMR state
   const [notes, setNotes] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
+  const [diagnosisCid, setDiagnosisCid] = useState("");
   const [treatmentPlan, setTreatmentPlan] = useState("");
   
   // Prescription state
@@ -142,6 +145,7 @@ const WorkspaceMedico = () => {
       if (recordRes.data) {
         if (recordRes.data.notes) setNotes(recordRes.data.notes);
         if (recordRes.data.diagnosis) setDiagnosis(recordRes.data.diagnosis);
+        if (recordRes.data.diagnosis_cid) setDiagnosisCid(recordRes.data.diagnosis_cid);
         if (recordRes.data.treatment_plan) setTreatmentPlan(recordRes.data.treatment_plan);
       } else if (importedMatch) {
         setNotes(importedMatch.clinicalNotes || "");
@@ -226,14 +230,17 @@ const WorkspaceMedico = () => {
     if (!session) return;
 
     try {
-      await supabase.from("medical_records").insert({
+      if (!patientId) throw new Error("sem paciente");
+      const { error } = await supabase.from("medical_records").insert({
         patient_id: patientId,
         doctor_id: session.user.id,
-        appointment_id: appointmentId,
+        appointment_id: isConsultationAppointmentId(appointmentId) ? appointmentId : null,
         notes: notes,
         diagnosis: diagnosis,
+        diagnosis_cid: diagnosisCid || null,
         treatment_plan: treatmentPlan,
       });
+      if (error) throw error;
       toast({ title: "Salvo com sucesso", description: "Evolução registrada no prontuário." });
     } catch (error) {
       toast({ title: "Erro", description: "Não foi possível salvar.", variant: "destructive" });
@@ -462,8 +469,15 @@ const WorkspaceMedico = () => {
               
               <TabsContent value="evolution" className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Diagnóstico / Hipótese</Label>
-                  <Input placeholder="Ex: CID R52.2 - Outra dor crônica" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
+                  <Label>Diagnóstico / Hipótese (CID-10)</Label>
+                  <Cid10Search
+                    value={diagnosis}
+                    onChange={(text) => {
+                      setDiagnosis(text);
+                      if (diagnosisCid && !text.startsWith(diagnosisCid)) setDiagnosisCid("");
+                    }}
+                    onSelect={(item) => setDiagnosisCid(item[0])}
+                  />
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-end mb-1">
@@ -556,10 +570,7 @@ const WorkspaceMedico = () => {
               </TabsContent>
 
               <TabsContent value="history">
-                <div className="flex flex-col items-center justify-center py-10 text-muted-foreground text-sm">
-                  <Calendar size={32} className="mb-2 opacity-30"/>
-                  <p>Nenhum atendimento anterior encontrado para este paciente.</p>
-                </div>
+                {patientId ? <PatientTimeline patientId={patientId} /> : null}
               </TabsContent>
             </Tabs>
           </div>

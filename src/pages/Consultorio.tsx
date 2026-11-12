@@ -8,7 +8,9 @@ import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDas
 import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
 import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
-import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
+import { CopilotoEvidencias } from "@/components/doctor/CopilotoEvidencias";
+import { AssistenteJuridico } from "@/components/doctor/AssistenteJuridico";
+import { MeuKitAssinante } from "@/components/doctor/MeuKitAssinante";
 import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
 import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
 import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
@@ -515,6 +517,9 @@ const Consultorio = () => {
 
           <TabsList className="mb-6 w-full flex flex-nowrap overflow-x-auto h-auto p-1.5 bg-card/90 backdrop-blur-md border border-border/60 rounded-xl gap-2 whitespace-nowrap scrollbar-none">
             <TabsTrigger value="atendimentos" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Atendimentos</TabsTrigger>
+            <TabsTrigger value="meu-kit" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-emerald-500/15 text-emerald-500 data-[state=active]:bg-emerald-600 data-[state=active]:text-white border border-emerald-500/30">
+              🧰 Meu Kit do Assinante
+            </TabsTrigger>
             <TabsTrigger value="prontuarios-pacientes" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-emerald-500/15 text-emerald-400 data-[state=active]:bg-emerald-600 data-[state=active]:text-white border border-emerald-500/30">
               📂 Prontuário & Pacientes (Importar / Exportar / CPF)
             </TabsTrigger>
@@ -522,7 +527,10 @@ const Consultorio = () => {
               📅 Horários & Consulta por Vídeo
             </TabsTrigger>
             <TabsTrigger value="copiloto-vip" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-black border border-emerald-500/30">
-              🧠 Copiloto IA (Decisão Clínica)
+              🧠 Copiloto de Evidências (PubMed)
+            </TabsTrigger>
+            <TabsTrigger value="juridico" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-indigo-500/15 text-indigo-400 data-[state=active]:bg-indigo-600 data-[state=active]:text-white border border-indigo-500/30">
+              ⚖️ Assistente Jurídico
             </TabsTrigger>
             <TabsTrigger value="paciente-teste" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all bg-emerald-500/10 text-emerald-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
               🎭 Paciente Teste (Simulação 360°)
@@ -555,8 +563,16 @@ const Consultorio = () => {
             />
           </TabsContent>
 
+          <TabsContent value="meu-kit" className="mt-0 border-0 p-0">
+            <MeuKitAssinante planTier={doctor?.plan_tier} onOpenTab={setActiveTab} />
+          </TabsContent>
+
           <TabsContent value="copiloto-vip" className="mt-0 border-0 p-0">
-            <CopilotoClinicoVIP />
+            <CopilotoEvidencias />
+          </TabsContent>
+
+          <TabsContent value="juridico" className="mt-0 border-0 p-0">
+            <AssistenteJuridico />
           </TabsContent>
 
           <TabsContent value="paciente-teste" className="mt-0 border-0 p-0">

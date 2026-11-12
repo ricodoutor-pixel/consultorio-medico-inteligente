@@ -267,6 +267,13 @@
       "when": 1794502857555,
       "tag": "0037_verdinho_knowledge_service_only",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1794503057555,
+      "tag": "0038_doctor_ai_usage",
+      "breakpoints": true
     }
   ]
 }

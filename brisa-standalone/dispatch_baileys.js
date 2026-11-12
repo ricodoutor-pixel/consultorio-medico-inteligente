@@ -120,13 +120,13 @@ async function runBaileysCampaign() {
         const cleanPhone = phone.replace(/\D/g, "");
 
         if (progress.sentNumbers.includes(cleanPhone)) {
-          console.log(`⏩ [PULANDO JÁ ENVIADO] +${cleanPhone} já processado.`);
+          console.log(`⏩ [PULANDO JÁ ENVIADO] ***${String(cleanPhone).slice(-4)} já processado.`);
           progress.lastIndex = i + 1;
           saveProgress();
           continue;
         }
 
-        console.log(`[${new Date().toLocaleTimeString('pt-BR')}] 🚀 [${i + 1}/${phonesList.length}] Enviando convite para +${cleanPhone}...`);
+        console.log(`[${new Date().toLocaleTimeString('pt-BR')}] 🚀 [${i + 1}/${phonesList.length}] Enviando convite para ***${String(cleanPhone).slice(-4)}...`);
 
         let targetJid = `${cleanPhone}@s.whatsapp.net`;
         try {
@@ -138,11 +138,11 @@ async function runBaileysCampaign() {
 
         try {
           const sentMsg = await sock.sendMessage(targetJid, { text: messageText });
-          console.log(`✅ [ENTREGUE VIA WEBSOCKET] Convite enviado a +${cleanPhone}! (JID: ${targetJid} | ID: ${sentMsg?.key?.id || 'OK'})`);
+          console.log(`✅ [ENTREGUE VIA WEBSOCKET] Convite enviado a ***${String(cleanPhone).slice(-4)}! (JID: ${targetJid} | ID: ${sentMsg?.key?.id || 'OK'})`);
           progress.successfulCount++;
           progress.sentNumbers.push(cleanPhone);
         } catch (err) {
-          console.error(`❌ [FALHA DE ENVIO BAILEYS] +${cleanPhone}:`, err.message);
+          console.error(`❌ [FALHA DE ENVIO BAILEYS] ***${String(cleanPhone).slice(-4)}:`, err.message);
           progress.failedCount++;
         }
 

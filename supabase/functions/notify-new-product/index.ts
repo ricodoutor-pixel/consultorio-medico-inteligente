@@ -91,10 +91,10 @@ Deno.serve(async (req) => {
           sentCount++;
         } else {
           const errText = await response.text();
-          console.error(`Failed to send to ${sub.phone}:`, errText);
+          console.error(`Failed to send to subscriber ***${String(sub.phone).slice(-4)}:`, errText);
         }
       } catch (err) {
-        console.error(`Error sending to ${sub.phone}:`, err);
+        console.error(`Error sending to subscriber ***${String(sub.phone).slice(-4)}:`, err);
       }
 
       // Also create in-app notification

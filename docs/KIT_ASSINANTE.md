@@ -33,6 +33,8 @@ Migração: `0038_doctor_ai_usage.sql` (uso das ferramentas de IA, para limites 
 | **Resumo do dia para o médico** | WhatsApp às 7 h (Brasília) | Quantidade e horários das consultas pagas do dia, sem dados de pacientes, mais o lembrete de ligar o ON. Uma vez por dia. |
 
 | **Nota real no perfil público** | Vitrine e `/profissionais/:id` | Autorizada pelo Dr. Edilson em 12/11/2026. Média e número de avaliações de consultas pagas, avaliadas pelo próprio paciente (função `doctor_public_ratings`, migração 0041). Só aparece com 5 avaliações ou mais. Também vai para o Google (AggregateRating). Substituiu a nota 5,0 fixa no código e os depoimentos escritos à mão, que não eram avaliações reais. |
+| **Luz amarela e "Avise-me quando ficar livre"** | Vitrine e perfil do médico | Verde = botão ON com batimento; amarelo = consulta paga em andamento (`doctors_in_consultation`, migração 0044); vermelho = offline. No amarelo, o paciente pede um WhatsApp único quando o médico ficar livre (`doctor_free_alerts`, migração 0045, cron `doctor-free-alerts` a cada minuto; expira em 3 h). |
+| Teste da jornada completa | `src/lib/patient-journey.test.ts` | 11 passos: link do médico → pagamento → triagem → sala → avaliação → indicação → aviso de médico livre → lembretes. |
 
 ## Parte 3 — escriba pronto; o restante depende de contrato (pesquisa de 12/11/2026)
 

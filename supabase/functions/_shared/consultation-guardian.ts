@@ -11,6 +11,8 @@ export const GUARDIAN_LIMITS = {
   waitingTooLongMinutes: 13 * 60,
   /** Avaliação registrada e repasse não liberado depois disso. */
   payoutGraceMinutes: 15,
+  /** Saque Pix "processing" (resposta incerta do Mercado Pago) sem conclusão depois disso. */
+  withdrawalProcessingMinutes: 60,
   /** Janela olhada para trás (evita reabrir histórico antigo). */
   lookbackDays: 30,
 } as const;
@@ -21,7 +23,8 @@ export type GuardianEventKind =
   | "video_server_down"
   | "stuck_in_progress_closed"
   | "paid_waiting_too_long"
-  | "rating_without_payout";
+  | "rating_without_payout"
+  | "withdrawal_stuck_processing";
 
 export function minutesAgoIso(now: Date, minutes: number): string {
   return new Date(now.getTime() - minutes * 60_000).toISOString();

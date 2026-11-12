@@ -107,5 +107,6 @@ A função `consultation-guardian` roda pelo cron a cada 5 minutos (migração 0
 | Consulta "em andamento" há mais de 3 h e sem conversa há 1 h | **Corrige sozinho**: encerra a consulta com a marca `[ENCERRADA_PELO_GUARDIAO]`. O paciente ainda avalia e o repasse continua dependendo da avaliação. |
 | Pagou e não foi atendido em 13 h (prazo da sala de espera + folga) | Alerta crítico para contato humano (atendimento, remarcação ou reembolso). |
 | Avaliou e o repasse de 93% não foi liberado em 15 min | Alerta para conferir a carteira do médico. |
+| Saque Pix "em processamento" há mais de 1 h | Alerta crítico: conferir no painel do Mercado Pago antes de devolver o saldo (evita pagar duas vezes). |
 
 O guardião não altera dinheiro, receitas nem dados clínicos sozinho. Correções automáticas se limitam a casos seguros e ficam registradas para auditoria.

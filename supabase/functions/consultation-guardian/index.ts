@@ -171,6 +171,27 @@ Deno.serve(async (req) => {
     }
   }
 
+  // 5. Saque Pix com resposta incerta do Mercado Pago: conferir no painel antes de qualquer reembolso.
+  const { data: stuckPayouts, error: payoutErr } = await sb
+    .from("withdrawal_requests")
+    .select("id, net_amount, updated_at")
+    .eq("status", "processing")
+    .lt("updated_at", minutesAgoIso(now, GUARDIAN_LIMITS.withdrawalProcessingMinutes))
+    .gte("created_at", since)
+    .limit(50);
+  if (payoutErr) errors.push(`withdrawals: ${payoutErr.message}`);
+  for (const w of stuckPayouts ?? []) {
+    events.push({
+      kind: "withdrawal_stuck_processing",
+      severity: "critical",
+      appointment_id: null,
+      message: `Saque Pix ${String(w.id).slice(0, 8)} de R$ ${Number(w.net_amount).toFixed(2)} está "em processamento" há mais de 1 hora. Confira no painel do Mercado Pago se o Pix saiu antes de qualquer devolução ao médico, para não pagar duas vezes.`,
+      auto_fixed: false,
+      dedupe_key: guardianDedupeKey("withdrawal_stuck_processing", String(w.id), now),
+      details: { withdrawal_id: w.id, net_amount: w.net_amount },
+    });
+  }
+
   // Registra uma única vez e avisa os administradores só sobre o que é novo.
   let created: { id: string; kind: string; message: string; appointment_id: string | null }[] = [];
   if (events.length) {

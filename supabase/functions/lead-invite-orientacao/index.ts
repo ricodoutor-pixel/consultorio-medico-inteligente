@@ -121,10 +121,19 @@ Deno.serve(async (req) => {
     // Anti-duplicação: se já existe tag de convite enviado, não dispara de novo.
     const { data: existing } = await supabase
       .from("leads_contatos")
-      .select("id,tags")
+      .select("id,tags,nome,created_at")
       .eq("telefone", phoneDigits)
       .order("created_at", { ascending: false })
       .limit(1);
+
+    // Only invite a number that was just submitted through the lead form (opt-in) with the same name.
+    const fresh = existing?.[0];
+    if (!fresh || Date.now() - new Date(fresh.created_at).getTime() > 15 * 60 * 1000 ||
+        String(fresh.nome || "").trim().toLowerCase() !== String(nome).trim().toLowerCase()) {
+      return new Response(JSON.stringify({ ok: true, skipped: "no_recent_optin" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const leadRow = existing?.[0];
     if (leadRow?.tags?.includes("Convite_R30_Enviado")) {

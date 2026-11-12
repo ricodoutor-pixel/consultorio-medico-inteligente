@@ -26,6 +26,7 @@ import { PatientTimeline } from "@/components/doctor/PatientTimeline";
 import { PatientEvolutionChart } from "@/components/doctor/PatientEvolutionChart";
 import { ClinicalAlertsBar } from "@/components/doctor/ClinicalAlertsBar";
 import { AnamnesisTemplatePicker } from "@/components/doctor/AnamnesisTemplatePicker";
+import { ScribeRecorder } from "@/components/doctor/ScribeRecorder";
 import { APP_CONFIG } from "@/lib/app-config";
 import { ageOn, CONSULTATION_DOCUMENTS, type ConsultationDocumentKind, parsePrescriptionText } from "@/lib/consultation-prescription";
 import type { Json } from "@/integrations/supabase/types";
@@ -494,6 +495,7 @@ const WorkspaceMedico = () => {
                     </Button>
                     </div>
                   </div>
+                  <ScribeRecorder onSoap={(text) => setNotes((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${text}` : text))} />
                   <Textarea className="min-h-[150px]" placeholder="Paciente relata melhora no quadro álgico após início de CBD 20%..." value={notes} onChange={e => setNotes(e.target.value)} />
                 </div>
                 <div className="space-y-2">

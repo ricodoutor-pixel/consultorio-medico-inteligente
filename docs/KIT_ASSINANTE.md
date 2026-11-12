@@ -34,12 +34,22 @@ Migração: `0038_doctor_ai_usage.sql` (uso das ferramentas de IA, para limites 
 
 | **Nota real no perfil público** | Vitrine e `/profissionais/:id` | Autorizada pelo Dr. Edilson em 12/11/2026. Média e número de avaliações de consultas pagas, avaliadas pelo próprio paciente (função `doctor_public_ratings`, migração 0041). Só aparece com 5 avaliações ou mais. Também vai para o Google (AggregateRating). Substituiu a nota 5,0 fixa no código e os depoimentos escritos à mão, que não eram avaliações reais. |
 
-## Parte 3 — dependem de contrato ou decisão
+## Parte 3 — escriba pronto; o restante depende de contrato (pesquisa de 12/11/2026)
 
-1. **Escriba de IA:** a consulta vira rascunho do SOAP. Exige termo de consentimento do paciente (LGPD) e escolha do serviço de transcrição.
-2. **Assinatura ICP-Brasil em 1 clique** (BirdID ou VIDaaS via parceiro). Resolve a receita de controle especial e tira o vai e vem do gov.br.
-3. **Base de medicamentos** com posologia e interações (licença de base farmacológica).
-4. **Certificação SBIS/CFM** do prontuário (NGS1/NGS2), que serve como selo de confiança.
+### Escriba de IA — pronto (aguardando o Lovable)
+Construído dentro da plataforma com a transcrição da Lovable AI (`google/gemini-3.5-transcribe`), pagando só pelo uso. Os escribas de mercado custam R$ 97 a R$ 449 por médico por mês (Escriba Médico, Integrativ, Assist4Doc, MedWiser, Noa da Doctoralia, Voa Health, Vokkari).
+- **Onde:** Workspace → Evolução → "Escriba de IA" (função `doctor-scribe`, migração 0042).
+- **Ditar resumo:** só o microfone do médico.
+- **Gravar a consulta:** microfone + áudio da aba da chamada (o médico escolhe a aba e marca "compartilhar áudio"). Exige marcar que o paciente autorizou. A linha de consentimento entra no prontuário.
+- Grava em trechos de 4,5 min, transcreve durante a consulta e para sozinho aos 50 min. **O áudio não é armazenado.**
+- "Gerar SOAP" organiza a transcrição sem inventar dados, marca [conferir] o que estiver ambíguo e acrescenta o texto às notas para o médico revisar e salvar.
+- Limite diário: 150 usos nos planos pagos e 6 no plano free (cada trecho e cada SOAP contam 1).
+
+### Assinatura ICP-Brasil e base de medicamentos — recomendação: integrar a Memed
+- **Memed:** prescrição digital gratuita para o médico, com base de medicamentos e assinatura ICP-Brasil. Integração por API para parceiros: API Key e Secret, tela de prescrição sobre a nossa aplicação, ambiente de homologação e termo de aceite antes das chaves de produção. Resolve juntos a assinatura em 1 clique e a base de medicamentos. **Passo do Dr. Edilson:** preencher o formulário de parceiro da Memed (doc.memed.com.br).
+- **Alternativa com API própria:** Prescri (API REST/SDK, aceita VIDaaS e BirdID), preço da API sob consulta.
+- **Certificado do médico:** o CFM fornece o **VIDaaS (ICP-Brasil em nuvem) sem custo** ao médico em dia que tem a carteira CIM de policarbonato. BirdID custa cerca de R$ 90 a R$ 150 por ano. Exigência: Resolução CFM 2.299/2021 (NGS2).
+- **Certificação SBIS do prontuário:** fica para depois da escala, porque o processo é longo e caro.
 
 ## Assinatura digital: estado atual
 

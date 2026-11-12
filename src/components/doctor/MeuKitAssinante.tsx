@@ -52,7 +52,7 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
     {
       icon: Stethoscope,
       title: "Prontuário eletrônico",
-      text: "Linha do tempo, CID-10 oficial (DATASUS), modelos de anamnese, alergias no topo e gráfico de evolução.",
+      text: "Escriba de IA (ditado ou consulta inteira → SOAP), CID-10 oficial, modelos, alergias no topo, linha do tempo e gráfico de evolução.",
       badge: "no Workspace",
       tab: "prontuarios-pacientes",
     },
@@ -94,8 +94,7 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
   ];
 
   const next = [
-    "Escriba de IA: a consulta vira rascunho do SOAP (com consentimento do paciente)",
-    "Assinatura ICP-Brasil em 1 clique (BirdID/VIDaaS), inclusive controle especial",
+    "Assinatura ICP-Brasil em 1 clique e base de medicamentos (integração Memed), inclusive controle especial",
   ];
 
   return (

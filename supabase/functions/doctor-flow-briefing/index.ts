@@ -80,5 +80,6 @@ Deno.serve(async (req) => {
     out.push({ name, whatsapp: (wa as any).ok ?? false, wa_err: (wa as any).error, email: mail.ok, mail_err: mail.error });
     await new Promise((r) => setTimeout(r, 2500));
   }
+  console.log("briefing batch", JSON.stringify((out as any[]).map((o) => ({ wa: o.whatsapp, wa_err: o.wa_err, email: o.email, mail_err: o.mail_err }))));
   return json({ total: docs.length, offset, sent: out });
 });

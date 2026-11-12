@@ -1,0 +1,1 @@
+COMMENT ON TABLE public.consultation_guardian_events IS 'Anomalias de consultas registradas pelo consultation-guardian (uma vez por dedupe_key).';

@@ -2001,6 +2001,63 @@ export type Database = {
           },
         ]
       }
+      consultation_guardian_events: {
+        Row: {
+          appointment_id: string | null
+          auto_fixed: boolean
+          created_at: string
+          dedupe_key: string
+          details: Json
+          id: string
+          kind: string
+          message: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          auto_fixed?: boolean
+          created_at?: string
+          dedupe_key: string
+          details?: Json
+          id?: string
+          kind: string
+          message: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          auto_fixed?: boolean
+          created_at?: string
+          dedupe_key?: string
+          details?: Json
+          id?: string
+          kind?: string
+          message?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_guardian_events_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_guardian_events_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+        ]
+      }
       consultation_offers: {
         Row: {
           accepted_at: string | null

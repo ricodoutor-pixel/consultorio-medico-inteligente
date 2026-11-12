@@ -1,3 +1,4 @@
+import { csvCell } from "@/lib/admin-export";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -235,7 +236,7 @@ export default function AdminLeads() {
       String(l.lead_score), (l.condition_interest ?? "").replace(/[",\n]/g, " "),
       JSON.stringify(l.metadata ?? {}).replace(/"/g, "'"),
     ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const csv = [headers, ...rows].map((r) => r.map(csvCell).join(",")).join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

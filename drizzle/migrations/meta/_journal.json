@@ -218,6 +218,13 @@
       "when": 1794467830580,
       "tag": "0030_consultation_document_types",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794468040442,
+      "tag": "0031_consultation_chat_attachments_safe",
+      "breakpoints": true
     }
   ]
 }

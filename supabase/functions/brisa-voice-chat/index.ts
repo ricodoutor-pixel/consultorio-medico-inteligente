@@ -24,6 +24,8 @@ function montarSystemPrompt(body: ChatBody): string {
   const agora = body.now?.human
     || new Date().toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short", timeZone: "America/Sao_Paulo" });
 
+  const bpmNum = Number(body.contextBpm);
+  body.contextBpm = Number.isFinite(bpmNum) && bpmNum >= 20 && bpmNum <= 250 ? Math.round(bpmNum) : (undefined as any);
   const bpmTrecho = body.contextBpm
     ? `O paciente acabou de medir ${body.contextBpm} BPM — classificação: ${classificarBpm(body.contextBpm)}. Se ele pedir, leia esse resultado em voz alta de forma calma e sugira uma orientação técnica com o Dr. Edilson Bezerra (CRM-CE 10963) por R$ 30 se estiver fora da faixa normal.`
     : `O paciente ainda não mediu os batimentos nesta sessão. Se ele pedir leitura, oriente a tocar em "Iniciar Medição" no monitor cardíaco acima.`;

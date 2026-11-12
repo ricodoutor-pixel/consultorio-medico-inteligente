@@ -17,7 +17,7 @@ serve(async (req) => {
   if (limited) return limited
 
   try {
-    const { 
+    let { 
       activityType, 
       distanceKm, 
       timeMinutes, 
@@ -26,6 +26,12 @@ serve(async (req) => {
       steps, 
       stairs 
     } = await req.json()
+    const num = (v: unknown) => { const n = Number(v); return Number.isFinite(n) ? Math.max(0, Math.min(n, 100000)) : 0 }
+    const ALLOWED = ["corrida","caminhada","bicicleta","ciclismo","natação","natacao","escada","musculação","musculacao","outro","running","walking","cycling"]
+    const at = String(activityType ?? "").toLowerCase().trim()
+    activityType = ALLOWED.includes(at) ? at : "outro"
+    distanceKm = num(distanceKm); timeMinutes = num(timeMinutes); speedKmh = num(speedKmh)
+    calories = num(calories); steps = num(steps); stairs = num(stairs)
 
     if (!GEMINI_API_KEY) {
       throw new Error("API Key not configured")

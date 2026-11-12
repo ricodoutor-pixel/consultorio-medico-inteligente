@@ -1,5 +1,11 @@
 # Roadmap
 
+## Implantação das consultas — 12/11/2026
+- [ ] Aplicar migrações 0021–0026 em ordem e verificar os resultados no Cloud
+- [ ] Confirmar consultation_queue_sweep ativo e consultation-files privado
+- [ ] Implantar as seis funções solicitadas e confirmar META_APP_SECRET
+- [ ] Conferir segurança e solicitar publicação do site
+
 ## Presença pública dos médicos — 11/11/2026
 - [x] Publicar somente o batimento de presença no catálogo seguro e retirar a leitura privada da vitrine
 - [x] Conferir sincronização e proteção dos cadastros; 12 testes aprovados e lista pública conferida em computador/celular, sem alterar presença real (zero batimentos recentes nesta verificação)

@@ -7,6 +7,8 @@ import drSadiMentaImg from "@/assets/dr-sadi-menta.jpg";
 import cfmDrSadiMenta from "@/assets/cfm_prints/cfm-dr-sadi-menta.png";
 import draGeovanaTorresImg from "@/assets/dra-geovana-torres.jpg";
 import cfmDraGeovanaTorres from "@/assets/cfm_prints/cfm-dra-geovana-torres.png";
+import draGeisellTorresImg from "@/assets/dra-geisell-torres.jpg";
+import cfmDraGeisellTorres from "@/assets/cfm_prints/cfm-dra-geisell-torres.png";
 import draGraceConceicaoImg from "@/assets/dra-grace-conceicao.jpg";
 import cfmDraGraceConceicao from "@/assets/cfm_prints/cfm-dra-grace-conceicao.png";
 import drOtavioBasseteImg from "@/assets/dr-otavio-bassete.jpg";
@@ -494,6 +496,29 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento, muito atenciosa e dedicada." }
     ],
+  },
+  {
+    id: "med-geisell-torres",
+    name: "Dra. Geisell Martinez Torres",
+    category: "Médicos Prescritores",
+    bio: "Médica graduada pelo Instituto Superior de Ciências Médicas de Havana em 2002, com diploma revalidado pela Universidade Federal do Acre (UFAC). Inscrita no CRM 31192/BA (situação regular no CFM), com inscrição anterior no CRM/AC. Atua em Clínica Geral e Medicina Canabinoide, com acolhimento humanizado e cuidado integrativo voltado à qualidade de vida.",
+    flags: ["🇧🇷"],
+    experience: "24 anos",
+    tags: ["Clínica Geral", "Medicina Canabinoide", "Medicina Integrativa", "Prescritor"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    whatsapp: "5511991363154",
+    rating: null,
+    consults: 0,
+    avatar: "GM",
+    imageUrl: draGeisellTorresImg,
+    online: false,
+    cfmPrintUrl: cfmDraGeisellTorres,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: [],
+    crm: "31192/BA",
+    reviews: [],
   },
   {
     id: "med-daniel-kobayashi",

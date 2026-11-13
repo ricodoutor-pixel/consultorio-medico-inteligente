@@ -195,7 +195,7 @@ export default function FarmaciaVitrine() {
     });
 
     toast({
-      title: "🛒 Medicamento adicionado ao carrinho!",
+      title: "🛒 Medicamento adicionado à solicitação!",
       description: `${product.name} foi inserido no seu pedido.`
     });
     setSelectedProduct(null);
@@ -229,7 +229,7 @@ export default function FarmaciaVitrine() {
             A vitrine que você está procurando pode ter sido desativada ou não existe.
           </p>
           <Button asChild className="bg-primary text-primary-foreground font-bold">
-            <Link to="/shopping">Voltar ao Shopping Geral</Link>
+            <Link to="/shopping">Voltar ao Catálogo Geral</Link>
           </Button>
         </div>
         <Footer />
@@ -246,7 +246,7 @@ export default function FarmaciaVitrine() {
         <div className="mb-4">
           <Button variant="ghost" size="sm" asChild className="text-xs font-bold text-muted-foreground hover:text-foreground">
             <Link to="/shopping">
-              <ArrowLeft size={14} className="mr-1.5" /> Voltar ao Shopping
+              <ArrowLeft size={14} className="mr-1.5" /> Voltar ao Catálogo
             </Link>
           </Button>
         </div>
@@ -424,7 +424,7 @@ export default function FarmaciaVitrine() {
                       className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl h-10 shadow-md shadow-emerald-950/20"
                       onClick={() => handleAddToCart(p)}
                     >
-                      <ShoppingBag size={14} className="mr-1.5" /> Adicionar ao Carrinho
+                      <ShoppingBag size={14} className="mr-1.5" /> Adicionar à Solicitação
                     </Button>
                     <Button
                       variant="outline"
@@ -567,7 +567,7 @@ export default function FarmaciaVitrine() {
                   className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-11 rounded-xl"
                   onClick={() => handleAddToCart(selectedProduct)}
                 >
-                  <ShoppingBag size={16} className="mr-2" /> Adicionar ao Carrinho
+                  <ShoppingBag size={16} className="mr-2" /> Adicionar à Solicitação
                 </Button>
                 <Button
                   variant="outline"

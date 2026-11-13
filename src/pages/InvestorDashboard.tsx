@@ -124,7 +124,7 @@ const InvestorDashboard = () => {
                     </li>
                     <li className="flex items-start gap-2 text-xs text-muted-foreground">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                      Novas parcerias no Shopping adicionaram 15 novos lojistas.
+                      Novas parcerias no Catálogo adicionaram 15 novos lojistas.
                     </li>
                   </ul>
                 </div>

@@ -51,8 +51,8 @@
       "icons": [{ "src": "/dr-verdinho-192.png?v=9", "sizes": "192x192" }]
     },
     {
-      "name": "Shopping Canabinoide",
-      "short_name": "Shopping",
+      "name": "Produtos Autorizados",
+      "short_name": "Produtos",
       "description": "Produtos e fitocanabinoides autorizados",
       "url": "/shopping?source=shortcut",
       "icons": [{ "src": "/dr-verdinho-192.png?v=9", "sizes": "192x192" }]

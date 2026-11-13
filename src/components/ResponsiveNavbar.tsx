@@ -182,7 +182,7 @@ export const ResponsiveNavbar = () => {
       <div className="bg-gradient-to-r from-green-50 to-blue-50 px-4 py-2 flex items-center justify-center gap-2">
         <GlobalComplianceBadge />
         <span className="text-xs text-gray-600 font-medium">
-          Plataforma Popular-Saúde-Shopping | Conformidade: ANVISA | CFM | LGPD
+          Plataforma Popular-Saúde-Produtos | Conformidade: ANVISA | CFM | LGPD
         </span>
       </div>
     </>

@@ -879,7 +879,7 @@ export default function FarmaciaVirtual() {
                     </Badge>
                   </div>
                   <CardDescription className="text-xs">
-                    Cadastre medicamentos e fitocanabinoides regulados ANVISA para exibição no Shopping.
+                    Cadastre medicamentos e fitocanabinoides regulados ANVISA para exibição no Catálogo.
                   </CardDescription>
                 </CardHeader>
 

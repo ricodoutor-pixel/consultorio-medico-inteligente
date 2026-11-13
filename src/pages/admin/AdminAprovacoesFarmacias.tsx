@@ -205,9 +205,9 @@ export const AdminAprovacoesFarmacias = () => {
     }
 
     if (nextState) {
-      toast.success(`Loja "${pharmacy.nome_fantasia}" APROVADA e publicada no Shopping! 🛍️`);
+      toast.success(`Loja "${pharmacy.nome_fantasia}" APROVADA e publicada no Catálogo! 🛍️`);
     } else {
-      toast.warning(`Loja "${pharmacy.nome_fantasia}" pausada no Shopping.`);
+      toast.warning(`Loja "${pharmacy.nome_fantasia}" pausada no Catálogo.`);
     }
   };
 
@@ -278,7 +278,7 @@ export const AdminAprovacoesFarmacias = () => {
               Aprovações & KYC de <span className="text-gradient-green">Farmácias e Lojas</span>
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Auditoria de fachada física, contrato social, alvará ANVISA e liberação no catálogo do Shopping.
+              Auditoria de fachada física, contrato social, alvará ANVISA e liberação no Catálogo de Produtos.
             </p>
           </div>
 
@@ -323,7 +323,7 @@ export const AdminAprovacoesFarmacias = () => {
           <Card className="border-emerald-500/30 bg-emerald-500/5">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-xs text-emerald-400 font-bold uppercase">No Shopping (Ativas)</p>
+                <p className="text-xs text-emerald-400 font-bold uppercase">No Catálogo (Ativas)</p>
                 <p className="text-2xl font-black text-emerald-400 mt-1">{counts.approved}</p>
               </div>
               <CheckCircle2 className="w-8 h-8 text-emerald-500/40" />
@@ -439,7 +439,7 @@ export const AdminAprovacoesFarmacias = () => {
                           <OnlineStatusIndicator online={true} size="sm" showLabel />
                           {pharmacy.is_approved ? (
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-bold">
-                              PUBLICADA NO SHOPPING ✅
+                              PUBLICADA NO CATÁLOGO ✅
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="text-amber-400 border-amber-500/40 text-[10px] font-bold">
@@ -471,7 +471,7 @@ export const AdminAprovacoesFarmacias = () => {
                     {/* Toggle de Liberação no Shopping */}
                     <div className="flex items-center gap-3 bg-muted/30 p-3 rounded-2xl border border-border w-full lg:w-auto justify-between">
                       <div className="text-left pr-2">
-                        <p className="text-xs font-bold text-foreground">Liberar no Shopping</p>
+                        <p className="text-xs font-bold text-foreground">Liberar no Catálogo</p>
                         <p className="text-[10px] text-muted-foreground">Exibir produtos e catálogo</p>
                       </div>
                       <Switch

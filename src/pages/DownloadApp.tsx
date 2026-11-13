@@ -108,7 +108,7 @@ const DownloadApp = () => {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-muted-foreground text-lg mb-8 font-medium max-w-lg">
-                Orientações Técnicas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e atalho em 1 clique na sua Área de Trabalho.
+                Orientações Técnicas, receitas, produtos e biblioteca científica — tudo offline-first com biometria, push notifications e atalho em 1 clique na sua Área de Trabalho.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-4">

@@ -140,7 +140,7 @@ const Pay = () => {
                 {payType === "order" && items.length === 0 ? (
                   <div className="text-center py-8">
                     <ShoppingCart size={40} className="text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm mb-4">Nenhum item no carrinho</p>
+                    <p className="text-muted-foreground text-sm mb-4">Nenhum item na solicitação</p>
                     <Button variant="outline" className="rounded-xl" asChild>
                       <Link to="/shopping">Ir ao Shopping</Link>
                     </Button>

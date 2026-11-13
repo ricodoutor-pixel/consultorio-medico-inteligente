@@ -465,7 +465,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   return (
     <div className="container mx-auto px-4 pt-20 pb-12 md:pt-24 max-w-6xl">
       <Link to="/shopping" className="inline-flex items-center gap-2 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors mb-4 sm:mb-6">
-        <ArrowLeft size={14} /> Voltar ao Shopping
+        <ArrowLeft size={14} /> Voltar ao Catálogo
       </Link>
 
       <div className="grid md:grid-cols-2 gap-6 lg:gap-10">

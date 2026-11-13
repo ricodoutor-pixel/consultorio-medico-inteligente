@@ -17,7 +17,7 @@ export function NavbarOptimized() {
     { label: 'Início', href: '/' },
     { label: 'Profissionais', href: '/profissionais' },
     { label: 'Telemedicina', href: '/telemedicina' },
-    { label: 'Shopping', href: '/shopping' },
+    { label: 'Produtos', href: '/shopping' },
     { label: 'Biblioteca', href: '/biblioteca' },
     { label: 'Comunidade', href: '/comunidade' },
     { label: 'Planos', href: '/planos' }

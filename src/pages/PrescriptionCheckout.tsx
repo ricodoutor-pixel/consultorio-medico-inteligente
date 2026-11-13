@@ -46,12 +46,12 @@ export default function PrescriptionCheckout() {
           body: { action: "get_cart", cart_token: token },
         });
         if (err || !data?.cart) {
-          setError("Carrinho não encontrado ou expirado.");
+          setError("Solicitação não encontrada ou expirada.");
           return;
         }
         setCart(data.cart as PrescriptionCart);
       } catch {
-        setError("Erro ao carregar carrinho.");
+        setError("Erro ao carregar a solicitação.");
       } finally {
         setLoading(false);
       }
@@ -96,7 +96,7 @@ export default function PrescriptionCheckout() {
         <div className="pt-28 pb-16 flex items-center justify-center min-h-[70vh]">
           <div className="text-center space-y-4 px-4">
             <ShoppingCart size={64} className="mx-auto text-muted-foreground" />
-            <h1 className="text-2xl font-bold text-foreground">{error || "Carrinho não encontrado"}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{error || "Solicitação não encontrada"}</h1>
             <p className="text-muted-foreground">O link pode ter expirado ou já foi utilizado.</p>
           </div>
         </div>

@@ -138,7 +138,7 @@ export default function CartCheckout() {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">Carrinho vazio</p>
+          <p className="text-muted-foreground mb-4">Solicitação vazia</p>
           <Button onClick={() => navigate('/')}>Voltar para Home</Button>
         </div>
       </div>

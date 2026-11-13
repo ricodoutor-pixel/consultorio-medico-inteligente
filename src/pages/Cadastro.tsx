@@ -970,7 +970,7 @@ const Cadastro = () => {
                             <Building2 size={15} className="text-primary" /> Anexo de Documentos & Compliance da Loja Física (KYC)
                           </p>
                           <p className="text-[11px] text-muted-foreground">
-                            Estes documentos serão auditados antes da publicação dos seus produtos no Shopping.
+                            Estes documentos serão auditados antes da publicação dos seus produtos no Catálogo.
                           </p>
 
                           <div className="grid sm:grid-cols-2 gap-3">
@@ -979,7 +979,7 @@ const Cadastro = () => {
                               <Input type="file" accept="image/*" className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs font-bold text-muted-foreground">Logomarca da Empresa (Shopping) *</Label>
+                              <Label className="text-xs font-bold text-muted-foreground">Logomarca da Empresa (Catálogo) *</Label>
                               <Input type="file" accept="image/*" className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">

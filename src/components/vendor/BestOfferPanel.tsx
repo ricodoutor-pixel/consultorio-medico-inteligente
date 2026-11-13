@@ -108,7 +108,7 @@ export function BestOfferPanel() {
           <Sparkles size={18} /> Sua Melhor Oferta
         </CardTitle>
         <CardDescription>
-          Escolha 1 dos seus produtos para ficar em destaque no card da farmácia e na vitrine do Shopping.
+          Escolha 1 dos seus produtos para ficar em destaque no card da farmácia e na vitrine do Catálogo.
           Você pode trocar quando quiser.
         </CardDescription>
       </CardHeader>

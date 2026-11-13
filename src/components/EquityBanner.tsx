@@ -71,7 +71,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
              <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
            </p>
 
-            {/* CTAs Mobile Only - Iniciar Orientação Técnica + Abrir Shopping */}
+            {/* CTAs Mobile Only - Iniciar Orientação Técnica + Ver Produtos */}
             <div className="flex flex-col gap-3 mt-4 md:hidden">
               <Link
                 to="/profissionais"
@@ -83,7 +83,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                 to="/shopping"
                 className="flex items-center justify-center gap-2 px-6 py-4 border-2 border-primary text-primary font-black rounded-2xl text-base transition-all hover:scale-105 active:scale-95 bg-white"
               >
-                🛍️ Abrir Shopping <ShoppingBag size={18} />
+                🛍️ Ver Produtos <ShoppingBag size={18} />
               </Link>
             </div>
 

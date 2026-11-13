@@ -63,7 +63,7 @@ export const Navbar = () => {
     { to: "/profissionais", label: "Profissionais" },
     { to: "/telemedicina", label: "Telemedicina" },
     { to: "/monitoramento-saude", label: "Monitoramento" },
-    { to: "/shopping", label: "Shopping" },
+    { to: "/shopping", label: "Produtos" },
     { to: "/planos", label: "Planos" },
   ];
 

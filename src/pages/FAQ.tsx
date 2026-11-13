@@ -12,9 +12,9 @@ const FAQ = () => {
     {
       category: "Geral",
       questions: [
-        { q: "O que é a Planta & Raiz?", a: "Planta & Raiz é uma plataforma que democratiza o acesso a profissionais habilitados, teleatendimento quando aplicável e um Shopping de bem-estar com preços populares e pagamento via Pix." },
+        { q: "O que é a Planta & Raiz?", a: "Planta & Raiz é uma plataforma que democratiza o acesso a profissionais habilitados, teleatendimento quando aplicável e um catálogo de produtos de bem-estar com preços populares e pagamento via Pix." },
         { q: "A Planta & Raiz vende 'cura' ou promete resultados?", a: "Não. A plataforma é de intermediação e educação. Qualquer conduta clínica depende de avaliação individual por profissional habilitado." },
-        { q: "Posso usar sem receita médica?", a: "Sim! Você pode consultar profissionais, usar o Shopping de bem-estar e acessar conteúdos. Prescrição só quando aplicável após avaliação." },
+        { q: "Posso usar sem receita médica?", a: "Sim! Você pode consultar profissionais, usar o catálogo de produtos e acessar conteúdos. Prescrição só quando aplicável após avaliação." },
       ],
     },
     {
@@ -34,9 +34,9 @@ const FAQ = () => {
       ],
     },
     {
-      category: "Shopping",
+      category: "Produtos",
       questions: [
-        { q: "O que é o Shopping?", a: "É um Shopping multi-vendor com lojas verificadas, produtos de bem-estar e preços populares. Checkout via Pix." },
+        { q: "O que é o Catálogo de Produtos?", a: "É um catálogo de produtos com lojas verificadas, produtos de bem-estar e preços populares. Checkout via Pix." },
         { q: "Como garantir qualidade?", a: "Vendedores com verificação (CNPJ/CPF), produtos com laudos/COA, política de devolução e moderação." },
         { q: "Os produtos são legais?", a: "Sim! Todos seguem legislação vigente. Produtos controlados só com prescrição válida." },
       ],
@@ -45,7 +45,7 @@ const FAQ = () => {
       category: "Legal & Compliance",
       questions: [
         { q: "A plataforma é defensável legalmente?", a: "Sim. Foco em receita por serviço (consulta, intermediação, assinatura popular), sem promessa de retorno financeiro. Termos, LGPD e auditoria." },
-        { q: "O que é o modelo de receita?", a: "Taxa sobre consultas (10-20%), take rate do Shopping (8-15%), assinatura popular com benefícios. Sem linguagem de investimento." },
+        { q: "O que é o modelo de receita?", a: "Taxa sobre consultas (10-20%), taxa sobre produtos (8-15%), assinatura popular com benefícios. Sem linguagem de investimento." },
         { q: "Posso usar relatos reais na landing?", a: "Sim, mas apenas com consentimento explícito e documentado. Nomes e fotos ilustrativos devem ser identificados como tal." },
       ],
     },

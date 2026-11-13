@@ -386,7 +386,7 @@ async function createMercadoPagoPreferenceWithSplit(
             title: formatPaymentName(
               calculation.type === 'consultation'
                 ? 'Teleconsulta Cannabis Medicinal'
-                : 'Produto Shopping'),
+                : 'Produto do Catálogo'),
             quantity: 1,
             currency_id: 'BRL',
             unit_price: calculation.grossAmount,

@@ -308,7 +308,7 @@ export default function CadastroFarmacia() {
                   <Store className="text-primary w-5 h-5" /> Qual é o seu tipo de parceiro?
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Todos aparecem no Shopping. Só muda a lista de documentos pedida.
+                  Todos aparecem no Catálogo. Só muda a lista de documentos pedida.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -356,7 +356,7 @@ export default function CadastroFarmacia() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold">Nome Fantasia (Exibição no Shopping) *</Label>
+                    <Label className="text-xs font-bold">Nome Fantasia (Exibição no Catálogo) *</Label>
                     <Input
                       required
                       placeholder="Ex: Farmácia Planta y Raíz Jardins"

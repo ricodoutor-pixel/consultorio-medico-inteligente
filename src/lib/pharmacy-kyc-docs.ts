@@ -19,7 +19,7 @@ export type PharmacyKycKind =
 
 export const PHARMACY_KYC_LABELS: Record<PharmacyKycKind, string> = {
   foto_fachada: "Foto da Fachada / Loja Física",
-  logo_empresa: "Logomarca Oficial (Catálogo Shopping)",
+  logo_empresa: "Logomarca Oficial (Catálogo de Produtos)",
   contrato_social_pdf: "Contrato Social / Razão Social (PDF)",
   cartao_cnpj: "Cartão CNPJ / Registro Fiscal (Tax ID)",
   alvara_sanitario: "Alvará Sanitário / Autorização ANVISA (AFE)",

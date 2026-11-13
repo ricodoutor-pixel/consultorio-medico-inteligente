@@ -12,7 +12,7 @@ export default function SaudeDigital() {
         <title>Planos de Saúde Digital | Planta y Raiz</title>
         <meta
           name="description"
-          content="Planos de saúde digital com acesso à Brisa IA, descontos no shopping e orientações técnicas inclusas."
+          content="Planos de saúde digital com acesso à Brisa IA, descontos no catálogo e orientações técnicas inclusas."
         />
       </Helmet>
 
@@ -35,7 +35,7 @@ export default function SaudeDigital() {
               Planos de <span className="text-gradient-green">Saúde Digital</span>
             </h1>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
-              Acesso à Brisa IA, descontos no shopping e orientações técnicas inclusas.
+              Acesso à Brisa IA, descontos no catálogo e orientações técnicas inclusas.
             </p>
           </div>
 

@@ -59,7 +59,7 @@ export const UNIVERSAL_PLANS: PricedItem[] = [
     name: "Plano Paciente",
     price: UNIVERSAL_PLAN_PRICE,
     recurring: true,
-    description: "Acompanhamento contínuo, descontos no Shopping e prioridade na triagem.",
+    description: "Acompanhamento contínuo, descontos no catálogo e prioridade na triagem.",
   },
   {
     sku: "plano_medico",
@@ -73,7 +73,7 @@ export const UNIVERSAL_PLANS: PricedItem[] = [
     name: "Plano Lojista",
     price: UNIVERSAL_PLAN_PRICE,
     recurring: true,
-    description: "Vitrine no Shopping, repasses automáticos e painel de vendas.",
+    description: "Vitrine no catálogo, repasses automáticos e painel de vendas.",
   },
 ];
 
@@ -81,7 +81,7 @@ export const PLAN_FEATURES: Record<PlanSku, string[]> = {
   plano_paciente: [
     "Brisa IA 24h para triagem e dúvidas",
     "Prioridade na fila de atendimento",
-    "Descontos no Shopping",
+    "Descontos no catálogo",
     "Renovação de receita facilitada",
     "Histórico clínico completo",
   ],
@@ -93,7 +93,7 @@ export const PLAN_FEATURES: Record<PlanSku, string[]> = {
     "Repasses via Pix e painel financeiro",
   ],
   plano_lojista: [
-    "Vitrine de produtos no Shopping",
+    "Vitrine de produtos no catálogo",
     "Repasses automáticos via Mercado Pago",
     "Painel de vendas e estoque",
     "Selo de loja verificada",

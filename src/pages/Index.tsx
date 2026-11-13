@@ -362,7 +362,7 @@ const Index = () => {
                 <div className="text-center">
                   <div className="text-2xl mb-1">⚕️</div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-primary">3. Sala</p>
-                  <p className="text-[10px] text-muted-foreground">com Dr. Edilson ON</p>
+                  <p className="text-[10px] text-muted-foreground">com Dr. Edilson Bezerra ON</p>
                 </div>
               </div>
               <div className="flex justify-center pt-4">
@@ -374,7 +374,7 @@ const Index = () => {
                     newTab={false}
                     className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
                     source="CTA_DrEdilson_Triagem"
-                    modalMessage="Antes de entrar na sala virtual, deixe seu contato — garantimos sua Orientação Técnica em Nuvem de R$30 com o Dr. Edilson Bezerra On."
+                    modalMessage="Antes de entrar na sala virtual, deixe seu contato — garantimos sua Orientação Técnica em Nuvem de R$30 com o Dr. Edilson Bezerra ON."
                   >
                     💬 Iniciar Orientação Técnica em Nuvem (R$ 30) <ArrowRight size={20} className="ml-2" />
                   </BrisaCTAGate>

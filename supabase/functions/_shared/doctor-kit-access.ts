@@ -9,6 +9,7 @@ export interface DoctorKitAccess {
   doctor: boolean;
   verified: boolean;
   paid: boolean;
+  planTier: string | null;
   limit: number;
   used: number;
 }
@@ -39,7 +40,8 @@ export async function doctorKitAccess(req: Request, tool: DoctorAiTool): Promise
     doctor,
     verified: doctor && Boolean(doc?.is_verified),
     paid,
-    limit: dailyLimit(tool, { paid, admin }),
+    planTier: doc?.plan_tier ?? null,
+    limit: dailyLimit(tool, { paid, admin, planTier: doc?.plan_tier ?? null }),
     used: count ?? 0,
   };
 }

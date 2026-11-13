@@ -6,10 +6,13 @@
 //    Sem médico: a consulta fica agendada na sala de espera e a fila recomeça periodicamente até o prazo (12 h; 1 h se urgente).
 //    Prazo esgotado: Orientação Técnica gratuita com acesso do médico escolhido ao relatório.
 
+import { planRank } from "./doctor-plans.ts";
+
 export const PRESENCE_HEARTBEAT_INTERVAL_MS = 30_000; // ~30 segundos
 export const PRESENCE_TIMEOUT_MS = 120_000; // 2 minutos sem batimento = offline automático
 
 /** Mensagem genérica (compatibilidade); use patientRescheduleMessage(urgent) para o texto da regra atual. */
+
 export const PATIENT_URGENCY_RESCHEDULE_MESSAGE =
   "No momento todos os médicos estão em atendimento. Sua consulta está garantida e acontecerá em até 12 horas. Fique nesta sala de espera: avisamos aqui assim que um médico entrar.";
 
@@ -57,7 +60,7 @@ export const DEFAULT_QUEUE_ROUTING_CONFIG: QueueRoutingConfig = {
   urgentRescheduleDelayMinutes: 15,
   deadlineMinutes: 720,
   urgentDeadlineMinutes: 60,
-  subscriberTiers: ["vip", "vip_prescritor", "premium", "basic", "assinante", "pro", "plano_medico"],
+  subscriberTiers: ["vip", "vip_prescritor", "premium", "basic", "assinante", "pro", "plano_medico", "ouro", "platina", "diamante", "elite", "black"],
   subscriberOrder: "priority_then_rotation",
   prioritySubscriberCrms: ["58169", "206873"],
 };
@@ -190,6 +193,9 @@ export function sortSubscribers(
         if (idxA !== idxB) return idxA - idxB;
       }
     }
+    // Depois dos CRMs prioritários configurados, planos maiores (Black > … > Premium) recebem a oferta antes.
+    const rankDiff = planRank(b.plan_tier) - planRank(a.plan_tier);
+    if (rankDiff !== 0) return rankDiff;
     if (config.subscriberOrder === "rating") {
       const rDiff = Number(b.rating ?? 0) - Number(a.rating ?? 0);
       if (rDiff !== 0) return rDiff;

@@ -1,3 +1,4 @@
+import { doctorPlan } from "../../../supabase/functions/_shared/doctor-plans";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ export function VIPExpirationAlert({ doctorId }: Props) {
   const handleRenew = async () => {
     try {
       const { data, error } = await supabase.functions.invoke("mp-checkout", {
-        body: { sku: "plano_medico" },
+        body: { sku: doctorPlan(sub.plan_tier).sku ?? "plano_medico" },
       });
       if (error) throw error;
       if (data?.init_point) window.location.href = data.init_point;

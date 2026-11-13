@@ -1,3 +1,4 @@
+import { DOCTOR_PLANS } from "../../supabase/functions/_shared/doctor-plans";
 import { useState, useEffect, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { SERVICE_MENU, SERVICES, PREMIUM_SUGGESTED_PRICE, FIXED_SERVICE_NOTICE, formatBRL } from "@/lib/pricing";
@@ -1269,21 +1270,14 @@ const CadastroProfissional = () => {
                   {/* Plano de Adesão */}
                   <div className="space-y-2">
                     <Label htmlFor="plano" className="text-xs font-bold text-muted-foreground">{t.plan}</Label>
-                    <Select value={form.plano} onValueChange={(v) => handleChange("plano", v)}>
-                      <SelectTrigger className="bg-muted border-border h-11">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-900 text-slate-100 border-slate-700">
-                        <SelectItem value="free" className="hover:bg-slate-800">
-                          <span className="flex items-center gap-2 font-bold">Free — Gratuito (Paga apenas taxa por consulta) <Badge className="bg-muted text-muted-foreground text-[9px]">INICIANTE</Badge></span>
-                        </SelectItem>
-                        <SelectItem value="basic" className="hover:bg-slate-800">
-                          <span className="flex items-center gap-2 font-bold">VIP — R$ 99/mês (Taxa Zero + Destaque) <Badge className="bg-primary text-black text-[9px]">MAIS POPULAR</Badge></span>
-                        </SelectItem>
-                        <SelectItem value="professional" className="hover:bg-slate-800">Profissional — R$ 299/mês (Dashboard Completo)</SelectItem>
-                        <SelectItem value="premium" className="hover:bg-slate-800">Premium — R$ 599/mês (Selo VIP + Prioridade na Busca)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {/* Todo cadastro começa no Gratuito (trigger do banco); o plano pago é assinado no Consultório. */}
+                    <div className="rounded-xl border border-border bg-muted/40 p-3 text-xs text-muted-foreground space-y-1">
+                      <p className="font-bold text-foreground">Você começa no plano Gratuito (paga só a taxa por consulta).</p>
+                      <p>
+                        Depois da aprovação, assine no seu Consultório:{" "}
+                        {DOCTOR_PLANS.filter((p) => p.sku).map((p) => `${p.name} R$ ${p.priceBrl.toLocaleString("pt-BR")}`).join(" · ")} por mês.
+                      </p>
+                    </div>
                   </div>
 
                   {/* Termos de Consentimento & Autorização de Imagem em Redes Sociais */}

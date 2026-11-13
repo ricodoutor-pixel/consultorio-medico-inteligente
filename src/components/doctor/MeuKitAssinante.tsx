@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BrainCircuit, CheckCircle2, Clock, FileSignature, Link2, Scale, Stethoscope, Video, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { DOCTOR_AI_DAILY_LIMITS, isPaidPlan } from "../../../supabase/functions/_shared/doctor-kit";
+import { isPaidPlan } from "../../../supabase/functions/_shared/doctor-kit";
+import { doctorPlan } from "../../../supabase/functions/_shared/doctor-plans";
+import { DoctorPlansGrid } from "./DoctorPlansGrid";
+import { DoctorProTools } from "./DoctorProTools";
 
 interface Props {
   planTier?: string | null;
@@ -20,6 +22,9 @@ interface Usage {
 /** Resumo do Kit do Assinante: o que o plano inclui, uso de hoje das ferramentas de IA e o que vem a seguir. */
 export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
   const paid = isPaidPlan(planTier);
+  const plan = doctorPlan(paid ? planTier : "free");
+  const plansRef = useRef<HTMLDivElement>(null);
+  const seePlans = () => plansRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   const [copiloto, setCopiloto] = useState<Usage | null>(null);
   const [juridico, setJuridico] = useState<Usage | null>(null);
 
@@ -39,14 +44,14 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
       icon: BrainCircuit,
       title: "Copiloto de evidências (PubMed)",
       text: "Pergunta clínica, interações, titulação e SOAP com estudos conferidos pelo PMID.",
-      badge: usageText(copiloto, paid ? DOCTOR_AI_DAILY_LIMITS.copiloto.paid : DOCTOR_AI_DAILY_LIMITS.copiloto.free),
+      badge: usageText(copiloto, plan.limits.copiloto),
       tab: "copiloto-vip",
     },
     {
       icon: Scale,
       title: "Assistente jurídico",
       text: "CFM, telemedicina, publicidade, LGPD e Anvisa. Orientação informativa.",
-      badge: paid ? usageText(juridico, DOCTOR_AI_DAILY_LIMITS.juridico.paid) : "planos pagos",
+      badge: plan.limits.juridico > 0 ? usageText(juridico, plan.limits.juridico) : "planos pagos",
       tab: "juridico",
     },
     {
@@ -104,7 +109,7 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle>Meu Kit do Assinante</CardTitle>
             <Badge className={paid ? "bg-emerald-600 text-white" : "bg-muted text-foreground"}>
-              {paid ? `Plano ${String(planTier).toUpperCase()}` : "Plano Free"}
+              {paid ? `Plano ${plan.name}` : "Plano Gratuito"}
             </Badge>
           </div>
           <CardDescription>
@@ -144,12 +149,18 @@ export function MeuKitAssinante({ planTier, onOpenTab }: Props) {
             </p>
           ))}
           {!paid && (
-            <Button asChild className="mt-2">
-              <Link to="/dashboard-medico">Conhecer os planos</Link>
+            <Button className="mt-2" onClick={seePlans}>
+              Conhecer os planos
             </Button>
           )}
         </CardContent>
       </Card>
+
+      <DoctorProTools onSeePlans={seePlans} />
+
+      <div ref={plansRef}>
+        <DoctorPlansGrid planTier={paid ? planTier : "free"} />
+      </div>
     </div>
   );
 }

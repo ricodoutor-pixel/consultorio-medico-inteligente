@@ -4,6 +4,7 @@ import { notifyPaymentConfirmedOnce, notifyRecipientOnce, buildDoctorConsultatio
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 import { getPaymentServices } from "../_shared/payment-catalog.ts";
 import { paymentCoversConsultation } from "../_shared/consultation-price.ts";
+import { DOCTOR_PLAN_SKUS, doctorPlanBySku } from "../_shared/doctor-plans.ts";
 
 const getFirstEnv = (...names: string[]) => {
   for (const name of names) {
@@ -770,7 +771,7 @@ Deno.serve(async (req) => {
 
     // === PLANOS UNIVERSAIS R$99/mês (paciente · médico · lojista) ===
     // external_reference: `plano_xxx:<user_id>:<ts>` (mp-checkout)
-    const PLAN_SKUS = ["plano_paciente", "plano_medico", "plano_lojista"];
+    const PLAN_SKUS = ["plano_paciente", "plano_lojista", ...DOCTOR_PLAN_SKUS];
     const refSku = externalRef.split(":")[0];
     const planSku = PLAN_SKUS.includes(String(metadata.sku))
       ? String(metadata.sku)
@@ -794,11 +795,23 @@ Deno.serve(async (req) => {
         split_processed: payment.status === "approved",
       });
       if (planLogErr) console.error("[plan] payment_webhooks insert error:", planLogErr);
-      if (payment.status === "approved" && planUserId) {
+      const doctorPlanDef = doctorPlanBySku(planSku);
+      // O valor aprovado precisa cobrir o preço do plano (Premium R$ 99 … Black R$ 1.500)
+      const planPriceOk = !doctorPlanDef || Number(totalAmount || 0) + 0.009 >= doctorPlanDef.priceBrl;
+      if (payment.status === "approved" && planUserId && !planPriceOk) {
+        console.error(`[plan] ${planSku}: pagamento ${payment.id} de R$ ${totalAmount} abaixo do preço R$ ${doctorPlanDef?.priceBrl}; plano não ativado`);
+        await supabase.from("audit_log").insert({
+          action: "plan_blocked_amount_mismatch",
+          table_name: "doctors",
+          record_id: String(planUserId),
+          new_data: { payment_id: String(payment.id), sku: planSku, paid_amount: totalAmount, expected_amount: doctorPlanDef?.priceBrl },
+        });
+      }
+      if (payment.status === "approved" && planUserId && planPriceOk) {
         const now = new Date();
         const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-        const planName = planSku === "plano_medico"
-          ? "Plano Médico"
+        const planName = doctorPlanDef
+          ? `Plano Médico ${doctorPlanDef.name}`
           : planSku === "plano_lojista"
             ? "Plano Lojista"
             : "Plano Paciente";
@@ -820,12 +833,12 @@ Deno.serve(async (req) => {
         if (subErr) console.error("[plan] subscriptions upsert error:", subErr);
 
         // Plano Médico VIP: reflete a assinatura paga no painel do médico e do admin
-        if (planSku === "plano_medico") {
+        if (doctorPlanDef) {
           const { data: doc } = await supabase
             .from("doctors").select("id, crm, user_id").eq("user_id", planUserId).maybeSingle();
           if (doc?.id) {
-            // medical_subscriptions só aceita basic/professional/premium/enterprise
-            const tier = "premium";
+            // Plano exato (premium, ouro, platina, diamante, elite, black) — 0050 amplia o CHECK
+            const tier = doctorPlanDef.key;
             const { data: existingMed } = await supabase
               .from("medical_subscriptions").select("id")
               .eq("doctor_id", doc.id).eq("plan_tier", tier).maybeSingle();
@@ -833,7 +846,7 @@ Deno.serve(async (req) => {
               doctor_id: doc.id,
               plan_tier: tier,
               status: "active",
-              amount: totalAmount || 99,
+              amount: totalAmount || doctorPlanDef.priceBrl,
               mercadopago_subscription_id: String(payment.id),
               started_at: now.toISOString(),
               expires_at: periodEnd.toISOString(),
@@ -844,13 +857,12 @@ Deno.serve(async (req) => {
               : await supabase.from("medical_subscriptions").insert(medPayload);
             if (medErr) console.error("[plan] medical_subscriptions error:", medErr);
 
-            // Atualiza diretamente na tabela doctors
-            await supabase.from("doctors").update({
-              plan_tier: "vip",
-              is_verified: true,
-              is_approved_by_admin: true,
+            // Atualiza o plano do médico. Pagar NÃO aprova cadastro: CRM/KYC seguem na aprovação manual do admin.
+            const { error: tierErr } = await supabase.from("doctors").update({
+              plan_tier: tier,
               updated_at: now.toISOString()
             }).eq("id", doc.id);
+            if (tierErr) console.error("[plan] doctors.plan_tier update error:", tierErr);
 
             // Busca perfil para obter nome e telefone do médico
             const { data: docProfile } = await supabase
@@ -864,7 +876,7 @@ Deno.serve(async (req) => {
                   fullName: docProfile?.full_name || "Médico Prescritor",
                   email: docProfile?.email,
                   crm: doc.crm,
-                  planTier: "vip",
+                  planTier: tier,
                   actionType: "welcome_vip"
                 }
               });

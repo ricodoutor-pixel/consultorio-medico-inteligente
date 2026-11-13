@@ -351,6 +351,13 @@
       "when": 1794541488100,
       "tag": "0049_public_platform_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794542566674,
+      "tag": "0050_doctor_plan_tiers",
+      "breakpoints": true
     }
   ]
 }

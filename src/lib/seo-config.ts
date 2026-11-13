@@ -67,7 +67,7 @@ export const routeSEOMap: Record<string, PageSEO> = {
     h1: "Cannabis Medicinal em São Paulo e Brasil — Telemedicina 24/7 com Especialistas",
   },
   "/shopping": {
-    title: `Shopping de Produtos Canabinoides | ${BRAND}`,
+    title: `Catálogo de Produtos Autorizados ANVISA | ${BRAND}`,
     description:
       "Solicite óleos e produtos de cannabis medicinal via farmácias parceiras autorizadas pela ANVISA, com verificação de prescrição conforme RDC 660.",
     keywords: "comprar cannabis medicinal São Paulo, óleo CBD Brasil, marketplace cannabis medicinal, produtos canabinoides ANVISA",

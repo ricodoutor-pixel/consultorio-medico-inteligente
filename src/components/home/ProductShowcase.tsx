@@ -71,7 +71,7 @@ export function ProductShowcase({ products }: { products: any[] }) {
               <Button 
                 className="w-full mt-4 font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-900/20"
               >
-                <FileText size={16} className="mr-2" /> Comprar com Receita
+                <FileText size={16} className="mr-2" /> Solicitar com Receita
               </Button>
             </div>
           </CardContent>

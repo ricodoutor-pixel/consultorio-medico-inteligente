@@ -22,7 +22,8 @@ export function ShoppingCart() {
       <button
         onClick={() => setShowCart(true)}
         className="fixed bottom-6 left-6 bg-primary text-primary-foreground rounded-full p-4 shadow-lg hover:opacity-90 transition-all z-40"
-        title="Abrir carrinho"
+        title="Minha Solicitação"
+        aria-label="Minha Solicitação"
       >
         <CartIcon size={24} />
         {items.length > 0 && (
@@ -43,7 +44,7 @@ export function ShoppingCart() {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center md:justify-end">
       <Card className="w-full md:w-96 h-dvh md:h-auto md:rounded-lg rounded-t-2xl bg-card shadow-2xl flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-2xl font-bold text-card-foreground">Carrinho de Compras</h2>
+          <h2 className="text-2xl font-bold text-card-foreground">Itens da Sua Solicitação de Importação</h2>
           <button onClick={() => setShowCart(false)} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
 

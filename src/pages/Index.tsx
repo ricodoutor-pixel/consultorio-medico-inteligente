@@ -278,7 +278,7 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra — CRM 10963 - Sta Cruz (BO)"
+                      alt="Dr. Edilson Bezerra — Fundador e CEO"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -286,7 +286,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">CEO Planta y Raíz · CRM 10963 - Sta Cruz (BO)</p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Fundador e CEO</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 pt-2">
@@ -400,7 +400,7 @@ const Index = () => {
               Selecione as suas <span className="text-gradient-green">patologias</span>
             </h2>
             <p className="text-muted-foreground font-medium">
-              Consulte médicos habilitados para avaliação clínica individualizada.
+              Consulte médicos habilitados para avaliação clínica individualizada. O uso terapêutico de fitocanabinoides depende de indicação médica profissional e prescrição individualizada.
             </p>
             <p className="text-base text-muted-foreground mt-2">
               Para qual condição de saúde você busca orientação médica?

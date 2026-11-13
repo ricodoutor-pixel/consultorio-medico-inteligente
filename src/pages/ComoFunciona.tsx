@@ -205,7 +205,7 @@ const ComoFunciona = () => {
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-xs font-black text-primary uppercase tracking-wider">1. Mentoria</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">Dr. Edilson ON</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">Dr. Edilson Bezerra ON</span>
                       </div>
                       <h3 className="font-bold text-foreground text-sm">Orientação Técnica</h3>
                       <p className="text-xs text-muted-foreground mt-1">Chat de até 30 min para tirar dúvidas e mentoria clínica. Não emite receita.</p>

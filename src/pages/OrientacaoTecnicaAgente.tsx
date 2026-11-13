@@ -968,7 +968,7 @@ export default function OrientacaoTecnicaAgente() {
                   <p className="text-xs text-muted-foreground">
                     Como funciona: <strong className="text-foreground">1.</strong> pagamento seguro de R$ 30 pelo Mercado Pago →{" "}
                     <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (5 perguntas), após confirmação →{" "}
-                    <strong className="text-foreground">3.</strong> sala com o Dr. Edilson ON, após concluir a triagem.
+                    <strong className="text-foreground">3.</strong> sala com o Dr. Edilson Bezerra ON, após concluir a triagem.
                   </p>
 
                   <Button onClick={() => setPhase("checkout")} className="w-full h-14 rounded-2xl font-black text-base">

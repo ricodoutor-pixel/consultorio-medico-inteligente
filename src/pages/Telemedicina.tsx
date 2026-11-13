@@ -598,7 +598,7 @@ const Telemedicina = () => {
               </div>
               <div className="p-6 space-y-5 text-sm text-foreground">
                 <p className="text-muted-foreground">
-                  Todo paciente passa primeiro pela <strong>Triagem da Enf. Brisa</strong>. Os dados são enviados para o médico escolhido — ou para o <strong>Dr. Edilson Bezerra</strong> em caso de Orientação Técnica.
+                  Todo paciente passa primeiro pela <strong>Triagem da Enf. Brisa</strong>. Os dados são enviados para o médico escolhido — ou para o <strong>Dr. Edilson Bezerra ON</strong> em caso de Orientação Técnica.
                 </p>
 
                 <div className="space-y-3">
@@ -611,7 +611,7 @@ const Telemedicina = () => {
 
                   <div className="rounded-2xl border border-border p-4 bg-muted/30">
                     <p className="font-black text-foreground mb-1">2 · Triagem + Orientação Técnica + Consulta</p>
-                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação com Dr. Edilson Bezerra → consulta com médico prescritor → receita.</p>
+                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação com Dr. Edilson Bezerra ON → consulta com médico prescritor → receita.</p>
                   </div>
 
                   <div className="rounded-2xl border border-border p-4 bg-muted/30">
@@ -964,7 +964,7 @@ const Telemedicina = () => {
                     {/* Link para Orientação Técnica em Nuvem (Dr. Edilson On - R$ 30) */}
                     <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                       <div className="text-xs text-muted-foreground leading-relaxed">
-                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra On (consulta em tempo real ao acervo PubMed/NCBI)?</span>
+                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra ON (consulta em tempo real ao acervo PubMed/NCBI)?</span>
                       </div>
                       <Link to="/orientacao-tecnica">
                         <Button variant="outline" size="sm" className="text-xs font-black border-primary text-primary hover:bg-primary/10 gap-1 rounded-xl shrink-0">

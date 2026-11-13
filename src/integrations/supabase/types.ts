@@ -2680,6 +2680,81 @@ export type Database = {
           },
         ]
       }
+      doctor_availability_exceptions: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          end_time: string | null
+          exception_date: string
+          exception_type: string
+          id: string
+          reason: string | null
+          start_time: string | null
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          end_time?: string | null
+          exception_date: string
+          exception_type: string
+          id?: string
+          reason?: string | null
+          start_time?: string | null
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          end_time?: string | null
+          exception_date?: string
+          exception_type?: string
+          id?: string
+          reason?: string | null
+          start_time?: string | null
+        }
+        Relationships: []
+      }
+      doctor_availability_rules: {
+        Row: {
+          break_between_slots_minutes: number
+          created_at: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id: string
+          is_active: boolean
+          modalities: string[]
+          slot_duration_minutes: number
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          break_between_slots_minutes?: number
+          created_at?: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id?: string
+          is_active?: boolean
+          modalities?: string[]
+          slot_duration_minutes?: number
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          break_between_slots_minutes?: number
+          created_at?: string
+          day_of_week?: number
+          doctor_id?: string
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          modalities?: string[]
+          slot_duration_minutes?: number
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       doctor_contracts: {
         Row: {
           contract_version: string
@@ -2879,6 +2954,33 @@ export type Database = {
           updated_at?: string
           weighted_score?: number
           year?: number
+        }
+        Relationships: []
+      }
+      doctor_scheduling_settings: {
+        Row: {
+          created_at: string
+          daily_consultation_limit: number | null
+          doctor_id: string
+          max_advance_days: number
+          min_advance_hours: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          daily_consultation_limit?: number | null
+          doctor_id: string
+          max_advance_days?: number
+          min_advance_hours?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          daily_consultation_limit?: number | null
+          doctor_id?: string
+          max_advance_days?: number
+          min_advance_hours?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -10402,6 +10504,23 @@ export type Database = {
           pix_key: string
           pix_key_type: string
           whatsapp_proof_number: string
+        }[]
+      }
+      get_available_days: {
+        Args: { p_doctor_id: string; p_modality?: string; p_month: string }
+        Returns: {
+          day_date: string
+          has_available_slots: boolean
+          slots_count: number
+        }[]
+      }
+      get_available_slots: {
+        Args: { p_date: string; p_doctor_id: string; p_modality?: string }
+        Returns: {
+          is_available: boolean
+          shift: string
+          slot_datetime: string
+          time_slot: string
         }[]
       }
       get_cron_health: {

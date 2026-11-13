@@ -330,6 +330,13 @@
       "when": 1794529003594,
       "tag": "0046_apply_0044_0045_marker",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1794532810209,
+      "tag": "0047_doctor_individual_schedule_and_booking_overhaul",
+      "breakpoints": true
     }
   ]
 }

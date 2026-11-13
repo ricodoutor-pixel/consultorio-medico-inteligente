@@ -5,7 +5,7 @@ import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { DoctorsStatusBoard } from "@/components/doctors/DoctorsStatusBoard";
+import { PublicDoctorsOnlineBoard } from "@/components/doctors/PublicDoctorsOnlineBoard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -567,7 +567,7 @@ const Telemedicina = () => {
           </motion.div>
 
           <div className="max-w-2xl mx-auto mt-8">
-            <DoctorsStatusBoard title="Médicos disponíveis agora" />
+            <PublicDoctorsOnlineBoard title="Médicos disponíveis agora" />
           </div>
         </div>
       </section>

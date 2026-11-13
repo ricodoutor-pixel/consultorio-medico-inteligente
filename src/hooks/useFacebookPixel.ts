@@ -15,6 +15,9 @@ let pixelLoaded = false;
 function loadPixelScript(pixelId: string) {
   if (pixelLoaded || typeof window === "undefined") return;
   pixelLoaded = true;
+  // O index.html já inicia o Pixel e envia o PageView inicial: iniciar de novo gera "Duplicate Pixel ID"
+  // e conta a visita duas vezes.
+  if (typeof (window as { fbq?: unknown }).fbq === "function") return;
 
   /* Meta base code */
   (function (f: any, b: any, e: any, v: any, n?: any, t?: any, s?: any) {

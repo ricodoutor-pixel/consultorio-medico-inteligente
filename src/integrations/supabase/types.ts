@@ -2754,6 +2754,41 @@ export type Database = {
           },
         ]
       }
+      doctor_free_alerts: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          id: string
+          notified_at: string | null
+          patient_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          id?: string
+          notified_at?: string | null
+          patient_id?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          notified_at?: string | null
+          patient_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_free_alerts_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctor_kyc_documents: {
         Row: {
           created_at: string
@@ -10333,6 +10368,12 @@ export type Database = {
           doctor_id: string
           rating_avg: number
           rating_count: number
+        }[]
+      }
+      doctors_in_consultation: {
+        Args: never
+        Returns: {
+          doctor_id: string
         }[]
       }
       email_queue_dispatch: { Args: never; Returns: undefined }

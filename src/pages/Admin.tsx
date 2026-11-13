@@ -31,21 +31,12 @@ import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown"
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AgentsHub } from "@/components/admin/AgentsHub";
 import { WhatsAppFailoverManager } from "@/components/admin/WhatsAppFailoverManager";
-import { GoogleAnalyticsLiveMirror } from "@/components/admin/GoogleAnalyticsLiveMirror";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
-import { BrisaOmniTracker } from "@/components/admin/BrisaOmniTracker";
 import { DoctorKycPipeline } from "@/components/admin/DoctorKycPipeline";
-import { UserCensus360 } from "@/components/admin/UserCensus360";
-import { AgenticCommerceTracker } from "@/components/admin/AgenticCommerceTracker";
-import { FinancialSplitPanel } from "@/components/admin/FinancialSplitPanel";
-import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
-import { AgentOptimizerStatusCard } from "@/components/admin/AgentOptimizerStatusCard";
-import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
-import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
 import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
-import { OpusSocialAutomation } from "@/components/admin/OpusSocialAutomation";
 import { AdminFiscalManagement } from "@/components/admin/AdminFiscalManagement";
 import { PrescriptionsAnvisaPanel } from "@/components/admin/PrescriptionsAnvisaPanel";
+import { LiveCommandCenter } from "@/components/admin/LiveCommandCenter";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -109,14 +100,9 @@ const Admin = () => {
   const [data, setData] = useState<DashboardData>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [lastSync, setLastSync] = useState<Date>(new Date());
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatInput, setChatInput] = useState("");
+  const [liveSignal, setLiveSignal] = useState(0);
   const [drill, setDrill] = useState<{ open: boolean; source: DrillSource | null; title: string }>({ open: false, source: null, title: "" });
   const [liveAlerts, setLiveAlerts] = useState<{ kind: string; title: string; message: string; created_at: string }[]>([]);
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "Comandante Dr. Edilson, Command Center 360 online. Dados reais sincronizando em tempo real." },
-  ]);
-
   // Auth gate
   useEffect(() => {
     (async () => {
@@ -142,15 +128,16 @@ const Admin = () => {
         leadsAll, leads24, medicos, prescs, pacientes, alertasA,
         errosR, auditR, otRecentes, leadsRec, auditRec, growthRec, paymentR, notifsR, funnel30d,
       ] = await Promise.all([
-        supabase.from("orientacao_tecnica_orders").select("amount,status,created_at").gte("created_at", d30d),
-        supabase.from("orientacao_tecnica_orders").select("amount,status").gte("created_at", todayISO),
-        supabase.from("orders").select("total,created_at").gte("created_at", d30d),
-        supabase.from("orders").select("total").gte("created_at", todayISO),
+        // Receita = somente pagamentos confirmados (Orientação com paid_at, consulta paga). Pedido pendente não é receita.
+        supabase.from("orientacao_tecnica_orders").select("amount,amount_brl,paid_at").not("paid_at", "is", null).gte("paid_at", d30d),
+        supabase.from("orientacao_tecnica_orders").select("amount,amount_brl").not("paid_at", "is", null).gte("paid_at", todayISO),
+        supabase.from("appointments").select("amount,created_at").eq("payment_status", "paid").gte("created_at", d30d),
+        supabase.from("appointments").select("amount").eq("payment_status", "paid").gte("created_at", todayISO),
         supabase.from("appointments").select("id", { count: "exact", head: true }).gte("created_at", todayISO),
         supabase.from("consultation_queue").select("id", { count: "exact", head: true }).eq("status", "waiting"),
         supabase.from("leads").select("id", { count: "exact", head: true }),
         supabase.from("leads").select("source,status,created_at").gte("created_at", d24h),
-        supabase.from("doctors").select("id", { count: "exact", head: true }),
+        supabase.from("doctors").select("id", { count: "exact", head: true }).eq("is_approved_by_admin", true),
         supabase.from("prescriptions").select("id", { count: "exact", head: true }).gte("created_at", d7d),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("sent_at", d24h),
@@ -165,11 +152,11 @@ const Admin = () => {
         supabase.from("funnel_events").select("event_name,funnel,created_at").gte("created_at", d30d),
       ]);
 
-      const sum = (rows: any[] | null, key: string) => (rows ?? []).reduce((s, r) => s + Number(r[key] ?? 0), 0);
+      const sum = (rows: any[] | null, key: string) => (rows ?? []).reduce((s, r) => s + Number((key === "amount" ? r.amount_brl ?? r.amount : r[key]) ?? 0), 0);
       const receitaOT30 = sum(otAll.data, "amount");
-      const receitaOrders30 = sum(ordersAll.data, "total");
+      const receitaOrders30 = sum(ordersAll.data, "amount");
       const receita30d = receitaOT30 + receitaOrders30;
-      const receitaHoje = sum(otHoje.data, "amount") + sum(ordersHoje.data, "total");
+      const receitaHoje = sum(otHoje.data, "amount") + sum(ordersHoje.data, "amount");
       const ordensTotal = (otAll.data?.length ?? 0) + (ordersAll.data?.length ?? 0);
       const ordensHoje = (otHoje.data?.length ?? 0) + (ordersHoje.data?.length ?? 0);
       const ticketMedio = ordensTotal > 0 ? receita30d / ordensTotal : 0;
@@ -181,15 +168,15 @@ const Admin = () => {
         const key = d.toISOString().slice(0, 10);
         byDay.set(key, { receita: 0, ordens: 0 });
       }
-      const addToDay = (rows: any[] | null, amountKey: string) => {
+      const addToDay = (rows: any[] | null, dateKey: string) => {
         (rows ?? []).forEach((r) => {
-          const k = String(r.created_at).slice(0, 10);
+          const k = String(r[dateKey]).slice(0, 10);
           const cell = byDay.get(k);
-          if (cell) { cell.receita += Number(r[amountKey] ?? 0); cell.ordens += 1; }
+          if (cell) { cell.receita += Number(r.amount_brl ?? r.amount ?? 0); cell.ordens += 1; }
         });
       };
-      addToDay(otAll.data, "amount");
-      addToDay(ordersAll.data, "total");
+      addToDay(otAll.data, "paid_at");
+      addToDay(ordersAll.data, "created_at");
       const receitaSerie = Array.from(byDay.entries()).map(([k, v]) => ({
         dia: k.slice(5), receita: Math.round(v.receita), ordens: v.ordens,
       }));
@@ -267,7 +254,7 @@ const Admin = () => {
 
   // ---- Realtime sync + alerts ----
   useAdminRealtime({
-    onChange: loadData,
+    onChange: () => { void loadData(); setLiveSignal((n) => n + 1); },
     onAlert: (a) => setLiveAlerts((prev) => [a, ...prev].slice(0, 25)),
   });
 
@@ -321,31 +308,7 @@ const Admin = () => {
     setDrill({ open: true, source, title });
   }, []);
 
-  const sendMessage = () => {
-    if (!chatInput.trim()) return;
-    const msgs = [...messages, { role: "user", content: chatInput }];
-    setMessages(msgs);
-    setChatInput("");
-    setTimeout(() => setMessages([...msgs, { role: "assistant", content: "Comando recebido. Executando análise nos módulos de produção." }]), 800);
-  };
-
   // kpi already declared above
-
-  // ---------- KPI definitions ----------
-  const kpiCards = useMemo<Array<{ label: string; value: string; icon: any; accent: string; bg: string; drill?: DrillSource }>>(() => [
-    { label: "Receita 30d", value: BRL(kpi.receita30d), icon: DollarSign, accent: "text-emerald-400", bg: "from-emerald-500/20", drill: "ot_orders" },
-    { label: "Receita Hoje", value: BRL(kpi.receitaHoje), icon: TrendingUp, accent: "text-emerald-400", bg: "from-emerald-500/20", drill: "ot_orders" },
-    { label: "Ticket Médio", value: BRL(kpi.ticketMedio), icon: CreditCard, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
-    { label: "Ordens Hoje", value: NUM(kpi.ordensHoje), icon: ShoppingBag, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
-    { label: "Orientações Hoje", value: NUM(kpi.consultasHoje), icon: Stethoscope, accent: "text-sky-400", bg: "from-sky-500/20", drill: "appointments" },
-    { label: "Fila Ativa", value: NUM(kpi.filaAtiva), icon: Clock, accent: "text-sky-400", bg: "from-sky-500/20", drill: "queue" },
-    { label: "Pacientes", value: NUM(kpi.pacientes), icon: Users, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20", drill: "patients" },
-    { label: "Médicos Ativos", value: NUM(kpi.medicos), icon: HeartPulse, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20", drill: "doctors" },
-    { label: "Leads 24h", value: NUM(kpi.leads24h), icon: UserPlus, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
-    { label: "Conversão Leads", value: PCT(kpi.conversao), icon: BarChart3, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
-    { label: "Prescrições 7d", value: NUM(kpi.prescricoes7d), icon: FileText, accent: "text-orange-400", bg: "from-orange-500/20" },
-    { label: "Erros 24h", value: NUM(kpi.erros24h), icon: AlertTriangle, accent: kpi.erros24h > 5 ? "text-red-500" : "text-emerald-400", bg: "from-red-500/20", drill: "error_logs" },
-  ], [kpi]);
 
   const quickLinks = [
     { label: "🌍 Mapa Global", path: "/admin/global-ops", icon: Globe },
@@ -366,7 +329,10 @@ const Admin = () => {
     { label: "KYC Agentes & IAs", path: "/admin/kyc-agentes", icon: Bot },
     { label: "💳 Comprovantes de Pagamento", path: "/admin/comprovantes-pagamento", icon: CreditCard },
     { label: "TikTok Ads & Pixel", path: "/admin/conversoes", icon: Video },
-    { label: "Lead Hunter (10k Médicos)", path: "/admin/leads", icon: Sparkles },
+    { label: "Médicos online", path: "/admin/medicos-online", icon: Stethoscope },
+    { label: "Orientações", path: "/admin/orientacoes", icon: HeartPulse },
+    { label: "WhatsApp Inbox", path: "/admin/inbox", icon: MessageSquare },
+    { label: "Webhooks MP", path: "/admin/mp-webhooks", icon: CreditCard },
   ];
 
   return (
@@ -383,11 +349,11 @@ const Admin = () => {
               </div>
               <div>
                 <h1 className="text-2xl md:text-4xl font-display font-black text-foreground tracking-tight">
-                  Command Center 360 <span className="text-primary">·</span> Planta y Raiz
+                  Central de Comando <span className="text-primary">·</span> Planta y Raíz
                 </h1>
                 <p className="text-muted-foreground text-xs md:text-sm flex items-center gap-2 mt-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Operação 24/7 · Sync {since(lastSync.toISOString())} atrás · {new Date().toLocaleTimeString("pt-BR")}
+                  Dados reais do banco · gráficos sincronizados {since(lastSync.toISOString())} atrás
                 </p>
               </div>
             </div>
@@ -407,39 +373,26 @@ const Admin = () => {
               <Button onClick={() => navigate("/admin/president")} variant="outline" size="sm" className="rounded-xl border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
                 <Crown size={14} className="mr-1.5" /> Presidente
               </Button>
-              <Button onClick={() => setChatOpen(!chatOpen)} className="bg-primary text-primary-foreground font-bold rounded-xl">
-                <Bot size={16} className="mr-1.5" /> Manus CEO
-              </Button>
               <Button variant="outline" size="sm" className="rounded-xl text-destructive border-destructive/30" onClick={() => void logout()}>
                 <LogOut size={14} />
               </Button>
             </div>
           </motion.div>
 
-          {/* GOOGLE ANALYTICS 4 LIVE MIRROR (TOP WIDGET) */}
-          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-            <GoogleAnalyticsLiveMirror />
-          </motion.div>
+          {/* CENTRAL DE COMANDO — todos os parâmetros reais, 15 s + tempo real */}
+          <LiveCommandCenter refreshSignal={liveSignal} />
 
-          {/* KPI STRIP */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-6">
-            {kpiCards.map((k, i) => (
-              <motion.div key={k.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-                <Card
-                  className={`relative overflow-hidden border-border bg-gradient-to-br ${k.bg} to-card/40 hover:border-primary/50 transition-all group ${k.drill ? "cursor-pointer hover:scale-[1.02]" : ""}`}
-                  onClick={k.drill ? () => openDrill(k.drill!, k.label) : undefined}
-                >
-                  <CardContent className="p-3">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <k.icon size={16} className={k.accent} />
-                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">{k.drill ? "DRILL ↗" : "LIVE"}</span>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider truncate">{k.label}</p>
-                    <p className={`text-lg md:text-xl font-black ${k.accent} mt-0.5 truncate`}>{k.value}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+          {/* MÓDULOS */}
+          <div className="mb-8">
+            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Módulos</h3>
+            <div className="flex flex-wrap gap-2">
+              {quickLinks.map((q) => (
+                <button key={q.path + q.label} onClick={() => navigate(q.path)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/50 px-3 py-1.5 text-xs font-bold text-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary transition-colors">
+                  <q.icon size={13} /> {q.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* HUB DE AGENTES IA — chat direto + execução manual */}
@@ -479,60 +432,14 @@ const Admin = () => {
           {/* NOVOS CARDS ESTRATÉGICOS 360° (ACRÉSCIMO)     */}
           {/* ============================================== */}
 
-          {/* CARD 1: ATENDIMENTOS ENFª BRISA & WHATSAPP */}
-          <div className="mb-6">
-            <BrisaOmniTracker />
-          </div>
-
           {/* CARD 2: ESTEIRA DE HOMOLOGAÇÃO KYC DE MÉDICOS */}
           <div className="mb-6">
             <DoctorKycPipeline onRefresh={loadData} />
           </div>
 
-          {/* CARD 3: CENSO GERAL DE USUÁRIOS 360° */}
-          <div className="mb-6">
-            <UserCensus360
-              totalPacientes={kpi.pacientes}
-              totalMedicos={kpi.medicos}
-              totalLojistas={0}
-            />
-          </div>
-
-          {/* CARD 4 & 5: COMÉRCIO AGÊNTICO + FINANCEIRO SPLIT */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-            <AgenticCommerceTracker />
-            <FinancialSplitPanel
-              receita30d={kpi.receita30d}
-              receitaHoje={kpi.receitaHoje}
-              ordens30d={kpi.ordensTotal}
-              ticketMedio={kpi.ticketMedio}
-            />
-          </div>
-
-          {/* CARD 6: STATUS DE SAÚDE DA INFRAESTRUTURA */}
-          <div className="mb-6">
-            <SystemHealthGrid />
-          </div>
-
-          {/* CARD 7 & 8: BRAIN OPTIMIZER 04H + FARMÁCIA OFICIAL PLANTA Y RAÍZ LTDA */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-            <AgentOptimizerStatusCard />
-            <OfficialPharmacyCard />
-          </div>
-
-          {/* CARD 9: TIKTOK ADS & VÍDEOS 1-MINUTO (PIXEL DA8R8N3C77UBCVGL01RG) */}
-          <div className="mb-6">
-            <TikTokAnalyticsPanel />
-          </div>
-
           {/* CARD 10: LEAD HUNTER AI & CRM PIPELINE (META DE 10.000 MÉDICOS) */}
           <div className="mb-6">
             <LeadHunterTracker />
-          </div>
-
-          {/* CARD 11: FILA DE 43 VÍDEOS OPUS CLIP COM LINK & WHATSAPP */}
-          <div className="mb-6">
-            <OpusSocialAutomation />
           </div>
 
           {/* CARD 12: MOTOR AUTOMÁTICO DE FATURAMENTO, NOTAS FISCAIS & RECIBOS IRPF (DMED) */}
@@ -554,7 +461,7 @@ const Admin = () => {
             <Card className="lg:col-span-2 border-border bg-card/40">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display font-black text-sm md:text-base">Receita & Ordens · 30 dias</h3>
+                  <h3 className="font-display font-black text-sm md:text-base">Receita confirmada & pagamentos · 30 dias</h3>
                   <Badge variant="outline" className="text-[10px]">BRL · Real-time</Badge>
                 </div>
                 <div className="h-64">
@@ -728,7 +635,7 @@ const Admin = () => {
           </div>
 
           {/* STATUS ROW */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <Card className="border-border bg-card/40">
               <CardContent className="p-5">
                 <h3 className="font-display font-black text-sm mb-3 flex items-center gap-2">
@@ -746,27 +653,6 @@ const Admin = () => {
                       <div className="text-right">
                         <p className="text-[10px] text-muted-foreground">{p.latency_ms}ms · {p.error_rate}%</p>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border bg-card/40">
-              <CardContent className="p-5">
-                <h3 className="font-display font-black text-sm mb-3 flex items-center gap-2">
-                  <TrendingUp size={16} className="text-primary" /> Growth CEO Runs
-                </h3>
-                <div className="space-y-2">
-                  {data.growthRuns.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">Nenhuma execução ainda</p>
-                  ) : data.growthRuns.map((r: any) => (
-                    <div key={r.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50 border border-border">
-                      <div className="flex items-center gap-2">
-                        {r.status === "success" ? <CheckCircle2 size={12} className="text-emerald-400" /> : <Clock size={12} className="text-yellow-400" />}
-                        <span className="text-xs font-medium">{r.pages_analyzed ?? 0} pgs · {r.pages_optimized ?? 0} opt</span>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground">{since(r.started_at)}</span>
                     </div>
                   ))}
                 </div>
@@ -795,22 +681,6 @@ const Admin = () => {
             </Card>
           </div>
 
-          {/* QUICK ACCESS */}
-          <Card className="border-border bg-card/40 mb-6">
-            <CardContent className="p-5">
-              <h3 className="font-display font-black text-sm mb-4">Acesso Rápido · Módulos Admin</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                {quickLinks.map((q) => (
-                  <button key={q.path} onClick={() => navigate(q.path)}
-                    className="group flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-border bg-background/40 hover:bg-primary/10 hover:border-primary/50 transition-all">
-                    <q.icon size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span className="text-[10px] font-bold text-center text-foreground group-hover:text-primary">{q.label}</span>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* WHATSAPP FAILOVER & DISPARADOR AUTÔNOMO DR. EDILSON BEZERRA (5511987131241) */}
           <div className="mb-6">
             <ErrorBoundary>
@@ -819,56 +689,6 @@ const Admin = () => {
           </div>
         </div>
       </section>
-
-      {/* CHAT MANUS CEO */}
-      <AnimatePresence>
-        {chatOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: 300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 300 }}
-            className="fixed top-0 right-0 w-full sm:w-96 h-full bg-card border-l border-border shadow-2xl z-[100] flex flex-col"
-          >
-            <div className="p-5 border-b border-border bg-primary/5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                  <Bot size={20} className="text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="font-black text-sm">Manus CEO</p>
-                  <p className="text-[10px] text-primary font-bold">ONLINE · IA ATIVA</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setChatOpen(false)}>
-                <XCircle size={20} />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-3">
-              {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] p-3 rounded-2xl text-xs font-medium ${m.role === "user" ? "bg-primary text-primary-foreground rounded-tr-none" : "bg-muted border border-border rounded-tl-none"}`}>
-                    {m.content}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="p-4 border-t border-border bg-background">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Comande a operação..."
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  className="rounded-xl h-11"
-                />
-                <Button onClick={sendMessage} className="h-11 w-11 rounded-xl bg-primary text-primary-foreground">
-                  <Send size={16} />
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <KpiDrillDown
         open={drill.open}

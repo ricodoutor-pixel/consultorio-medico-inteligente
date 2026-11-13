@@ -1,32 +1,28 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
-import { TrendingUp, Users, Search, Leaf, Activity } from "lucide-react";
+import { TrendingUp, Users, Stethoscope, Leaf, Activity } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  MARKET_SOURCE, marketSeries, platformProjection, recentMonthlyRate, formatBrlCompact, type PlatformStats,
+} from "@/lib/growth-projection";
 
 type ViewMode = "planta" | "mercado";
 
-const plantaData = [
-  { year: "2026", value: 13.5, usuarios: 15_000, marco: "Início das operações reguladas" },
-  { year: "2027", value: 45.9, usuarios: 45_000, marco: "Expansão nacional acelerada" },
-  { year: "2028", value: 125.4, usuarios: 110_000, marco: "Parcerias com redes farmacêuticas" },
-  { year: "2029", value: 315, usuarios: 250_000, marco: "Liderança no mercado digital" },
-  { year: "2030", value: 690, usuarios: 500_000, marco: "Consolidação e Acesso em Massa" },
-];
-
-const mercadoData = [
-  { year: "2026", value: 2.2, marco: "Regulamentação ANVISA consolidada" },
-  { year: "2027", value: 3.8, marco: "Novos players e importações facilitadas" },
-  { year: "2028", value: 5.1, marco: "Cultivo nacional autorizado em escala" },
-  { year: "2029", value: 7.3, marco: "Integração com o SUS em fase piloto" },
-  { year: "2030", value: 9.5, marco: "Mercado maduro e regulado" },
-];
+interface ChartPoint {
+  year: string;
+  value: number;
+  usuarios?: number;
+  pacientes?: number;
+  marco: string;
+}
 
 const formatValue = (v: number, mode: ViewMode) =>
-  mode === "planta" ? `R$ ${v}M` : `R$ ${v}B`;
+  mode === "planta" ? `${Math.round(v).toLocaleString("pt-BR")} usuários` : `R$ ${v.toLocaleString("pt-BR")} mi`;
 
 const CustomTooltip = ({ active, payload, mode }: any) => {
   if (!active || !payload?.length) return null;
@@ -35,11 +31,11 @@ const CustomTooltip = ({ active, payload, mode }: any) => {
     <div className="rounded-2xl border border-border bg-[hsl(240,15%,8%)] px-5 py-4 shadow-2xl max-w-[260px]">
       <p className="text-sm font-black text-foreground mb-2">{d?.year}</p>
       <p className="text-xs font-bold mb-1" style={{ color: mode === "planta" ? "#39FF14" : "#FFD700" }}>
-        💰 {formatValue(d?.value, mode)}
+        {mode === "planta" ? "👥" : "💰"} {formatValue(d?.value, mode)}
       </p>
-      {mode === "planta" && d?.usuarios && (
+      {mode === "mercado" && d?.pacientes && (
         <p className="text-xs font-bold text-emerald-400 mb-1">
-          👥 {d.usuarios.toLocaleString("pt-BR")} usuários
+          👥 {d.pacientes.toLocaleString("pt-BR")} pacientes
         </p>
       )}
       <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
@@ -52,57 +48,81 @@ const CustomTooltip = ({ active, payload, mode }: any) => {
 const CannabisMarketChart = () => {
   const isMobile = useIsMobile();
   const [mode, setMode] = useState<ViewMode>("planta");
-  const medUsersRef = useRef(347_200);
-  const googleRef = useRef(12_580);
-  const plantaRef = useRef(1_000);
-  const [, setTick] = useState(0);
+  const [stats, setStats] = useState<PlatformStats | null>(null);
 
+  // Números reais do servidor (só totais agregados), atualizados a cada minuto
   useEffect(() => {
-    const id = setInterval(() => {
-      medUsersRef.current += Math.floor(Math.random() * 3) + 1;
-      googleRef.current += Math.floor(Math.random() * 8) + 2;
-      if (Math.random() < 0.08) plantaRef.current += 5;
-      else if (Math.random() < 0.4) plantaRef.current += 1;
-      setTick((t) => t + 1);
-    }, 2000);
-    return () => clearInterval(id);
+    let active = true;
+    const load = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- RPC nova ainda fora dos tipos gerados
+      const { data, error } = await (supabase as any).rpc("public_platform_stats");
+      if (active && !error && data) setStats(data as PlatformStats);
+    };
+    void load();
+    const id = setInterval(load, 60_000);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
   }, []);
 
-  const medUsers = medUsersRef.current;
-  const googleSearches = googleRef.current;
-  const plantaUsers = plantaRef.current;
+  const market = useMemo(() => marketSeries(), []);
+  const projection = useMemo(() => (stats ? platformProjection(stats) : []), [stats]);
+  const currentYear = new Date().getFullYear();
+
+  const plantaData: ChartPoint[] = projection.map((p) => ({
+    year: String(p.year),
+    value: p.users,
+    usuarios: p.users,
+    marco:
+      p.year === currentYear
+        ? `Hoje: ${(stats?.users_total ?? 0).toLocaleString("pt-BR")} cadastrados (real) · fim do ano no ritmo atual`
+        : `Projeção: ritmo real atual + 15% a.a. · ${formatBrlCompact(p.revenueBrl)} no ano · ${p.marketSharePct.toLocaleString("pt-BR")}% dos pacientes do país`,
+  }));
+  const mercadoData: ChartPoint[] = market.map((m) => ({
+    year: String(m.year),
+    value: m.revenueMi,
+    pacientes: m.patients,
+    marco: m.projected ? "Projeção do setor: +15% ao ano (Kaya Mind)" : "Dado real do Anuário Kaya Mind",
+  }));
 
   const data = mode === "planta" ? plantaData : mercadoData;
   const color = mode === "planta" ? "#39FF14" : "#FFD700";
   const gradientId = mode === "planta" ? "gradPlanta" : "gradMercado";
+  const fmt = (n?: number) => (stats && typeof n === "number" ? n.toLocaleString("pt-BR") : "…");
 
   const liveCounters = [
     {
-      icon: Activity,
-      value: medUsers.toLocaleString("pt-BR"),
-      label: "Usuários de Cannabis Medicinal / min",
-      color: "text-emerald-400",
-      bg: "bg-emerald-500/10 border-emerald-500/20",
+      icon: Users,
+      value: fmt(stats?.users_total),
+      label: "Cadastrados na Planta y Raiz",
+      color: "text-primary",
+      bg: "bg-primary/10 border-primary/20",
     },
     {
-      icon: Search,
-      value: googleSearches.toLocaleString("pt-BR"),
-      label: "Buscas no Google / min",
+      icon: Stethoscope,
+      value: fmt(stats?.doctors_total),
+      label: "Profissionais na plataforma",
       color: "text-sky-400",
       bg: "bg-sky-500/10 border-sky-500/20",
     },
     {
-      icon: Users,
-      value: plantaUsers.toLocaleString("pt-BR"),
-      label: "Cadastrados Planta y Raiz",
-      color: "text-primary",
-      bg: "bg-primary/10 border-primary/20",
+      icon: Activity,
+      value: fmt(stats ? stats.consultations_paid + stats.orientations_paid : undefined),
+      label: "Atendimentos pagos realizados",
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/10 border-emerald-500/20",
     },
   ];
 
+  const last = projection[projection.length - 1];
+  const signupRate = stats ? Math.round(recentMonthlyRate(stats.monthly, "signups")) : 0;
+  const market2025 = market.find((m) => m.year === 2025)!;
+  const market2030 = market[market.length - 1];
+
   const legendText = mode === "planta"
-    ? "Nossa meta é capturar 7% do market share nacional através da democratização do acesso à cannabis medicinal."
-    : "Estimativa de crescimento orgânico do setor regulado pela ANVISA no Brasil.";
+    ? "Números reais do banco de dados, atualizados a cada minuto. A projeção parte do total de hoje, segue o ritmo real de cadastros e faturamento dos últimos 3 meses e cresce 15% ao ano, junto com o mercado."
+    : "Mercado brasileiro de cannabis medicinal (Anuário Kaya Mind): dados reais de 2024 e 2025 e projeção do setor de 15% ao ano.";
 
   return (
     <section className="py-20 md:py-32 bg-background relative overflow-hidden">
@@ -125,7 +145,7 @@ const CannabisMarketChart = () => {
             Projeção de <span className="text-gradient-green">Crescimento</span> 2026–2030
           </h2>
           <p className="text-base md:text-lg text-muted-foreground font-medium">
-            Compare as projeções da Planta y Raiz com o mercado brasileiro de cannabis medicinal
+            Números reais da Planta y Raiz, ao vivo, comparados com o mercado brasileiro de cannabis medicinal
           </p>
         </motion.div>
 
@@ -172,7 +192,7 @@ const CannabisMarketChart = () => {
                     Dashboard Comparativo
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Alterne entre as projeções para comparar cenários
+                    Real até hoje + projeção pelo ritmo atual
                   </p>
                 </div>
 
@@ -236,6 +256,11 @@ const CannabisMarketChart = () => {
                   transition={{ duration: 0.35 }}
                   className="h-[320px] md:h-[420px] w-full"
                 >
+                  {data.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                      Carregando os números reais da plataforma…
+                    </div>
+                  ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
@@ -254,7 +279,7 @@ const CannabisMarketChart = () => {
                         axisLine={false}
                       />
                       <YAxis
-                        tickFormatter={(v) => mode === "planta" ? `R$${v}M` : `R$${v}B`}
+                        tickFormatter={(v) => mode === "planta" ? Number(v).toLocaleString("pt-BR", { notation: "compact" }) : `R$ ${v} mi`}
                         stroke={`${color}66`}
                         fontSize={11}
                         tickLine={false}
@@ -275,6 +300,7 @@ const CannabisMarketChart = () => {
                       />
                     </AreaChart>
                   </ResponsiveContainer>
+                  )}
                 </motion.div>
               </AnimatePresence>
 
@@ -290,10 +316,10 @@ const CannabisMarketChart = () => {
                 {mode === "planta" && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     {[
-                      { label: "Usuários 2030", value: "500K", icon: "👥" },
-                      { label: "Faturamento 2030", value: "R$ 690M", icon: "💰" },
-                      { label: "CAGR Receita", value: "119%", icon: "📈" },
-                      { label: "Market Share", value: "7%", icon: "🎯" },
+                      { label: "Usuários 2030 (proj.)", value: last ? last.users.toLocaleString("pt-BR") : "…", icon: "👥" },
+                      { label: "Faturamento 2030 (proj.)", value: last ? formatBrlCompact(last.revenueBrl) : "…", icon: "💰" },
+                      { label: "Novos cadastros / mês", value: stats ? signupRate.toLocaleString("pt-BR") : "…", icon: "📈" },
+                      { label: "Fatia dos pacientes 2030", value: last ? `${last.marketSharePct.toLocaleString("pt-BR")}%` : "…", icon: "🎯" },
                     ].map((s, i) => (
                       <div key={i} className="text-center p-3 rounded-xl bg-muted/20 border border-border">
                         <span className="text-lg">{s.icon}</span>
@@ -307,10 +333,10 @@ const CannabisMarketChart = () => {
                 {mode === "mercado" && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     {[
-                      { label: "Mercado 2026", value: "R$ 2.2B", icon: "📊" },
-                      { label: "Mercado 2030", value: "R$ 9.5B", icon: "🏆" },
-                      { label: "CAGR Setor", value: "44%", icon: "📈" },
-                      { label: "Crescimento", value: "4.3x", icon: "🚀" },
+                      { label: "Mercado 2025 (real)", value: `R$ ${market2025.revenueMi.toLocaleString("pt-BR")} mi`, icon: "📊" },
+                      { label: "Pacientes 2025 (real)", value: market2025.patients.toLocaleString("pt-BR"), icon: "👥" },
+                      { label: "Crescimento do setor", value: "15% a.a.", icon: "📈" },
+                      { label: "Mercado 2030 (proj.)", value: `R$ ${Math.round(market2030.revenueMi).toLocaleString("pt-BR")} mi`, icon: "🏆" },
                     ].map((s, i) => (
                       <div key={i} className="text-center p-3 rounded-xl bg-muted/20 border border-border">
                         <span className="text-lg">{s.icon}</span>
@@ -323,6 +349,13 @@ const CannabisMarketChart = () => {
 
                 <p className="text-xs text-muted-foreground leading-relaxed text-center italic">
                   {legendText}
+                </p>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  Fonte do mercado:{" "}
+                  <a href={MARKET_SOURCE.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+                    {MARKET_SOURCE.name}
+                  </a>
+                  {stats && <> · Plataforma atualizada às {new Date(stats.generated_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</>}
                 </p>
               </motion.div>
             </CardContent>

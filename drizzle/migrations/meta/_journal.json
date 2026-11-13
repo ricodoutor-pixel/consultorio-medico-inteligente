@@ -344,6 +344,13 @@
       "when": 1794539047778,
       "tag": "0048_fix_doctor_agenda_rls_and_slots",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1794541488100,
+      "tag": "0049_public_platform_stats",
+      "breakpoints": true
     }
   ]
 }

@@ -23,7 +23,7 @@ export const PHARMACY_DOC_CHECKLIST: DocItem[] = [
   { label: "Certidão de Regularidade Técnica — CRF", detail: "Com nome e nº de inscrição do farmacêutico responsável técnico.", required: true },
   { label: "Documento de identidade + CPF do responsável legal", detail: "RG ou CNH legível (frente e verso).", required: true },
   { label: "Comprovante de endereço comercial", detail: "Conta de luz, água ou telefone dos últimos 90 dias.", required: true },
-  { label: "Foto da fachada / loja física", detail: "Usada para o card da farmácia no Shopping.", required: true },
+  { label: "Foto da fachada / loja física", detail: "Usada para o card da farmácia no Catálogo.", required: true },
   { label: "Logomarca oficial (PNG ou JPG)", detail: "Fundo claro, mínimo 400x400px — aparece no catálogo.", required: true },
   { label: "Dados bancários / Pix + ID de vendedor Mercado Pago", detail: "Obrigatório para receber o repasse de 95% das vendas.", required: true },
   { label: "Certidão negativa de débitos (CND)", detail: "Opcional, acelera a homologação.", required: false },
@@ -49,7 +49,7 @@ const STEPS = [
   {
     icon: CheckCircle2,
     title: "4. Aguarde a homologação",
-    body: "Nossa equipe confere os documentos em até 48h úteis. Aprovada, sua loja passa a aparecer no Shopping Planta y Raíz.",
+    body: "Nossa equipe confere os documentos em até 48h úteis. Aprovada, sua loja passa a aparecer no Catálogo Planta y Raíz.",
   },
   {
     icon: Package,

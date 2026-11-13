@@ -102,7 +102,7 @@ export const ClubCheckout: React.FC<CheckoutProps> = ({
   // Processar pagamento via Mercado Pago
   const handleCheckout = async () => {
     if (cart.length === 0) {
-      alert('Carrinho vazio!');
+      alert('Solicitação vazia!');
       return;
     }
 
@@ -164,7 +164,7 @@ export const ClubCheckout: React.FC<CheckoutProps> = ({
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
             <ShoppingCart className="w-10 h-10 text-emerald-400" />
-            Carrinho de Compras
+            Minha Solicitação
           </h1>
           <p className="text-slate-400">
             Manus CEO administra seu pedido 24/7 automaticamente
@@ -177,7 +177,7 @@ export const ClubCheckout: React.FC<CheckoutProps> = ({
             {cart.length === 0 ? (
               <div className="bg-slate-800/50 backdrop-blur border border-purple-500/20 rounded-2xl p-8 text-center">
                 <ShoppingCart className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                <p className="text-slate-400 text-lg">Seu carrinho está vazio</p>
+                <p className="text-slate-400 text-lg">Sua solicitação está vazia</p>
                 <p className="text-slate-500 text-sm mt-2">
                   Volte à loja e adicione produtos!
                 </p>

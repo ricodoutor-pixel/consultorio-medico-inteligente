@@ -157,7 +157,7 @@ export const AdminAprovacoesPacientes = () => {
             const first = Array.isArray(o.items) ? (o.items[0] as any) : null;
             return {
               id: o.id,
-              product_name: first?.name || first?.title || "Pedido do Shopping",
+              product_name: first?.name || first?.title || "Pedido do Catálogo",
               category: "medicamento" as const,
               quantity: Number(first?.quantity ?? 1),
               total: Number(o.total ?? 0),
@@ -532,7 +532,7 @@ export const AdminAprovacoesPacientes = () => {
                           <Award size={14} className="text-emerald-400" /> Cartão Verde
                         </TabsTrigger>
                         <TabsTrigger value="shopping" className="text-xs font-bold gap-1.5">
-                          <ShoppingBag size={14} className="text-purple-400" /> Compras / Shopping ({patient.shopping_orders.length})
+                          <ShoppingBag size={14} className="text-purple-400" /> Compras / Produtos ({patient.shopping_orders.length})
                         </TabsTrigger>
                         <TabsTrigger value="indicacao" className="text-xs font-bold gap-1.5">
                           <Gift size={14} className="text-amber-400" /> Indicações
@@ -647,7 +647,7 @@ export const AdminAprovacoesPacientes = () => {
                       <TabsContent value="shopping" className="pt-3">
                         {patient.shopping_orders.length === 0 ? (
                           <div className="p-4 rounded-xl bg-muted/20 text-center text-xs text-muted-foreground">
-                            Nenhum pedido realizado no Shopping até o momento.
+                            Nenhum pedido realizado no Catálogo até o momento.
                           </div>
                         ) : (
                           <div className="space-y-2">

@@ -232,7 +232,7 @@ const President360 = () => {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="font-display font-black text-lg">Tendência de Receita · 30 dias</h3>
-                  <p className="text-xs text-muted-foreground">Soma consolidada: Orientações Técnicas + Shopping</p>
+                  <p className="text-xs text-muted-foreground">Soma consolidada: Orientações Técnicas + Produtos</p>
                 </div>
                 <Badge variant="outline" className="border-amber-500/40 text-amber-400">{BRL(s.receita30d)}</Badge>
               </div>

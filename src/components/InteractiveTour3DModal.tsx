@@ -127,7 +127,7 @@ const TOUR_DATA: Record<TourRole, { title: string; subtitle: string; icon: any; 
       },
       {
         stepNumber: 5,
-        title: "Recebimento do Produto no Shopping Oficial",
+        title: "Recebimento do Produto no Catálogo Oficial",
         badge: "Passo 5 de 5 · Farmácia & Entrega",
         shortDesc: "Adquira seu tratamento com 1 clique na Farmácia Oficial Planta y Raíz ou importe com assessoria completa até a sua porta.",
         details: [
@@ -289,7 +289,7 @@ const TOUR_DATA: Record<TourRole, { title: string; subtitle: string; icon: any; 
           title: "Dossiê Regulatório da Farmácia",
           sub: "Planta y Raíz Ltda / Farmácia Raiz Verde",
           status: "AFE / CRF HOMOLOGADO ✓",
-          items: ["Alvará Sanitário Vigente", "Farmacêutico CRF/PR Ativo", "Homologada no Shopping"],
+          items: ["Alvará Sanitário Vigente", "Farmacêutico CRF/PR Ativo", "Homologada no Catálogo"],
           tag: "LOJA OFICIAL ANVISA",
         },
       },

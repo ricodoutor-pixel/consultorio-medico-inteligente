@@ -669,7 +669,7 @@ const Club = () => {
               onClick={(e) => e.stopPropagation()}>
 
               <div className="flex items-center justify-between p-5 border-b border-border">
-                <h2 className="text-xl font-bold text-foreground">🛒 Carrinho ({cartCount})</h2>
+                <h2 className="text-xl font-bold text-foreground">🛒 Minha Solicitação ({cartCount})</h2>
                 <button onClick={() => setShowCart(false)}><X size={20} className="text-muted-foreground" /></button>
               </div>
 
@@ -677,7 +677,7 @@ const Club = () => {
                 {cart.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                     <ShoppingCart size={48} className="mb-4 opacity-30" />
-                    <p>Seu carrinho está vazio</p>
+                    <p>Sua solicitação está vazia</p>
                   </div>
                 ) : cart.map((item) => (
                   <div key={item.product.id} className="flex gap-3 bg-muted/50 rounded-lg p-3">
@@ -703,7 +703,7 @@ const Club = () => {
                   <Button className="w-full py-5" onClick={handleCheckout} disabled={checkoutLoading}>
                     {checkoutLoading ? <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando...</> : "Comprar Agora 💳"}
                   </Button>
-                  <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Carrinho</Button>
+                  <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Solicitação</Button>
                 </div>
               )}
             </motion.div>

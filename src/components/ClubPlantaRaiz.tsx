@@ -185,12 +185,12 @@ export const ClubPlantaRaiz: React.FC<ClubPlantaRaizProps> = ({
                         <span className="text-slate-400">({product.reviews} avaliações)</span>
                       </div>
 
-                      {/* Botão Adicionar ao Carrinho */}
+                      {/* Botão Adicionar à Solicitação */}
                       <button
                         onClick={() => handleAddToCart(product.id)}
                         className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold py-2 rounded-lg transition"
                       >
-                        🛒 Adicionar ao Carrinho
+                        🛒 Adicionar à Solicitação
                       </button>
                     </div>
                   </div>

@@ -316,7 +316,7 @@ const BREADCRUMB_LABELS: Record<string, string> = {
   planos: 'Planos',
   profissionais: 'Profissionais',
   'saude-verde': 'Saúde Verde',
-  shopping: 'Shopping',
+  shopping: 'Produtos',
   telemedicina: 'Telemedicina',
   tratamentos: 'Tratamentos',
   'como-funciona': 'Como Funciona',
@@ -477,7 +477,7 @@ export function getSchemaOrgByRoute(pathname: string): SchemaOrgConfig[] {
     return [
       ...baseSchemas,
       buildCollectionPageSchema({
-        name: 'Shopping de Produtos Canabinoides',
+        name: 'Catálogo de Produtos Canabinoides',
         description: 'Produtos de cannabis medicinal disponíveis via farmácias parceiras autorizadas pela ANVISA.',
         path: '/shopping',
       }),

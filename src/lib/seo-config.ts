@@ -70,9 +70,9 @@ export const routeSEOMap: Record<string, PageSEO> = {
     title: `Catálogo de Produtos Autorizados ANVISA | ${BRAND}`,
     description:
       "Solicite óleos e produtos de cannabis medicinal via farmácias parceiras autorizadas pela ANVISA, com verificação de prescrição conforme RDC 660.",
-    keywords: "comprar cannabis medicinal São Paulo, óleo CBD Brasil, marketplace cannabis medicinal, produtos canabinoides ANVISA",
+    keywords: "comprar cannabis medicinal São Paulo, óleo CBD Brasil, catálogo cannabis medicinal, produtos canabinoides ANVISA",
     canonical: `${BASE}/shopping`,
-    h1: "Cannabis Medicinal em São Paulo e Brasil — Shopping Verificado e Seguro",
+    h1: "Cannabis Medicinal em São Paulo e Brasil — Catálogo Verificado e Seguro",
   },
   "/saude-verde": {
     title: `Programa Saúde Verde | ${BRAND}`,

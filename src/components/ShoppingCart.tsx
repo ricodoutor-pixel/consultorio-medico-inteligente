@@ -52,7 +52,7 @@ export function ShoppingCart() {
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
               <CartIcon size={48} className="mb-4 opacity-50" />
-              <p>Seu carrinho está vazio</p>
+              <p>Sua solicitação está vazia</p>
             </div>
           ) : (
             items.map((item) => (
@@ -108,8 +108,8 @@ export function ShoppingCart() {
             </div>
             <div className="p-6 border-t border-border space-y-3">
               <Button className="w-full py-6" onClick={() => { window.location.href = '/cart-checkout'; }}>Ir para Checkout</Button>
-              <Button variant="outline" className="w-full" onClick={() => clearCart()}>Limpar Carrinho</Button>
-              <Button variant="ghost" className="w-full" onClick={() => setShowCart(false)}>Continuar Comprando</Button>
+              <Button variant="outline" className="w-full" onClick={() => clearCart()}>Limpar Solicitação</Button>
+              <Button variant="ghost" className="w-full" onClick={() => setShowCart(false)}>Continuar Navegando</Button>
             </div>
           </>
         )}

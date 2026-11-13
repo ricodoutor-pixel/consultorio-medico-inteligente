@@ -84,6 +84,17 @@ describe("Doctor Schedule - Dr. Anderson Mikalauskas rules and booking", () => {
     expect(activeDays.length).toBeGreaterThan(15);
   });
 
+  it("never invents slots for a doctor without a published agenda when the server is down", async () => {
+    const slots = await getDoctorAvailableSlots("med-sem-agenda", new Date("2026-11-02T10:00:00Z"));
+    expect(slots).toHaveLength(0);
+  });
+
+  it("trusts an empty server answer (no free slots) instead of falling back", async () => {
+    vi.spyOn(supabase, "rpc").mockImplementation((() => Promise.resolve({ data: [], error: null })) as never);
+    const slots = await getDoctorAvailableSlots(doctorSlug, new Date("2026-11-02T10:00:00Z"));
+    expect(slots).toHaveLength(0);
+  });
+
   it("should hold a slot temporarily with expiration", async () => {
     const res = await createTemporarySlotHold(doctorSlug, "2026-11-02", "13:00", "test-patient-id");
     expect(res.success).toBe(true);

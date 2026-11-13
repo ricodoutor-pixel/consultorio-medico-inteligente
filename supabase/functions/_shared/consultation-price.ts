@@ -105,3 +105,20 @@ export function validateConsultationPaymentGuard(input: ConsultationValidationIn
   }
   return { ok: true, amount: input.expectedAmount };
 }
+const CONSULTATION_FLOOR_SKUS = ["retorno_consulta", "consulta_chat", "consulta_video"];
+
+/**
+ * Webhook guard: an approved provider payment confirms a consultation only when it covers at least the cheapest
+ * official consultation price. The modality price itself is enforced when the payment is created (mp-checkout,
+ * create-payment, create-payment-split); the patient-written appointments.amount is never trusted here.
+ */
+export function paymentCoversConsultation(
+  paidAmount: number | null | undefined,
+  catalog: Record<string, PaymentService> = FALLBACK_SERVICES,
+): { ok: boolean; expected: number } {
+  const prices = CONSULTATION_FLOOR_SKUS
+    .map((sku) => Number(catalog[sku]?.amount_brl ?? FALLBACK_SERVICES[sku]?.amount_brl ?? 0))
+    .filter((v) => v > 0);
+  const expected = prices.length ? Math.min(...prices) : 90;
+  return { ok: Number(paidAmount || 0) + 0.009 >= expected, expected };
+}

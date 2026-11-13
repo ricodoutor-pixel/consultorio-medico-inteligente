@@ -2,6 +2,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { canEnterOrientation } from "../_shared/orientation-triage.ts";
 import { notifyPaymentConfirmedOnce, notifyRecipientOnce, buildDoctorConsultationMessage } from "../_shared/payment-notify.ts";
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
+import { getPaymentServices } from "../_shared/payment-catalog.ts";
+import { paymentCoversConsultation } from "../_shared/consultation-price.ts";
 
 const getFirstEnv = (...names: string[]) => {
   for (const name of names) {
@@ -1017,6 +1019,27 @@ Deno.serve(async (req) => {
         }
       } else if (appointmentId) {
         // === CONSULTATION PAYMENT ===
+        // 0. O valor aprovado precisa cobrir ao menos a consulta oficial mais barata; o valor gravado na consulta
+        //    (appointments.amount) é escrito pelo paciente e nunca serve de referência.
+        const { data: pre } = await supabase
+          .from("appointments")
+          .select("id")
+          .eq("id", appointmentId)
+          .maybeSingle();
+        const coverage = paymentCoversConsultation(totalAmount, await getPaymentServices(supabase));
+        if (!pre || !coverage.ok) {
+          console.error(`[Webhook] Pagamento ${paymentId} de R$ ${totalAmount} NÃO confirma a consulta ${appointmentId} (mínimo R$ ${coverage.expected})`);
+          await supabase.from("audit_log").insert({
+            action: "payment_blocked_amount_mismatch",
+            table_name: "appointments",
+            record_id: String(appointmentId),
+            new_data: { payment_id: String(payment.id), paid_amount: totalAmount, expected_amount: coverage.expected, found: Boolean(pre) },
+          });
+          return new Response(JSON.stringify({ status: "amount_mismatch", appointment_id: appointmentId }), {
+            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
         // 1. Update appointment status
         const { error: updateErr } = await supabase
           .from("appointments")

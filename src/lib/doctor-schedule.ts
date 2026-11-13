@@ -68,7 +68,8 @@ export async function getDoctorAvailableSlots(
       p_modality: modality,
     });
 
-    if (!error && Array.isArray(data) && data.length > 0) {
+    // Resposta do servidor (mesmo vazia) é a verdade: horários vêm só da agenda gravada do médico.
+    if (!error && Array.isArray(data)) {
       return (data as any[]).map(s => ({
         timeSlot: s.time_slot,
         slotDatetime: s.slot_datetime,
@@ -80,37 +81,30 @@ export async function getDoctorAvailableSlots(
     console.warn("[doctor-schedule] RPC indisponível, usando fallback de regras semanais:", err);
   }
 
-  // Fallback baseado em regras semanais soberanas do médico
+  // Servidor indisponível: só médicos com grade declarada (SPECIAL_DOCTOR_RULES) mostram horários; nunca
+  // inventamos horário para quem não publicou agenda (a lista de espera cobre esse caso).
   const dow = targetDate.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
   const special = SPECIAL_DOCTOR_RULES[doctorIdOrSlug] || (pro?.id ? SPECIAL_DOCTOR_RULES[pro.id] : null);
+  if (!special) return [];
 
   const now = new Date();
   const isToday = format(now, "yyyy-MM-dd") === dateStr;
   const currentMinutes = now.getHours() * 60 + now.getMinutes() + 120; // 2 horas de antecedência mínima
 
-  let candidateSlots: string[] = [];
+  const candidateSlots: string[] = [];
 
-  if (special) {
-    // 1. Tarde
-    if (special.afternoonDays.includes(dow)) {
-      candidateSlots.push(...special.afternoonSlots);
-    }
-    // 2. Noite
-    const evening = special.eveningRules.find(e => e.day === dow);
-    if (evening) {
-      candidateSlots.push(...evening.slots);
-    }
-    // 3. Manhã
-    if (special.morningSlots.length > 0 && dow >= 1 && dow <= 5) {
-      candidateSlots.push(...special.morningSlots);
-    }
-  } else {
-    // Regra padrão de outros médicos (Seg a Sex: 09:00 - 11:30 e 14:00 - 17:30)
-    if (dow >= 1 && dow <= 5) {
-      candidateSlots = ["09:00", "09:30", "10:30", "11:00", "14:00", "14:30", "15:30", "16:00", "17:00"];
-    } else if (dow === 6) {
-      candidateSlots = ["09:00", "10:00", "11:00"];
-    }
+  // 1. Tarde
+  if (special.afternoonDays.includes(dow)) {
+    candidateSlots.push(...special.afternoonSlots);
+  }
+  // 2. Noite
+  const evening = special.eveningRules.find(e => e.day === dow);
+  if (evening) {
+    candidateSlots.push(...evening.slots);
+  }
+  // 3. Manhã
+  if (special.morningSlots.length > 0 && dow >= 1 && dow <= 5) {
+    candidateSlots.push(...special.morningSlots);
   }
 
   // Filtra horários passados ou com menos de 2h de antecedência se for hoje
@@ -147,7 +141,7 @@ export async function getDoctorAvailableDays(
       p_modality: modality,
     });
 
-    if (!error && Array.isArray(data) && data.length > 0) {
+    if (!error && Array.isArray(data)) {
       return (data as any[]).map(d => ({
         date: d.day_date,
         hasAvailableSlots: Boolean(d.has_available_slots),

@@ -146,7 +146,6 @@ const Passaporte = lazyWithRecovery(() => import("./pages/Passaporte"), { source
 const TratamentoDorCronica = lazyWithRecovery(() => import("./pages/TratamentoDorCronica"), { sourceRef: "/tratamento-dor-cronica" });
 const TratamentoAnsiedadeSaudeMental = lazyWithRecovery(() => import("./pages/TratamentoAnsiedadeSaudeMental"), { sourceRef: "/tratamento-ansiedade-saude-mental" });
 const Club = lazyWithRecovery(() => import("./pages/Club"), { sourceRef: "/club" });
-const Deposits = lazyWithRecovery(() => import("./pages/Deposits"), { sourceRef: "/deposits" });
 const CartCheckout = lazyWithRecovery(() => import("./pages/CartCheckout"), { sourceRef: "/cart-checkout" });
 const PaymentSuccess = lazyWithRecovery(() => import("./pages/PaymentSuccess"), { sourceRef: "/payment/success" });
 const PaymentFailure = lazyWithRecovery(() => import("./pages/PaymentFailure"), { sourceRef: "/payment/failure" });
@@ -373,7 +372,7 @@ const App = () => (
                 <Route path="/manual" element={<ManualPlataforma />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/pay" element={<Pay />} />
-                <Route path="/carteira" element={<Carteira />} />
+                <Route path="/carteira" element={<PrivateRoute><Carteira /></PrivateRoute>} />
                 <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
                 <Route path="/cadastro-farmacia" element={<CadastroFarmacia />} />
                 <Route path="/cadastro" element={<Cadastro />} />
@@ -401,9 +400,9 @@ const App = () => (
                 <Route path="/reembolso" element={<PoliticaDeReembolso />} />
                 <Route path="/politica-de-reembolso" element={<PoliticaDeReembolso />} />
                 <Route path="/pagamento" element={<ConsultationPayment />} />
-                <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
+                <Route path="/dashboard-especialista" element={<PrivateRoute><SpecialistDashboard /></PrivateRoute>} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />
-                <Route path="/usuarios-online" element={<OnlineUsers />} />
+                <Route path="/usuarios-online" element={<AdminRoute><OnlineUsers /></AdminRoute>} />
                 <Route path="/admin-ceo" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
                 <Route path="/admin/president" element={<AdminRoute><President360 /></AdminRoute>} />
@@ -461,7 +460,7 @@ const App = () => (
                 <Route path="/iomt" element={<IoMTHub />} />
                 <Route path="/dispositivos" element={<IoMTHub />} />
                 <Route path="/blog" element={<Blog />} />
-                <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
+                <Route path="/dashboard-loja" element={<PrivateRoute><ShoppingDashboard /></PrivateRoute>} />
                 <Route path="/investidores" element={<AdminRoute><InvestorDashboard /></AdminRoute>} />
                 <Route path="/videochamada" element={<LegacyVideoCallRedirect />} />
                 <Route path="/orientacao-rapida" element={<OrientationEntryRedirect />} />
@@ -479,7 +478,7 @@ const App = () => (
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
                 <Route path="/tratamento/:condicao" element={<SEOCondicoes />} />
                 <Route path="/club" element={<Club />} />
-                <Route path="/deposits" element={<Deposits />} />
+                <Route path="/deposits" element={<Navigate to="/saude-plus/meu-cartao" replace />} />
                 <Route path="/cart-checkout" element={<CartCheckout />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />

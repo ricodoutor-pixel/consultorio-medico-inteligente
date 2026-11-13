@@ -1,4 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { getPaymentServices } from "../_shared/payment-catalog.ts";
+import { paymentCoversConsultation } from "../_shared/consultation-price.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -107,8 +109,9 @@ Deno.serve(async (req) => {
 
       if (webhook) {
         if (webhook.status === "approved") {
-          // Validate paid amount matches expected appointment amount
-          if (webhook.amount != null && Number(webhook.amount) < Number(appt.amount)) {
+          // O valor pago precisa cobrir o valor da consulta E a consulta oficial mais barata (appointments.amount é
+          // escrito pelo paciente, então sozinho não serve de referência).
+          if (webhook.amount == null || Number(webhook.amount) < Number(appt.amount) || !paymentCoversConsultation(Number(webhook.amount), await getPaymentServices(supabase)).ok) {
             console.error(`Payment amount mismatch: paid ${webhook.amount}, expected ${appt.amount}`);
             return new Response(JSON.stringify({ error: "Valor pago inferior ao valor da consulta", status: "amount_mismatch" }), {
               status: 400,

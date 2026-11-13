@@ -92,7 +92,7 @@ const TratamentoDorCronica = () => {
                 Tratamento de <span className="text-primary">Dor Crônica</span> com Cannabis Medicinal em São Paulo
               </h1>
               <p className="text-muted-foreground text-base md:text-lg mb-6 max-w-xl">
-                Médicos especialistas em medicina canabinoide. Orientação Técnica Online a partir de <strong className="text-primary">R$30</strong> com prescrição digital ANVISA.
+                Médicos especialistas em medicina canabinoide. Orientação Técnica Online a partir de <strong className="text-primary">R$30</strong>; havendo indicação, a consulta médica emite a receita digital.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">

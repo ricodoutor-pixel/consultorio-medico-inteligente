@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { FALLBACK_DESCRIPTOR, getPaymentServices, resolveDisplayName } from "../_shared/payment-catalog.ts";
+import { expectedConsultationPrice } from "../_shared/consultation-price.ts";
 
 const PLATFORM_FEE_CONSULTATION = 0.07; // 7% consultas
 const PLATFORM_FEE_MARKETPLACE = 0.05; // 5% marketplace
@@ -69,7 +70,22 @@ Deno.serve(async (req) => {
       });
     }
 
-    const totalAmount = Number(appt.amount);
+    // Preço oficial da modalidade (payment_services; Premium usa o valor validado do médico). appointments.amount
+    // é escrito pelo paciente e nunca define o valor cobrado.
+    const catalog = await getPaymentServices(supabase);
+    let premiumPrice: number | null = null;
+    if (String(appt.type || "").toLowerCase() === "premium" && appt.doctor_id) {
+      const { data: doc } = await supabase.from("doctors").select("price_video_chat").eq("id", appt.doctor_id).maybeSingle();
+      premiumPrice = Number(doc?.price_video_chat || 0) || null;
+    }
+    const officialPrice = expectedConsultationPrice(appt.type || "video", premiumPrice, catalog);
+    if (officialPrice === null) {
+      return new Response(JSON.stringify({ error: "Modalidade de consulta inválida" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const totalAmount = officialPrice;
     const feeRate = type === "marketplace" ? PLATFORM_FEE_MARKETPLACE : PLATFORM_FEE_CONSULTATION;
     const platformFee = Math.round(totalAmount * feeRate * 100) / 100;
     const doctorPayout = Math.round((totalAmount - platformFee) * 100) / 100;
@@ -82,7 +98,6 @@ Deno.serve(async (req) => {
       .single();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const catalog = await getPaymentServices(supabase);
     const modalityCode: Record<string, string> = { video: "consulta_video", chat: "consulta_chat", retorno: "retorno_consulta", renovacao: "retorno_consulta", premium: "consulta_premium" };
 
     // Create Mercado Pago preference with marketplace split info in metadata

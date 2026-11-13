@@ -337,6 +337,13 @@
       "when": 1794532810209,
       "tag": "0047_doctor_individual_schedule_and_booking_overhaul",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794539047778,
+      "tag": "0048_fix_doctor_agenda_rls_and_slots",
+      "breakpoints": true
     }
   ]
 }

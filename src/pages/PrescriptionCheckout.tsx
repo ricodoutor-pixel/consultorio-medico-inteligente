@@ -125,7 +125,7 @@ export default function PrescriptionCheckout() {
             <Leaf size={16} className="text-primary" />
             <span className="text-primary text-sm font-medium">Prescrição Personalizada</span>
           </div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Seu Carrinho Exclusivo</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground">Itens da Sua Solicitação de Importação</h1>
           <p className="text-muted-foreground mt-2">Produtos prescritos pelo seu médico, prontos para compra</p>
         </div>
 

@@ -1,4 +1,4 @@
-import { Home, Search, ShoppingBag, Calendar, User } from "lucide-react";
+import { Home, Search, ShieldCheck, Calendar, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AccountMenu } from "@/components/AccountMenu";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { icon: Home, label: "Início", path: "/" },
   { icon: Search, label: "Quiz", path: "/quiz" },
   { icon: Calendar, label: "Agendar", path: "/agendamento" },
-  { icon: ShoppingBag, label: "Loja", path: "/shopping" },
+  { icon: ShieldCheck, label: "Produtos", path: "/shopping" },
   { icon: User, label: "Perfil", path: "/dashboard" },
 ];
 

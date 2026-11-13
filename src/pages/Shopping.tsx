@@ -560,7 +560,7 @@ const ProductDetail = ({ id }: { id: string }) => {
 
           <div className="space-y-2 pt-2">
             <Button className="w-full font-bold h-12 sm:h-14 text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-950/20" onClick={handleBuy}>
-              Comprar com Receita Médica 💳
+              Acessar com Receita Médica 📄
             </Button>
           </div>
 
@@ -727,9 +727,10 @@ const Shopping = () => {
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-foreground mb-1 sm:mb-2">
-              🌿 Shopping Farmacêutico Medicinal
+              🌿 Catálogo de Produtos Autorizados ANVISA
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">Dispensação oficial de fitocanabinoides, extratos purificados e medicamentos autorizados ANVISA</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">Consulta pública e suporte técnico à importação regulamentada por pessoa física (RDC 660/2022 e RDC 327/2019).</p>
+            <p className="text-[11px] sm:text-xs text-muted-foreground max-w-2xl mx-auto mb-2 px-3 py-2 rounded-lg border border-border/50 bg-muted/30">A Planta y Raíz atua exclusivamente como intermediadora tecnológica de telessaúde. Não comercializamos, não estocamos e não vendemos medicamentos. A dispensação ou importação é realizada diretamente por farmácias e importadoras autorizadas pela ANVISA mediante prescrição médica válida.</p>
             <ProductAlertBell category="shopping" />
           </div>
 
@@ -988,7 +989,7 @@ const Shopping = () => {
                                   className="w-full text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-9 shadow-md shadow-emerald-950/20"
                                   onClick={(e) => { e.preventDefault(); handleBuyProduct(p); }}
                                 >
-                                  Comprar com Receita 💳
+                                  Solicitar com Receita 📄
                                 </Button>
                               </div>
                             </CardContent>

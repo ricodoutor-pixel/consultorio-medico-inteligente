@@ -33,7 +33,7 @@ export function EmergencyCTA() {
     if (!isAuthed) {
       toast({
         title: "Acesso exclusivo a pacientes cadastrados",
-        description: "Faça login (ou cadastre-se gratuitamente) para falar AGORA com o Dr. Edilson em caso de urgência.",
+        description: "Faça login (ou cadastre-se gratuitamente) para falar com a Enfª Brisa ou com o plantonista credenciado.",
       });
       navigate("/login?redirect=/&emergency=1");
       return;
@@ -88,7 +88,7 @@ export function EmergencyCTA() {
       {/* Botão pulsátil */}
       <button
         onClick={handleClick}
-        aria-label="Botão de Emergência — falar com o Dr. Edilson Bezerra agora"
+        aria-label="Atendimento e Triagem Rápida — fale com a Enfª Brisa ou com o plantonista credenciado"
         className="relative group inline-flex items-center justify-center gap-3 px-8 py-5 sm:px-12 sm:py-6 rounded-2xl font-display font-black text-xl sm:text-3xl tracking-wider text-white shadow-[0_0_40px_rgba(239,68,68,0.6)] overflow-hidden"
         style={{ background: "linear-gradient(135deg,#dc2626 0%,#ef4444 50%,#b91c1c 100%)" }}
       >
@@ -106,12 +106,12 @@ export function EmergencyCTA() {
           transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }}
         />
         <Siren className="relative z-10 animate-pulse" size={28} />
-        <span className="relative z-10">EMERGÊNCIA</span>
+        <span className="relative z-10">ATENDIMENTO &amp; TRIAGEM RÁPIDA</span>
         <Phone className="relative z-10" size={24} />
       </button>
 
       <p className="mt-3 text-center text-sm sm:text-base font-bold text-red-300 max-w-md">
-        Em caso de dor, clique no botão e fale com um Médico AGORA.
+        Fale com a Enfª Brisa ou com o Plantonista Credenciado
       </p>
       {!isAuthed && (
         <p className="mt-1 text-center text-[11px] uppercase tracking-wider text-white/60">

@@ -87,9 +87,9 @@ const Precos = () => {
       period: "/mês",
       tag: "MAIS POPULAR",
       icon: Stethoscope,
-      description: "Receba 100% do valor da consulta + selo de verificação premium.",
+      description: "Prioridade no rodízio de pacientes + Copiloto, Assistente Jurídico e Escriba.",
       features: [
-        "100% do valor da consulta (taxa zero)",
+        "Prioridade no rodízio (93% de cada consulta é seu)",
         "Selo de Médico Verificado",
         "Telemedicina ilimitada",
         "Prontuário digital ilimitado",

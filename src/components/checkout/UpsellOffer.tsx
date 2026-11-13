@@ -20,7 +20,7 @@ const UPSELL_OFFERS = [
     color: "text-amber-400",
     benefits: [
       "Atendimento prioritário na fila",
-      "Taxa zero em consultas",
+      "Brisa IA 24h para dúvidas",
       "Selo VIP no perfil",
       "Suporte WhatsApp 24h",
     ],

@@ -44,7 +44,7 @@ const EVERGREEN_CONTENT = [
   "🧠 Cannabis e Saúde Mental: Estudos mostram eficácia do CBD para ansiedade generalizada, TEPT e insônia.",
   "⚖️ Legislação 2026: A RDC 660 simplificou a prescrição de cannabis medicinal. Seus pacientes podem se beneficiar!",
   "🏥 Telemedicina Cannabis: 92% dos pacientes relatam melhora significativa após 3 meses de tratamento guiado.",
-  "💰 Dica de Faturamento: Médicos na Planta y Raiz faturam em média R$ 15k/mês com teleconsultas. Taxa Zero para VIP!",
+  "💰 Dica de Faturamento: Médicos na Planta y Raiz faturam em média R$ 15k/mês com teleconsultas. Assinantes recebem pacientes antes no rodízio!",
   "🎓 Novo curso disponível: 'Farmacologia dos Canabinoides' - 10 módulos gratuitos na plataforma.",
   "🌱 Dose-resposta: Começar com doses baixas e aumentar gradualmente é a chave do sucesso no tratamento.",
   "📱 Sabia que você pode prescrever cannabis medicinal 100% online? Receita digital com assinatura ICP-Brasil.",
@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
             if (sub?.data?.id) {
               await sendContent(sub.data.id, [{
                 type: "text",
-                text: `🔥 Parabéns! Sua indicação foi um sucesso!\n\nSeu bônus de 10% recebeu um BOOST temporário de 48h! 🚀\n\nIndique mais colegas agora e maximize seus ganhos:\nhttps://consultorio-medico-inteligente.lovable.app/indicacoes\n\nSeu link exclusivo: https://consultorio-medico-inteligente.lovable.app/?ref=${ref.code}`
+                text: `🔥 Parabéns! Sua indicação foi um sucesso!\n\nSeu bônus de 10% recebeu um BOOST temporário de 48h! 🚀\n\nIndique mais colegas agora e maximize seus ganhos:\nhttps://plantayraiz.com.br/indicacoes\n\nSeu link exclusivo: https://plantayraiz.com.br/?ref=${ref.code}`
               }]);
               await tagSubscriber(sub.data.id, "Referral_Boost_Active");
               boosted++;
@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
           if (sub?.data?.id) {
             await sendContent(sub.data.id, [{
               type: "text",
-              text: `📬 Conteúdo da Semana - Planta y Raiz\n\n${content}\n\n📖 Mais conteúdo na Biblioteca: https://consultorio-medico-inteligente.lovable.app/biblioteca`
+              text: `📬 Conteúdo da Semana - Planta y Raiz\n\n${content}\n\n📖 Mais conteúdo na Biblioteca: https://plantayraiz.com.br/biblioteca`
             }]);
             sent++;
           }

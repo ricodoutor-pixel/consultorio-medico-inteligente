@@ -143,7 +143,7 @@ Deno.serve(async (req) => {
             prescription.valid_until ? `📅 *Válida até:* ${new Date(prescription.valid_until).toLocaleDateString("pt-BR")}` : "",
             prescription.anvisa_code ? `🔐 *Código ANVISA:* ${prescription.anvisa_code}` : "",
             ``,
-            `Acesse sua receita completa: https://consultorio-medico-inteligente.lovable.app/prontuario`,
+            `Acesse sua receita completa: https://plantayraiz.com.br/prontuario`,
             ``,
             `🐸 _Enfermeira Brisa — Planta y Raiz_`,
           ].filter(Boolean).join("\n");

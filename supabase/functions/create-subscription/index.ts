@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
+    const siteUrl = "https://plantayraiz.com.br";
     const userEmail = user.email || "";
 
     // ========== Try Mercado Pago Preapproval (Real Recurring) ==========

@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
               headers: { "Content-Type": "application/json", apikey: EVO_KEY },
               body: JSON.stringify({
                 number: profile.phone.replace(/\D/g, ""),
-                text: `🌿 Olá ${profile.full_name || ''}!\n\nSua receita de cannabis medicinal vence em breve.\n\n📋 Renove agora para não ficar sem medicação:\n👉 https://consultorio-medico-inteligente.lovable.app/dashboard\n\n— Equipe Planta & Raiz`,
+                text: `🌿 Olá ${profile.full_name || ''}!\n\nSua receita de cannabis medicinal vence em breve.\n\n📋 Renove agora para não ficar sem medicação:\n👉 https://plantayraiz.com.br/dashboard\n\n— Equipe Planta & Raiz`,
                 delay: 1200,
               }),
             });

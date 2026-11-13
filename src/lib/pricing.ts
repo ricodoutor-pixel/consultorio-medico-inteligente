@@ -66,7 +66,7 @@ export const UNIVERSAL_PLANS: PricedItem[] = [
     name: "Plano Médico",
     price: UNIVERSAL_PLAN_PRICE,
     recurring: true,
-    description: "Taxa zero de intermediação e assinatura digital da plataforma inclusa.",
+    description: "Prioridade no rodízio de pacientes e ferramentas de IA (Copiloto, Jurídico, Escriba); taxa de 7% por consulta mantida.",
   },
   {
     sku: "plano_lojista",

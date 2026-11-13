@@ -87,20 +87,20 @@ serve(async (req) => {
 
     if (actionType === "welcome_standard") {
       const name = String(fullName || "").replace(/^Dr\(?a?\)?\.?\s*/i, "");
-      doctorMsg = `🌿 *Seja bem-vinda à Planta y Raíz, Dra. ${name}!*
+      doctorMsg = `🌿 *Seja bem-vindo(a) à Planta y Raíz, Dr(a). ${name}!*
 
-Agora a senhora faz parte de um grupo seleto de médicos prescritores da nossa plataforma de telemedicina e cuidado canabinoide.
+Agora você faz parte de um grupo seleto de médicos prescritores da nossa plataforma de telemedicina e cuidado canabinoide.
 
 📋 *Para começar a atender, falta pouco:*
 1. ✍️ Cadastrar sua *assinatura digital gov.br* (sem ela não é possível emitir receitas).
 2. 📄 Assinar o *contrato da plataforma* no Consultório.
 3. ✅ Aguardar a aprovação final do seu cadastro pela nossa equipe.
 
-Assim que aprovada, é só ligar o botão *ON* no Consultório para receber pacientes:
+Assim que aprovado(a), é só ligar o botão *ON* no Consultório para receber pacientes:
 👉 https://plantayraiz.com.br/consultorio
 
 ⭐ *Médico assinante vale mais!*
-Com o *Plano Premium por apenas R$ 99/mês* a senhora:
+Com o *Plano Premium por apenas R$ 99/mês* você:
 • recebe os pacientes *antes* no rodízio de consultas (assinantes online têm prioridade);
 • usa o Copiloto Clínico com PubMed, o Assistente Jurídico e o Escriba de consulta;
 • atende mais e melhor.
@@ -111,7 +111,7 @@ Qualquer dúvida, responda esta mensagem. 💚
 Enfª Brisa | Relacionamento Médico
 Planta y Raíz`;
       adminMsg = `🩺 *Boas-vindas enviada*
-Médica: ${fullName}
+Médico(a): ${fullName}
 CRM: ${crm || "N/A"}
 Plano: normal (sem VIP grátis). Pendências: assinatura gov.br, contrato, aprovação.`;
     } else if (actionType === "vip_expired") {

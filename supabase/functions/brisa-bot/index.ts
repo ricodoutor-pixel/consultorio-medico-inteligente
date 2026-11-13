@@ -124,7 +124,7 @@ Como você está se sentindo hoje? Se preferir, me conte um pouco sobre sua quei
 
 Somos um ecossistema completo desenvolvido para médicos e profissionais prescritores:
 🩺 *Consultório Virtual Inteligente:* Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022).
-💰 *Política de Repasse Oficial:* 100% de repasse no primeiro mês (Plano VIP sem taxa) e 93% líquido padrão via PIX Instantâneo.
+💰 *Política de Repasse Oficial:* 93% líquido de cada consulta via PIX (taxa de 7% da plataforma em todos os planos).
 📄 *Prescrição Eletrônica RDC 327/660:* Acesso a catálogo de produtos regulamentados com entrega em todo o Brasil.
 ⏳ *Homologação Rápida:* Ativação do consultório e vitrine em até 24 a 48 horas úteis após conferência dos 4 documentos (CRM, Residência, Diploma/RQE e Chave PIX).
 🎓 *Mentoria Técnica:* Suporte clínico e discussão de casos complexos com o Dr. Edilson Bezerra.

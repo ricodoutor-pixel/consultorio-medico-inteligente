@@ -297,7 +297,7 @@ export const OnboardingFlow: React.FC = () => {
             >
               <h3 className="text-xl font-bold mb-2">👨‍⚕️ Médico</h3>
               <p className="text-gray-600">
-                Plano Médico VIP (R$ 99/mês) - Receita 100%, sem taxa de saque
+                Plano Médico Premium (R$ 99/mês) - prioridade no rodízio de pacientes e ferramentas de IA; taxa de 7% por consulta mantida
               </p>
             </button>
 
@@ -307,7 +307,7 @@ export const OnboardingFlow: React.FC = () => {
             >
               <h3 className="text-xl font-bold mb-2">💊 Lojista/Farmácia</h3>
               <p className="text-gray-600">
-                Plano Lojista VIP (R$ 99/mês) - Taxa zero, destaque nas recomendações
+                Plano Lojista VIP (R$ 99/mês) - destaque nas recomendações; taxa de 5% por venda mantida
               </p>
             </button>
           </div>

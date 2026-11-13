@@ -35,9 +35,9 @@ const PLANS = [
     highlight: true,
     vip: true,
     multiplier: "1.5×",
-    tagline: "TAXA ZERO",
+    tagline: "PRIORIDADE",
     features: [
-      "Taxa de intermediação 0%",
+      "Prioridade no rodízio de pacientes",
       "Selo VIP no Perfil",
       "Prioridade na triagem IA"
     ],
@@ -252,10 +252,10 @@ export const DoctorSubscriptionPlans = ({ doctorId, currentTier, onTierChange }:
         <div className="flex items-start gap-3">
           <ShieldCheck size={24} className="text-primary shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-display font-black text-foreground mb-1">Plano Médico VIP — Taxa Zero</h4>
+            <h4 className="font-display font-black text-foreground mb-1">Plano Médico Premium — Prioridade</h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              No Plano VIP, você retém <span className="text-primary font-bold">100% dos seus honorários</span>. 
-              A taxa de intermediação é <span className="text-primary font-bold">0%</span> — a tecnologia trabalha para você. 
+              No Premium, você recebe pacientes <span className="text-primary font-bold">antes</span> no rodízio e usa Copiloto, Assistente Jurídico e Escriba. 
+              A taxa de intermediação de <span className="text-primary font-bold">7% por consulta</span> continua valendo (93% são seus). 
               Concentre-se no que importa: cuidar dos seus pacientes. A plataforma cuida do resto.
             </p>
           </div>

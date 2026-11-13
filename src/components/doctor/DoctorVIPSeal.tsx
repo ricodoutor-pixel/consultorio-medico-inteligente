@@ -15,7 +15,7 @@ export const DoctorVIPSeal = ({ tier, size = "sm", npsScore }: { tier?: string |
         <Badge className={`bg-primary/15 text-primary border-primary/30 font-black gap-1 ${isLarge ? "text-sm px-3 py-1" : "text-[10px] px-2"}`}
           style={{ boxShadow: "0 0 8px hsl(152 80% 45% / 0.3)" }}>
           <ShieldCheck size={isLarge ? 14 : 10} /> VIP
-          <span className="text-[8px] font-bold opacity-70 ml-0.5">TAXA ZERO</span>
+          <span className="text-[8px] font-bold opacity-70 ml-0.5">PRIORIDADE</span>
         </Badge>
       </motion.div>
     );

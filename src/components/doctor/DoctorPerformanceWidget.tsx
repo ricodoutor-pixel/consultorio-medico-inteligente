@@ -155,7 +155,7 @@ export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
         {perf.feeRate === 0 && (
           <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-4 flex items-center gap-2">
             <ShieldCheck size={16} className="text-primary" />
-            <span className="text-xs font-bold text-primary">Taxa Zero — 100% dos honorários são seus!</span>
+            <span className="text-xs font-bold text-primary">Assinante — prioridade no rodízio de pacientes</span>
           </div>
         )}
 

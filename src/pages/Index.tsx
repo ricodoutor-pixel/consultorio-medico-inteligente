@@ -327,14 +327,14 @@ const Index = () => {
           >
             <div className="space-y-5">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-xs font-black uppercase tracking-wider text-primary">
-                ⚕️ CRM 10963 - Sta Cruz (BO)
+                🌿 Fundador e CEO · Orientação Técnica
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}
                 <span className="text-gradient-green">Dr. Edilson Bezerra</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Dr. Edilson Bezerra ON</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (médico formado em 2018, medicina integrativa, CRM Bolívia nº 10963), <strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
+                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Dr. Edilson Bezerra ON</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (fundador da plataforma, medicina integrativa),<strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>

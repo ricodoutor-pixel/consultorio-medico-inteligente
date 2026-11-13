@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
 
             await sendContent(subscriberId, [{
               type: "text",
-              text: `Dr. ${lead.nome}, notei que você iniciou sua jornada na Planta y Raiz mas ainda não garantiu sua Taxa Zero! 🌿\n\nFicou alguma dúvida sobre o bônus de 10% sobre lucros? Estou aqui para ajudar!\n\n👉 Complete seu cadastro agora e comece a faturar: https://consultorio-medico-inteligente.lovable.app/cadastro-profissional`
+              text: `Dr. ${lead.nome}, notei que você iniciou sua jornada na Planta y Raiz mas ainda não concluiu seu cadastro! 🌿\n\nFicou alguma dúvida sobre o bônus de 10% sobre lucros? Estou aqui para ajudar!\n\n👉 Complete seu cadastro agora e comece a faturar: https://plantayraiz.com.br/cadastro-profissional`
             }]);
 
             await tagSubscriber(subscriberId, "recovery_24h");
@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
 
             await sendContent(subscriberId, [{
               type: "text",
-              text: `Dr. ${lead.nome}, identificamos seu perfil médico! 🩺\n\nVocê foi movido para o Fast Track de aprovação imediata.\n\n✅ Taxa Zero no primeiro mês\n✅ Bônus de 10% sobre lucros\n✅ Aprovação em menos de 24h\n\n👉 Complete seu cadastro: https://consultorio-medico-inteligente.lovable.app/cadastro-profissional`
+              text: `Dr. ${lead.nome}, identificamos seu perfil médico! 🩺\n\nVocê foi movido para o Fast Track de aprovação imediata.\n\n✅ Bônus de 10% sobre lucros\n✅ Aprovação em menos de 24h\n\n👉 Complete seu cadastro: https://plantayraiz.com.br/cadastro-profissional`
             }]);
 
             qualified.medico++;
@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
 
               await sendContent(subscriberId, [{
                 type: "text",
-                text: `Olá ${lead.nome}! 🌿\n\nVi que você tem interesse em cannabis medicinal. Nossos especialistas podem te ajudar!\n\n📅 Agende sua consulta online agora (a partir de R$30):\nhttps://consultorio-medico-inteligente.lovable.app/agendamento`
+                text: `Olá ${lead.nome}! 🌿\n\nVi que você tem interesse em cannabis medicinal. Nossos especialistas podem te ajudar!\n\n📅 Agende sua consulta online agora (a partir de R$30):\nhttps://plantayraiz.com.br/agendamento`
               }]);
 
               qualified.paciente++;
@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
 
               await sendContent(subscriberId, [{
                 type: "text",
-                text: `Oi ${lead.nome}! 😊\n\nQuer saber mais sobre cannabis medicinal? Baixe nosso e-book gratuito:\nhttps://consultorio-medico-inteligente.lovable.app/ebook-medicina-canabinoide\n\nOu fale com nosso assistente Verdinho! 🐸`
+                text: `Oi ${lead.nome}! 😊\n\nQuer saber mais sobre cannabis medicinal? Baixe nosso e-book gratuito:\nhttps://plantayraiz.com.br/ebook-medicina-canabinoide\n\nOu fale com nosso assistente Verdinho! 🐸`
               }]);
 
               qualified.curioso++;
@@ -245,7 +245,7 @@ Deno.serve(async (req) => {
         if (sub?.data?.id) {
           await sendContent(sub.data.id, [{
             type: "text",
-            text: `🩺 Encontramos um especialista para você!\n\n👨‍⚕️ ${profile?.full_name || "Especialista"}\n📋 ${doctor.specialty}\n⭐ Avaliação: ${doctor.rating}/5\n💰 Consulta: R$ ${doctor.consultation_price}\n\n📅 Clique para agendar e pagar:\nhttps://consultorio-medico-inteligente.lovable.app/agendamento?doctor=${doctor.id}\n\n✅ 100% online | Receita digital | Sigilo total`
+            text: `🩺 Encontramos um especialista para você!\n\n👨‍⚕️ ${profile?.full_name || "Especialista"}\n📋 ${doctor.specialty}\n⭐ Avaliação: ${doctor.rating}/5\n💰 Consulta: R$ ${doctor.consultation_price}\n\n📅 Clique para agendar e pagar:\nhttps://plantayraiz.com.br/agendamento?doctor=${doctor.id}\n\n✅ 100% online | Receita digital | Sigilo total`
           }]);
           await tagSubscriber(sub.data.id, "Agendamento_Iniciado");
         }

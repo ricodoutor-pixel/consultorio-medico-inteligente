@@ -18,7 +18,7 @@ export const BRISA_CONFIG = {
 
   // 2. MODELO DE REPASSE E MONETIZAÇÃO
   POLITICA_COMERCIAL: {
-    ofertaGancho: "Repasse de 100% da sua teleconsulta no primeiro mês (taxa zero da plataforma com adesão ao Plano VIP).",
+    ofertaGancho: "Prioridade no rodízio de pacientes e ferramentas de IA com o Plano Premium (R$ 99/mês).",
     regraPadrao: "Repasse instantâneo via PIX com retenção de apenas 7% da plataforma (o médico retém 93% líquido de cada consulta).",
     percentualMedicoPadrao: 93,
     taxaPlataformaPadrao: 7,

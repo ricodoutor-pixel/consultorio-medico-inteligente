@@ -80,10 +80,8 @@ Deno.serve(async (req) => {
 
           if (sub?.plan_tier === "vip") continue;
 
-          // Calcular quanto economizaria com VIP
+          // Faturamento estimado do mês (a taxa de 7% vale para todos os planos)
           const revenue = m.consultations_count * (doctor.consultation_price || 150);
-          const currentFee = revenue * 0.07; // 7% taxa
-          const savings = currentFee; // VIP = 0% taxa
 
           // Buscar perfil para telefone
           const { data: profile } = await supabase.from("profiles").select("phone, full_name").eq("id", doctor.user_id).maybeSingle();
@@ -93,7 +91,7 @@ Deno.serve(async (req) => {
           if (subscriber?.data?.id) {
             await sendContent(subscriber.data.id, [{
               type: "text",
-              text: `💎 Dr. ${profile.full_name}, parabéns!\n\nVocê realizou ${m.consultations_count} consultas este mês e faturou R$ ${revenue.toFixed(0)}! 🎉\n\nSe fosse VIP, teria economizado R$ ${savings.toFixed(0)} em taxas! 💰\n\n🔥 Plano VIP (R$ 99/mês) = Taxa ZERO\n\n👉 Upgrade agora: https://consultorio-medico-inteligente.lovable.app/dashboard-medico\n\nO investimento se paga com apenas 1 consulta!`
+              text: `💎 Dr. ${profile.full_name}, parabéns!\n\nVocê realizou ${m.consultations_count} consultas este mês e faturou R$ ${revenue.toFixed(0)}! 🎉\n\n🔥 Plano Premium (R$ 99/mês) = prioridade no rodízio de pacientes + Copiloto, Jurídico e Escriba\n\n👉 Upgrade agora: https://plantayraiz.com.br/dashboard-medico\n\nMais pacientes chegam primeiro a quem assina.`
             }]);
             await tagSubscriber(subscriber.data.id, "VIP_Upgrade_Offer");
             upgraded++;
@@ -152,7 +150,7 @@ Deno.serve(async (req) => {
 
             await sendContent(sub.data.id, [{
               type: "text",
-              text: `Olá ${profile.full_name}! 🌿\n\nFaz ${monthsAgo} meses desde sua última consulta. Como está seu tratamento?\n\n🎁 Temos um cupom especial de 15% para seu retorno: RETORNO15\n\n📅 Agende agora: https://consultorio-medico-inteligente.lovable.app/agendamento\n\nSeu bem-estar é nossa prioridade! 💚`
+              text: `Olá ${profile.full_name}! 🌿\n\nFaz ${monthsAgo} meses desde sua última consulta. Como está seu tratamento?\n\n🎁 Temos um cupom especial de 15% para seu retorno: RETORNO15\n\n📅 Agende agora: https://plantayraiz.com.br/agendamento\n\nSeu bem-estar é nossa prioridade! 💚`
             }]);
             await tagSubscriber(sub.data.id, "Reactivation_Sent");
             reactivated++;
@@ -253,7 +251,7 @@ Deno.serve(async (req) => {
             if (sub?.data?.id) {
               await sendContent(sub.data.id, [{
                 type: "text",
-                text: `⚠️ ALERTA ANVISA - Prescrição #${rx.id.slice(0, 8)}\n\nDr. ${profile.full_name}, identificamos pendências:\n\n${issues.join("\n")}\n\n🔒 Corrija para manter compliance total.\n\n👉 Acesse: https://consultorio-medico-inteligente.lovable.app/prontuario`
+                text: `⚠️ ALERTA ANVISA - Prescrição #${rx.id.slice(0, 8)}\n\nDr. ${profile.full_name}, identificamos pendências:\n\n${issues.join("\n")}\n\n🔒 Corrija para manter compliance total.\n\n👉 Acesse: https://plantayraiz.com.br/prontuario`
               }]);
               await tagSubscriber(sub.data.id, "Prescription_Alert");
               alerts++;

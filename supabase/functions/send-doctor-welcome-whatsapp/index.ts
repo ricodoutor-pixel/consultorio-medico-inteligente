@@ -1,5 +1,6 @@
 import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 import { doctorPlan, DOCTOR_PRO_TOOLS, proToolsForPlan } from "../_shared/doctor-plans.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -43,7 +44,8 @@ serve(async (req) => {
     const payload = await req.json();
     let { phone, fullName, email, crm, planTier = "vip", actionType = "welcome_vip", renewalLink } = payload;
     // Only service/admin callers may choose recipient/action; a signed-in doctor gets only their own welcome.
-    if (requireServiceAuth(req, corsHeaders) !== null) {
+    const managedCron = Boolean(Deno.env.get("LOVABLE_CRON_SECRET")) && authenticateCronRequest(req) === null;
+    if (!managedCron && requireServiceAuth(req, corsHeaders) !== null) {
       const uid = await getCallerUserId(req);
       if (!uid) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -64,12 +66,55 @@ serve(async (req) => {
       }
     }
 
+    // Service/admin may target a doctor by user id; phone is read server-side.
+    if (payload.doctorUserId && !phone) {
+      const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { data: prof } = await svc.from("profiles").select("phone, full_name").eq("id", payload.doctorUserId).maybeSingle();
+      const { data: doc } = await svc.from("doctors").select("crm").eq("user_id", payload.doctorUserId).maybeSingle();
+      phone = prof?.phone; fullName = prof?.full_name || fullName; crm = doc?.crm || crm;
+      if (actionType === "welcome_standard") {
+        const { data: once } = await svc.rpc("check_edge_rate_limit", { p_bucket: "doctor-welcome-standard", p_key: payload.doctorUserId, p_max_hits: 1, p_window_seconds: 604800 });
+        if (once === false) {
+          return new Response(JSON.stringify({ ok: true, skipped: "already_sent" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+      }
+    }
+
     console.log(`[VIP Lifecycle] action=${actionType} sent`);
 
     let doctorMsg = "";
     let adminMsg = "";
 
-    if (actionType === "vip_expired") {
+    if (actionType === "welcome_standard") {
+      const name = String(fullName || "").replace(/^Dr\(?a?\)?\.?\s*/i, "");
+      doctorMsg = `🌿 *Seja bem-vinda à Planta y Raíz, Dra. ${name}!*
+
+Agora a senhora faz parte de um grupo seleto de médicos prescritores da nossa plataforma de telemedicina e cuidado canabinoide.
+
+📋 *Para começar a atender, falta pouco:*
+1. ✍️ Cadastrar sua *assinatura digital gov.br* (sem ela não é possível emitir receitas).
+2. 📄 Assinar o *contrato da plataforma* no Consultório.
+3. ✅ Aguardar a aprovação final do seu cadastro pela nossa equipe.
+
+Assim que aprovada, é só ligar o botão *ON* no Consultório para receber pacientes:
+👉 https://plantayraiz.com.br/consultorio
+
+⭐ *Médico assinante vale mais!*
+Com o *Plano Premium por apenas R$ 99/mês* a senhora:
+• recebe os pacientes *antes* no rodízio de consultas (assinantes online têm prioridade);
+• usa o Copiloto Clínico com PubMed, o Assistente Jurídico e o Escriba de consulta;
+• atende mais e melhor.
+👉 https://plantayraiz.com.br/precos
+
+Qualquer dúvida, responda esta mensagem. 💚
+
+Enfª Brisa | Relacionamento Médico
+Planta y Raíz`;
+      adminMsg = `🩺 *Boas-vindas enviada*
+Médica: ${fullName}
+CRM: ${crm || "N/A"}
+Plano: normal (sem VIP grátis). Pendências: assinatura gov.br, contrato, aprovação.`;
+    } else if (actionType === "vip_expired") {
       // Regra de Vencimento e Renovação
       doctorMsg = `Olá, Dr(a). ${fullName}!
 

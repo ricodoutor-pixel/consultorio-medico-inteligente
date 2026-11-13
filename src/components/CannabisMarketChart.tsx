@@ -121,7 +121,7 @@ const CannabisMarketChart = () => {
   const market2030 = market[market.length - 1];
 
   const legendText = mode === "planta"
-    ? "Números reais do banco de dados, atualizados a cada minuto. A projeção parte do total de hoje, segue o ritmo real de cadastros e faturamento dos últimos 3 meses e cresce 15% ao ano, junto com o mercado."
+    ? "Números reais do banco de dados, atualizados a cada minuto. A projeção parte do total de hoje, segue o ritmo real de cadastros e faturamento dos últimos 3 meses (ou do mês atual, quando é o primeiro com vendas) e cresce 15% ao ano, junto com o mercado."
     : "Mercado brasileiro de cannabis medicinal (Anuário Kaya Mind): dados reais de 2024 e 2025 e projeção do setor de 15% ao ano.";
 
   return (

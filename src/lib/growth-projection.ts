@@ -79,9 +79,19 @@ export function platformProjection(stats: PlatformStats, now = new Date(), endYe
   const market = new Map(marketSeries(endYear).map((m) => [m.year, m.patients]));
   const year = now.getFullYear();
   const monthsLeft = 11 - now.getMonth(); // meses inteiros após o mês corrente
-  const signupRate = recentMonthlyRate(stats.monthly, "signups");
-  const serviceRate = recentMonthlyRate(stats.monthly, "services");
-  const revenueRate = recentMonthlyRate(stats.monthly, "revenue_brl");
+  const curKey = `${year}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const cur = stats.monthly.length ? stats.monthly[stats.monthly.length - 1] : undefined;
+  const daysInMonth = new Date(year, now.getMonth() + 1, 0).getDate();
+  // Ritmo real dos últimos 3 meses completos; se eles ainda não tiveram movimento (ex.: primeiras vendas
+  // neste mês), usa o mês corrente proporcional aos dias já passados, para não projetar zero até 2030.
+  const pace = (key: keyof Omit<MonthlyStat, "month">) => {
+    const r = recentMonthlyRate(stats.monthly, key);
+    if (r > 0 || !cur || cur.month !== curKey) return r;
+    return (Number(cur[key] || 0) * daysInMonth) / Math.max(1, now.getDate());
+  };
+  const signupRate = pace("signups");
+  const serviceRate = pace("services");
+  const revenueRate = pace("revenue_brl");
 
   const ytd = (key: "services" | "revenue_brl") =>
     stats.monthly.filter((m) => m.month.startsWith(`${year}-`)).reduce((s, m) => s + Number(m[key] || 0), 0);

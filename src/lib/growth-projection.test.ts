@@ -44,4 +44,21 @@ describe("Projeção de crescimento com dados reais", () => {
     expect(p.every((x) => x.users === 1000)).toBe(true);
     expect(p.every((x) => x.revenueBrl === 0)).toBe(true);
   });
+
+  it("primeiras vendas no mês atual: projeta pelo ritmo do mês, não zero até 2030 (dados reais de 13/11/2026)", () => {
+    const real: PlatformStats = {
+      users_total: 74, doctors_total: 46, consultations_paid: 0, orientations_paid: 13, revenue_brl: 390,
+      monthly: [
+        { month: "2026-08", signups: 23, services: 0, revenue_brl: 0 },
+        { month: "2026-09", signups: 10, services: 0, revenue_brl: 0 },
+        { month: "2026-10", signups: 23, services: 0, revenue_brl: 0 },
+        { month: "2026-11", signups: 8, services: 13, revenue_brl: 390 },
+      ],
+    } as PlatformStats;
+    const p = platformProjection(real, new Date("2026-11-13T12:00:00-03:00"));
+    // 390 em 13 dias → 900/mês; fim de 2026 = 390 + 900 (dezembro)
+    expect(p[0].revenueBrl).toBe(1290);
+    expect(p[1].revenueBrl).toBe(Math.round(900 * 12 * 1.15));
+    expect(p[p.length - 1].revenueBrl).toBeGreaterThan(0);
+  });
 });

@@ -262,7 +262,7 @@ const Index = () => {
                 newTab={false}
                 className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105"
                 source="CTA_Index_Hero"
-                modalMessage="Antes de entrar na sala virtual, deixe seu contato — assim agilizamos sua Orientação Técnica em Nuvem de apenas R$30 com o Dr. Edilson Bezerra On."
+                modalMessage="Antes de entrar na sala virtual, deixe seu contato — assim agilizamos sua Orientação Técnica em Nuvem de apenas R$30 com o Dr. Edilson Bezerra ON."
               >
                 🎯 Iniciar Orientação Técnica (R$ 30) <ArrowRight size={18} className="ml-2" />
               </BrisaCTAGate>

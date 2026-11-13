@@ -222,7 +222,7 @@ ${patientContext}\
         </div>
         <div className="hidden sm:flex flex-col items-start leading-tight">
           <span className="text-[10px] uppercase tracking-wider opacity-90">Suporte Exclusivo</span>
-          <span className="text-sm font-semibold">Dr. Edilson On</span>
+          <span className="text-sm font-semibold">Dr. Edilson Bezerra ON</span>
         </div>
       </motion.button>
 

@@ -104,7 +104,7 @@ export default function BrisaWhatsAppQR() {
         <header className="space-y-2">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Smartphone className="h-6 w-6 text-primary" />
-            WhatsApp da Enfª Brisa — Dr. Edilson On
+            WhatsApp da Enfª Brisa — Dr. Edilson Bezerra ON
           </h1>
           <p className="text-sm text-muted-foreground">
             Conecte o número oficial escaneando o QR Code. Enquanto estiver conectado, a Brisa

@@ -179,7 +179,7 @@ export default function OrientacaoAoVivo() {
             </h1>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Supervisão clínica em tempo real das sessões da persona Dr. Edilson ON (CRM 10963 - Sta Cruz/BO).
+            Supervisão clínica em tempo real das sessões da persona Dr. Edilson Bezerra ON (CRM 10963 - Sta Cruz/BO).
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -322,7 +322,7 @@ export default function OrientacaoAoVivo() {
                             }`}
                           >
                             <span className="text-[10px] text-slate-500 mb-0.5 px-1 font-semibold">
-                              {isPatient ? "Paciente" : isAgent ? "Dr. Edilson ON (IA)" : "Dr. Edilson (Humano / Supervisor)"} · {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                              {isPatient ? "Paciente" : isAgent ? "Dr. Edilson Bezerra ON (IA)" : "Dr. Edilson (Humano / Supervisor)"} · {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                             </span>
                             <div
                               className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed ${

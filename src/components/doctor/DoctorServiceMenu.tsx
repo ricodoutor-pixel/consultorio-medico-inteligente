@@ -118,7 +118,7 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
                   {isLoading ? (
                     <><Loader2 size={14} className="mr-1 animate-spin" /> Gerando…</>
                   ) : item.redirectToEdilson ? (
-                    "Iniciar com Dr. Edilson ON"
+                    "Iniciar com Dr. Edilson Bezerra ON"
                   ) : (
                     "Contratar Agora"
                   )}
@@ -134,7 +134,7 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
       </p>
       <p className="text-[11px] text-muted-foreground">
         <strong className="text-foreground">Orientação Técnica</strong> é modalidade exclusiva do{" "}
-        <strong className="text-foreground">Dr. Edilson Bezerra On</strong> (assistente de IA apoiado em
+        <strong className="text-foreground">Dr. Edilson Bezerra ON</strong> (assistente de IA apoiado em
         evidências científicas publicadas no PubMed e supervisionado em tempo real pelo Dr. Edilson Bezerra),
         que orienta tecnicamente e encaminha ao especialista. Nenhum outro profissional da vitrine realiza essa modalidade.
       </p>

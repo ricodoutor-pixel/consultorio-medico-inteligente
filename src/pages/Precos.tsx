@@ -452,8 +452,8 @@ const Precos = () => {
               plataforma digital de intermediação entre pacientes e profissionais de saúde. Não somos uma clínica médica.
             </p>
             <p>
-              <strong className="text-foreground">Responsável Técnica:</strong> Dr. Edilson Bezerra ·
-              <strong> CRM-PR 49354</strong>. Atendimentos realizados conforme <strong>CFM Resolução nº 2.314/2022</strong> (Telemedicina).
+              <strong className="text-foreground">Supervisora Técnica:</strong> Dra. Suelen Naves Rodrigues ·
+              <strong> CRM 49354/PR</strong>. Atendimentos realizados conforme <strong>CFM Resolução nº 2.314/2022</strong> (Telemedicina).
             </p>
             <p>
               <strong className="text-foreground">Cannabis Medicinal:</strong> prescrições e importações seguem a

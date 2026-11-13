@@ -3,7 +3,8 @@ import { AlertTriangle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const HolidayPlantaoBanner: React.FC = () => {
-  const warningText = "🚭 PARE DE FUMAR: O CIGARRO É EXTREMAMENTE PREJUDICIAL À SAÚDE! · CUIDE DA SUA SAÚDE PULMONAR E CARDIOVASCULAR · PLANTA Y RAÍZ MEDICINA INTEGRATIVA";
+  const warningText =
+    "🚭 PARE DE FUMAR: O CIGARRO É EXTREMAMENTE PREJUDICIAL À SAÚDE! · CUIDE DA SUA SAÚDE PULMONAR E CARDIOVASCULAR · PLANTA Y RAÍZ MEDICINA INTEGRATIVA · AINDA ESTAMOS EM FASE DE TESTES E IMPLEMENTAÇÕES DE TODAS AS NOVAS NORMAS, REGRAS E RESOLUÇÕES GOVERNAMENTAIS, SEMPRE ESTUDANDO E APRIMORANDO PARA SERVIR NOSSOS MÉDICOS E PACIENTES COM EXCELÊNCIA · CONHEÇA MELHOR, VENHA, PARTICIPE, CADASTRE-SE ANTES DE JULGAR E FAÇA PARTE DO NOSSO PROJETO!";
 
   return (
     <div className="w-full bg-gradient-to-r from-red-950 via-neutral-900 to-amber-950 border-y border-red-500/50 py-2 relative z-30 shadow-lg overflow-hidden">
@@ -15,7 +16,7 @@ export const HolidayPlantaoBanner: React.FC = () => {
         .animate-pyr-marquee {
           display: inline-flex;
           white-space: nowrap;
-          animation: pyrMarquee 28s linear infinite;
+          animation: pyrMarquee 84s linear infinite;
         }
         .animate-pyr-marquee:hover {
           animation-play-state: paused;

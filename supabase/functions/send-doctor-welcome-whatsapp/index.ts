@@ -1,5 +1,6 @@
 import { getCallerUserId, isAdmin } from "../_shared/admin-auth.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 import { doctorPlan, DOCTOR_PRO_TOOLS, proToolsForPlan } from "../_shared/doctor-plans.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -43,7 +44,8 @@ serve(async (req) => {
     const payload = await req.json();
     let { phone, fullName, email, crm, planTier = "vip", actionType = "welcome_vip", renewalLink } = payload;
     // Only service/admin callers may choose recipient/action; a signed-in doctor gets only their own welcome.
-    if (requireServiceAuth(req, corsHeaders) !== null) {
+    const managedCron = Boolean(Deno.env.get("LOVABLE_CRON_SECRET")) && authenticateCronRequest(req) === null;
+    if (!managedCron && requireServiceAuth(req, corsHeaders) !== null) {
       const uid = await getCallerUserId(req);
       if (!uid) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });

@@ -16,7 +16,7 @@ export const HolidayPlantaoBanner: React.FC = () => {
         .animate-pyr-marquee {
           display: inline-flex;
           white-space: nowrap;
-          animation: pyrMarquee 28s linear infinite;
+          animation: pyrMarquee 84s linear infinite;
         }
         .animate-pyr-marquee:hover {
           animation-play-state: paused;

@@ -10697,6 +10697,7 @@ export type Database = {
       }
       private_get_brisa_cron_secret: { Args: never; Returns: string }
       prune_webhook_idempotency: { Args: never; Returns: undefined }
+      public_platform_stats: { Args: never; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {

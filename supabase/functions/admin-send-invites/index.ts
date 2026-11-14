@@ -16,7 +16,7 @@ const EVOLUTION_API_URL = (Deno.env.get('EVOLUTION_API_URL') || '').replace(/\/$
 const EVOLUTION_API_KEY = Deno.env.get('EVOLUTION_API_KEY') || '';
 const EVOLUTION_INSTANCE = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz';
 
-const INVITATION_MESSAGE = `Olá Doutor(a)!\n\nSou a Brisa 🌿, assistente virtual e Enfermeira Consultora da clínica digital Planta y Raiz. Estamos ampliando nossa infraestrutura de telemedicina focada em tratamentos com Cannabis Medicinal.\n\nGostaríamos de convidá-lo(a) para conhecer nossa plataforma. Somos uma clínica com infraestrutura completa e comissões automáticas (split).\n\nPara saber mais, acesse: https://plantayraiz.com.br/cadastro-profissional\n\nQualquer dúvida, estou à disposição!`;
+const INVITATION_MESSAGE = `Olá, Doutor(a)! Tudo bem? 🌿\n\nVi que você faz parte do nosso grupo médico da *Planta y Raíz* e gostaria de saber se já ativou seu Consultório Digital gratuito na nossa vitrine de prescritores.\n\n• *Repasse líquido de 93% via PIX* após cada teleconsulta (taxa fixa de apenas 7% da plataforma);\n• *Prontuário CFM e prescrição com assinatura ICP-Brasil / Gov.br*;\n• *Encaminhamento de pacientes* que passam pela nossa triagem.\n\nPara ativar seu perfil (leva menos de 2 minutos), acesse:\n👉 https://www.plantayraiz.com.br/cadastro-profissional\n\nOu, se preferir, pode me enviar seu CRM por aqui mesmo que nossa equipe te ajuda na ativação!`;
 
 async function isAdminRequest(req: Request): Promise<boolean> {
   if (!SB_URL || !SB_KEY) return false;

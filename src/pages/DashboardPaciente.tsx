@@ -35,6 +35,7 @@ import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
 import { FarmacogenomicaCard } from "@/components/FarmacogenomicaCard";
 import { TitulacaoTrackerCard } from "@/components/TitulacaoTrackerCard";
 import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
+import { anvisaProtocolOf, anvisaStatusLabel } from "@/lib/anvisa-status";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
@@ -43,41 +44,6 @@ import { PatientInvoicesList } from "@/components/patient/PatientInvoicesList";
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 const tooltipStyle = { background: "hsl(240 15% 8%)", border: "1px solid hsl(240 10% 16%)", borderRadius: "12px", color: "hsl(240 10% 93%)" };
-
-// ── Receita Real Regulamentada pela ANVISA (RDC 660/2022) ──
-export const OFFICIAL_ANVISA_PRESCRIPTION: any = {
-  id: "rx-anv-8492015",
-  doctor_id: "doc-edilson-10963",
-  patient_id: "patient-mariana-01",
-  created_at: "2026-09-02T14:30:00.000Z",
-  status: "active",
-  diagnosis_cid: "G40.8 - Outras epilepsias e síndromes epilépticas (Refratária ao tratamento convencional)",
-  instructions: "Uso contínuo por via sublingual. Iniciar com 5 gotas pela manhã e 5 gotas à noite durante 7 dias. Aumentar para 10 gotas a cada 12 horas a partir da 2ª semana. Manter frasco em local seco ao abrigo da luz solar.",
-  valid_until: "2028-09-02T23:59:59.000Z",
-  anvisa_code: "ANV-2026-8492015",
-  anvisa_status: "APROVADO_INSTANTANEO",
-  anvisa_process_number: "25351.984721/2026-44",
-  anvisa_approval_date: "02/09/2026",
-  anvisa_certificate_url: "https://gov.br/anvisa/certificados/ANV-2026-8492015",
-  tracking_code: "PYR-TRK-BR9482015",
-  tracking_url: "https://rastreamento.correios.com.br/app/index.php?objeto=PYR-TRK-BR9482015",
-  digital_signature: "Assinatura Digital ICP-Brasil Padrão PAdES (SHA-256)",
-  signature_hash: "E8B9A2F41C67D3E052B88901FA44B3092D84C701B2E3F90422AA10D756CB2E98",
-  doctor_name: "Dr. Edilson Bezerra",
-  doctor_crm: "CRM 10963 - Sta Cruz (BO)",
-  medications: [
-    {
-      name: "Epidiolex / Canabidiol 100 mg/mL (Extrato Puro de Cannabis Sativa)",
-      medication: "Epidiolex / Canabidiol 100 mg/mL",
-      dosage: "10 gotas (0,5 mL) a cada 12 horas por via sublingual",
-      concentration: "100 mg/mL",
-      thcPct: 0.0,
-      cbdMg: 100,
-      quantity: "2 frascos de 100 mL",
-      regulatory_framework: "RDC 660/2022 Anvisa (Importação Excepcional Pessoa Física)",
-    }
-  ]
-};
 
 const allBadges = [
   { name: "Iniciante", icon: "🌱", earned: true, desc: "Criou conta na plataforma" },
@@ -110,13 +76,13 @@ const DashboardPaciente = () => {
   const [isCadastrarReceitaOpen, setIsCadastrarReceitaOpen] = useState(false);
   const [newRxSaving, setNewRxSaving] = useState(false);
   const [newRxForm, setNewRxForm] = useState({
-    doctorName: "Dr. Edilson Bezerra",
-    doctorCrm: "CRM 10963 - Sta Cruz (BO)",
-    productName: "Epidiolex / Canabidiol 100 mg/mL",
-    dosage: "10 gotas (0,5 mL) a cada 12 horas por via sublingual",
-    cid: "G40.8 - Outras epilepsias e síndromes epilépticas (Refratária)",
-    instructions: "Uso contínuo por via sublingual. Manter frasco protegido da luz.",
-    anvisaCode: `ANV-2026-${Math.floor(1000000 + Math.random() * 9000000)}`,
+    doctorName: "",
+    doctorCrm: "",
+    productName: "",
+    dosage: "",
+    cid: "",
+    instructions: "",
+    anvisaCode: "",
   });
 
   const navigate = useNavigate();
@@ -136,20 +102,8 @@ const DashboardPaciente = () => {
 
   const fetchData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    
-    // Se não houver sessão ativa, carrega perfil demo do paciente com a receita real da ANVISA
+    // Sem sessão: nenhum paciente ou receita de demonstração.
     if (!session) {
-      setProfile({
-        id: "demo-patient-mariana",
-        full_name: "Mariana Silva Costa",
-        cpf: "348.912.740-55",
-        rg: "42.819.302-1",
-        email: "mariana.silva@email.com",
-        phone: "(11) 98765-4321",
-        address: "Av. Paulista, 1842 - Bela Vista, São Paulo - SP",
-        anvisa_protocol: "ANV-2026-8492015",
-      });
-      setPrescriptions([OFFICIAL_ANVISA_PRESCRIPTION]);
       setLoading(false);
       return;
     }
@@ -167,12 +121,7 @@ const DashboardPaciente = () => {
     if (profileRes.data) setProfile(profileRes.data);
     if (apptsRes.data) setAppointments(apptsRes.data);
     if (notifRes.data) setNotifications(notifRes.data);
-    
-    let rxs: any[] = prescRes.data || [];
-    if (rxs.length === 0) {
-      rxs = [OFFICIAL_ANVISA_PRESCRIPTION];
-    }
-    setPrescriptions(rxs);
+    setPrescriptions(prescRes.data || []);
     if (triageRes.data) setTriages(triageRes.data);
     setLoading(false);
   };
@@ -181,32 +130,24 @@ const DashboardPaciente = () => {
     e.preventDefault();
     setNewRxSaving(true);
     try {
-      const generatedProtocol = newRxForm.anvisaCode || `ANV-2026-${Math.floor(1000000 + Math.random() * 9000000)}`;
+      const informedProtocol = newRxForm.anvisaCode.trim() || null;
       const newRx: any = {
-        id: `rx-anv-${Date.now().toString().slice(-7)}`,
-        doctor_id: "doc-edilson-10963",
-        patient_id: profile?.id || "patient-mariana-01",
+        id: `rx-paciente-${Date.now().toString().slice(-7)}`,
+        doctor_id: null,
+        patient_id: profile?.id || null,
         created_at: new Date().toISOString(),
         status: "active",
-        diagnosis_cid: newRxForm.cid,
-        instructions: newRxForm.instructions,
-        valid_until: new Date(Date.now() + 730 * 24 * 60 * 60 * 1000).toISOString(),
-        anvisa_code: generatedProtocol,
-        anvisa_status: "APROVADO_INSTANTANEO",
-        anvisa_process_number: `25351.${Math.floor(100000 + Math.random() * 900000)}/2026-44`,
-        anvisa_approval_date: new Date().toLocaleDateString("pt-BR"),
-        tracking_code: `PYR-TRK-BR${Math.floor(1000000 + Math.random() * 9000000)}`,
-        digital_signature: "Assinatura Digital ICP-Brasil PAdES (SHA-256)",
-        signature_hash: crypto.randomUUID().replace(/-/g, "").toUpperCase(),
-        doctor_name: newRxForm.doctorName,
-        doctor_crm: newRxForm.doctorCrm,
+        diagnosis_cid: newRxForm.cid.trim() || null,
+        instructions: newRxForm.instructions.trim() || null,
+        anvisa_code: informedProtocol,
+        anvisa_status: "INFORMADO_PELO_PACIENTE",
+        doctor_name: newRxForm.doctorName.trim(),
+        doctor_crm: newRxForm.doctorCrm.trim(),
         medications: [
           {
-            name: newRxForm.productName,
-            medication: newRxForm.productName,
-            dosage: newRxForm.dosage,
-            quantity: "2 frascos",
-            regulatory_framework: "RDC 660/2022 Anvisa (Importação Excepcional)",
+            name: newRxForm.productName.trim(),
+            medication: newRxForm.productName.trim(),
+            dosage: newRxForm.dosage.trim(),
           }
         ]
       };
@@ -233,8 +174,8 @@ const DashboardPaciente = () => {
       setPrescriptions((prev) => [newRx, ...prev]);
       setIsCadastrarReceitaOpen(false);
       toast({
-        title: "Receita ANVISA Cadastrada com Sucesso! 🏛️",
-        description: `Protocolo ${generatedProtocol} gerado e deferido para importação RDC 660.`,
+        title: "Receita registrada",
+        description: "Guardamos os dados que você informou. Eles não foram verificados pela plataforma nem pela ANVISA.",
       });
     } catch (err: any) {
       toast({ title: "Erro ao cadastrar receita", description: err.message, variant: "destructive" });
@@ -285,55 +226,36 @@ const DashboardPaciente = () => {
 
   const handleDownloadPrescriptionPdf = (rx: any) => {
     const meds = Array.isArray(rx.medications) ? rx.medications : [];
+    const protocol = anvisaProtocolOf(rx);
     const content = `
-REPÚBLICA FEDERATIVA DO BRASIL - MINISTÉRIO DA SAÚDE
-AGÊNCIA NACIONAL DE VIGILÂNCIA SANITÁRIA - ANVISA
-AUTORIZAÇÃO DE IMPORTAÇÃO EXCEPCIONAL DE CANABINOIDES (RDC 660/2022)
+RESUMO DA RECEITA — CÓPIA INFORMATIVA DA PLATAFORMA PLANTA Y RAÍZ
+Não é documento oficial da ANVISA e não substitui a receita original assinada pelo médico.
 ================================================================================
-PROTOCOLO ANVISA: ${rx.anvisa_code || rx.anvisa_protocol || "ANV-2026-8492015"}
-STATUS DA AUTORIZAÇÃO: ${rx.anvisa_status || "APROVADO INSTANTÂNEO"}
-Nº PROCESSO SEI/ANVISA: ${rx.anvisa_process_number || "25351.984721/2026-44"}
-DATA DE DEFERIMENTO: ${rx.anvisa_approval_date || new Date(rx.created_at).toLocaleDateString("pt-BR")}
-VALIDADE REGULATÓRIA: 2 ANOS (Art. 8º da RDC 660/2022)
+Protocolo ANVISA informado: ${protocol || "não informado"}
+Situação na plataforma: ${anvisaStatusLabel(rx.anvisa_status)}
+Data do registro: ${new Date(rx.created_at).toLocaleDateString("pt-BR")}
 ================================================================================
-DADOS DO PACIENTE:
-Nome Completo: ${profile?.full_name || "Mariana Silva Costa"}
-CPF: ${profile?.cpf || "348.912.740-55"}
-Endereço: ${profile?.address || "Av. Paulista, 1842 - Bela Vista, São Paulo - SP"}
+PACIENTE: ${profile?.full_name || "—"}
 
-DADOS DO MÉDICO PRESCRITOR:
-Médico: ${rx.doctor_name || "Dr. Edilson Bezerra"}
-Registro Profissional: ${rx.doctor_crm || "CRM 10963 - Sta Cruz (BO)"}
+MÉDICO PRESCRITOR: ${rx.doctor_name || "não informado"}${rx.doctor_crm ? ` (${rx.doctor_crm})` : ""}
 
-PRESCRIÇÃO TERAPÊUTICA & MEDICAMENTOS:
-Diagnóstico CID-10: ${rx.diagnosis_cid || "G40.8 - Outras epilepsias e síndromes epilépticas"}
-${meds.map((m: any, idx: number) => `[Item ${idx + 1}] ${m.name || m.medication || "Canabidiol"}
-Posologia: ${m.dosage || "Conforme orientação médica"}
-Quantidade Autorizada: ${m.quantity || "2 frascos"}
-Enquadramento: ${m.regulatory_framework || "RDC 660/2022 ANVISA"}`).join("\n")}
-
-Instruções Clínicas de Uso:
-${rx.instructions || "Uso contínuo por via sublingual conforme posologia estabelecida."}
-
-AUTENTICAÇÃO & ASSINATURA DIGITAL:
-Padrão Criptográfico: ${rx.digital_signature || "Assinatura Digital ICP-Brasil PAdES (SHA-256)"}
-Hash da Assinatura: ${rx.signature_hash || "E8B9A2F41C67D3E052B88901FA44B3092D84C701B2E3F90422AA10D756CB2E98"}
-Código de Rastreamento Farmacêutico: ${rx.tracking_code || "PYR-TRK-BR9482015"}
+${rx.diagnosis_cid ? `CID-10: ${rx.diagnosis_cid}\n` : ""}${meds.map((m: any, idx: number) => `[Item ${idx + 1}] ${m.name || m.medication || "Produto não informado"}
+Posologia: ${m.dosage || "conforme a receita original"}${m.quantity ? `\nQuantidade: ${m.quantity}` : ""}`).join("\n")}
+${rx.instructions ? `\nInstruções: ${rx.instructions}` : ""}
 ================================================================================
-Este documento possui validade jurídica em todo o território nacional conforme
-Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução CFM nº 2.299/2021.
+A autorização de importação é solicitada pelo paciente no portal gov.br e decidida pela ANVISA.
     `.trim();
 
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `receita-anvisa-${rx.anvisa_code || rx.id}.txt`;
+    a.download = `resumo-receita-${rx.id}.txt`;
     a.click();
     URL.revokeObjectURL(url);
     toast({
-      title: "Comprovante ANVISA Baixado! 📄",
-      description: `Protocolo ${rx.anvisa_code || "ANV-2026-8492015"} salvo com sucesso.`,
+      title: "Resumo da receita baixado",
+      description: "Cópia informativa: não substitui a receita original nem a autorização da ANVISA.",
     });
   };
 
@@ -703,7 +625,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                         Minhas Prescrições & Receitas Médicas
                       </h2>
                       <p className="text-xs text-muted-foreground">
-                        Documentos com Assinatura Digital ICP-Brasil e Protocolos Sanitários da ANVISA (RDC 660/2022).
+                        Receitas emitidas pelos médicos da plataforma e receitas que você registrou. A autorização de importação é da ANVISA (gov.br).
                       </p>
                     </div>
                   </div>
@@ -713,7 +635,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                   className="rounded-xl text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-md hover:shadow-primary/25 transition-all flex items-center gap-1.5 self-start sm:self-center"
                   onClick={() => setIsCadastrarReceitaOpen(true)}
                 >
-                  <PlusCircle size={15} /> Cadastrar Nova Receita ANVISA
+                  <PlusCircle size={15} /> Registrar receita que já tenho
                 </Button>
               </div>
 
@@ -728,7 +650,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                       className="mt-4 rounded-xl bg-primary text-primary-foreground font-bold"
                       onClick={() => setIsCadastrarReceitaOpen(true)}
                     >
-                      <PlusCircle size={14} className="mr-1" /> Cadastrar Receita ANVISA
+                      <PlusCircle size={14} className="mr-1" /> Registrar receita que já tenho
                     </Button>
                   </CardContent>
                 </Card>
@@ -737,7 +659,8 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                   {prescriptions.map(rx => {
                     const meds = Array.isArray(rx.medications) ? rx.medications : [];
                     const nearExpiry = isNearExpiry(rx.valid_until);
-                    const protocolNumber = rx.anvisa_code || rx.anvisa_protocol || "ANV-2026-8492015";
+                    const protocolNumber = anvisaProtocolOf(rx);
+                    const hasSignature = Boolean(rx.signed_pdf_path || rx.signature_hash);
 
                     return (
                       <Card key={rx.id} className={`border-border hover:border-primary/30 transition-all shadow-sm ${nearExpiry ? "border-yellow-500/30" : ""}`}>
@@ -755,7 +678,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                                 <FileSignature size={12} className="text-primary" />
-                                Prescritor: <strong className="text-foreground">{rx.doctor_name || "Dr. Edilson Bezerra"}</strong> ({rx.doctor_crm || "CRM 10963 - Sta Cruz (BO)"})
+                                Prescritor: <strong className="text-foreground">{rx.doctor_name || "não informado"}</strong>{rx.doctor_crm ? ` (${rx.doctor_crm})` : ""}
                               </p>
                             </div>
 
@@ -768,9 +691,11 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                               <Badge className={`text-[10px] font-bold uppercase ${rx.status === "active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-muted text-muted-foreground"}`}>
                                 {rx.status === "active" ? "Ativa" : rx.status}
                               </Badge>
-                              <Badge className="text-[10px] bg-sky-500/10 text-sky-400 border-sky-500/20 flex items-center gap-1">
-                                <ShieldCheck size={11} /> ICP-Brasil SHA-256
-                              </Badge>
+                              {hasSignature && (
+                                <Badge className="text-[10px] bg-sky-500/10 text-sky-400 border-sky-500/20 flex items-center gap-1">
+                                  <ShieldCheck size={11} /> Assinada digitalmente
+                                </Badge>
+                              )}
                             </div>
                           </div>
 
@@ -783,17 +708,17 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                                 </div>
                                 <div>
                                   <p className="text-xs font-black text-emerald-400 uppercase tracking-wide">
-                                    Autorização Sanitária ANVISA — RDC 660/2022
+                                    Autorização de importação ANVISA — RDC 660/2022
                                   </p>
                                   <p className="text-[11px] text-muted-foreground">
-                                    Importação Excepcional por Pessoa Física para Tratamento de Saúde
+                                    Solicitada pelo paciente no gov.br · decisão da ANVISA
                                   </p>
                                 </div>
                               </div>
 
                               <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-black tracking-wide uppercase px-3 py-1 flex items-center gap-1.5 self-start sm:self-auto shadow-sm">
                                 <CheckCircle2 size={13} className="text-emerald-400 fill-emerald-400/20" />
-                                {rx.anvisa_status || "APROVADO INSTANTÂNEO"}
+                                {anvisaStatusLabel(rx.anvisa_status)}
                               </Badge>
                             </div>
 
@@ -801,15 +726,15 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                             <div className="bg-background/80 backdrop-blur-sm border border-emerald-500/30 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                               <div>
                                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                                  Protocolo Oficial de Liberação ANVISA
+                                  Protocolo ANVISA informado
                                 </span>
                                 <span className="font-mono text-base sm:text-lg font-black text-emerald-400 tracking-wider">
-                                  {protocolNumber}
+                                  {protocolNumber || "ainda não informado"}
                                 </span>
                               </div>
 
                               <div className="flex items-center gap-2">
-                                <Button
+                                {protocolNumber && <Button
                                   size="sm"
                                   variant="outline"
                                   className="h-8 text-xs font-bold border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-lg gap-1.5"
@@ -822,34 +747,19 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                                   }}
                                 >
                                   <Copy size={13} /> Copiar Protocolo
-                                </Button>
+                                </Button>}
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   className="h-8 text-xs font-bold border-border text-foreground hover:bg-muted rounded-lg gap-1.5"
                                   onClick={() => handleDownloadPrescriptionPdf(rx)}
                                 >
-                                  <ExternalLink size={13} /> Ver Laudo / PDF
+                                  <ExternalLink size={13} /> Baixar resumo
                                 </Button>
                               </div>
                             </div>
 
-                            {/* Detalhes Regulatórios Adicionais */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-[11px] text-muted-foreground">
-                              <div className="bg-muted/30 rounded-lg px-3 py-1.5 border border-border/50">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Processo SEI / Anvisa:</span>
-                                <span className="font-mono text-foreground font-semibold">{rx.anvisa_process_number || "25351.984721/2026-44"}</span>
-                              </div>
-                              <div className="bg-muted/30 rounded-lg px-3 py-1.5 border border-border/50">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Validade da Autorização:</span>
-                                <span className="text-foreground font-semibold">2 Anos (RDC 660 Art. 8º)</span>
-                              </div>
-                              <div className="bg-muted/30 rounded-lg px-3 py-1.5 border border-border/50">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Desembaraço Aduaneiro:</span>
-                                <span className="text-emerald-400 font-semibold">Canal Verde Liberado</span>
-                              </div>
                             </div>
-                          </div>
 
                           {/* Diagnóstico CID */}
                           {rx.diagnosis_cid && (
@@ -902,23 +812,23 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                             </p>
                           )}
 
-                          {/* Assinatura Digital ICP-Brasil */}
-                          <div className="p-2.5 bg-muted/20 border border-border/60 rounded-xl text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-muted-foreground font-mono">
+                          {/* Assinatura digital: só quando existe de verdade */}
+                          {(hasSignature || rx.valid_until) && <div className="p-2.5 bg-muted/20 border border-border/60 rounded-xl text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-muted-foreground font-mono">
                             <div>
-                              <span>🔒 {rx.digital_signature || "Assinatura Digital ICP-Brasil PAdES (SHA-256)"}</span>
-                              <p className="text-[10px] text-muted-foreground/80 truncate max-w-md">
-                                Hash: {rx.signature_hash || "E8B9A2F41C67D3E052B88901FA44B3092D84C701B2E3F90422AA10D756CB2E98"}
-                              </p>
+                              {hasSignature && <span>🔒 Receita assinada digitalmente pelo médico</span>}
+                              {rx.signature_hash && (
+                                <p className="text-[10px] text-muted-foreground/80 truncate max-w-md">Hash: {rx.signature_hash}</p>
+                              )}
                             </div>
                             {rx.valid_until && (
                               <span className="text-[10px] text-foreground font-sans self-start sm:self-auto shrink-0">
                                 Validade da Receita: <strong>{new Date(rx.valid_until).toLocaleDateString("pt-BR")}</strong>
                               </span>
                             )}
-                          </div>
+                          </div>}
 
                           {/* Bloco de Rastreamento / Entrega */}
-                          {(rx.status === "dispensed" || rx.status === "sent_to_pharmacy" || rx.dispensed_at || rx.tracking_code) && (
+                          {rx.tracking_code && (
                             <div className="p-3.5 bg-emerald-950/30 border border-emerald-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                               <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
@@ -927,7 +837,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                                 <div>
                                   <p className="text-[10px] uppercase font-bold text-muted-foreground">Código de Rastreio da Farmácia</p>
                                   <span className="font-mono font-black text-xs text-emerald-400">
-                                    {rx.tracking_code || `PYR-TRK-${rx.id.slice(0, 8).toUpperCase()}`}
+                                    {rx.tracking_code}
                                   </span>
                                 </div>
                               </div>
@@ -937,7 +847,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                                   variant="outline"
                                   className="h-8 text-[11px] font-bold border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-lg"
                                   onClick={() => {
-                                    const code = rx.tracking_code || `PYR-TRK-${rx.id.slice(0, 8).toUpperCase()}`;
+                                    const code = rx.tracking_code;
                                     navigator.clipboard.writeText(code);
                                     toast({ title: "Código de Rastreio Copiado! 📋", description: code });
                                   }}
@@ -963,27 +873,13 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
 
                           {/* Ações Inferiores */}
                           <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                            <Anvisa1ClickButton 
-                              patientData={{
-                                name: profile?.full_name || "Mariana Silva Costa",
-                                cpf: profile?.cpf || "348.912.740-55",
-                                rg: profile?.rg || "42.819.302-1",
-                                address: profile?.address || "Av. Paulista, 1842 - Bela Vista, São Paulo - SP",
-                                email: profile?.email || "mariana.silva@email.com"
-                              }}
+                            <Anvisa1ClickButton
                               prescriptionData={{
-                                doctorName: rx.doctor_name || "Dr. Edilson Bezerra", 
-                                doctorCrm: rx.doctor_crm || "CRM 10963 - Sta Cruz (BO)",
-                                productName: meds[0]?.name || meds[0]?.medication || "Epidiolex / Canabidiol 100 mg/mL", 
-                                posology: meds[0]?.dosage || "10 gotas a cada 12 horas por via sublingual", 
+                                doctorName: rx.doctor_name || "",
+                                doctorCrm: rx.doctor_crm || "",
+                                productName: meds[0]?.name || meds[0]?.medication || "",
+                                posology: meds[0]?.dosage || "",
                                 date: new Date(rx.created_at).toLocaleDateString("pt-BR")
-                              }}
-                              onSuccess={(newProtocol) => {
-                                setPrescriptions(prev => prev.map(p => p.id === rx.id ? { ...p, anvisa_code: newProtocol, anvisa_status: "APROVADO_INSTANTANEO" } : p));
-                                toast({
-                                  title: "Autorização ANVISA Sincronizada! 🏛️",
-                                  description: `Protocolo ${newProtocol} deferido e atualizado com sucesso.`,
-                                });
                               }}
                               className="w-full text-xs"
                             />
@@ -1199,7 +1095,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                 <Input 
                   value={newRxForm.doctorName} 
                   onChange={e => setNewRxForm(prev => ({ ...prev, doctorName: e.target.value }))}
-                  placeholder="Ex: Dr. Edilson Bezerra"
+                  placeholder="Nome do médico como está na receita"
                   required
                   className="text-xs"
                 />
@@ -1209,7 +1105,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                 <Input 
                   value={newRxForm.doctorCrm} 
                   onChange={e => setNewRxForm(prev => ({ ...prev, doctorCrm: e.target.value }))}
-                  placeholder="Ex: CRM 10963 - Sta Cruz (BO)"
+                  placeholder="Ex: CRM 12345/SP"
                   required
                   className="text-xs"
                 />
@@ -1262,29 +1158,17 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
             </div>
 
             <div className="p-3.5 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                  <ShieldCheck size={14} /> Protocolo de Liberação ANVISA
-                </Label>
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 text-[11px] text-emerald-400 hover:bg-emerald-500/10"
-                  onClick={() => setNewRxForm(prev => ({ ...prev, anvisaCode: `ANV-2026-${Math.floor(1000000 + Math.random() * 9000000)}` }))}
-                >
-                  Gerar Novo Protocolo
-                </Button>
-              </div>
-              <Input 
+              <Label className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <ShieldCheck size={14} /> Protocolo da ANVISA (se você já tiver)
+              </Label>
+              <Input
                 value={newRxForm.anvisaCode} 
                 onChange={e => setNewRxForm(prev => ({ ...prev, anvisaCode: e.target.value }))}
-                placeholder="ANV-2026-XXXXXXX"
-                required
+                placeholder="Número que a ANVISA enviou para você (opcional)"
                 className="font-mono font-bold text-xs bg-background border-emerald-500/40 text-emerald-400"
               />
               <p className="text-[10px] text-muted-foreground">
-                Regulamentado pela <strong>RDC nº 660/2022 da ANVISA</strong> (Aprovação automática instantânea e validade de 2 anos).
+                A autorização é pedida por você no portal gov.br e decidida pela ANVISA (RDC nº 660/2022). A plataforma não aprova nem verifica protocolos.
               </p>
             </div>
 
@@ -1293,7 +1177,7 @@ Medida Provisória nº 2.200-2/2001, Lei Federal nº 14.063/2020 e Resolução C
                 Cancelar
               </Button>
               <Button type="submit" className="rounded-xl text-xs bg-primary text-primary-foreground font-bold" disabled={newRxSaving}>
-                {newRxSaving ? "Salvando..." : "Salvar & Ativar Receita ANVISA"}
+                {newRxSaving ? "Salvando..." : "Registrar receita"}
               </Button>
             </DialogFooter>
           </form>

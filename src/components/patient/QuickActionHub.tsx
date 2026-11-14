@@ -46,7 +46,7 @@ const CONSULT_ACTIONS: ActionItem[] = [
   {
     emoji: "🌿",
     label: "Orientação Técnica R$ 30",
-    desc: "Atendimento c/ Dr. Edilson",
+    desc: "Com Dr. Edilson Bezerra ON",
     icon: Stethoscope,
     to: "/orientacao-tecnica",
     gradient: "from-emerald-500/15 to-emerald-500/5",

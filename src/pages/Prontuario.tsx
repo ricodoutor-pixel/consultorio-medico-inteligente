@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
-import { OFFICIAL_ANVISA_PRESCRIPTION } from "@/pages/DashboardPaciente";
+import { anvisaProtocolOf, anvisaStatusLabel } from "@/lib/anvisa-status";
 import { downloadFhirBundleJson } from "@/services/fhirExport";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -32,7 +32,6 @@ const Prontuario = () => {
   const fetchData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      setPrescriptions([OFFICIAL_ANVISA_PRESCRIPTION]);
       setLoading(false);
       return;
     }
@@ -44,11 +43,7 @@ const Prontuario = () => {
     ]);
 
     if (recordsRes.data) setRecords(recordsRes.data);
-    let rxs: any[] = prescriptionsRes.data || [];
-    if (rxs.length === 0) {
-      rxs = [OFFICIAL_ANVISA_PRESCRIPTION];
-    }
-    setPrescriptions(rxs);
+    setPrescriptions(prescriptionsRes.data || []);
     if (auditRes.data) setAccessLogs(auditRes.data);
     setLoading(false);
   };
@@ -251,7 +246,7 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                       </Card>
                     ) : (
                       prescriptions.map(rx => {
-                        const protocolNumber = rx.anvisa_code || rx.anvisa_protocol || "ANV-2026-8492015";
+                        const protocolNumber = anvisaProtocolOf(rx);
                         return (
                           <Card key={rx.id} className="border-border hover:border-primary/20 transition-colors">
                             <CardContent className="p-5">
@@ -262,7 +257,7 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                                     <span className="text-xs text-muted-foreground">{format(new Date(rx.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
                                     <Badge className={`text-[10px] ${statusColors[rx.status] || ""}`}>{statusLabels[rx.status] || rx.status}</Badge>
                                     <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px]">
-                                      {rx.anvisa_status || "APROVADO INSTANTÂNEO"}
+                                      {anvisaStatusLabel(rx.anvisa_status)}
                                     </Badge>
                                   </div>
                                   {rx.diagnosis_cid && <p className="text-xs text-muted-foreground">CID: {rx.diagnosis_cid}</p>}
@@ -285,10 +280,10 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                                 </div>
                                 <div className="text-left sm:text-right shrink-0">
                                   <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono font-bold block mb-1">
-                                    ANVISA: {protocolNumber}
+                                    ANVISA: {protocolNumber || "não informado"}
                                   </Badge>
                                   <span className="text-[10px] text-muted-foreground block">
-                                    RDC 660/2022 (Validade 2 anos)
+                                    Autorização decidida pela ANVISA
                                   </span>
                                   {rx.tracking_code && (
                                     <span className="text-[10px] font-mono text-emerald-400 block mt-1">

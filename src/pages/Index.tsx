@@ -24,6 +24,7 @@ import { ScientificBadge } from "@/components/ScientificBadge";
 import { ProtocolCalculator } from "@/components/ProtocolCalculator";
 import { EbookGate } from "@/components/EbookGate";
 import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
+import { EdilsonOnNotice } from "@/components/EdilsonOnNotice";
 import { RecoverableRender } from "@/lib/runtime-recovery";
 import { DoctorsOnlineWidget } from "@/components/DoctorsOnlineWidget";
 import { HomeFAQ } from "@/components/HomeFAQ";
@@ -278,15 +279,15 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra — Fundador e CEO"
+                      alt="Dr. Edilson Bezerra ON — assistente de IA supervisionado"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
                     />
                   </div>
                   <div>
-                    <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Fundador e CEO</p>
+                    <p className="font-display font-black text-xl">Dr. Edilson Bezerra ON</p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">IA supervisionada · Fundador e CEO</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 pt-2">
@@ -308,6 +309,7 @@ const Index = () => {
                     "Atendo com base científica, escutando cada paciente com empatia. A equidade no acesso à saúde é a nossa missão."
                   </p>
                 </div>
+                <EdilsonOnNotice />
               </CardContent>
             </Card>
           </div>
@@ -331,7 +333,7 @@ const Index = () => {
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}
-                <span className="text-gradient-green">Dr. Edilson Bezerra</span>
+                <span className="text-gradient-green">Dr. Edilson Bezerra ON</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Dr. Edilson Bezerra ON</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (fundador da plataforma, medicina integrativa),<strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.

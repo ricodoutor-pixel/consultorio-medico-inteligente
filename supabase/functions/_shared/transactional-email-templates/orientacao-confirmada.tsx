@@ -32,8 +32,9 @@ const OrientacaoConfirmadaEmail = ({ name, whatsappUrl, protocolo }: Props) => (
         </Heading>
         <Text style={text}>
           Pagamento recebido com sucesso. Em até <strong>24 horas</strong> a enfermeira
-          Brisa entrará em contato pelo WhatsApp para agendar sua consulta com o
-          Dr. Edilson Bezerra (CRM-CE 10963).
+          Brisa entrará em contato pelo WhatsApp para iniciar sua Orientação Técnica com o
+          Dr. Edilson Bezerra ON (assistente de IA supervisionado). A Orientação é educativa e é
+          o primeiro passo: o tratamento começa na consulta com médico habilitado.
         </Text>
         {protocolo ? (
           <Text style={text}>

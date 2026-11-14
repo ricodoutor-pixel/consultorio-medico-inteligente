@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       `Recebi sua solicitação do *Guia Completo de Cannabis Medicinal 2026*. ` +
       `Segue o PDF para download imediato:\n\n` +
       `📘 ${EBOOK_PDF_URL}\n\n` +
-      `✨ Bônus: você desbloqueou *acesso prioritário* à Orientação Técnica do Dr. Edilson Bezerra (CRM-CE 10963). ` +
+      `✨ Bônus: você desbloqueou *acesso prioritário* à Orientação Técnica com o Dr. Edilson Bezerra ON (assistente de IA supervisionado; educativa, primeiro passo antes da consulta). ` +
       `Em 24h eu te envio um cupom especial. 💚\n\n` +
       `Qualquer dúvida sobre dosagem, receita ANVISA ou indicação, é só responder aqui.`;
 

@@ -127,7 +127,7 @@ Somos um ecossistema completo desenvolvido para médicos e profissionais prescri
 💰 *Política de Repasse Oficial:* 93% líquido de cada consulta via PIX (taxa de 7% da plataforma em todos os planos).
 📄 *Prescrição Eletrônica RDC 327/660:* Acesso a catálogo de produtos regulamentados com entrega em todo o Brasil.
 ⏳ *Homologação Rápida:* Ativação do consultório e vitrine em até 24 a 48 horas úteis após conferência dos 4 documentos (CRM, Residência, Diploma/RQE e Chave PIX).
-🎓 *Mentoria Técnica:* Suporte clínico e discussão de casos complexos com o Dr. Edilson Bezerra.
+🎓 *Apoio técnico:* discussão de casos com o Dr. Edilson Bezerra ON (assistente de IA supervisionado).
 
 👉 Conheça nossa estrutura e faça seu credenciamento gratuito:
 🔗 https://plantayraiz.com.br/cadastro-profissional

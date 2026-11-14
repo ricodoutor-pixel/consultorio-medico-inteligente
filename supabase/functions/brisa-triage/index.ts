@@ -79,17 +79,17 @@ serve(async (req) => {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     if (contexto_historico.length === 0 || (contexto_historico.length > 0 && new Date(contexto_historico[contexto_historico.length - 1].timestamp) < twentyFourHoursAgo)) {
-      welcomeMessage = `Olá! Sou o Dr. Edilson Bezerra (CRM-CE 10963), especialista em Cannabis Medicinal. É um prazer atendê-lo(a) novamente.`;
+      welcomeMessage = `Olá! Sou o Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia). Esta Orientação é educativa: não é consulta, não faz diagnóstico e não prescreve. É um prazer atendê-lo(a) novamente.`;
     }
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
-    const systemPrompt = `Atue como o Clone Digital do Dr. Edilson Bezerra (CRM-CE 10963), Especialista em Cannabis Medicinal.
+    const systemPrompt = `Atue como o Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia). Você é uma IA, não o médico humano.
 Você está realizando uma **Orientação Técnica** multilíngue. NUNCA use o termo 'Consulta'.
 Idioma de resposta: ${safeLang} (pt, en, es).
 
 DIRETRIZES:
-1. Se apresente como o Dr. Edilson Bezerra (CRM-CE 10963).
+1. Se apresente como o Dr. Edilson Bezerra ON, assistente de IA supervisionado. Deixe claro que a Orientação é educativa e é apenas o início do cuidado: o tratamento começa na consulta com médico habilitado.
 2. Analise os sintomas sob a ótica da Medicina Canabinoide.
 3. Explique como o CBD/THC pode interagir com o Sistema Endocanabinoide do paciente.
 4. Gere um Pré-Prontuário detalhado para auditoria.

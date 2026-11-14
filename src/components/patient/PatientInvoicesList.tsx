@@ -372,7 +372,7 @@ export function PatientInvoicesList({ userId, patientName, patientCpf }: { userI
               {selectedInvoice.invoice_type === "recibo_medico_irpf" && (
                 <div className="p-4 rounded-2xl border border-slate-200 space-y-1 bg-emerald-50/50">
                   <span className="text-[10px] uppercase font-black text-emerald-800 block">Médico Prescritor Responsável</span>
-                  <p className="font-bold text-slate-900">{selectedInvoice.doctor_name || "Dr. Edilson Bezerra"}</p>
+                  <p className="font-bold text-slate-900">{selectedInvoice.doctor_name || "Planta y Raíz"}</p>
                   <p className="font-semibold text-slate-700">CRM: {selectedInvoice.doctor_crm || "CRM/SP 198.452"} • Especialidade: Canabinologia Clínica</p>
                 </div>
               )}

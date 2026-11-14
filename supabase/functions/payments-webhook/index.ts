@@ -109,7 +109,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
         const patientMsg =
           `🌍 *Payment Confirmed — Planta y Raiz*\n\n` +
           `Hello ${orientacaoName?.split(" ")[0] || ""}! We received your payment of *USD ${amount.toFixed(2)}*.\n\n` +
-          `👨‍⚕️ *Dr. Edilson Bezerra* will contact you shortly right here on WhatsApp for your *Medical Cannabis Technical Guidance*.\n\n` +
+          `🤖 *Dr. Edilson Bezerra ON* (an AI assistant supervised by Dr. Edilson Bezerra, medical registration no. 10963 – Bolivia) will contact you shortly right here on WhatsApp for your *Technical Guidance*. It is educational and only the first step: it is not a medical consultation and does not diagnose or prescribe.\n\n` +
           `Any questions, just talk to me, Nurse Brisa.`;
         await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
           method: "POST",

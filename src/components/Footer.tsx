@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { AnvisaBadge } from "@/components/AnvisaBadge";
 import { EmergencyWebChat } from "@/components/EmergencyWebChat";
+import { EdilsonOnNotice } from "@/components/EdilsonOnNotice";
 
 export const Footer = () => {
   const { canInstall, isInstalled, promptInstall } = usePWAInstall();
@@ -116,7 +117,8 @@ export const Footer = () => {
         </div>
 
         {/* Disclaimer Legal — Intermediação Tecnológica */}
-        <div className="border-t border-border/30 mt-6 pt-5">
+        <div className="border-t border-border/30 mt-6 pt-5 space-y-3">
+          <EdilsonOnNotice />
           <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground/80">
               <strong className="text-foreground">Transparência Legal — Intermediação Tecnológica:</strong>{" "}

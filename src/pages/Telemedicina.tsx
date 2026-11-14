@@ -1061,7 +1061,7 @@ const Telemedicina = () => {
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
               <img
                 src={DrEdilsonPhoto}
-                alt="Dr. Edilson Bezerra"
+                alt="Dr. Edilson Bezerra ON"
                 className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-primary/30 shadow-xl shrink-0"
               />
               <div className="text-center md:text-left space-y-2">
@@ -1070,7 +1070,7 @@ const Telemedicina = () => {
                     Triagem Clínica & Educação em Saúde
                   </Badge>
                   <Badge variant="outline" className="border-primary/40 text-primary font-bold text-xs">
-                    ⚕️ CRM Bolívia 10963 · Formado em 2018
+                    ⚕️ Supervisão: registro médico nº 10963 (Bolívia)
                   </Badge>
                   <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 font-bold text-xs">
                     📚 Evidências Publicadas (PubMed)
@@ -1083,7 +1083,7 @@ const Telemedicina = () => {
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
                   Modalidade institucional desenvolvida para <strong>filtrar pacientes reais versus curiosos</strong>,
                   compreender profundamente o histórico de cada caso e educar sobre a terapêutica canabinoide
-                  antes da consulta médica formal. Conduzida pelo agente autônomo <strong>Dr. Edilson Bezerra ON</strong> (IA com mais de 10 anos de prática clínica integrativa, consultório físico em Santa Cruz de la Sierra: Edifício Ecodente, 1º Anillo, Andar 13, Sala 15), sob <strong>supervisão médica humana em tempo real</strong>.
+                  antes da consulta médica formal. Conduzida pelo <strong>Dr. Edilson Bezerra ON</strong>, um assistente de inteligência artificial, sob <strong>supervisão humana em tempo real</strong> do médico Dr. Edilson Bezerra (registro médico nº 10963, Bolívia; atendimento presencial no Edifício Ecodent, 1º Anillo, 13º andar, sala 15, Santa Cruz de la Sierra).
                 </p>
               </div>
             </div>

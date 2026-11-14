@@ -24,7 +24,7 @@ export const SignupEmail = ({ siteUrl, recipient, confirmationUrl }: SignupEmail
         <Text style={styles.text}>
           Falta só um passo: confirme que <strong>{recipient}</strong> é mesmo
           seu e-mail para liberar acesso à plataforma de telemedicina canábica
-          do Dr. Edilson Bezerra (CRM-CE 10963).
+          Planta y Raíz.
         </Text>
         <Button style={styles.button} href={confirmationUrl}>
           Confirmar meu e-mail

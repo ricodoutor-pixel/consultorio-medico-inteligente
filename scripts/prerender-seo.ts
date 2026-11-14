@@ -261,7 +261,7 @@ const STATIC_PAGES: StaticPage[] = [
     h1: "Orientação Técnica de Cannabis Medicinal — Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
     intro: [
       "Planta y Raiz é a plataforma de intermediação digital de Cannabis Medicinal regulamentada pela ANVISA (RDC 660/2022 e 327/2019).",
-      "Atendimento 100% online com Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva (CRM-SP 10963), médico especialista em Cannabis Medicinal e Farmacologia.",
+      "Atendimento 100% online com Dra. Suelen Naves Rodrigues (CRM-PR 49354), médica especialista em Cannabis Medicinal e Farmacologia.",
       "Orientação Técnica a partir de R$30 (PIX, Cartão ou Bitcoin). PDF com selo gov.br válido para importação ANVISA.",
     ],
   },
@@ -298,7 +298,7 @@ const STATIC_PAGES: StaticPage[] = [
     intro: [
       "Sim, a Cannabis Medicinal é legal no Brasil via ANVISA (RDC 660/2022 e RDC 327/2019).",
       "A orientação técnica inicial custa R$30 (BRL) ou US$10. Inclui avaliação digital e relatório em PDF com selo gov.br.",
-      "Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva, CRM-SP 10963, é o médico responsável especializado em Cannabis Medicinal.",
+      "Dra. Suelen Naves Rodrigues (CRM-PR 49354) é a médica responsável especializado em Cannabis Medicinal.",
     ],
   },
   {
@@ -340,7 +340,7 @@ const STATIC_PAGES: StaticPage[] = [
     h1: "Médicos Prescritores de Cannabis Medicinal",
     intro: [
       "Equipe médica especializada em Cannabis Medicinal, treinada na RDC 660/2022 e RDC 327/2019 da ANVISA.",
-      "Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva (CRM-SP 10963) — coordenador médico, especialista em Cannabis Medicinal e Farmacologia.",
+      "Dra. Suelen Naves Rodrigues (CRM-PR 49354) — coordenadora médica, especialista em Cannabis Medicinal e Farmacologia.",
       "Atendimento ético, sigiloso e baseado em evidências científicas.",
     ],
   },

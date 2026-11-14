@@ -17,7 +17,7 @@ const FOLLOWUP_RULES = [
     id: "d7_acolhimento",
     daysAfter: 7,
     message: (name: string) =>
-      `Olá ${name}! Aqui é a Brisa 🌿 Passando para saber como foi sua primeira semana com o protocolo do Dr. Edilson. Alguma dúvida sobre a administração das gotas? Estou aqui para te ajudar! 💚`,
+      `Olá ${name}! Aqui é a Brisa 🌿 Passando para saber como foi sua primeira semana com o tratamento indicado pelo seu médico. Alguma dúvida sobre a administração das gotas? Estou aqui para te ajudar! 💚`,
   },
   {
     id: "d30_estoque",

@@ -10,7 +10,7 @@ export const ORIENTACAO_CHECKOUT_URL = 'https://plantayraiz.com.br/orientacao-te
 export const BRISA_WHATSAPP_LINK = 'https://wa.me/5511991363154';
 
 /** Dados públicos do supervisor humano (contrato OT v2). */
-export const DOCTOR_PUBLIC_CRM = 'CRM (Bolívia) nº 10963';
+export const DOCTOR_PUBLIC_CRM = 'registro médico nº 10963 (Bolívia — não é CRM brasileiro)';
 export const DOCTOR_PUBLIC_BIO =
   `${DOCTOR_NAME} — médico formado em 2018, atuação em medicina integrativa; consultório físico em Santa Cruz de la Sierra (Bolívia), Edifício Ecodent, 1º Anillo, 13º andar, sala 15; ${DOCTOR_PUBLIC_CRM}.`;
 

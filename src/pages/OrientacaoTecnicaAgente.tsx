@@ -24,6 +24,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
+import { EdilsonOnNotice } from "@/components/EdilsonOnNotice";
 import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight, AlertTriangle,
   CheckCircle2, Sparkles, BookOpen, FileText, ArrowRight, Paperclip, X, PauseCircle,
@@ -899,19 +900,19 @@ export default function OrientacaoTecnicaAgente() {
                   <div className="flex items-center gap-4">
                     <img
                       src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra"
+                      alt="Dr. Edilson Bezerra ON"
                       className="w-16 h-16 rounded-2xl object-cover ring-2 ring-primary/40"
                       loading="lazy"
                       decoding="async"
                     />
                     <div className="min-w-0">
-                      <p className="font-display font-black text-lg text-foreground">Dr. Edilson Bezerra</p>
+                      <p className="font-display font-black text-lg text-foreground">Dr. Edilson Bezerra ON</p>
                       <p className="text-xs text-muted-foreground">
-                        Médico formado em 2018 · Medicina integrativa · CRM (Bolívia) nº 10963
+                        Assistente de IA supervisionado pelo médico Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia)
                       </p>
                       <p className="text-[11px] text-muted-foreground flex items-start gap-1 mt-1">
                         <MapPin size={12} className="shrink-0 mt-0.5" />
-                        Santa Cruz de la Sierra — Edifício Ecodent, 1º Anillo, 13º andar, sala 15
+                        Atendimento presencial do supervisor: Edifício Ecodent, 1º Anillo, 13º andar, sala 15 · Santa Cruz de la Sierra, Bolívia
                       </p>
                     </div>
                   </div>
@@ -928,6 +929,8 @@ export default function OrientacaoTecnicaAgente() {
                       <li>• <strong className="text-foreground">Encaminhamento</strong> ao médico prescritor mais indicado da nossa vitrine para a consulta.</li>
                     </ul>
                   </div>
+
+                  <EdilsonOnNotice />
 
                   <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4">
                     <h2 className="font-display font-black text-foreground text-base mb-2 flex items-center gap-2">
@@ -1335,7 +1338,7 @@ export default function OrientacaoTecnicaAgente() {
                   <div className="flex items-center gap-2 min-w-0">
                     <img
                       src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra"
+                      alt="Dr. Edilson Bezerra ON"
                       className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-white/30"
                     />
                     <div className="min-w-0">

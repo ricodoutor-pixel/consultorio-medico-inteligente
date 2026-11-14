@@ -166,10 +166,10 @@ export default function OrientacaoRelatorio() {
               <span className="text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
                 Planta y Raíz · Telemedicina Integrativa
               </span>
-              <h1 className="text-2xl font-black text-slate-900 mt-2">Dr. Edilson Bezerra</h1>
-              <p className="text-xs text-slate-600 font-medium">Médico Geral · Medicina Integrativa · Formado em 2018</p>
+              <h1 className="text-2xl font-black text-slate-900 mt-2">Dr. Edilson Bezerra ON</h1>
+              <p className="text-xs text-slate-600 font-medium">Assistente de IA supervisionado · Orientação educativa, não é consulta médica</p>
               <p className="text-xs text-slate-500">
-                CRM Bolívia nº 10963 · Consultório: Edifício Ecodent, 1º Anillo, 13º andar, sala 15 · Santa Cruz de la Sierra
+                Supervisor: Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia) · atendimento presencial: Edifício Ecodent, 1º Anillo, 13º andar, sala 15 · Santa Cruz de la Sierra
               </p>
             </div>
             <div className="text-right shrink-0">
@@ -192,7 +192,7 @@ export default function OrientacaoRelatorio() {
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm mb-6 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
             <div>
-              <strong>Relatório educativo gerado por IA:</strong> disponível para download, com revisão médica pendente. Esta versão não representa aprovação, prescrição ou assinatura médica. Supervisão da plataforma: Dr. Edilson Bezerra, CEO fundador, CRM Bolívia nº 10963, Santa Cruz de la Sierra.
+              <strong>Relatório educativo gerado por IA:</strong> disponível para download, com revisão médica pendente. Esta versão não representa aprovação, prescrição ou assinatura médica. Supervisão: Dr. Edilson Bezerra, registro médico nº 10963 (Bolívia), Santa Cruz de la Sierra. Esta orientação é apenas o início do cuidado; o tratamento começa na consulta com médico habilitado.
             </div>
           </div>
         )}

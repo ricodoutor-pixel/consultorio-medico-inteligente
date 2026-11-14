@@ -268,15 +268,15 @@ async function handleCommentEvent(entry) {
 
   if (isDoctor) {
     state.metrics.doctorsCaptured++;
-    const doctorMsg = `Olá, Dr(a). ${username}! Seja muito bem-vindo(a) à Planta y Raíz.\n\nTemos um modelo exclusivo de Consultório Virtual de Telemedicina com Taxa Zero na teleconsulta, repasse integral via PIX e opção de Plano VIP por R$ 99/mês com destaque máximo no topo da vitrine nacional e prontuário CFM integrado.\n\n👉 Conheça e ative seu acesso: https://plantayraiz.com.br/profissionais?utm_source=instagram&utm_medium=comment_auto&utm_campaign=medico_vip\n\nSe preferir falar diretamente com nossa diretoria médica, me envie seu WhatsApp ou CRM por aqui! 🌿`;
+    const doctorMsg = `Olá, Dr(a). ${username}! Seja muito bem-vindo(a) à Planta y Raíz.\n\nTemos um modelo de Consultório Virtual de Telemedicina com 93% de repasse líquido via PIX (taxa fixa de apenas 7%) e opção de Plano Premium por R$ 99/mês com prioridade na fila de pacientes, destaque na vitrine nacional e prontuário CFM integrado.\n\n👉 Conheça e ative seu acesso: https://www.plantayraiz.com.br/cadastro-profissional?utm_source=instagram&utm_medium=comment_auto&utm_campaign=medico_vip\n\nSe preferir falar diretamente com nossa diretoria médica, me envie seu WhatsApp ou CRM por aqui! 🌿`;
     if (userId) await sendDirectMessage(userId, doctorMsg);
   } else if (isPharmacy) {
     state.metrics.pharmaciesCaptured++;
-    const pharmMsg = `Olá, ${username}! Que alegria seu contato institucional com a Planta y Raíz.\n\nConectamos pacientes com prescrições médicas auditadas diretamente a farmácias e importadoras autorizadas pela RDC 660 / RDC 327, sem taxa de adesão de catálogo.\n\n📅 Agende uma reunião de alinhamento de 15 min com nossa diretoria: https://plantayraiz.com.br/reuniao-parceiros?utm_source=instagram&utm_medium=comment_auto&utm_campaign=farmacia_parceria\n\nOu me informe seu WhatsApp comercial para entrarmos em contato hoje mesmo! 🌿`;
+    const pharmMsg = `Olá, ${username}! Que alegria seu contato institucional com a Planta y Raíz.\n\nConectamos pacientes com prescrições médicas auditadas diretamente a farmácias e importadoras autorizadas pela RDC 660 / RDC 327, sem taxa de adesão de catálogo.\n\n📅 Agende uma reunião de alinhamento de 15 min com nossa diretoria: https://www.plantayraiz.com.br/reuniao-parceiros?utm_source=instagram&utm_medium=comment_auto&utm_campaign=farmacia_parceria\n\nOu me informe seu WhatsApp comercial para entrarmos em contato hoje mesmo! 🌿`;
     if (userId) await sendDirectMessage(userId, pharmMsg);
   } else {
     state.metrics.patientsCaptured++;
-    const patientMsg = `Olá, ${username}! Seja muito bem-vindo(a) à Planta y Raíz 🌿\n\nPara iniciar seu acolhimento ou triagem educativa com a Enfª Brisa IA e ter acesso a médicos prescritores certificados, me envie seu WhatsApp com DDD por aqui ou acesse direto:\n\n👉 https://plantayraiz.com.br/triagem?utm_source=instagram&utm_medium=comment_auto&utm_campaign=triagem30\n\nNossa equipe acolhe você com todo cuidado e segurança médica! 💚`;
+    const patientMsg = `Olá, ${username}! Seja muito bem-vindo(a) à Planta y Raíz 🌿\n\nPara iniciar sua Orientação Técnica (R$ 30) ou agendar teleconsulta com médicos prescritores certificados, me envie seu WhatsApp com DDD por aqui ou acesse direto:\n\n👉 https://www.plantayraiz.com.br/orientacao-tecnica?utm_source=instagram&utm_medium=comment_auto&utm_campaign=triagem30\n\nNossa equipe acolhe você com todo cuidado e segurança médica! 💚`;
     if (userId) await sendDirectMessage(userId, patientMsg);
   }
 }
@@ -315,7 +315,7 @@ async function handleDirectMessageEvent(entry) {
       userDialog.step = 2;
       state.activeDialogs[senderId] = userDialog;
       saveState();
-      await sendDirectMessage(senderId, `Perfeito, Doutor(a)! A Planta y Raíz conta com mais de 30 médicos homologados e milhares de pacientes buscando atendimento.\n\nQual o seu CRM e estado de atuação? Me informe também seu melhor e-mail para enviarmos seu acesso ao Consultório Virtual com Taxa Zero.`);
+      await sendDirectMessage(senderId, `Perfeito, Doutor(a)! A Planta y Raíz conta com mais de 40 médicos homologados e milhares de pacientes buscando atendimento.\n\nQual o seu CRM e estado de atuação? Me informe também seu melhor e-mail para enviarmos seu acesso ao Consultório Virtual Gratuito (93% de repasse via PIX).`);
       return;
     } else if (lower.includes('farmacia') || lower.includes('farmácia') || lower.includes('parceria') || lower.includes('empresa') || lower.includes('fornec')) {
       userDialog.data.persona = 'farmacia';

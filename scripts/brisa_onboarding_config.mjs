@@ -16,7 +16,7 @@ export const BRISA_CONFIG = {
 
   // 2. MODELO DE REPASSE E MONETIZAÇÃO
   POLITICA_COMERCIAL: {
-    ofertaGancho: "Repasse de 100% da sua teleconsulta no primeiro mês (taxa zero da plataforma com adesão ao Plano VIP).",
+    ofertaGancho: "Prioridade no rodízio de pacientes e ferramentas de IA com o Plano Premium (R$ 99/mês).",
     regraPadrao: "Repasse instantâneo via PIX com retenção de apenas 7% da plataforma (o médico retém 93% líquido de cada consulta).",
     percentualMedicoPadrao: 93,
     taxaPlataformaPadrao: 7,
@@ -61,9 +61,12 @@ export const BRISA_CONFIG = {
 
   // CANAIS E URLS OFICIAIS
   URLS: {
-    site: "https://plantayraiz.com.br",
-    cadastroProfissional: "https://plantayraiz.com.br/cadastro-profissional",
-    profissionais: "https://plantayraiz.com.br/profissionais",
+    site: "https://www.plantayraiz.com.br",
+    cadastroProfissional: "https://www.plantayraiz.com.br/cadastro-profissional",
+    profissionais: "https://www.plantayraiz.com.br/profissionais",
+    orientacaoTecnica: "https://www.plantayraiz.com.br/orientacao-tecnica",
+    agendamento: "https://www.plantayraiz.com.br/agendamento",
+    cadastroPaciente: "https://www.plantayraiz.com.br/cadastro",
     whatsappOficial: "https://wa.me/5511991363154"
   },
 
@@ -117,12 +120,12 @@ export function buildOfficialInvitationMessage(doctorName = '') {
   const nomeFormatado = doctorName ? `Dr(a). ${doctorName}` : 'Doutor(a)';
   return `Olá, ${nomeFormatado}! Tudo bem? 🌿🩺
 
-Aqui é a Enfermeira Brisa, coordenadora de credenciamento clínico da Planta y Raíz (${BRISA_CONFIG.URLS.site}).
+Sou a assistente virtual de credenciamento clínico da Planta y Raíz (${BRISA_CONFIG.URLS.site}).
 
-Gostaria de estender um convite oficial do Dr. Edilson Bezerra da Silva para integrar nosso corpo de médicos prescritores parceiros:
+Gostaria de apresentar o convite oficial do Dr. Edilson Bezerra da Silva para integrar nosso corpo de médicos prescritores parceiros:
 
-• 💰 *Repasse Integral (Plano VIP)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}
-• ⚡ *Repasse Instantâneo*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}
+• ⚡ *Repasse Oficial (93%)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}
+• 🚀 *Benefícios do Plano*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}
 • 🛡️ *Segurança Jurídica Total*: Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022) e ANVISA (RDCs 660 e 327) com assinatura ICP-Brasil / Gov.br nativa.
 • 🩺 *Demanda Ativa de Pacientes*: Pacientes direcionados por triagem clínica e perfil público na nossa vitrine oficial.
 • 🏪 *Farmácia Digital Integrada*: Facilidade de acesso aos fitocanabinoides prescritos para os seus pacientes.

@@ -232,12 +232,12 @@ function buildInvitationEmailHtml(lead, classification) {
         <li style="margin-bottom: 8px;"><strong>Prontuário Eletrônico CFM:</strong> Anamnese, histórico integrado e suporte ao protocolo terapêutico de 8 semanas.</li>
         <li style="margin-bottom: 8px;"><strong>Receitas Digitais com QR Code:</strong> Aceitas em 100% das farmácias do Brasil e processos de importação ANVISA (RDC 660 e 327).</li>
         <li style="margin-bottom: 8px;"><strong>Pacientes 100% do Médico:</strong> Total soberania de conduta, acompanhamento e retornos agendados diretamente com você.</li>
-        <li style="margin-bottom: 8px;"><strong>Repasse Financeiro Instantâneo via PIX:</strong> Plano VIP com 100% do valor da consulta (R$ 99/mês opcional) ou modelo padrão com 93% líquido após cada consulta.</li>
+        <li style="margin-bottom: 8px;"><strong>Repasse Financeiro Instantâneo via PIX:</strong> 93% líquido do valor da consulta (taxa fixa de apenas 7% da plataforma), com Plano Premium opcional (R$ 99/mês) para prioridade na fila e ferramentas de IA.</li>
       </ul>
 
       <!-- CTA Principal -->
       <div style="text-align: center; margin: 32px 0 24px 0;">
-        <a href="https://plantayraiz.com.br/cadastro-profissional?origem=convite_diretoria" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 2px 6px rgba(5,150,105,0.3);">
+        <a href="https://www.plantayraiz.com.br/cadastro-profissional?origem=convite_diretoria" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 2px 6px rgba(5,150,105,0.3);">
           Ativar Meu Consultório Virtual Gratuito
         </a>
       </div>

@@ -322,16 +322,16 @@ function buildCampaignEmailHtml(doctorName) {
           <strong>Pacientes 100% Seus:</strong> Total soberania na conduta, prescrição e retornos agendados diretamente na sua agenda.
         </li>
         <li style="margin-bottom: 10px;">
-          <strong>Repasse Financeiro Instantâneo via PIX:</strong> Sem burocracia ou retenções após o atendimento.
+          <strong>Repasse Financeiro Instantâneo via PIX (93% Líquido):</strong> Retenção fixa de apenas 7% de manutenção da plataforma, sem burocracia após o atendimento.
         </li>
         <li style="margin-bottom: 10px;">
-          <strong>Modelo de Médico Sócio VIP com Participação nos Lucros:</strong> Taxa zero de plataforma, destaque prioritário na vitrine e participação no faturamento e crescimento da rede.
+          <strong>Plano Premium Opcional (R$ 99/mês):</strong> Prioridade na fila de pacientes, destaque na vitrine e ferramentas de IA clínica.
         </li>
       </ul>
 
       <!-- CTA Principal -->
       <div style="text-align: center; margin: 32px 0 20px 0;">
-        <a href="https://plantayraiz.com.br/cadastro-profissional?origem=convite_socio" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 15px 36px; font-size: 16px; font-weight: 700; border-radius: 8px; box-shadow: 0 3px 8px rgba(5,150,105,0.35);">
+        <a href="https://www.plantayraiz.com.br/cadastro-profissional?origem=convite_socio" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 15px 36px; font-size: 16px; font-weight: 700; border-radius: 8px; box-shadow: 0 3px 8px rgba(5,150,105,0.35);">
           Ativar Meu Consultório Virtual Gratuito Agora 🚀
         </a>
       </div>
@@ -343,7 +343,7 @@ function buildCampaignEmailHtml(doctorName) {
       <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; font-size: 14px; margin-top: 24px;">
         <p style="margin: 0 0 6px 0;">
           🌐 <strong>Conheça nossa Vitrine de Especialistas:</strong><br>
-          <a href="https://plantayraiz.com.br/profissionais" style="color: #059669; text-decoration: none; font-weight: 600;">plantayraiz.com.br/profissionais</a>
+          <a href="https://www.plantayraiz.com.br/profissionais" style="color: #059669; text-decoration: none; font-weight: 600;">www.plantayraiz.com.br/profissionais</a>
         </p>
         <p style="margin: 10px 0 0 0;">
           💬 <strong>Dúvidas ou auxílio com seu cadastro?</strong><br>
@@ -442,15 +442,15 @@ Sabemos da sua excelência médica e estruturamos um ecossistema completo para s
 ✅ *Consultório Digital Completo*: Prontuário eletrônico CFM integrado, anamnese e evolução contínua dos pacientes.
 ✅ *Receitas Digitais com QR Code*: Válidas em 100% das farmácias do Brasil e processos de importação ANVISA (RDC 660 e 327).
 ✅ *Pacientes 100% Seus*: Total autonomia na condução clínica, prescrição e acompanhamento de retornos.
-✅ *Repasse Instantâneo via PIX*: Receba após cada atendimento (Plano VIP com taxa zero e 100% de repasse).
-✅ *Apoio da Enfª Brisa e Copilot*: Triagem prévia de pacientes para você receber casos já qualificados.
-✅ *Participação nos Lucros*: Modelo de médico sócio ativo no crescimento da rede.
+✅ *Repasse Instantâneo via PIX (93% Líquido)*: Receba após cada atendimento (taxa fixa de manutenção de apenas 7% da plataforma).
+✅ *Apoio de Triagem e Copiloto IA*: Pacientes pré-triados e ferramentas de apoio à decisão clínica.
+✅ *Planos Opcionais (a partir de R$ 99/mês)*: Prioridade no rodízio da fila de pacientes e destaque na vitrine.
 
 🌐 *Conheça nossa Vitrine de Especialistas:*
-https://plantayraiz.com.br/profissionais
+https://www.plantayraiz.com.br/profissionais
 
 🚀 *Ative seu Consultório Virtual Gratuito agora:*
-https://plantayraiz.com.br/cadastro-profissional?origem=convite_socio
+https://www.plantayraiz.com.br/cadastro-profissional?origem=convite_socio
 
 Dúvidas ou suporte para seu cadastro? Responda diretamente aqui para mim (Enfermeira Brisa) ou acesse o link:
 👉 https://wa.me/5511991363154

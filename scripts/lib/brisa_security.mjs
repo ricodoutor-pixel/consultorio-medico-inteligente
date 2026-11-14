@@ -200,19 +200,39 @@ export function unpauseAi(jid) {
 }
 
 // ============================================================================
-// S3. PARAR (OPT-OUT COM ZERO TOLERÂNCIA)
+// S3. PARAR (OPT-OUT COM ZERO TOLERÂNCIA) & ROBÔS EM LAÇO BLOQUEADOS
 // ============================================================================
-const OPT_OUT_REGEX = /^\s*(0|pare|parar|sair|remova|remover|descadastrar|nao\s+quero|não\s+quero|nao\s+enviem\s+mais|não\s+enviem\s+mais|bloquear|cancela|cancelar|chega|stop)\b/i;
+const OPT_OUT_START_REGEX = /^\s*(0|pare|parar|sair|remova|remover|descadastrar|bloquear|cancela|cancelar|chega|stop)\b/i;
+const OPT_OUT_ANYWHERE_REGEX = /\b(nao\s+quero|não\s+quero|nao\s+tenho\s+interesse|não\s+tenho\s+interesse|sem\s+interesse|nao\s+enviem?\s+mais|não\s+enviem?\s+mais|nao\s+me\s+mande|não\s+me\s+mande|pare\s+de\s+enviar|parar\s+de\s+enviar|pare\s+com\s+as\s+mensagens|remover\s+(da\s+lista|meu\s+numero)|tire\s+meu\s+numero|descadastrar|desinscrever|sair\s+da\s+lista|nao\s+autorizo)\b/i;
+
+export const PERMANENT_BOT_BLACKLIST = [
+  '5511979977802',
+  '5511979977802@s.whatsapp.net',
+  '5511979977802@c.us',
+  '53206709227635',
+  '53206709227635@lid',
+  '53206709227635@s.whatsapp.net',
+  '551153045378',
+  '551153045378@s.whatsapp.net',
+  '551153045378@c.us',
+  '558381838356',
+  '558381838356@s.whatsapp.net',
+  '558381838356@c.us',
+  '185405248905250',
+  '185405248905250@lid',
+  '185405248905250@s.whatsapp.net'
+];
 
 export function loadBlacklist() {
+  const set = new Set(PERMANENT_BOT_BLACKLIST);
   try {
     if (fs.existsSync(BLACKLIST_FILE)) {
       const data = JSON.parse(fs.readFileSync(BLACKLIST_FILE, 'utf8'));
-      if (Array.isArray(data)) return new Set(data);
-      if (typeof data === 'object') return new Set(Object.keys(data));
+      const items = Array.isArray(data) ? data : (typeof data === 'object' && data ? Object.keys(data) : []);
+      for (const item of items) set.add(item);
     }
   } catch (e) {}
-  return new Set();
+  return set;
 }
 
 export function saveBlacklist(set) {
@@ -224,7 +244,13 @@ export function saveBlacklist(set) {
 export function isOptOutRequested(text = '') {
   if (!text) return false;
   const clean = text.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return OPT_OUT_REGEX.test(clean) || clean === '0' || clean.includes('este numero ja pediu o encerramento') || clean.includes('este número já pediu o encerramento');
+  return (
+    OPT_OUT_START_REGEX.test(clean) ||
+    OPT_OUT_ANYWHERE_REGEX.test(clean) ||
+    clean === '0' ||
+    clean.includes('este numero ja pediu o encerramento') ||
+    clean.includes('este número já pediu o encerramento')
+  );
 }
 
 export function registerOptOut(jid, text = '') {
@@ -303,17 +329,29 @@ const AUTO_REPLY_PATTERNS = [
   /para\s+falar\s+com\s+atendente\s+digite/i,
   /para\s+encerrar\s+digite/i,
 
-  // 4. Frases clássicas de abertura de bot para bot
+  // 4. Frases clássicas de abertura de bot para bot e secretárias eletrônicas de clínicas
   /como\s+posso\s+(te\s+)?ajudar\s+hoje\s*\?/i,
   /em\s+que\s+posso\s+(te\s+)?ajudar\s*\?/i,
   /qual\s+o\s+motivo\s+do\s+seu\s+contato\s*\?/i,
-  /para\s+iniciarmos\s+o\s+atendimento/i
+  /para\s+iniciarmos\s+o\s+atendimento/i,
+  /este\s+canal\s+[eé]\s+(da|do|de|exclusivo)/i,
+  /n[aã]o\s+consigo\s+verificar\s+cadastro/i,
+  /n[aã]o\s+agendamos\s+consulta[s]?\s+por\s+aqui/i,
+  /agendamento\s+de\s+consultas?\s+(apenas|somente|pelo)/i,
+  /bem[\s-]*vind[oa]\(a\)?\s+(ao|a|à)\s+(cl[ií]nica|consult[oó]rio|instituto|centro|espa[cç]o|central)/i,
+  /consult[oó]rio\s+dr[a]?\.?\s+.*agendamento/i,
+  /para\s+agendar\s+(sua\s+)?consulta\s+(ligue|acesse|clique|envie)/i
 ];
 
 export function isAutoReplyBot(text = '', senderJid = '') {
-  // Avisos de sistema da Meta ou WhatsApp
-  if (senderJid && (senderJid.includes('status@') || senderJid.includes('@newsletter') || senderJid === '0@s.whatsapp.net')) {
-    return true;
+  // Avisos de sistema da Meta ou WhatsApp ou números em laço bloqueados
+  if (senderJid) {
+    if (senderJid.includes('status@') || senderJid.includes('@newsletter') || senderJid === '0@s.whatsapp.net') {
+      return true;
+    }
+    if (isBlacklisted(senderJid)) {
+      return true;
+    }
   }
 
   if (!text) return false;
@@ -484,6 +522,18 @@ export function classifyDoctorDocumentType(filename = '', caption = '', mimeType
 // S7. HIGIENIZAÇÃO E SANITIZAÇÃO DE NOMES
 // ============================================================================
 const PREPOSITIONS = new Set(['da', 'de', 'do', 'dos', 'das', 'e', 'del', 'd', 'von', 'van']);
+const GENERIC_PROFILE_WORDS = new Set([
+  'consultorio', 'clinica', 'recepcao', 'agendamento', 'equipe', 'secretaria',
+  'central', 'espaco', 'instituto', 'centro', 'atendimento', 'saude', 'medicina',
+  'odonto', 'odontologia', 'vital', 'global', 'cards', 'backup', 'backupvacjup',
+  'projeto', 'laboratorio', 'consulmed', 'imedicos', 'renoveja', 'oralface',
+  'terracannabis', 'psicologa', 'psiquiatra', 'urologia', 'veterinaria', 'medico',
+  'medica', 'doutor', 'doutora', 'paciente', 'usuario', 'cliente', 'contato'
+]);
+
+function normalizeWordAscii(word = '') {
+  return String(word).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '');
+}
 
 export function sanitizeDoctorName(rawName) {
   if (!rawName) return 'Doutor(a)';
@@ -495,7 +545,8 @@ export function sanitizeDoctorName(rawName) {
     return 'Doutor(a)';
   }
 
-  // Remove títulos repetidos no início (ex.: "Dr(a). Dr. Geilson", "Dra. A Verônica")
+  // Remove prefixos institucionais e títulos repetidos no início (ex.: "Consultório Dr. Victor", "Clínica Dra. Katia")
+  n = n.replace(/^(consult[oó]rio|cl[ií]nica|recep[cç][aã]o|equipe|agendamento|espac[oç]|instituto|central)\s+/gi, '');
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|médico|médica)\s*/gi, '');
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|médico|médica)\s*/gi, '');
   
@@ -503,7 +554,10 @@ export function sanitizeDoctorName(rawName) {
   n = n.replace(/^[aAoO]\s+([A-ZÁ-Ú])/g, '$1');
   n = n.replace(/[–—\-_/\\|]/g, ' ').trim();
 
-  const words = n.split(/\s+/).filter(Boolean);
+  const words = n.split(/\s+/).filter(w => {
+    const cleanW = normalizeWordAscii(w);
+    return cleanW.length > 0 && !GENERIC_PROFILE_WORDS.has(cleanW);
+  });
   if (words.length === 0) return 'Doutor(a)';
 
   // Preserva o primeiro nome e sobrenome respeitando preposições
@@ -536,7 +590,7 @@ export function sanitizeDoctorName(rawName) {
 
 /**
  * Sanitiza o nome informado pelo paciente:
- * - Nunca usa nome de usuário, e-mail ou números como nome.
+ * - Nunca usa nome de usuário, e-mail, números ou nomes comerciais ("Consultório", "Recepção", "Vital") como nome.
  * - Não usa "Dr." ou "Dra." para pacientes.
  * - Retorna o primeiro nome limpo ou vazio.
  */
@@ -547,6 +601,10 @@ export function sanitizePatientName(rawName) {
   if (/\d/.test(n) || /[@_]/.test(n)) {
     return '';
   }
+  const normFull = n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (/\b(consultorio|clinica|recepcao|agendamento|equipe|secretaria|central|espaco|instituto|vital\s+apex|odontologia|dentario|vacinas|urologia|veterinaria|terracannabis|renoveja|imedicos|consulmed)\b/i.test(normFull)) {
+    return '';
+  }
   // Remove títulos indevidos para paciente
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|paciente|usuario|user)\s*/gi, '');
   // Remove pontuações
@@ -554,7 +612,8 @@ export function sanitizePatientName(rawName) {
   const words = n.split(/\s+/).filter(Boolean);
   if (words.length === 0) return '';
   let first = words[0];
-  if (first.length < 2 || first.length > 20 || /^(paciente|usuario|cliente|doutor|doutora)$/i.test(first)) {
+  const firstAscii = normalizeWordAscii(first);
+  if (first.length < 2 || first.length > 20 || GENERIC_PROFILE_WORDS.has(firstAscii)) {
     return '';
   }
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
@@ -617,6 +676,26 @@ export function isGeneralSpamOrUnrelated(text = '') {
 // Executado imediatamente antes do disparo na Evolution API
 // ============================================================================
 export function preSendGuard(jid, text, options = {}) {
+  const cleanText = String(text || '').trim();
+
+  // 0a. NUNCA permitir que mensagem automática afirme ser agente humano (CFM / CDC)
+  if (/\bsou\s+(um\s+|uma\s+)?(agente\s+humano|atendente\s+humano|humano|pessoa\s+real|pessoa\s+de\s+verdade)\b/i.test(cleanText)) {
+    return {
+      canSend: false,
+      reason: 'FORBIDDEN_HUMAN_CLAIM',
+      log: `[BLOQUEIO ÉTICO] Mensagem barrada por afirmar ser humano para ${jid}: "${cleanText.slice(0, 60)}"`
+    };
+  }
+
+  // 0b. NUNCA enviar link cru sem frase explicativa
+  if (/^https?:\/\/\S+$/i.test(cleanText)) {
+    return {
+      canSend: false,
+      reason: 'BARE_LINK_BLOCKED',
+      log: `[BLOQUEIO LINK CRU] Mensagem barrada por conter apenas link sem explicação para ${jid}: "${cleanText}"`
+    };
+  }
+
   // 1. Está no modo DRY-RUN?
   if (BRISA_CONFIG.DRY_RUN && !options.bypassDryRun) {
     return {

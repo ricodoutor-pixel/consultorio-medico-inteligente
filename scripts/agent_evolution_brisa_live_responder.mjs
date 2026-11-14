@@ -27,7 +27,8 @@ import {
   saveContactLidMapping,
   preSendGuard,
   isDoctorKycMedia,
-  classifyDoctorDocumentType
+  classifyDoctorDocumentType,
+  isBlacklisted
 } from './lib/brisa_security.mjs';
 
 dotenv.config();
@@ -748,6 +749,40 @@ async function textToSpeechElevenLabs(text) {
   }
 }
 
+async function upsertLeadToSupabase(remoteJid, senderName, role = 'unknown', stage = 'perguntou', extraMeta = {}) {
+  try {
+    const adminSupa = await getAdminSupabase();
+    if (!adminSupa) return;
+    const norm = normalizeJid(remoteJid);
+    const jid = norm.normalizedJid || remoteJid;
+    const tipoMap = {
+      doctor: 'medico',
+      patient: 'paciente',
+      pharmacy: 'farmacia',
+      clinic_secretary: 'empresa',
+      unknown: 'desconhecido'
+    };
+    const tipo = tipoMap[role] || 'desconhecido';
+    const nomeLimpo = tipo === 'medico' ? sanitizeDoctorName(senderName) : (sanitizePatientName(senderName) || senderName || null);
+
+    await adminSupa.from('whatsapp_contacts').upsert({
+      jid_normalizado: jid,
+      jids_alternativos: norm.aliases || [],
+      nome_limpo: nomeLimpo,
+      tipo,
+      origem_do_contato: 'whatsapp_atendimento',
+      metadata: {
+        phone: norm.phone || null,
+        raw_name: senderName || null,
+        etapa_funil: stage,
+        ultima_interacao_em: new Date().toISOString(),
+        ...extraMeta
+      },
+      atualizado_em: new Date().toISOString()
+    }, { onConflict: 'jid_normalizado' });
+  } catch (e) {}
+}
+
 async function logMessageToSupabase(remoteJid, messageText, direction = 'out', senderName = 'Enfermeira Brisa') {
   try {
     const adminSupa = await getAdminSupabase();
@@ -947,8 +982,6 @@ async function ingestIncomingDoc(msg, recipient, senderName) {
         doctor = doctors.find(d => d.crm === '135012-9' || (d.name && d.name.includes('Mariana Alves')));
       } else if (recipient.includes('70373206949947')) {
         doctor = doctors.find(d => d.crm === '58169' || (d.name && d.name.includes('Urban')));
-      } else if (recipient.includes('53206709227635')) {
-        doctor = doctors.find(d => d.name && d.name.includes('Anderson'));
       } else if (recipient.includes('129076786409510')) {
         doctor = doctors.find(d => d.crm === '98083' || (d.name && d.name.includes('Geovana')));
       } else if (recipient.includes('4952130879556') || cleanPhone.includes('8494183793')) {
@@ -1135,7 +1168,7 @@ function classifyAudience(jid, senderName, text) {
   }
 
   // Verificação de Secretária / Recepção / Clínica
-  if (/\b(secretari[ao]|recepcao|recepção|atendente)\b/i.test(normName) || /\b(sou secretari[ao]|aqui e da recepcao|repassar ao medico|repassar ao doutor)\b/i.test(normText)) {
+  if (/\b(secretari[ao]|recepcao|recepção|atendente|consultorio|consultório|clinica|clínica|agendamento|equipe|central|instituto|espaco|espaço|vital apex|odontologia|dentario|veterinaria)\b/i.test(normName) || /\b(sou secretari[ao]|aqui e da recepcao|repassar ao medico|repassar ao doutor|este canal e da|este canal e de|nao agendamos consulta)\b/i.test(normText)) {
     return {
       role: 'clinic_secretary',
       name: senderName,
@@ -1153,19 +1186,18 @@ function classifyAudience(jid, senderName, text) {
     const doctors = loadKnownDoctors();
     if (jid.includes('66516175310923')) doctorObj = doctors.find(d => d.crm === '135012-9' || (d.name && d.name.includes('Mariana Alves')));
     else if (jid.includes('70373206949947')) doctorObj = doctors.find(d => d.crm === '58169' || (d.name && d.name.includes('Urban')));
-    else if (jid.includes('53206709227635')) doctorObj = doctors.find(d => d.name && d.name.includes('Anderson'));
     else if (jid.includes('129076786409510')) doctorObj = doctors.find(d => d.crm === '98083' || (d.name && d.name.includes('Geovana')));
     else if (jid.includes('157342100390139')) doctorObj = doctors.find(d => d.crm === '206873' || (d.name && d.name.includes('Victor')));
     else if (jid.includes('206219281190998')) doctorObj = doctors.find(d => d.name && d.name.includes('Abbade'));
-    else if (jid.includes('16673096659146')) doctorObj = doctors.find(d => d.name && d.name.includes('Menta'));
+    else if (jid.includes('16673096659146')) doctorObj = doctors.find(d => d.name && d.name.includes('Menta')));
     else if (jid.includes('4952130879556')) doctorObj = doctors.find(d => d.crm === '9727' || (d.name && d.name.includes('Edna')));
     else if (jid.includes('202469137248373')) doctorObj = doctors.find(d => (d.name && d.name.includes('Verônica')) || (d.name && d.name.includes('Veronica')));
     else if (jid.includes('199218014748755')) doctorObj = doctors.find(d => d.crm === '54892' || (d.name && d.name.includes('Frederico')));
   }
 
-  // Uso estrito de \bcrm\b com limite de palavra para não casar crmv!
-  const isDoctorKeywords = /(\bcrm\b|prescritor|prescrever|prescricao|prontuario|titulacao|ajuste de dose|meus pacientes|minha agenda|honorarios|plano vip|credenciamento|sou medico|sou medica|minha clinica|retorno de paciente|minha cedula|documentos medicos|assinatura digital|icp|vidaas|birdid|posso prescrever|como prescrever|receita controlada)/i.test(normText);
-  const isDoctorName = /^(dr\b|dra\b|doutor|doutora|medico|medica)/i.test(normName) || normName.includes('dr.') || normName.includes('dra.');
+  // Uso estrito de palavras exclusivas de médico prescritor (nunca 'prescricao' ou 'receita controlada' isoladas, pois pacientes usam!)
+  const isDoctorKeywords = /(\bcrm\b|sou prescritor|quero prescrever|prontuario|meus pacientes|minha agenda|honorarios|plano vip|plano premium|credenciamento|sou medico|sou medica|sou doutor|sou doutora|minha clinica|minha cedula|documentos medicos|assinatura digital|icp-brasil|vidaas|birdid|posso prescrever|como prescrever|cadastro profissional)/i.test(normText);
+  const isDoctorName = /^(dr\b|dra\b|doutor|doutora)\s+[a-zá-ú]/i.test(normName) && !/\b(consultorio|clinica|equipe|recepcao|agendamento)\b/i.test(normName);
 
   if (doctorObj || invitedDoc || isDoctorKeywords || isDoctorName) {
     let cleanName = cleanDoctorName(doctorObj?.name || (invitedDoc ? invitedDoc.name : senderName));
@@ -1195,11 +1227,29 @@ function classifyAudience(jid, senderName, text) {
     };
   }
 
-  // 4. PADRÃO PARA TODA A DEMANDA DE ANÚNCIOS / TRÁFEGO: CLASSIFICA COMO PACIENTE
-  // Garante acolhimento humanizado e foco em cadastro imediato sem questionários robóticos!
+  // 4. Se já temos o papel salvo na memória da conversa, preserva para nunca mudar de paciente para médico no meio da conversa
+  const existingMem = conversationMemory.get(jid) || conversationMemory.get(cleanPhone);
+  if (existingMem?.audienceRole && existingMem.audienceRole !== 'unknown') {
+    return {
+      role: existingMem.audienceRole,
+      name: senderName || 'Paciente',
+      doctor: null
+    };
+  }
+
+  // 5. Se a pessoa falou explicitamente de sintomas, Orientação Técnica, consulta como paciente ou respondeu "1" / "sou paciente"
+  if (/^1\b|\bsou paciente\b|\borientacao\b|\btriagem\b|\bquero (uma |marcar |agendar )?consulta\b|\bpreciso de (uma )?consulta\b|\bminha dor\b|\binsonia\b|\bansiedade\b|\bsintoma\b|\bremedio\b|\btratamento\b|\bquanto custa\b/i.test(normText)) {
+    return {
+      role: 'patient',
+      name: senderName || 'Paciente',
+      doctor: null
+    };
+  }
+
+  // 6. Se não sabemos se é paciente ou médico (ex.: só disse "oi", "quero informações", "como funciona", "quero cadastro"), classifica como 'unknown' para perguntar 1 vez!
   return {
-    role: 'patient',
-    name: senderName || 'Paciente',
+    role: 'unknown',
+    name: senderName || '',
     doctor: null
   };
 }
@@ -1226,7 +1276,10 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
 
   // Dúvidas de credenciamento: "como seria?", "como funciona?", "qual a proposta?", "o que é?" (Dra. Camyla)
   if (q.includes('como seria') || q.includes('como funciona') || q.includes('qual a proposta') || q.includes('qual o objetivo') || q.includes('do que se trata') || q.includes('o que e') || q.includes('o que é') || q.includes('me explica') || q.includes('explicar')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nNossa plataforma conecta médicos prescritores a pacientes que buscam acompanhamento em cannabis medicinal e medicina integrativa:\n\n• 💰 *Repasse Integral (Plano VIP)*: 100% do valor da sua teleconsulta (taxa zero da plataforma) e repasse instantâneo via PIX!\n• 🛡️ *Segurança Jurídica Total*: Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022) e ANVISA (RDCs 660 e 327) com assinatura ICP-Brasil / Gov.br nativa.\n• 🩺 *Demanda Ativa de Pacientes*: Pacientes direcionados por triagem clínica da plataforma e perfil público na nossa vitrine.\n• 🏪 *Farmácia Digital Integrada*: Validação ágil de receitas e acesso facilitado aos fitocanabinoides para seus pacientes.\n\nPara ativar seu consultório gratuito em menos de 2 minutos, basta acessar:\n👉 https://www.plantayraiz.com.br/cadastro-profissional\n\nSe preferir, pode me enviar fotos da sua Cédula do CRM e comprovante de endereço por aqui mesmo no WhatsApp! 🙏✨`;
+    if (doctorObj && doctorObj.is_approved_by_admin !== false && doctorObj.crm) {
+      return `Olá, Dr(a). ${senderName}! Sou a assistente virtual da coordenação clínica da Planta y Raíz 🌿🩺\n\nSeu perfil já consta em nossa base de médicos parceiros! Para acessar seu Consultório Virtual (Prontuário CFM, Copiloto de Evidências, Assistente Jurídico, Escriba de IA e Financeiro com repasse líquido de 93% via PIX), acesse:\n👉 https://www.plantayraiz.com.br/consultorio\n\nEm que posso te apoiar hoje?`;
+    }
+    return `Olá, Dr(a). ${senderName}! Sou a assistente virtual da coordenação clínica da Planta y Raíz 🌿🩺\n\nNossa plataforma conecta médicos prescritores a pacientes que buscam acompanhamento em cannabis medicinal e medicina integrativa:\n\n• ⚡ *Repasse Oficial (93%)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}\n• 🚀 *Planos de Assinatura*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}\n• 🛡️ *Segurança Jurídica Total*: Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022) e ANVISA (RDCs 660 e 327) com assinatura ICP-Brasil / Gov.br nativa.\n• 🩺 *Demanda Ativa de Pacientes*: Pacientes direcionados por triagem clínica da plataforma e perfil público na nossa vitrine.\n\nPara ativar seu consultório gratuito em menos de 2 minutos, acesse:\n👉 https://www.plantayraiz.com.br/cadastro-profissional\n\nSe preferir, pode me enviar fotos da sua Cédula do CRM e comprovante de endereço por aqui mesmo no WhatsApp! 🙏✨`;
   }
 
   // Dificuldade no cadastro no site (Dr. Frederico)
@@ -1270,7 +1323,7 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
 
   // Dúvidas sobre distribuição de pacientes, escolha do paciente, modelo estilo Uber
   if (q.includes('distribui') || q.includes('paciente') || q.includes('chegam') || q.includes('vitrine') || q.includes('encaminha') || q.includes('escolhe') || q.includes('uber') || q.includes('divis') || q.includes('divisão') || q.includes('divisao') || q.includes('fila') || q.includes('indica') || q.includes('funciona a escolha')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre a *escolha do paciente* e nossa *distribuição de consultas* (operamos no estilo *Uber da Saúde Canábica*), o sistema funciona com critérios técnicos e meritocráticos:\n\n1️⃣ *Escolha Soberana do Paciente*: Na vitrine de especialistas (https://www.plantayraiz.com.br/profissionais), o paciente conhece sua biografia e títulos e pode escolher agendar diretamente com o senhor(a). Se você estiver online e apto, o atendimento é seu! Se estiver offline no momento urgente, o paciente é avisado e a consulta é transferida para o médico mais qualificado online.\n\n2️⃣ *Despacho Inteligente e Rodízio Autônomo ("Estilo Uber")*:\n• *Prioridade #1*: Médicos assinantes do *Plano VIP* (R$ 99/mês, taxa zero e 100% repasse) têm preferência imediata na fila geral.\n• *Prioridade #2*: *Geolocalização* — o sistema cruza as coordenadas e prioriza o médico mais próximo geograficamente do paciente.\n• *Fallback Autônomo 24/7*: Se o médico mais próximo estiver offline, o sistema busca o próximo médico com assinatura em dia, KYC 100% verificado e status Online.\n\n3️⃣ *Fluxo da Telemedicina*: Entrevista com 5 perguntas -> Pagamento -> Triagem -> Teleconsulta -> Avaliação do paciente -> Liberação instantânea do repasse via PIX ao médico!\n\n4️⃣ *Orientação Técnica (porta de entrada, R$ 30)*: triagem e educação em saúde conduzidas por inteligência artificial supervisionada em tempo real pela diretoria técnica. A IA não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais indicado, com relatório estruturado. O médico recebe o paciente já triado e educado para a consulta (Chat R$ 100 / Vídeo R$ 150).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
+    return `Olá, Dr(a). ${senderName}! Sou a assistente virtual da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre a *escolha do paciente* e nossa *distribuição de consultas*, o sistema funciona com critérios técnicos e transparentes:\n\n1️⃣ *Escolha Soberana do Paciente*: Na vitrine de especialistas (https://www.plantayraiz.com.br/profissionais), o paciente conhece sua biografia e títulos e pode escolher agendar diretamente com o senhor(a).\n\n2️⃣ *Despacho Inteligente e Fila de Atendimento*:\n• *Prioridade na Fila*: Médicos assinantes dos planos pagos (a partir do Plano Premium R$ 99/mês) têm prioridade na fila de ofertas e limites ampliados nas ferramentas de IA.\n• *Repasse Oficial*: Em todos os planos, o médico recebe *93% líquido* do valor da consulta via PIX (taxa fixa de 7% da plataforma).\n\n3️⃣ *Orientação Técnica (início do cuidado, R$ 30)*: triagem e educação em saúde conduzidas pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). A IA não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais indicado. O médico recebe o paciente já triado para a consulta (Chat R$ 100 / Vídeo R$ 150).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
   }
 
   return null;
@@ -1333,36 +1386,48 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
   // 5. Se mencionou médico específico de anúncio (e NÃO é só saudação)
   for (const doc of DOCTOR_ADS_MAP) {
     if (doc.keywords.some(k => q.includes(k))) {
-      return `O ${doc.name} atende pela Planta y Raíz! O caminho para a sua consulta por videochamada é bem simples:\n1) Cadastro gratuito em plantayraiz.com.br/cadastro\n2) Pré-triagem com nossa equipe\n3) Escolha do médico e horário\n4) Consulta ao vivo por videochamada.\nVocê gostaria que eu te ajude no cadastro passo a passo?`;
+      return `O ${doc.name} atende pela Planta y Raíz! O caminho para a sua consulta por videochamada é bem simples:\n1) Cadastro gratuito em https://www.plantayraiz.com.br/cadastro\n2) Escolha do médico e horário em https://www.plantayraiz.com.br/agendamento\n3) Consulta ao vivo por videochamada (R$ 150) ou por chat (R$ 100).\nVocê gostaria que eu te ajude no agendamento?`;
     }
+  }
+
+  // 5b. Se pediu Orientação Técnica
+  if (/orienta[cç][aã]o|triagem|edilson|30\s*reais|r\$\s*30/i.test(q)) {
+    return `${greeting} A Orientação Técnica (R$ 30 · 30 minutos) é o início do cuidado na Planta y Raiz, conduzida pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). Ela educa sobre sua condição e encaminha ao médico prescritor ideal (não realiza prescrição).\n\nVocê pode iniciar diretamente em:\n👉 https://www.plantayraiz.com.br/orientacao-tecnica\n\nFicou com alguma dúvida sobre como funciona?`;
+  }
+
+  // 5c. Se pediu Consulta ou Agendamento
+  if (/consulta|agendar|agendamento|marcar|telemedicina|videochamada/i.test(q)) {
+    return `${greeting} Na Planta y Raiz você pode agendar sua consulta médica diretamente com um médico prescritor da nossa vitrine (Consulta por Chat R$ 100 ou Teleconsulta por Vídeo R$ 150):\n👉 https://www.plantayraiz.com.br/agendamento\n\nSe preferir passar antes pela Orientação Técnica inicial (R$ 30), acesse:\n👉 https://www.plantayraiz.com.br/orientacao-tecnica\n\nQual modalidade você prefere?`;
   }
 
   // 6. Dúvidas sobre remédios, sintomas, insônia, remédio para dormir, dor, ansiedade, dose
   if (/rem[eé]dio|dormir|ins[oô]nia|ansiedade|dor|sintoma|depress[aã]o|rem[eé]dios|canabidiol|cbd|thc|[oó]leo|gotas|dosagem|posologia/i.test(q)) {
-    return `Quem avalia isso e define a melhor conduta é o médico na consulta. O primeiro passo é o cadastro gratuito em plantayraiz.com.br/cadastro. Você já tem cadastro na plataforma?`;
+    return `Quem avalia isso e define a melhor conduta é o médico na consulta. O primeiro passo é fazer seu cadastro gratuito em https://www.plantayraiz.com.br/cadastro ou agendar sua consulta em https://www.plantayraiz.com.br/agendamento. Você já tem cadastro na plataforma?`;
   }
 
   // 7. Dúvidas sobre valores e preços
   if (/quanto\s+custa|qual\s+o\s+valor|pre[cç]o|tabela|valores/i.test(q)) {
-    return `Na Planta y Raíz, a teleconsulta por vídeo ao vivo é R$ 150 e a consulta por chat é R$ 100, com receita oficial válida pela ANVISA. O primeiro passo é o cadastro gratuito em plantayraiz.com.br/cadastro. Você já tem cadastro na plataforma?`;
+    return `Na Planta y Raíz, a teleconsulta médica por vídeo ao vivo é R$ 150, a consulta por chat é R$ 100, e a Orientação Técnica inicial (que é o início do cuidado e não prescreve) é R$ 30. Para começar, acesse https://www.plantayraiz.com.br/agendamento ou https://www.plantayraiz.com.br/orientacao-tecnica. Qual modalidade você prefere?`;
   }
 
   // 8. Se já tem cadastro ("já tenho cadastro", "já fiz", "já me cadastrei")
   if (/j[aá]\s+tenho|j[aá]\s+fiz|j[aá]\s+me\s+cadastrei|conclu[ií]\s+o\s+cadastro/i.test(q)) {
-    return `Perfeito! O próximo passo é escolher seu médico e horário para a consulta por videochamada em plantayraiz.com.br/agendamento. Quer que eu te ajude na escolha?`;
+    return `Perfeito! O próximo passo é escolher seu médico e horário para a consulta em https://www.plantayraiz.com.br/agendamento ou iniciar a Orientação Técnica em https://www.plantayraiz.com.br/orientacao-tecnica. Quer que eu te ajude na escolha?`;
   }
 
   // 9. Agradecimento
   if (/obrigad|valeu|agrade[cç]o/i.test(q)) {
-    return `Por nada! Qualquer dúvida sobre o seu cadastro ou agendamento em plantayraiz.com.br/cadastro, estou à inteira disposição!`;
+    return `Por nada! Qualquer dúvida sobre o seu cadastro ou agendamento em https://www.plantayraiz.com.br/agendamento, estou à inteira disposição!`;
   }
 
   return null;
 }
 
-// ❓ SAUDAÇÃO PARA CONTATOS DESCONHECIDOS / AMBÍGUOS
+// ❓ SAUDAÇÃO PARA CONTATOS DESCONHECIDOS / AMBÍGUOS (Pergunta UMA vez se é paciente ou profissional antes de mandar link)
 function getUnknownAudienceGreeting(senderName) {
-  return `Olá! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nPara que eu possa te direcionar com a melhor atenção da nossa equipe:\n\n1️⃣ *É Médico(a) Prescritor(a)*? (Credenciamento, envio de documentos pelo WhatsApp, prontuário e pacientes)\n2️⃣ *É Farmácia / Drogaria Parceira*? (Catálogo de produtos, dispensação e validação de receitas ANVISA)\n3️⃣ *É Paciente*? (Acolhimento, triagem de sintomas e agendamento de teleconsulta)\n\nComo posso te ajudar hoje?`;
+  const cleanName = sanitizePatientName(senderName);
+  const hi = cleanName ? `Olá, ${cleanName}!` : 'Olá!';
+  return `${hi} Sou a assistente virtual da Planta y Raiz 🌿\n\nPara eu te enviar o link certo, você busca atendimento como *paciente* (Consulta ou Orientação Técnica) ou informações como *médico(a) prescritor(a)*?`;
 }
 
 async function askBrisaGemini(question, senderName, audience, recipient) {
@@ -1375,15 +1440,24 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
   if (role === 'opt_out') {
     reply = `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`;
   } else if (role === 'doctor') {
+    // Se médico fizer pergunta jurídica ou de contrato, aciona handoff humano real imediatamente
+    if (/\b(contrato|clausula|cláusula|juridic[oa]|jurídic[oa]|advogad[oa]|imposto|tribut|nota fiscal|cnpj|rpa)\b/i.test(question)) {
+      try {
+        const humanLocked = loadHumanLocked();
+        humanLocked.add(recipient);
+        saveHumanLocked(humanLocked);
+        registerHumanTakeover(recipient, true, false, { permanent: true });
+        await sendWhatsApp(ADMIN_PHONE, `⚖️ *[MÉDICO COM DÚVIDA JURÍDICA / CONTRATO]*\n\n*Médico:* ${senderName}\n*Contato:* ${recipient}\n*Pergunta:* "${question}"\n\n🛑 Automação pausada até liberação do operador.`);
+      } catch (e) { log(`Aviso handoff medico: ${e.message}`); }
+      return `Dr(a). ${senderName}, acabei de encaminhar sua dúvida sobre contrato/questão jurídica diretamente para a direção técnica (Dr. Edilson Bezerra) para te responder pessoalmente por aqui em instantes.`;
+    }
     reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
   } else if (role === 'pharmacy') {
     reply = getPharmacySpecializedAnswer(question, senderName);
   } else if (role === 'patient') {
     reply = getPatientSpecializedAnswer(question, senderName, recipient);
   } else if (role === 'unknown') {
-    if (isPureGreeting(question)) {
-      reply = `Olá! Como posso ajudar? Você já tem cadastro na plataforma?`;
-    }
+    return getUnknownAudienceGreeting(senderName);
   }
 
   // 2. Consulta à Edge Function chat-brisa com role explícito e histórico
@@ -1407,16 +1481,10 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
         if (data.handoff) {
           try {
             const locked = loadHumanLocked();
-            locked.set(recipient, {
-              jid: recipient,
-              paused: true,
-              reason: 'solicitou_atendente_humano',
-              pausedAt: new Date().toISOString(),
-              pausedBy: 'ia_handoff',
-              expiresAt: Date.now() + 24 * 3600 * 1000
-            });
+            locked.add(recipient);
             saveHumanLocked(locked);
-            await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada para esta conversa.`);
+            registerHumanTakeover(recipient, true, false, { permanent: true });
+            await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada para esta conversa até liberação do operador.`);
           } catch (e) { log(`Aviso handoff: ${e.message}`); }
         }
 
@@ -1427,7 +1495,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
           reply = apiReply;
         } else if (isDegraded) {
           log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro padrão de cadastro.`);
-          reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
+          reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse https://www.plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
         }
       }
     } catch (e) {
@@ -1440,7 +1508,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     if (role === 'doctor') {
       reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
     } else {
-      reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
+      reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse https://www.plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
     }
   }
 
@@ -1830,12 +1898,22 @@ async function loop() {
                 }
               }
 
-              // 🛑 VERIFICAÇÃO 1: Opt-Out / LGPD ("0", "pare", "sair", etc.)
-              if (checkOptOutSecurity(combinedText)) {
+              // 🛑 VERIFICAÇÃO 0: Se o número já está na lista negra permanente (opt-out ou robô em laço), silêncio imediato!
+              if (isBlacklisted(recipient) || isBlacklisted(canonical) || isBlacklisted(jid)) {
+                log(`🛑 [BLACKLIST ATIVA] Contato ${senderName} (${canonical}) está bloqueado permanentemente. Ignorando.`);
+                continue;
+              }
+
+              // 🛑 VERIFICAÇÃO 1: Opt-Out / LGPD ("0", "pare", "sair", "não quero", etc.)
+              if (checkOptOutSecurity(combinedText) || isOptOutRequested(combinedText)) {
                 registerOptOut(recipient, combinedText);
                 registerOptOut(canonical, combinedText);
+                upsertLeadToSupabase(canonical, senderName, 'unknown', 'opt_out', { opt_out_text: combinedText.slice(0, 200) });
                 log(`🛑 [OPT-OUT LGPD] Contato ${senderName} (${canonical}) solicitou descadastro total.`);
-                await sendWhatsApp(recipient, `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`);
+                const optOutMsg = `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`;
+                if (!hasRecentlySent(canonical, optOutMsg)) {
+                  await sendWhatsApp(recipient, optOutMsg);
+                }
                 continue;
               }
 
@@ -1844,9 +1922,10 @@ async function loop() {
                 humanLocked.add(recipient);
                 humanLocked.add(canonical);
                 saveHumanLocked(humanLocked);
-                registerHumanTakeover(jid, true, false);
-                registerHumanTakeover(canonical, true, false);
-                log(`🚨 [HUMANO SOLICITADO / RECLAMAÇÃO] Contato ${senderName} (${canonical}) pediu humano ou expressou insatisfação. Silenciando IA por 24h.`);
+                registerHumanTakeover(jid, true, false, { permanent: true });
+                registerHumanTakeover(canonical, true, false, { permanent: true });
+                upsertLeadToSupabase(canonical, senderName, 'unknown', 'handoff_humano', { last_message: combinedText.slice(0, 200) });
+                log(`🚨 [HUMANO SOLICITADO / RECLAMAÇÃO] Contato ${senderName} (${canonical}) pediu humano ou expressou insatisfação. Silenciando IA até liberação do operador.`);
 
                 const humanHandoffMsg = "Vou passar para nossa equipe e retornamos por aqui.";
                 if (!hasRecentlySent(canonical, humanHandoffMsg)) {
@@ -1856,7 +1935,7 @@ async function loop() {
                 }
 
                 try {
-                  const alertMsg = `🚨 *[ALERTA: ATENDIMENTO HUMANO REQUISITADO]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A IA Enfª Brisa foi pausada por 24h para esta conversa.`;
+                  const alertMsg = `🚨 *[ALERTA: ATENDIMENTO HUMANO REQUISITADO]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A assistente virtual foi pausada permanentemente para esta conversa até liberação manual.`;
                   await sendWhatsApp(ADMIN_PHONE, alertMsg);
                 } catch (e) {}
 
@@ -1865,18 +1944,21 @@ async function loop() {
 
               // 🛑 VERIFICAÇÃO 3: Filtro de resposta de outro AGENTE, BOT ou SECRETÁRIA VIRTUAL
               if (isAutoReplyBot(combinedText, recipient)) {
-                log(`🤖 [OUTRO AGENTE/BOT DETECTADO] Mensagem de outro bot/assistente identificada de ${senderName} (${canonical}): "${combinedText.slice(0, 80)}...". PAUSANDO automação por 24h para impedir loop de robôs.`);
+                log(`🤖 [OUTRO AGENTE/BOT DETECTADO] Mensagem de outro bot/assistente identificada de ${senderName} (${canonical}): "${combinedText.slice(0, 80)}...". PAUSANDO automação permanentemente para impedir loop de robôs.`);
                 
-                // 🔒 PAUSA A IA IMEDIATAMENTE POR 24H PARA ESTE CONTATO (grava no arquivo human_mode e bloqueia qualquer resposta futura)
-                registerHumanTakeover(canonical, true, false);
-                registerHumanTakeover(recipient, true, false);
+                // 🔒 PAUSA A IA PERMANENTEMENTE E ADICIONA À BLACKLIST PARA ESTE CONTATO (impede retorno do loop no dia seguinte)
+                registerHumanTakeover(canonical, true, false, { permanent: true });
+                registerHumanTakeover(recipient, true, false, { permanent: true });
+                registerOptOut(canonical, 'auto_reply_bot_detected');
+                registerOptOut(recipient, 'auto_reply_bot_detected');
+                upsertLeadToSupabase(canonical, senderName, 'clinic_secretary', 'silenciado_robo_clinica', { sample: combinedText.slice(0, 200) });
 
                 // NÃO RESPONDE! (Silêncio total para cortar a conversa e nunca ficar falando por horas)
                 lastRepliedAt.set(canonical, Date.now());
                 lastRepliedAt.set(recipient, Date.now());
 
                 try {
-                  const alertMsg = `🤖 *[ALERTA: OUTRO AGENTE/BOT DETECTADO]*\n\n*Contato:* ${senderName} (${recipient})\n*Mensagem:* "${combinedText.slice(0, 200)}"\n\n🛑 A IA Enfª Brisa foi pausada por 24h para esta conversa para evitar loop infinito entre agentes. Se for um humano real, um operador pode intervir.`;
+                  const alertMsg = `🤖 *[ALERTA: OUTRO AGENTE/BOT DETECTADO]*\n\n*Contato:* ${senderName} (${recipient})\n*Mensagem:* "${combinedText.slice(0, 200)}"\n\n🛑 A assistente foi silenciada permanentemente para esta conversa para evitar loop entre robôs.`;
                   await sendWhatsApp(ADMIN_PHONE, alertMsg);
                 } catch (e) {}
 
@@ -1885,13 +1967,15 @@ async function loop() {
 
               // 🛑 VERIFICAÇÃO 4: Checa se IA está pausada ou se equipe humana assumiu
               const pauseCheck = checkAiPause(jid);
-              if (pauseCheck.paused || humanLocked.has(recipient) || humanLocked.has(canonical)) {
+              const pauseCheckCanonical = checkAiPause(canonical);
+              if (pauseCheck.paused || pauseCheckCanonical.paused || humanLocked.has(recipient) || humanLocked.has(canonical)) {
                 log(`🛑 [IA SILENCIADA] Conversa com ${senderName} (${canonical}) está em modo humano ou pausada. Silenciando robô.`);
                 continue;
               }
 
-              // 🛑 VERIFICAÇÃO 5: Limite de 2 mensagens seguidas da Brisa sem resposta do contato
-              const recentHistory = (getContactMemory(recipient)?.messages || []).map(m => ({ fromMe: m.role === 'brisa' }));
+              // 🛑 VERIFICAÇÃO 5: Limite de 2 mensagens seguidas da Brisa sem resposta do contato (usa .turns da memória!)
+              const turnsHistory = getContactMemory(canonical)?.turns || getContactMemory(recipient)?.turns || [];
+              const recentHistory = turnsHistory.map(m => ({ fromMe: m.role === 'brisa' }));
               const limitCheck = checkConsecutiveBrisaLimit(recentHistory);
               if (!limitCheck.allowed) {
                 log(`🛑 [LIMITE 2 MSGS] Contato ${senderName} (${canonical}) já recebeu ${limitCheck.count} msgs seguidas sem retorno. Silenciando.`);
@@ -1943,19 +2027,35 @@ async function loop() {
                 continue;
               }
 
-              // ⏳ CONTROLE DE COOLDOWN: Mínimo 20 segundos entre respostas para o mesmo contato
+              // ⏳ CONTROLE DE COOLDOWN: Mínimo 60 segundos entre respostas para o mesmo contato (impede respostas dobradas à mesma pergunta)
               const lastTime = Math.max(lastRepliedAt.get(canonical) || 0, lastRepliedAt.get(recipient) || 0);
               const elapsed = Date.now() - lastTime;
-              if (elapsed < 20000) {
-                log(`⏳ Contato ${senderName} (${canonical}) recebeu resposta há ${Math.round(elapsed/1000)}s. Aguardando cooldown para não gerar mensagens duplicadas.`);
+              if (elapsed < 60000) {
+                log(`⏳ Contato ${senderName} (${canonical}) recebeu resposta há ${Math.round(elapsed/1000)}s. Aguardando cooldown de 60s para não gerar mensagens duplicadas.`);
                 continue;
               }
 
               // 💬 SE FOR TEXTO: PROCESSAMENTO COGNITIVO COM MEMÓRIA E ANTI-REPETIÇÃO
               if (combinedText.trim().length > 0) {
                 const cleanSenderName = sanitizePatientName(senderName) || sanitizeDoctorName(senderName);
-                const audience = classifyAudience(recipient, cleanSenderName, combinedText);
+                const audience = classifyAudience(canonical || recipient, senderName, combinedText);
                 log(`🎯 Público classificado para ${cleanSenderName} (${canonical}): [${audience.role.toUpperCase()}]`);
+
+                // Se for secretária/recepção de clínica, silencia e nunca responde como se fosse paciente ou médico
+                if (audience.role === 'clinic_secretary') {
+                  log(`🏥 [RECEPÇÃO/CONSULTÓRIO DETECTADO] Silenciando conversa com ${senderName} (${canonical}) para evitar falar com secretária eletrônica.`);
+                  registerHumanTakeover(canonical, true, false, { permanent: true });
+                  registerHumanTakeover(recipient, true, false, { permanent: true });
+                  upsertLeadToSupabase(canonical, senderName, 'clinic_secretary', 'silenciado_recepcao');
+                  continue;
+                }
+
+                // Impede saudações repetidas no mesmo dia
+                const mem = getContactMemory(canonical);
+                if (isPureGreeting(combinedText) && mem.lastGreetedAt && (Date.now() - mem.lastGreetedAt) < 24 * 3600 * 1000) {
+                  log(`🛡️ [SAUDAÇÃO REPETIDA BARRADA] Contato ${canonical} já recebeu saudação nas últimas 24h.`);
+                  continue;
+                }
 
                 addMessageToMemory(recipient, 'user', combinedText, audience.role);
                 if (canonical !== recipient) addMessageToMemory(canonical, 'user', combinedText, audience.role);
@@ -1971,6 +2071,16 @@ async function loop() {
                   log(`🛡️ [ANTI-REPETIÇÃO 24H] Mensagem idêntica ou similar já enviada para ${canonical} em menos de 24h. Silenciando envio repetido.`);
                   continue;
                 }
+
+                if (isPureGreeting(combinedText)) {
+                  mem.lastGreetedAt = Date.now();
+                  saveConversationMemory();
+                }
+
+                const hasLink = /https?:\/\/\S+/i.test(reply);
+                upsertLeadToSupabase(canonical, senderName, audience.role, hasLink ? 'link_enviado' : 'perguntou', {
+                  last_question: combinedText.slice(0, 200)
+                });
 
                 await sendWhatsApp(recipient, reply);
                 lastRepliedAt.set(canonical, Date.now());

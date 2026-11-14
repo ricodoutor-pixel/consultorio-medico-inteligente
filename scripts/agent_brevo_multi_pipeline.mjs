@@ -159,7 +159,7 @@ function buildDoctorStep1Html(doctorName) {
   const cleanName = String(doctorName || 'Doutor(a)').replace(/^(dr|dra|dr\(a\))\.?\s+/i, '').trim();
   return `<!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><title>Consultório Virtual com Taxa Zero | Planta y Raíz</title></head>
+<head><meta charset="utf-8"><title>Consultório Virtual com 93% de Repasse | Planta y Raíz</title></head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b130e; margin: 0; padding: 24px 0; color: #e2e8f0; line-height: 1.6;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #121e16; border-radius: 14px; overflow: hidden; border: 1px solid #1f3a2b;">
     <tr>
@@ -173,17 +173,17 @@ function buildDoctorStep1Html(doctorName) {
       <td style="padding: 32px 30px;">
         <p style="font-size: 16px; font-weight: 600; color: #ffffff; margin-top: 0;">Olá, Dr(a). ${cleanName},</p>
         <p style="font-size: 14.5px; color: #cbd5e1;">Sabemos que as plataformas convencionais de telemedicina retêm até 30% a 40% dos seus honorários médicos e demoram semanas para efetuar repasses.</p>
-        <p style="font-size: 14.5px; color: #cbd5e1;">A <strong>Planta y Raíz</strong> foi criada para revolucionar esse cenário: oferecemos <strong>Consultório Virtual com Taxa Zero no 1º mês</strong> e repasse de <strong>93% líquido via PIX instantâneo</strong> nas consultas seguintes.</p>
+        <p style="font-size: 14.5px; color: #cbd5e1;">A <strong>Planta y Raíz</strong> foi criada para transformar esse cenário: oferecemos <strong>Consultório Virtual sem taxa de adesão</strong> e repasse de <strong>93% líquido via PIX instantâneo</strong> (taxa fixa de apenas 7% da plataforma).</p>
         
         <div style="background-color: #172a1e; border-left: 4px solid #10b981; padding: 16px; border-radius: 6px; margin: 20px 0;">
           <strong style="color: #34d399; font-size: 14px;">🛡️ Prontuário CFM & Validação ICP-Brasil Nativa</strong>
-          <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8;">Emita receitas com certificação digital válida em farmácias de todo o Brasil e conte com o apoio da Enfª Brisa IA para pré-triagem dos seus pacientes.</p>
+          <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8;">Emita receitas com certificação digital válida em farmácias de todo o Brasil e conte com triagem inteligente para receber pacientes qualificados.</p>
         </div>
 
         <div style="text-align: center; margin: 28px 0;">
-          <a href="https://plantayraiz.com.br/cadastro-profissional?utm_source=brevo_email&utm_medium=cold_outreach&utm_campaign=regua_step1" target="_blank" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #042f2e; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 32px; border-radius: 8px; display: inline-block; text-transform: uppercase;">Ativar Consultório Virtual Grátis →</a>
+          <a href="https://www.plantayraiz.com.br/cadastro-profissional?utm_source=brevo_email&utm_medium=cold_outreach&utm_campaign=regua_step1" target="_blank" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #042f2e; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 32px; border-radius: 8px; display: inline-block; text-transform: uppercase;">Ativar Consultório Virtual Grátis →</a>
         </div>
-        <p style="font-size: 13px; color: #94a3b8; text-align: center;">Ou agende uma apresentação rápida com nossa coordenação: <a href="https://plantayraiz.com.br/reuniao-parceiros" style="color: #34d399; text-decoration: underline;">plantayraiz.com.br/reuniao-parceiros</a></p>
+        <p style="font-size: 13px; color: #94a3b8; text-align: center;">Ou agende uma apresentação rápida com nossa coordenação: <a href="https://www.plantayraiz.com.br/reuniao-parceiros" style="color: #34d399; text-decoration: underline;">www.plantayraiz.com.br/reuniao-parceiros</a></p>
       </td>
     </tr>
   </table>
@@ -248,7 +248,7 @@ function buildDoctorStep3Html(doctorName) {
           <ul style="margin: 0; padding-left: 18px; font-size: 13.5px; color: #fde68a;">
             <li style="margin-bottom: 8px;"><strong>Topo Absoluto da Vitrine:</strong> Seu card é exibido com Selo Ouro de Verificação para milhares de visitantes mensais.</li>
             <li style="margin-bottom: 8px;"><strong>Roteamento Prioritário com IA:</strong> Pacientes triados 24h pela Enfª Brisa no WhatsApp e no site são direcionados para os médicos VIP.</li>
-            <li style="margin-bottom: 8px;"><strong>100% dos Honorários no 1º Mês (Taxa Zero)</strong> e 93% líquido via PIX a partir do 2º mês. Uma única consulta já paga todo o seu plano!</li>
+            <li style="margin-bottom: 8px;"><strong>Repasse de 93% dos Honorários via PIX</strong> (taxa fixa de apenas 7% da plataforma). Uma única consulta já paga todo o seu plano!</li>
             <li><strong>Ferramenta de Prontuários:</strong> Importação/Exportação da sua carteira de pacientes com busca rápida por Nome ou CPF.</li>
           </ul>
         </div>
@@ -353,9 +353,9 @@ export async function runMultiPipelineBatch(maxPerRun = 25) {
     let textContent = '';
 
     if (nextStep === 1) {
-      subject = `Dr(a). ${doc.name || 'Doutor(a)'}, Consultório Virtual com Taxa Zero e Repasse via PIX`;
+      subject = `Dr(a). ${doc.name || 'Doutor(a)'}, Consultório Virtual com 93% de Repasse via PIX`;
       htmlContent = buildDoctorStep1Html(doc.name);
-      textContent = `Olá Dr(a). ${doc.name}, conheça o Consultório Virtual da Planta y Raíz com Taxa Zero no 1º mês e 93% via PIX. Ative em https://plantayraiz.com.br/cadastro-profissional`;
+      textContent = `Olá Dr(a). ${doc.name}, conheça o Consultório Virtual da Planta y Raíz com 93% de repasse líquido via PIX. Ative em https://www.plantayraiz.com.br/cadastro-profissional`;
     } else if (nextStep === 2) {
       subject = `Dr(a). ${doc.name || 'Doutor(a)'}, Acesso a 40.000 Estudos Clínicos na Planta y Raíz`;
       htmlContent = buildDoctorStep2Html(doc.name);

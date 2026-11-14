@@ -8,6 +8,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { claimBrisaInbound } from '../_shared/brisa-inbound-claim.ts';
+import { LOOPING_BOT_NUMBERS, patientName, quickResponse, sanitizeOutboundAnswer } from '../_shared/brisa-response-policy.mjs';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -38,40 +39,24 @@ const SB_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
 import { DOCTOR_NAME, DOCTOR_CRM, DOCTOR_PHONE } from '../_shared/clinic-info.ts';
 
-// ── ROTEIRO COMPLETO DE ORIENTAÇÃO TÉCNICA DO DR. EDILSON BEZERRA ──────
-const ROTEIRO_ORIENTACAO_TECNICA = `📲 *PASSO A PASSO DO SEU ATENDIMENTO:*
+// ── ROTEIRO COMPLETO DE ORIENTAÇÃO TÉCNICA (DR. EDILSON BEZERRA ON) ──────
+const ROTEIRO_ORIENTACAO_TECNICA = `📲 *COMO FUNCIONA A ORIENTAÇÃO TÉCNICA (R$ 30):*
 
-1️⃣ *Acesse o Perfil do Profissional:*
-Acesse o link direto do ${DOCTOR_NAME} na nossa plataforma:
-👉 https://plantayraiz.com.br/profissionais
+1️⃣ *Início do Cuidado (Triagem e Educação em Saúde):*
+A Orientação Técnica é o início do seu atendimento na plataforma e é conduzida pelo *${DOCTOR_NAME} ON*, um assistente de inteligência artificial supervisionado pelo ${DOCTOR_NAME} (registro médico boliviano nº 10963, consultório físico no 1º Anillo, Santa Cruz de la Sierra). A Orientação Técnica é apenas o início do cuidado e não realiza prescrição médica:
+👉 https://www.plantayraiz.com.br/orientacao-tecnica
 
-_(O ${DOCTOR_NAME} da Planta y Raíz Ltda — Médico Prescritor com mais de 10 anos de experiência em modulação do sistema Endo Canabinoide humano atende fisicamente Presencial em Santa Cruz de la Sierra Bolivia Primeiro anillo Edifícil Ecodent piso 19 — com Registro ${DOCTOR_CRM} Sta Cruz Bo. No Brasil, atua apenas Prestando Mentoria Orientação Técnica Especializada)._
-
-2️⃣ *Escolha a Modalidade Desejada:*
-
-💬 *Orientação Técnica via Chat (30 min):* R$ 30,00
-_(Ideal para tirar dúvidas iniciais, entender posologia e histórico)._
-
-📹 *Orientação Técnica Completa (Chat + Vídeo):* R$ 100,00
-_(Atendimento por chamada de vídeo ao vivo para avaliação detalhada)._
+2️⃣ *Modalidades na Plataforma:*
+💬 *Orientação Técnica (30 min):* R$ 30,00 — etapa inicial educativa e de triagem, com relatório de encaminhamento ao médico prescritor mais indicado.
+🩺 *Consulta Médica com Prescritor da Vitrine:* Chat R$ 100,00 ou Vídeo ao vivo R$ 150,00 — acesse em https://www.plantayraiz.com.br/agendamento
 
 3️⃣ *Pagamento Rápido e Seguro:*
-O pagamento pode ser feito via PIX Instantâneo ou Cartão de Crédito (Mercado Pago).
-Assim que o pagamento é confirmado, nossa assistente virtual Enfermeira Brisa envia o comprovante e o link de acesso direto para o seu WhatsApp!
+O pagamento é feito via PIX ou Cartão no site oficial. Assim que confirmado, sua sala de Orientação Técnica é liberada imediatamente.
 
-4️⃣ *Seu Atendimento ao Vivo:*
-No horário combinado, você entra na sala virtual segura pelo celular ou computador.
-O ${DOCTOR_NAME} analisará o seu caso, histórico de saúde, sintomas e a indicação de canabinoides medicinais.
+4️⃣ *Encaminhamento Clínico:*
+Ao final da Orientação Técnica, você recebe seu Relatório de Encaminhamento para seguir o tratamento com um médico prescritor habilitado da nossa vitrine.
 
-5️⃣ *Recebimento do Relatório Técnico Digital:*
-Ao final da orientação, você receberá o seu Relatório de Encaminhamento Técnico Completo, assinado digitalmente.
-Este relatório contém o seu resumo clínico, a sugestão de protocolo terapêutico e o encaminhamento formal para que você possa dar continuidade ao seu tratamento com um médico prescritor referendado na plataforma.
-
-❓ Ficou com alguma dúvida ou precisa de ajuda para agendar?
-Nossa equipe e a Enfermeira Brisa estão prontas para te auxiliar no WhatsApp:
-💬 https://wa.me/5511991363154
-
-Seja muito bem-vindo(a) à medicina do futuro! 🌿💚`;
+Como posso te ajudar agora? 🌿💚`;
 
 // ── PERSONAS SEPARADAS (mesmo cérebro Gemini, conteúdos diferentes) ─────
 // Enf. Brisa    → triagem curta + paywall
@@ -98,88 +83,91 @@ const PERSONA = BRISA_TRIAGE_PERSONA;
 
 // ── RESPOSTAS INSTANTÂNEAS POR PERFIL (Médico, Paciente, Farmácia) ──────
 const MSGS = {
-  boas_vindas: `Olá! 🌿 Sou a *Enfermeira Brisa*, assistente oficial da *Planta y Raíz* — clínica digital de Medicina Integrativa e Canabinoide.
+  boas_vindas: `Olá! 🌿 Sou a assistente virtual da *Planta y Raíz*.
 
-Para te atender com máxima precisão, como posso te direcionar hoje?
+Para eu te enviar o link certo, você busca atendimento como *paciente* ou informações como *médico(a) prescritor(a)*?
 
-1️⃣ *Sou Paciente* — Quero entender o tratamento, fazer triagem ou agendar Orientação Técnica (R$ 30).
-2️⃣ *Sou Médico(a) / Prescritor(a)* — Quero credenciar meu consultório virtual, suporte em prescrição e encaminhamentos.
-3️⃣ *Sou Farmácia / Lojista / Associação* — Quero integrar meus produtos ao Shopping e canal de dispensação.
+1️⃣ *Sou Paciente* — Quero agendar Consulta Médica (Chat R$ 100 / Vídeo R$ 150) ou iniciar pela Orientação Técnica (R$ 30).
+2️⃣ *Sou Médico(a) Prescritor(a)* — Quero credenciar meu consultório virtual (repasse líquido de 93% via PIX).
+3️⃣ *Sou Farmácia / Lojista / Associação* — Quero integrar produtos ao canal de dispensação.
 
 Pode responder com o *número* ou me contar como posso te ajudar! 💚`,
 
-  paciente: `Olá! 🌿💚 Sou a *Enfermeira Brisa*, assistente da *Planta y Raíz*.
+  paciente: `Olá! 🌿💚 Sou a assistente virtual da *Planta y Raíz*.
 
-Estamos aqui para te acolher e facilitar seu acesso seguro à Medicina Canabinoide:
+Veja os caminhos disponíveis para o seu atendimento:
 
-📋 *Orientação Técnica Especializada (R$ 30):*
-Atendimento individualizado para entender seu histórico de saúde, tirar dúvidas sobre posologia, canabinoides e receber um Relatório Técnico Completo com encaminhamento clínico.
+🩺 *Consulta Médica (Chat R$ 100 | Vídeo R$ 150):*
+Atendimento direto com médico prescritor habilitado da nossa vitrine:
+👉 https://www.plantayraiz.com.br/agendamento
 
-👉 Faça sua triagem inicial e inicie direto pelo site:
-🔗 https://plantayraiz.com.br/orientacao-tecnica
+📋 *Orientação Técnica Inicial (R$ 30 · 30 min):*
+Início do cuidado conduzido pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra), para educação em saúde e encaminhamento ao médico ideal (não realiza prescrição):
+👉 https://www.plantayraiz.com.br/orientacao-tecnica
 
-Como você está se sentindo hoje? Se preferir, me conte um pouco sobre sua queixa ou sintomas.`,
+📝 *Cadastro Gratuito de Paciente:*
+👉 https://www.plantayraiz.com.br/cadastro
 
-  medico: `Olá, Doutor(a)! 👨‍⚕️🌿 É uma satisfação recebê-lo(a) na *Planta y Raíz*!
+Você prefere ir direto para a consulta médica ou começar pela Orientação Técnica?`,
 
-Somos um ecossistema completo desenvolvido para médicos e profissionais prescritores:
-🩺 *Consultório Virtual Inteligente:* Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022).
-💰 *Política de Repasse Oficial:* 93% líquido de cada consulta via PIX (taxa de 7% da plataforma em todos os planos).
-📄 *Prescrição Eletrônica RDC 327/660:* Acesso a catálogo de produtos regulamentados com entrega em todo o Brasil.
-⏳ *Homologação Rápida:* Ativação do consultório e vitrine em até 24 a 48 horas úteis após conferência dos 4 documentos (CRM, Residência, Diploma/RQE e Chave PIX).
-🎓 *Apoio técnico:* discussão de casos com o Dr. Edilson Bezerra ON (assistente de IA supervisionado).
+  medico: `Olá, Doutor(a)! 👨‍⚕️🌿 Sou a assistente virtual de credenciamento da *Planta y Raíz*!
 
-👉 Conheça nossa estrutura e faça seu credenciamento gratuito:
-🔗 https://plantayraiz.com.br/cadastro-profissional
-🔗 https://plantayraiz.com.br/profissionais
+Somos um ecossistema completo para médicos prescritores:
+🩺 *Consultório Virtual Inteligente:* Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022), Copiloto de Evidências, Assistente Jurídico e Escriba de IA.
+💰 *Política de Repasse Oficial:* 93% líquido de cada consulta via PIX (taxa fixa de 7% da plataforma em todos os planos).
+📄 *Prescrição Eletrônica RDC 327/660:* Emissão de receitas assinadas via ICP-Brasil / Gov.br.
+⏳ *Homologação em 24 a 48h úteis:* Após conferência dos 4 documentos (CRM, Residência, Diploma/RQE e Chave PIX).
 
-Como podemos apoiar a sua prática clínica hoje?`,
+👉 Faça seu credenciamento gratuito em:
+🔗 https://www.plantayraiz.com.br/cadastro-profissional
+
+Como posso apoiar a sua prática clínica hoje?`,
 
   farmacia_lojista: `Olá! 🏪🌿 Bem-vindo(a) ao canal corporativo da *Planta y Raíz*!
 
-Conectamos farmácias, fornecedores e associações de cannabis medicinal a médicos prescritores e milhares de pacientes:
+Conectamos farmácias, fornecedores e associações a médicos prescritores e pacientes:
 📦 *Shopping & Vitrine Oficial:* Seus produtos em destaque na nossa farmácia digital.
-💰 *Split 95/5 no Checkout:* 95% do valor da venda vai direto para o lojista parceiro.
-🚚 *Integração com Prescrição Médica:* Pacientes recebem o carrinho já pronto com o produto prescrito pelo médico.
+💰 *Split 95/5 no Checkout:* 95% do valor da venda vai para o lojista parceiro (taxa de 5% do marketplace).
 
-👉 Cadastre sua farmácia ou produtos na plataforma:
-🔗 https://plantayraiz.com.br/cadastro
+👉 Cadastre sua farmácia ou associação na plataforma:
+🔗 https://www.plantayraiz.com.br/cadastro
 
-Qual marca, produto ou associação você representa?`,
+Qual marca, farmácia ou associação você representa?`,
 
-  cadastrado: `Ótimo! Você já pode agendar sua Orientação Técnica ou acessar seu painel:
-👉 https://plantayraiz.com.br/orientacao-tecnica 🌿`,
+  cadastrado: `Ótimo! Se você já tem cadastro como paciente, pode escolher seu médico e agendar sua consulta em https://www.plantayraiz.com.br/agendamento ou iniciar a Orientação Técnica (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica 🌿`,
 
   orientacao_tecnica: ROTEIRO_ORIENTACAO_TECNICA,
 
-  cannabis_info: `*Cannabis Medicinal no Brasil* 🌿
+  cannabis_info: `*Acompanhamento na Planta y Raiz* 🌿
 
-100% legal com prescrição e orientação técnica especializada! +870 mil pacientes ativos no país.
+O tratamento é avaliado individualmente pelo médico prescritor em consulta. Veja como iniciar seu atendimento:
 
 ${ROTEIRO_ORIENTACAO_TECNICA}`,
 
-  generica: ROTEIRO_ORIENTACAO_TECNICA,
+  generica: `Olá! 🌿 Sou a assistente virtual da *Planta y Raíz*. Para eu te ajudar com o link certo: você busca atendimento como *paciente* (Consulta ou Orientação Técnica) ou informações como *médico(a) prescritor(a)*?`,
 };
 
 function norm(t: string) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
 
 function intent(text: string): keyof typeof MSGS {
   const t = norm(text);
-  if (/^2\b|\bmedico\b|\bmedica\b|\bdoutor?a?\b|\bdr\.?\b|\bdra\.?\b|crm\b|prescri|prescritor|especialista|minha clinica|sou medico|sou medica/.test(t)) return 'medico';
+  // Somente identifica como médico quando a pessoa diz que É médico/prescritor ou pede credenciamento profissional
+  if (/^2\b|\bsou medic[oa]\b|\bsou doutor?a?\b|\bsou prescritor?a?\b|\bmeu crm\b|\btenho crm\b|\bquero prescrever\b|\bquero me credenciar\b|\bcredenciamento\b|\bcadastro profissional\b|\bminha clinica\b/.test(t)) return 'medico';
   if (/^3\b|\bfarmacia\b|\blojista\b|\bparceiro\b|\bparceria\b|\bafiliado\b|\bdistribuid|\brevend|\bassocia|\bforneced|\blaboratorio\b|\bmarca\b/.test(t)) return 'farmacia_lojista';
-  if (/^1\b|\bpaciente\b|\bsou paciente\b|\bconsulta\b|\btratamento\b|\bminha dor\b|\bremedio\b|\breceita\b|\bsintoma\b|\bagendar\b/.test(t)) return 'paciente';
-  if (/orientacao|tecnica|mentoria|edilson|bezerra|passo a passo|como funciona|atendimento/.test(t)) return 'orientacao_tecnica';
+  if (/orientacao|tecnica|mentoria|edilson|bezerra/.test(t)) return 'orientacao_tecnica';
   if (/ja (tenho|fiz|possuo) cadastro|ja sou cadastrad|ja me cadastrei/.test(t)) return 'cadastrado';
-  if (/cannabis|canabis|cbd|thc|canabidiol|maconha|epileps|autismo|fibromialgi|parkinson|ansiedade|insonia/.test(t)) return 'cannabis_info';
+  if (/^1\b|\bpaciente\b|\bsou paciente\b|\bconsulta\b|\btratamento\b|\bminha dor\b|\bremedio\b|\breceita\b|\bsintoma\b|\bagendar\b|\bagendamento\b|\bquero passar\b|\bquanto custa\b|\bvalor\b/.test(t)) return 'paciente';
+  if (/cannabis|canabis|cbd|thc|canabidiol|epileps|autismo|fibromialgi|parkinson|ansiedade|insonia/.test(t)) return 'paciente';
   if (/^(ola|oi|hey|bom dia|boa tarde|boa noite|tudo bem|salve|brisa|alo|hello|hola)[\s!.,?]*$/.test(t.trim())) return 'boas_vindas';
   return 'generica';
 }
 
 function instantReply(text: string, name: string | null): string {
   const k = intent(text);
-  const saud = name ? `Olá, *${name}*! ` : '';
+  const cleanName = patientName(name || '');
+  const saud = cleanName ? `Olá, *${cleanName}*! ` : '';
   const msg = MSGS[k];
-  return (k === 'boas_vindas' || k === 'medico' || k === 'farmacia_lojista' || k === 'paciente') ? msg : saud + msg;
+  return (k === 'boas_vindas' || k === 'medico' || k === 'farmacia_lojista' || k === 'paciente' || k === 'generica') ? msg : saud + msg;
 }
 
 // ── PARSER WAHA universal ────────────────────────────────────────────────
@@ -251,7 +239,9 @@ async function sendEvo(phone: string, text: string): Promise<boolean> {
     return false;
   } catch (e: unknown) { console.error(`[brisa][EVO] ${(e as Error)?.message}`); return false; }
 }
-async function sendMsg(chatId: string, phone: string, text: string): Promise<boolean> {
+async function sendMsg(chatId: string, phone: string, rawText: string): Promise<boolean> {
+  const text = sanitizeOutboundAnswer(rawText);
+  if (!text) return false;
   const ok = await sendWAHA(chatId, text);
   if (ok) return true;
   console.warn('[brisa] WAHA falhou → Evolution...');
@@ -379,6 +369,15 @@ serve(async (req: Request): Promise<Response> => {
 
   if (fromMe || isGroup || isStatus || !chatId || !text) {
     return new Response(JSON.stringify({ ok: true, ignored: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+
+  // Bloqueio imediato dos números em laço e respostas automáticas de consultórios
+  if ((phone && LOOPING_BOT_NUMBERS.has(phone)) || LOOPING_BOT_NUMBERS.has(chatId.replace(/@.*/, ''))) {
+    return new Response(JSON.stringify({ ok: true, ignored: 'looping_bot_blacklisted' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+  const quick = quickResponse({ question: text, senderName: name || '' });
+  if (quick?.suppressed) {
+    return new Response(JSON.stringify({ ok: true, ignored: quick.model }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
   const claim = SB_URL && SB_KEY

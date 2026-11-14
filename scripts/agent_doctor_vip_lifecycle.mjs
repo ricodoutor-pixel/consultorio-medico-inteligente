@@ -145,16 +145,16 @@ Confirmamos a ativação do seu *Plano Médico VIP Assinante* na Planta y Raíz 
 
 Seu perfil foi oficialmente reconhecido pelo sistema e todos os privilégios VIP de alta performance estão liberados para você:
 
-👑 *SUAS VANTAGENS EXCLUSIVAS DE MÉDICO VIP:*
-1. 💸 *Taxa de Intermediação ZERO (0%):* 100% do valor líquido das suas teleconsultas é repassado a você.
-2. 🏆 *Destaque Ouro na Vitrine:* Posicionamento de topo prioritário na vitrine médica oficial.
-3. 🤖 *Prioridade na Triagem IA (Enfª Brisa):* Roteamento de pacientes pré-triados diretamente para o seu agendamento.
+👑 *SUAS VANTAGENS EXCLUSIVAS DE MÉDICO ASSINANTE:*
+1. 💸 *Repasse via PIX Instantâneo (93% Líquido):* Taxa fixa de manutenção de apenas 7% da plataforma.
+2. 🏆 *Destaque na Vitrine:* Posicionamento prioritário na vitrine médica oficial.
+3. 🤖 *Prioridade na Fila de Consultas:* Roteamento prioritário de pacientes que aguardam atendimento.
 4. 📋 *Prontuário Eletrônico Inteligente:* Histórico longitudinal, anamnese digital e armazenamento seguro CFM/LGPD.
-5. 🧠 *Copiloto Clínico VIP de Consultas (IA):* Inteligência de apoio à decisão clínica treinada nas diretrizes ANVISA (RDC 660 e 327), literatura endocanabinoide e interações medicamentosas.
+5. 🧠 *Copiloto Clínico de Consultas (IA):* Inteligência de apoio à decisão clínica treinada nas diretrizes ANVISA (RDC 660 e 327), literatura endocanabinoide e interações medicamentosas.
 6. 🎥 *Telemedicina HD Integrada:* Sala criptografada de videochamada sem limite de tempo com chat integrado.
 
 Para acessar seu Consultório Virtual completo com o Copiloto IA e Prontuário, acesse agora:
-👉 https://plantayraiz.com.br/consultorio
+👉 https://www.plantayraiz.com.br/consultorio
 
 Conte sempre conosco para alavancar a sua prática clínica com tecnologia e humanização!
 
@@ -176,8 +176,8 @@ Enfª Brisa | Gestão & Relacionamento Médico
 Nome: ${doc.name}
 CRM: ${doc.crm}
 WhatsApp: ${doc.phone}
-Plano: VIP Prescritor (R$ 99/mês)
-Privilégios liberados: Taxa 0%, Vitrine Topo, Prontuário Eletrônico e Copiloto Clínico VIP.`;
+Plano: Premium Prescritor (R$ 99/mês)
+Privilégios liberados: Repasse 93% via PIX, Prioridade na Fila, Prontuário Eletrônico e Copiloto Clínico IA.`;
 
         if (options.sendWhatsApp && ADMIN_PHONE) {
           console.log(`  -> Notificando Dr. Edilson (Admin): ${ADMIN_PHONE}`);

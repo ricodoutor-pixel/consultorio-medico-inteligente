@@ -177,18 +177,22 @@ it('T4.2: Limite estrito de no máximo 2 mensagens seguidas da Brisa sem respost
 // ----------------------------------------------------------------------------
 console.log('\n🔹 Grupo 5: Anti-Repetição Semântica (S5)');
 
-it('T5.1: Deve bloquear o envio imediato da mesma resposta para o mesmo contato', () => {
+it('T5.1: Deve bloquear o envio imediato da mesma resposta para o mesmo contato (read-only com sentHistory)', () => {
   const testJid = '5511955554444@s.whatsapp.net';
   const text = 'Olá, Dr(a). Como posso te orientar hoje sobre o credenciamento?';
+  const sentHistory = [];
 
-  // 1ª vez: permitido
-  assert.strictEqual(checkSemanticRepetition(text, testJid), false);
+  // 1ª vez (antes do envio): permitido, não muta histórico no pre-check
+  assert.strictEqual(checkSemanticRepetition(text, testJid, sentHistory), false);
+
+  // Simula envio bem-sucedido entrando no histórico de 24h
+  sentHistory.push({ text, sentAt: Date.now() });
 
   // 2ª vez consecutiva: repetição detectada!
-  assert.strictEqual(checkSemanticRepetition(text, testJid), true);
+  assert.strictEqual(checkSemanticRepetition(text, testJid, sentHistory), true);
 
   // Texto diferente: permitido
-  assert.strictEqual(checkSemanticRepetition('Outra resposta diferente com mais detalhes', testJid), false);
+  assert.strictEqual(checkSemanticRepetition('Outra resposta diferente com mais detalhes', testJid, sentHistory), false);
 });
 
 // ----------------------------------------------------------------------------

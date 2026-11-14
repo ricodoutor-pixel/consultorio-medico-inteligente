@@ -14,8 +14,14 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dns from 'node:dns';
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import {
+  isValidDoctorEmailSyntax,
+  verifyEmailDeliverability,
+  addEmailToBouncedBlacklist,
+  logEmailSendInSupabase,
+  syncLeadToOfficialSupabase
+} from './lib/email_validator.mjs';
 
 dns.setDefaultResultOrder('ipv4first');
 dotenv.config();
@@ -30,22 +36,7 @@ const LOG_FILE = path.join(__dirname, 'cannabis_young_doctors_hunter.log');
 const BREVO_KEY = process.env.BREVO_API_KEY || '';
 const BREVO_BASE = 'https://api.brevo.com/v3';
 const BREVO_LIST_MEDICOS = Number(process.env.BREVO_LIST_MEDICOS || 6);
-
-const SMTP_HOST = process.env.SMTP_HOST || 'smtp.hostinger.com';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || 'SuaSenhaAqui';
-
-// Transporter Hostinger seguro
-const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: true,
-  auth: { user: SMTP_USER, pass: SMTP_PASS },
-  pool: true,
-  maxConnections: 1,
-  rateLimit: 1
-});
 
 function log(msg) {
   const line = `[${new Date().toISOString()}] [HUNTER-2020-CANNABIS] ${msg}`;
@@ -123,13 +114,13 @@ function classifyTargetDoctor(lead) {
   };
 }
 
-// Inserção / Atualização no Brevo CRM Lista 6
+// Inserção / Atualização no Brevo CRM Lista 6 (Apenas com e-mail real verificado — NUNCA cria @lead.plantayraiz.com.br sintético)
 async function syncToBrevoCRM(lead, classification) {
-  const email = lead.email;
-  const phone = normalizePhone(lead.phone);
-  if (!email && !phone) return false;
+  const emailCheck = lead.email ? isValidDoctorEmailSyntax(lead.email, lead.name) : { valid: false };
+  if (!emailCheck.valid) return false;
 
-  const fallbackEmail = email || `medico_${phone}@lead.plantayraiz.com.br`;
+  const verifiedEmail = emailCheck.email;
+  const phone = normalizePhone(lead.phone);
 
   const cleanName = (lead.name || 'Doutor(a)').replace(/^dr\(a\)\.?\s+/i, '').replace(/^dr\.?\s+/i, '').replace(/^dra\.?\s+/i, '').trim();
 
@@ -143,7 +134,7 @@ async function syncToBrevoCRM(lead, classification) {
     STATUS_PROSPECCAO: 'CONVITE_ENVIADO'
   };
 
-  if (phone) {
+  if (phone && /^55[1-9]{2}9\d{8}$/.test(phone)) {
     attributes.WHATSAPP = phone;
   }
 
@@ -156,7 +147,7 @@ async function syncToBrevoCRM(lead, classification) {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        email: fallbackEmail,
+        email: verifiedEmail,
         attributes,
         listIds: [BREVO_LIST_MEDICOS],
         updateEnabled: true
@@ -164,7 +155,7 @@ async function syncToBrevoCRM(lead, classification) {
     });
 
     if (res.ok || res.status === 201 || res.status === 204) {
-      log(`   📥 [BREVO CRM] Médico cadastrado com sucesso: Dr(a). ${cleanName} (${fallbackEmail}) [${classification.segment}]`);
+      log(`   📥 [BREVO CRM] Médico cadastrado com sucesso: Dr(a). ${cleanName} (${verifiedEmail}) [${classification.segment}]`);
       return true;
     } else {
       const err = await res.json().catch(() => ({}));
@@ -275,9 +266,15 @@ function buildInvitationEmailHtml(lead, classification) {
   `;
 }
 
-// Envia o e-mail oficial via Brevo API Transacional com fallback SMTP
+// Envia o e-mail oficial via Brevo API Transacional (Sem fallback SMTP Hostinger para evitar 550 5.7.1 [ESA] Sender blocked)
 async function sendDoctorInvitationEmail(lead, classification) {
-  if (!lead.email) return false;
+  if (!lead.email || !BREVO_KEY) return false;
+
+  const check = await verifyEmailDeliverability(lead.email, lead.name, BREVO_KEY);
+  if (!check.valid) {
+    log(`   ⛔ [FILTRO ANTI-BOUNCE] Descartando ${lead.name || '(sem nome)'} <${lead.email}> -> ${check.reason}`);
+    return false;
+  }
 
   const cleanName = (lead.name || 'Doutor(a)').replace(/^dr\(a\)\.?\s+/i, '').replace(/^dr\.?\s+/i, '').replace(/^dra\.?\s+/i, '').trim();
   const isCannabis = classification.segment === 'PRESCRITOR_CANNABIS';
@@ -288,7 +285,6 @@ async function sendDoctorInvitationEmail(lead, classification) {
 
   const html = buildInvitationEmailHtml(lead, classification);
 
-  // 1. Envio primário via Brevo API Transacional (Alta entregabilidade, DKIM/SPF 100% verificado)
   try {
     const res = await fetch(`${BREVO_BASE}/smtp/email`, {
       method: 'POST',
@@ -297,7 +293,7 @@ async function sendDoctorInvitationEmail(lead, classification) {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        sender: { name: 'Dr. Edilson Bezerra | Planta y Raíz', email: 'contato@plantayraiz.com.br' },
+        sender: { name: 'Dr. Edilson Bezerra | Planta y Raíz', email: SMTP_USER },
         to: [{ email: lead.email, name: `Dr(a). ${cleanName}` }],
         subject,
         htmlContent: html
@@ -305,33 +301,28 @@ async function sendDoctorInvitationEmail(lead, classification) {
     });
 
     if (res.ok || res.status === 201) {
+      const data = await res.json().catch(() => ({}));
       log(`   ✉️ [E-MAIL ENVIADO VIA BREVO]: Dr(a). ${cleanName} <${lead.email}> [${classification.segment}]`);
+      await logEmailSendInSupabase({
+        email: lead.email,
+        templateName: 'hunter_doctor_invite',
+        status: 'sent',
+        messageId: data.messageId || null,
+        metadata: { doctor_name: cleanName, segment: classification.segment }
+      });
       return true;
     } else {
       const errData = await res.json().catch(() => ({}));
       log(`   ⚠️ Brevo retorno (${res.status}): ${errData.message || res.statusText}`);
+      if (res.status === 400) {
+        addEmailToBouncedBlacklist(lead.email, `brevo_400_${errData.message || ''}`);
+      }
+      return false;
     }
   } catch (e) {
-    log(`   ⚠️ Brevo SMTP falhou, tentando fallback: ${e.message}`);
-  }
-
-  // 2. Fallback via Hostinger SMTP
-  try {
-    await transporter.sendMail({
-      from: `"Dr. Edilson Bezerra | Planta y Raíz" <${SMTP_USER}>`,
-      replyTo: SMTP_USER,
-      to: lead.email,
-      subject,
-      html
-    });
-    log(`   ✉️ [E-MAIL ENVIADO VIA HOSTINGER]: Dr(a). ${cleanName} <${lead.email}> [${classification.segment}]`);
-    return true;
-  } catch (e) {
-    log(`   ⚠️ [FALHA E-MAIL]: ${lead.email} - ${e.message}`);
+    log(`   ⚠️ Brevo SMTP falhou: ${e.message}`);
     return false;
   }
-}
-
 }
 
 // Carrega todos os leads disponíveis nas bases locais
@@ -390,7 +381,7 @@ async function runHuntingCycle() {
   log(`📊 Total de médicos minerados na base de conhecimento: ${allLeads.length}`);
 
   let sentInThisCycle = 0;
-  const maxPerCycle = 15; // Lote seguro por rodada para máxima entregabilidade
+  const maxPerCycle = 1; // Cadência estrita: 1 e-mail verificado a cada 15 minutos (zero rajadas)
 
   for (const lead of allLeads) {
     const leadKey = lead.email || lead.phone;
@@ -401,8 +392,20 @@ async function runHuntingCycle() {
     const classification = classifyTargetDoctor(lead);
     log(`🎯 Processando lead: ${lead.name} (${lead.email || lead.phone}) -> [${classification.segment}]`);
 
-    // 1. Cadastra/Atualiza no Brevo CRM (Lista 6)
+    // 1. Cadastra/Atualiza no Brevo CRM (Lista 6) e na plataforma oficial Lovable Cloud (CRM)
     await syncToBrevoCRM(lead, classification);
+    await syncLeadToOfficialSupabase({
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      category: '1-medico',
+      source: `hunter_${classification.segment.toLowerCase()}`,
+      specialty: lead.specialty || classification.roleLabel,
+      city: lead.city || '',
+      uf: lead.state || '',
+      crm: lead.crm || '',
+      status: 'invited'
+    });
     state.brevoSyncedCount = (state.brevoSyncedCount || 0) + 1;
 
     // 2. Se possuir e-mail válido, dispara a carta convite do Dr. Edilson
@@ -418,13 +421,9 @@ async function runHuntingCycle() {
     saveState(state);
 
     if (sentInThisCycle >= maxPerCycle) {
-      log(`🛑 Lote de ${maxPerCycle} e-mails concluído com sucesso neste ciclo.`);
+      log(`🛑 Cadência de ${maxPerCycle} e-mail verificado concluída neste ciclo.`);
       break;
     }
-
-    // Intervalo suave de 30 a 60 segundos entre cada médico
-    const delay = Math.floor(Math.random() * 30000) + 30000;
-    await sleep(delay);
   }
 
   state.lastCycleAt = new Date().toISOString();

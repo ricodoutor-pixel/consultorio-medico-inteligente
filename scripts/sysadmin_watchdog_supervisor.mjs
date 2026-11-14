@@ -21,7 +21,10 @@ const EXPECTED_SERVICES = [
   'anvisa-rdc660-rpa',
   'brevo-multi-pipeline',
   'partner-meeting-scheduler',
-  'organic-analytics-reporter'
+  'organic-analytics-reporter',
+  'cannabis-young-doctors-hunter',
+  'cadence-10min-inviter',
+  'email-bounce-guardian'
 ];
 
 function log(msg) {

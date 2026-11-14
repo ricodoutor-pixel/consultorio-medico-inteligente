@@ -22,8 +22,13 @@ dns.setDefaultResultOrder('ipv4first');
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import {
+  verifyEmailDeliverability,
+  addEmailToBouncedBlacklist,
+  logEmailSendInSupabase,
+  syncLeadToOfficialSupabase
+} from './lib/email_validator.mjs';
 
 dotenv.config();
 
@@ -32,24 +37,11 @@ const STATE_FILE = path.join(__dirname, 'brevo_multi_pipeline_state.json');
 const LOG_FILE = path.join(__dirname, 'brevo_multi_pipeline.log');
 
 const BREVO_KEY = process.env.BREVO_API_KEY || '';
-const SMTP_HOST = process.env.SMTP_HOST || 'smtp.hostinger.com';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465', 10);
 const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || '';
 const BREVO_LIST_MEDICOS = Number(process.env.BREVO_LIST_MEDICOS || 6);
 
 const CADENCE_STEP_MS = 48 * 60 * 60 * 1000; // 48 horas entre réguas
-const DAILY_BREVO_LIMIT = 300;
-
-const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: true,
-  auth: { user: SMTP_USER, pass: SMTP_PASS },
-  pool: true,
-  maxConnections: 1,
-  rateLimit: 1
-});
+const DAILY_BREVO_LIMIT = 60; // Limite diário conservador em cadência fixa (1 a cada 15 min)
 
 function log(msg) {
   const ts = new Date().toISOString();
@@ -100,57 +92,65 @@ function saveState() {
   } catch (_) {}
 }
 
-// ─── Envio com Gateway Híbrido (Brevo API + Fallback Hostinger) ───
+// ─── Envio Exclusivo via Brevo API Verificada (Sem Fallback SMTP Hostinger para evitar 550 5.7.1 [ESA] Sender blocked) ───
 async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, textContent) {
-  // 1. Tenta Brevo API se estiver dentro da cota diária de 300
-  if (BREVO_KEY && state.dailyBrevoCount < DAILY_BREVO_LIMIT) {
-    try {
-      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'api-key': BREVO_KEY,
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          sender: { name: 'Planta y Raíz · Expansão Médica', email: SMTP_USER },
-          to: [{ email: toEmail, name: toName || toEmail }],
-          replyTo: { email: SMTP_USER, name: 'Planta y Raíz Suporte' },
-          subject,
-          htmlContent,
-          textContent
-        })
-      });
-      if (res.ok) {
-        state.dailyBrevoCount++;
-        saveState();
-        return { ok: true, provider: 'Brevo API' };
-      } else {
-        const errText = await res.text();
-        log(`⚠️ Brevo HTTP ${res.status}: ${errText.slice(0, 100)} -> Tentando Hostinger SMTP...`);
-      }
-    } catch (e) {
-      log(`⚠️ Falha de conexão Brevo (${e.message}) -> Acionando Hostinger SMTP...`);
-    }
+  if (!BREVO_KEY) {
+    return { ok: false, error: 'BREVO_API_KEY ausente' };
+  }
+  if (state.dailyBrevoCount >= DAILY_BREVO_LIMIT) {
+    return { ok: false, error: 'DAILY_QUOTA_REACHED', retryable: true };
   }
 
-  // 2. Fallback transparente no Hostinger SMTP
   try {
-    const info = await transporter.sendMail({
-      from: `"Planta y Raíz · Expansão Médica" <${SMTP_USER}>`,
-      replyTo: SMTP_USER,
-      to: toEmail,
-      subject,
-      text: textContent,
-      html: htmlContent
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'api-key': BREVO_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'Dr. Edilson Bezerra · Planta y Raíz', email: SMTP_USER },
+        to: [{ email: toEmail, name: toName || toEmail }],
+        replyTo: { email: SMTP_USER, name: 'Dr. Edilson Bezerra · Planta y Raíz' },
+        subject,
+        htmlContent,
+        textContent
+      })
     });
-    state.metrics.hostingerFallbackSent++;
-    saveState();
-    return { ok: true, provider: 'Hostinger SMTP', messageId: info.messageId };
-  } catch (smtpErr) {
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      state.dailyBrevoCount++;
+      saveState();
+      await logEmailSendInSupabase({
+        email: toEmail,
+        templateName: 'brevo_multi_pipeline',
+        status: 'sent',
+        messageId: data.messageId || null,
+        metadata: { doctor_name: toName, subject }
+      });
+      return { ok: true, provider: 'Brevo API', messageId: data.messageId };
+    } else {
+      const errText = await res.text();
+      log(`⚠️ Brevo HTTP ${res.status}: ${errText.slice(0, 140)}`);
+      // Se for erro 400 (endereço inválido/bloqueado), adiciona à blacklist para nunca mais tentar
+      if (res.status === 400) {
+        addEmailToBouncedBlacklist(toEmail, `brevo_400_${errText.slice(0, 60)}`);
+      }
+      state.metrics.errors++;
+      saveState();
+      await logEmailSendInSupabase({
+        email: toEmail,
+        templateName: 'brevo_multi_pipeline',
+        status: res.status === 400 ? 'suppressed' : 'failed',
+        errorMessage: `HTTP ${res.status}: ${errText.slice(0, 120)}`
+      });
+      return { ok: false, error: `Brevo HTTP ${res.status}`, permanent: res.status === 400 };
+    }
+  } catch (e) {
     state.metrics.errors++;
     saveState();
-    return { ok: false, error: smtpErr.message };
+    return { ok: false, error: e.message, retryable: true };
   }
 }
 
@@ -342,6 +342,17 @@ export async function runMultiPipelineBatch(maxPerRun = 25) {
 
     if (entry.completed) continue;
 
+    // Verifica entregabilidade estrita (sintaxe ASCII, nome real, domínio não sintético, DNS MX e blacklist Brevo)
+    const check = await verifyEmailDeliverability(email, doc.name, BREVO_KEY);
+    if (!check.valid) {
+      log(`⛔ [FILTRO ANTI-BOUNCE] Descartando ${doc.name || '(sem nome)'} <${email}> -> Motivo: ${check.reason}`);
+      entry.completed = true;
+      entry.skippedReason = check.reason;
+      state.pipelineProgress[email] = entry;
+      saveState();
+      continue;
+    }
+
     // Verifica cadência temporal de 48h
     if (entry.lastSentAt && now - entry.lastSentAt < CADENCE_STEP_MS) {
       continue;
@@ -386,26 +397,48 @@ export async function runMultiPipelineBatch(maxPerRun = 25) {
 
       saveState();
       processedInThisRun++;
-      log(`✅ [RÉGUA ETAPA ${nextStep}] Enviado com sucesso via ${res.provider}!`);
-      await sleep(1500); // 1.5s entre envios
+
+      // Sincroniza o médico na plataforma oficial Lovable Cloud (CRM)
+      await syncLeadToOfficialSupabase({
+        name: doc.name,
+        email,
+        phone: doc.phone || '',
+        category: '1-medico',
+        source: `brevo_pipeline_step${nextStep}`,
+        specialty: doc.specialty || '',
+        city: doc.city || '',
+        uf: doc.state || doc.uf || '',
+        crm: doc.crm || '',
+        status: 'invited'
+      });
+
+      log(`✅ [RÉGUA ETAPA ${nextStep}] Enviado com sucesso via ${res.provider} e sincronizado no CRM!`);
+      await sleep(2000);
     } else {
+      if (res.permanent) {
+        entry.completed = true;
+        entry.skippedReason = res.error;
+        state.pipelineProgress[email] = entry;
+        saveState();
+      }
       log(`❌ Erro no envio para ${email}: ${res.error}`);
+      if (res.retryable) break;
     }
   }
 
-  log(`🏁 Rodada concluída: ${processedInThisRun} e-mails processados. Total Brevo hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
+  log(`🏁 Rodada concluída: ${processedInThisRun} e-mail(s) processado(s). Total Brevo hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
 }
 
-// Disparo quando executado diretamente
+// Disparo quando executado diretamente (Cadência Estrita: 1 e-mail verificado a cada 15 minutos, zero rajadas)
 async function startPipelineDaemon() {
-  log('🚀 [MÓDULO 2] Agente Brevo Multi-Pipeline Ativo em Loop Contínuo');
+  log('🚀 [MÓDULO 2] Agente Brevo Multi-Pipeline Ativo em Cadência Estrita (1 e-mail verificado a cada 15 min)');
   while (true) {
     try {
-      await runMultiPipelineBatch(20);
+      await runMultiPipelineBatch(1);
     } catch (e) {
       log(`⚠️ Erro no ciclo do pipeline: ${e.message}`);
     }
-    await sleep(15 * 60 * 1000); // Aguarda 15 minutos entre lotes
+    await sleep(15 * 60 * 1000); // Aguarda 15 minutos entre cada envio individual
   }
 }
 

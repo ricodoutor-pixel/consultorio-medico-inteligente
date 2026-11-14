@@ -20,6 +20,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dns from 'node:dns';
 import dotenv from 'dotenv';
+import {
+  isValidDoctorEmailSyntax,
+  syncLeadToOfficialSupabase
+} from './lib/email_validator.mjs';
 
 dns.setDefaultResultOrder('ipv4first');
 dotenv.config();
@@ -125,9 +129,12 @@ function extractCRM(text) {
   return null;
 }
 
-// Envia contato para o Brevo CRM com validação estrita e auto-recuperação
+// Envia contato para o Brevo CRM e para o Supabase Oficial (Lovable Cloud CRM) com validação estrita
 async function sendContactToBrevo({ email, attributes, listId }) {
-  if (!email && !attributes.WHATSAPP && !attributes.LANDLINE_NUMBER) return false;
+  const emailCheck = email ? isValidDoctorEmailSyntax(email, null) : { valid: false };
+  const verifiedEmail = emailCheck.valid ? emailCheck.email : null;
+
+  if (!verifiedEmail && !attributes.WHATSAPP && !attributes.LANDLINE_NUMBER) return false;
   
   const cleanAttr = { ...attributes };
   delete cleanAttr.SMS; // Remove SMS para evitar erro de identificador único duplicado
@@ -138,8 +145,25 @@ async function sendContactToBrevo({ email, attributes, listId }) {
     delete cleanAttr.WHATSAPP;
   }
 
-  const fallbackId = String(cleanAttr.WHATSAPP || cleanAttr.LANDLINE_NUMBER || cleanAttr.NOME || Date.now()).replace(/\W/g, '').toLowerCase().slice(0, 16);
-  const finalEmail = email || `lead_${fallbackId}@lead.plantayraiz.com.br`;
+  // Sincroniza sempre no CRM Oficial da Plataforma (leads_contatos / medicos_parceiros_leads / pacientes_leads)
+  await syncLeadToOfficialSupabase({
+    name: cleanAttr.NOME || cleanAttr.NOME_FANTASIA || 'Contato Apify',
+    email: verifiedEmail,
+    phone: cleanAttr.WHATSAPP || cleanAttr.LANDLINE_NUMBER || '',
+    category: listId === LIST_PACIENTES ? 'paciente' : (listId === LIST_FARMACIAS ? 'farmacia' : '1-medico'),
+    source: cleanAttr.FONTE || 'apify_harvester',
+    specialty: cleanAttr.JOB_TITLE || '',
+    city: cleanAttr.CIDADE || '',
+    uf: cleanAttr.UF || '',
+    status: 'scraped'
+  });
+
+  // Só envia para o Brevo se tiver e-mail real verificado ou WhatsApp válido (evita criar @lead.plantayraiz.com.br que gera bounce!)
+  if (!verifiedEmail) {
+    return true;
+  }
+
+  const finalEmail = verifiedEmail;
 
   try {
     const payload = {

@@ -17,8 +17,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dns from 'node:dns';
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import {
+  verifyEmailDeliverability,
+  addEmailToBouncedBlacklist,
+  logEmailSendInSupabase,
+  syncLeadToOfficialSupabase
+} from './lib/email_validator.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -47,23 +52,9 @@ const EVO_INSTANCE = process.env.EVOLUTION_INSTANCE || 'plantayraiz';
 
 const BREVO_KEY = process.env.BREVO_API_KEY || '';
 const BREVO_BASE = 'https://api.brevo.com/v3';
-
-const SMTP_HOST = process.env.SMTP_HOST || 'smtp.hostinger.com';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || '';
 
 const CADENCE_MS = 10 * 60 * 1000; // Exatamente 10 minutos por envio bem-sucedido
-
-const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: true,
-  auth: { user: SMTP_USER, pass: SMTP_PASS },
-  pool: true,
-  maxConnections: 1,
-  rateLimit: 1
-});
 
 function log(msg) {
   const line = `[${new Date().toISOString()}] [CADENCE-10MIN] ${msg}`;
@@ -445,63 +436,59 @@ function buildCampaignEmailHtml(doctorName) {
 </html>`;
 }
 
-// Disparo de E-mail (Brevo com fallback Hostinger SMTP)
+// Disparo de E-mail Exclusivo via Brevo Verificado (Sem fallback Hostinger SMTP para evitar 550 5.7.1 [ESA] Sender blocked)
 async function sendEmailInvite(doctor) {
   const email = (doctor.email || '').toLowerCase().trim();
-  if (!email || !email.includes('@')) return false;
+  if (!email || !email.includes('@') || !BREVO_KEY) return false;
+
+  const check = await verifyEmailDeliverability(email, doctor.name, BREVO_KEY);
+  if (!check.valid) {
+    log(`⛔ [FILTRO ANTI-BOUNCE] Descartando e-mail ${doctor.name || '(sem nome)'} <${email}> -> ${check.reason}`);
+    return false;
+  }
 
   const cleanName = sanitizeDisplayDoctorName(doctor.name);
   const subject = `Parabéns Dr(a). ${cleanName}, você foi escolhido(a) como Médico(a) Prescritor(a) Sócio(a) da Planta y Raíz 🌿🩺`;
   const html = buildCampaignEmailHtml(doctor.name);
 
-  // 1. Brevo API
-  if (BREVO_KEY) {
-    try {
-      const res = await fetch(`${BREVO_BASE}/smtp/email`, {
-        method: 'POST',
-        headers: {
-          'api-key': BREVO_KEY,
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          sender: { name: 'Dr. Edilson Bezerra | Planta y Raíz', email: 'contato@plantayraiz.com.br' },
-          to: [{ email, name: `Dr(a). ${cleanName}` }],
-          subject,
-          htmlContent: html
-        })
-      });
-
-      if (res.ok || res.status === 201) {
-        log(`✉️ [E-MAIL BREVO] Sucesso: Dr(a). ${cleanName} <${email}>`);
-        return true;
-      } else {
-        const err = await res.text().catch(() => '');
-        log(`⚠️ [BREVO ERRO ${res.status}]: ${err}`);
-      }
-    } catch (e) {
-      log(`⚠️ [BREVO FALHA]: ${e.message}, tentando SMTP Hostinger`);
-    }
-  }
-
-  // 2. SMTP Hostinger
-  if (SMTP_PASS) {
-    try {
-      await transporter.sendMail({
-        from: `"Dr. Edilson Bezerra | Planta y Raíz" <${SMTP_USER}>`,
-        replyTo: SMTP_USER,
-        to: email,
+  try {
+    const res = await fetch(`${BREVO_BASE}/smtp/email`, {
+      method: 'POST',
+      headers: {
+        'api-key': BREVO_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'Dr. Edilson Bezerra | Planta y Raíz', email: SMTP_USER },
+        to: [{ email, name: `Dr(a). ${cleanName}` }],
         subject,
-        html
+        htmlContent: html
+      })
+    });
+
+    if (res.ok || res.status === 201) {
+      const data = await res.json().catch(() => ({}));
+      log(`✉️ [E-MAIL BREVO] Sucesso: Dr(a). ${cleanName} <${email}>`);
+      await logEmailSendInSupabase({
+        email,
+        templateName: 'cadence_10min_invite',
+        status: 'sent',
+        messageId: data.messageId || null,
+        metadata: { doctor_name: cleanName }
       });
-      log(`✉️ [E-MAIL HOSTINGER] Sucesso: Dr(a). ${cleanName} <${email}>`);
       return true;
-    } catch (e) {
-      log(`❌ [E-MAIL ERRO]: ${email} - ${e.message}`);
+    } else {
+      const err = await res.text().catch(() => '');
+      log(`⚠️ [BREVO ERRO ${res.status}]: ${err.slice(0, 140)}`);
+      if (res.status === 400) {
+        addEmailToBouncedBlacklist(email, `brevo_400_${err.slice(0, 60)}`);
+      }
       return false;
     }
+  } catch (e) {
+    log(`⚠️ [BREVO FALHA]: ${e.message}`);
+    return false;
   }
-
-  return false;
 }
 
 // Mensagem Oficial WhatsApp (enxuta, humana e direta para aumentar a taxa de resposta sem parecer spam)
@@ -701,6 +688,17 @@ async function startCadenceInviter() {
       };
       state.lastRunAt = new Date().toISOString();
       saveState(state);
+
+      // Sincroniza o médico convidado na plataforma oficial Lovable Cloud (CRM)
+      await syncLeadToOfficialSupabase({
+        name: targetDoctor.name,
+        email: targetDoctor.email || null,
+        phone: targetPhone,
+        category: '1-medico',
+        source: targetDoctor.source || 'cadence_10min_inviter',
+        specialty: targetDoctor.specialty || '',
+        status: 'invited'
+      });
 
       const nextTime = new Date(Date.now() + CADENCE_MS).toLocaleTimeString('pt-BR');
       log(`✅ Convite entregue com sucesso! Aguardando 10 minutos para o próximo envio (próximo disparo às ${nextTime})...\n`);

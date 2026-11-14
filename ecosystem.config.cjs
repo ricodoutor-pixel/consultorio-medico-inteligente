@@ -209,6 +209,34 @@ module.exports = {
       env: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'cadence-10min-inviter',
+      script: 'scripts/agent_cadence_10min_inviter.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
+      name: 'email-bounce-guardian',
+      script: 'scripts/agent_email_bounce_and_reply_guardian.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '500M',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production'
+      }
     }
   ]
 };

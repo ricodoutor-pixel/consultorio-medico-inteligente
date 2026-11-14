@@ -34,6 +34,9 @@ interface Live {
   whatsOut24h: Val<number>;
   consult30dCount: Val<number>;
   ot30dCount: Val<number>;
+  platformUsers: Val<number>;
+  platformDoctors: Val<number>;
+  platformPaidCare: Val<number>;
   fetchedAt: number;
 }
 
@@ -67,6 +70,8 @@ async function loadLive(): Promise<Live> {
     profilesToday: supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", today),
     ratings: supabase.from("consultation_ratings").select("stars").gte("created_at", d30).limit(5000),
     ai: supabase.from("doctor_ai_usage").select("id", { count: "exact", head: true }).gte("created_at", today),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- RPC fora dos tipos gerados
+    platform: (supabase as any).rpc("public_platform_stats"),
   };
   const keys = Object.keys(q) as (keyof typeof q)[];
   const settled = await Promise.allSettled(keys.map((k) => q[k] as unknown as Promise<{ data: unknown; error: unknown; count?: number | null }>));
@@ -92,6 +97,8 @@ async function loadLive(): Promise<Live> {
   for (const s of subs) paidPlans[String(s.plan_tier || "premium")] = (paidPlans[String(s.plan_tier || "premium")] ?? 0) + 1;
   const stars = rows("ratings").map((r) => Number(r.stars)).filter((n) => n > 0);
   const ot24 = rows("ot24");
+  const pstats = res.platform?.data ?? null;
+  const pnum = (x: unknown): Val<number> => (pstats && typeof x === "number" ? x : null);
 
   const snap: LiveSnapshot = {
     nowMs,
@@ -130,6 +137,12 @@ async function loadLive(): Promise<Live> {
     whatsOut24h: count("waOut24"),
     consult30dCount: res.consult ? rows("consult").length : null,
     ot30dCount: res.otPaid || res.brisa ? rows("otPaid").length + rows("brisa").length : null,
+    platformUsers: pnum(pstats?.users_total),
+    platformDoctors: pnum(pstats?.doctors_total),
+    platformPaidCare:
+      pstats && typeof pstats.consultations_paid === "number" && typeof pstats.orientations_paid === "number"
+        ? pstats.consultations_paid + pstats.orientations_paid
+        : null,
     fetchedAt: nowMs,
   };
 }
@@ -270,6 +283,12 @@ export function LiveCommandCenter({ refreshSignal = 0 }: { refreshSignal?: numbe
         <Tile icon={MessageCircle} label="WhatsApp 24h" value={live.whatsIn24h == null ? "—" : `${NUM(live.whatsIn24h)} ↓ · ${NUM(live.whatsOut24h ?? 0)} ↑`} sub={`recebida ${formatAgo(sem("waIn") ? null : s.lastWhatsAppInIso, now)} · enviada ${formatAgo(s.lastWhatsAppOutIso, now)}`} status={alerts.some((a) => a.key === "whatsapp") ? "warning" : undefined} onClick={() => navigate("/admin/inbox")} />
         <Tile icon={CreditCard} label="Mercado Pago" value={sem("webhook") ? "—" : s.lastWebhookIso ? formatAgo(s.lastWebhookIso, now) : "nunca"} sub={webhookMin != null && webhookMin < 1440 ? "último aviso de pagamento recebido" : "sem aviso de pagamento nas últimas 24 h"} onClick={() => navigate("/admin/mp-webhooks")} />
         <Tile icon={AlertTriangle} label="Erros 24h" value={sem("errors") ? "—" : NUM(s.errors24h.length)} sub={`${NUM(s.notifyFailed)} aviso(s) de pagamento falho(s) · ${NUM(s.amountMismatch7d)} bloqueio(s) de valor`} status={alerts.find((a) => a.key === "errors" || a.key === "mismatch" || a.key === "notify")?.severity} onClick={() => navigate("/admin/monitoramento")} />
+      </Section>
+
+      <Section title="Totais da plataforma (desde o início)">
+        <Tile icon={Users} label="Cadastrados" value={v(live.platformUsers)} sub="total na Planta y Raiz" />
+        <Tile icon={Stethoscope} label="Profissionais" value={v(live.platformDoctors)} sub="na plataforma" />
+        <Tile icon={Activity} label="Atendimentos pagos" value={v(live.platformPaidCare)} sub="consultas + orientações pagas" />
       </Section>
     </section>
   );

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
-import { TrendingUp, Users, Stethoscope, Leaf, Activity } from "lucide-react";
+import { TrendingUp, Leaf } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -89,32 +89,6 @@ const CannabisMarketChart = () => {
   const data = mode === "planta" ? plantaData : mercadoData;
   const color = mode === "planta" ? "#39FF14" : "#FFD700";
   const gradientId = mode === "planta" ? "gradPlanta" : "gradMercado";
-  const fmt = (n?: number) => (stats && typeof n === "number" ? n.toLocaleString("pt-BR") : "…");
-
-  const liveCounters = [
-    {
-      icon: Users,
-      value: fmt(stats?.users_total),
-      label: "Cadastrados na Planta y Raiz",
-      color: "text-primary",
-      bg: "bg-primary/10 border-primary/20",
-    },
-    {
-      icon: Stethoscope,
-      value: fmt(stats?.doctors_total),
-      label: "Profissionais na plataforma",
-      color: "text-sky-400",
-      bg: "bg-sky-500/10 border-sky-500/20",
-    },
-    {
-      icon: Activity,
-      value: fmt(stats ? stats.consultations_paid + stats.orientations_paid : undefined),
-      label: "Atendimentos pagos realizados",
-      color: "text-emerald-400",
-      bg: "bg-emerald-500/10 border-emerald-500/20",
-    },
-  ];
-
   const last = projection[projection.length - 1];
   const signupRate = stats ? Math.round(recentMonthlyRate(stats.monthly, "signups")) : 0;
   const market2025 = market.find((m) => m.year === 2025)!;
@@ -145,34 +119,8 @@ const CannabisMarketChart = () => {
             Projeção de <span className="text-gradient-green">Crescimento</span> 2026–2030
           </h2>
           <p className="text-base md:text-lg text-muted-foreground font-medium">
-            Números reais da Planta y Raiz, ao vivo, comparados com o mercado brasileiro de cannabis medicinal
+            Projeção da Planta y Raiz comparada com o mercado brasileiro de cannabis medicinal
           </p>
-        </motion.div>
-
-        {/* Live Counters */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.15 }}
-        >
-          {liveCounters.map((c, i) => (
-            <Card key={i} className={`border ${c.bg}`}>
-              <CardContent className="p-4 md:p-6 flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${c.bg}`}>
-                  <c.icon size={22} className={c.color} />
-                </div>
-                <div className="min-w-0">
-                  <p className={`text-xl md:text-2xl font-display font-black ${c.color} tabular-nums`}>
-                    {c.value}
-                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 ml-2 animate-pulse" />
-                  </p>
-                  <p className="text-xs text-muted-foreground font-bold truncate">{c.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
         </motion.div>
 
         {/* Chart */}

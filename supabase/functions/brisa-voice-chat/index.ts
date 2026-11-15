@@ -3,12 +3,16 @@
 
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
-import { GATEWAY_GEMINI_PRIMARY } from "../_shared/gemini.ts";
+import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
 import { EDILSON_ON_SUPERVISION, OT_FIRST_STEP_NOTICE } from "../_shared/clinic-info.ts";
 
 /** Cérebro da Brisa por voz. Se o modelo não responder, cai no modelo padrão do gateway. */
 const BRISA_VOICE_MODEL = "google/gemini-3.8-flash";
 const MAX_REPLY_CHARS = 700;
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
+const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+/** Limite da tentativa rápida no modelo principal antes de usar o caminho de reserva. */
+const FAST_TIMEOUT_MS = 8000;
 
 /** Corta a resposta no fim de uma frase, para a voz nunca parar no meio de uma palavra. */
 function cortarEmFrase(texto: string, max: number): string {
@@ -172,15 +176,55 @@ Deno.serve(async (req) => {
     const perguntar = (model: string) =>
       processar_triagem_brisa(transcript, "monitoramento-saude-web", "web_voice", { history, systemPrompt, model, log: false });
 
-    let result = await perguntar(BRISA_VOICE_MODEL);
-    if (!result.ok || !result.reply) result = await perguntar(GATEWAY_GEMINI_PRIMARY);
+    // Voz precisa de resposta rápida: uma tentativa direta no modelo principal, com limite de
+    // tempo. Se falhar ou demorar, entra o caminho padrão (com repetição e provedores de reserva).
+    const t0 = Date.now();
+    let usedModel = BRISA_VOICE_MODEL;
+    let firstError = "";
+    let fastReply = "";
+    if (LOVABLE_API_KEY) {
+      try {
+        const res = await fetch(LOVABLE_URL, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          signal: AbortSignal.timeout(FAST_TIMEOUT_MS),
+          body: JSON.stringify({
+            model: BRISA_VOICE_MODEL,
+            messages: [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: transcript }],
+            temperature: 0.8,
+            top_p: 0.95,
+            max_tokens: 600,
+            reasoning: GATEWAY_NO_REASONING,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          fastReply = String(data?.choices?.[0]?.message?.content || "").trim();
+          if (!fastReply) firstError = "empty";
+        } else {
+          firstError = `http_${res.status}`;
+          console.error("[brisa-voice-chat] modelo principal", res.status, (await res.text().catch(() => "")).slice(0, 200));
+        }
+      } catch (e) {
+        firstError = e instanceof Error ? e.name : "exception";
+      }
+    } else {
+      firstError = "no_gateway_key";
+    }
+
+    let result = { ok: Boolean(fastReply), reply: fastReply };
+    if (!result.ok) {
+      usedModel = GATEWAY_GEMINI_PRIMARY;
+      result = await perguntar(GATEWAY_GEMINI_PRIMARY);
+    }
+    const meta = { model: usedModel, ms: Date.now() - t0, first_error: firstError || undefined };
 
     const reply = (result.reply || "Estou aqui com você. Pode me contar de novo o que está sentindo?")
       .replace(/[*_`#>]/g, "")
       .replace(/\s+/g, " ")
       .trim();
 
-    return json({ ok: true, transcript, reply: cortarEmFrase(reply, MAX_REPLY_CHARS) });
+    return json({ ok: true, transcript, reply: cortarEmFrase(reply, MAX_REPLY_CHARS), meta });
   } catch (e) {
     console.error("[brisa-voice-chat] error:", e);
     return json({ ok: true, reply: "Tive um probleminha agora, mas estou de volta. Pode repetir sua pergunta?" });

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Square, X, Send, Sparkles, AudioLines } from 'lucide-react';
+import { Mic, Square, X, Send, Sparkles, AudioLines, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
+import { brisaLinksFor, type BrisaLink } from '@/lib/brisa-links';
 
 import brisaImg from '@/assets/brisa-enfermeira.webp';
 
@@ -20,6 +22,7 @@ const SUGGESTIONS = [
   'Como meço meus batimentos pelo celular?',
   'Quais exames eu posso fazer aqui?',
   'Como marco uma consulta com um médico?',
+  'Quero me cadastrar',
 ];
 
 const PHASE_LABEL: Record<Phase, string> = {
@@ -97,6 +100,8 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
   const [reply, setReply] = useState('');
   const [typed, setTyped] = useState('');
   const [notice, setNotice] = useState('');
+  const [links, setLinks] = useState<BrisaLink[]>([]);
+  const signedInRef = useRef(false);
 
   const openRef = useRef(false);
   const phaseRef = useRef<Phase>('idle');
@@ -164,6 +169,7 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
       setNotice('');
       setHeard(q);
       setReply('');
+      setLinks([]);
       setPhase('thinking');
 
       let answer = '';
@@ -194,6 +200,10 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
         ].slice(-10);
       }
       setReply(answer);
+      // Atalho para o que a pessoa pediu; visitante sem conta sempre vê o convite ao cadastro.
+      const found = brisaLinksFor(q);
+      const hasSignup = found.some((l) => l.to.startsWith('/cadastro'));
+      setLinks(!signedInRef.current && !hasSignup ? [...found.slice(0, 2), { to: '/cadastro', label: 'Criar meu cadastro grátis' }] : found);
       speak(answer, !failed);
     },
     [setPhase, speak],
@@ -234,7 +244,7 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
       }
       heardRef.current = text;
       setHeard(text);
-      if (text.trim()) setReply('');
+      if (text.trim()) { setReply(''); setLinks([]); }
       clearTimer();
       if (isFinal) stopRecognition();
       else timerRef.current = setTimeout(() => stopRecognition(), END_OF_SPEECH_MS);
@@ -274,8 +284,10 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
     historyRef.current = [];
     setHeard('');
     setReply('');
+    setLinks([]);
     setNotice('');
     setOpen(true);
+    void supabase.auth.getSession().then(({ data }) => { signedInRef.current = Boolean(data.session); });
     if (question) void ask(question);
     else startListening();
   };
@@ -447,6 +459,20 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
                       >
                         {reply}
                       </motion.p>
+                    )}
+                    {reply && links.length > 0 && (
+                      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 pt-1">
+                        {links.map((l) => (
+                          <Link
+                            key={l.to + l.label}
+                            to={l.to}
+                            onClick={close}
+                            className="inline-flex items-center justify-between gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-lg transition-transform hover:scale-[1.03]"
+                          >
+                            {l.label} <ArrowRight size={16} />
+                          </Link>
+                        ))}
+                      </div>
                     )}
                     {!heard && !reply && (
                       <div className="text-center">

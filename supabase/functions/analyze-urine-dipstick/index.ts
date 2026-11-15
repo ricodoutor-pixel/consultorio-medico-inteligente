@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
+import { callGeminiApiWithFallback } from "../_shared/gemini.ts"
 import { requireAuthedUser, rateLimit, assertPayloadSize } from "../_shared/ai-guard.ts"
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
@@ -70,20 +71,12 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura:
       }
     };
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      }
-    )
-
-    const result = await response.json()
-
-    if (!response.ok) {
-      throw new Error(result.error?.message || "Failed to process image")
+    // Modelos gemini-1.5 foram desligados pelo Google; usa a cadeia atual com queda automática.
+    const geminiRes = await callGeminiApiWithFallback(GEMINI_API_KEY || "", requestBody)
+    if (!geminiRes.ok) {
+      throw new Error(geminiRes.data?.error?.message || "Falha ao processar com a IA")
     }
+    const result = geminiRes.data
 
     const aiResponseText = result.candidates[0].content.parts[0].text;
     let parsedResponse;

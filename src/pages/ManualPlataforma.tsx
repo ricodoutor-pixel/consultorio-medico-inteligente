@@ -236,7 +236,7 @@ export default function ManualPlataforma() {
     <div className="min-h-dvh bg-background text-foreground flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container max-w-6xl mx-auto pt-28 pb-20 px-4">
+      <main className="flex-1 container max-w-6xl mx-auto pt-[calc(var(--site-header-height,11.5rem)_+_1.5rem)] pb-20 px-4">
         
         {/* CABEÇALHO VIBRANTE */}
         <div className="text-center mb-10">

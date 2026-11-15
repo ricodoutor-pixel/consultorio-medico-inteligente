@@ -175,12 +175,12 @@ export default function MonitoramentoSaude() {
     <>
       <Helmet>
         <title>Monitoramento de Saúde | Planta y Raiz — Ferramentas de Diagnóstico com IA</title>
-        <meta name="description" content="Central de Monitoramento de Saúde da Planta y Raiz. 5 ferramentas de diagnóstico com IA: Monitor Cardíaco, Fundo de Olho, Oximetria SpO2, Dermatoscopia e Mobilidade Articular. Tudo pelo smartphone." />
+        <meta name="description" content="Central de Monitoramento de Saúde da Planta y Raiz. 11 exames de triagem com IA pelo celular: batimentos cardíacos, fundo de olho, oximetria, pele, mobilidade, ausculta, tremor, urina, visão e atividade física. A Enfª Brisa explica cada um por voz." />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalWebPage",
           name: "Monitoramento de Saúde - Planta y Raiz",
-          description: "Central de diagnóstico remoto com 5 ferramentas de IA",
+          description: "Central de triagem remota com 11 exames com IA pelo celular",
           medicalAudience: { "@type": "MedicalAudience", audienceType: "Patient" },
         })}</script>
       </Helmet>
@@ -207,14 +207,14 @@ export default function MonitoramentoSaude() {
                 </span>
               </h1>
               <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-                5 ferramentas de diagnóstico remoto alimentadas por inteligência artificial.
-                Realize exames pelo seu smartphone com segurança e precisão.
+                {tools.length} exames de triagem pelo celular, com inteligência artificial.
+                Escolha um exame abaixo ou pergunte à Enfª Brisa como cada um funciona.
               </p>
             </motion.div>
 
             {/* Enfª Brisa — assistente de voz, logo abaixo do texto */}
             <div className="mt-8 text-left">
-              <BrisaVoiceAssistant />
+              <BrisaVoiceAssistant activeExam={tools.find(t => t.id === activeTool)?.title} />
             </div>
           </div>
         </section>
@@ -292,28 +292,28 @@ export default function MonitoramentoSaude() {
                 {/* How it Works */}
                 <div className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 mb-8">
                   <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-violet-500" /> Como funciona nosso diagnóstico com IA
+                    <Brain className="w-5 h-5 text-violet-500" /> Como funcionam os exames com IA
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-black text-primary">1</div>
                       <div>
                         <p className="text-xs font-bold text-foreground">Captura</p>
-                        <p className="text-[11px] text-muted-foreground">Seu smartphone captura dados biométricos via câmera, flash e sensores.</p>
+                        <p className="text-[11px] text-muted-foreground">Seu celular capta imagem, som ou movimento pela câmera, flash, microfone e sensores.</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-black text-primary">2</div>
                       <div>
                         <p className="text-xs font-bold text-foreground">Análise IA</p>
-                        <p className="text-[11px] text-muted-foreground">O Gemini 2.5 Flash cruza seus dados com nosso banco de patologias e +40k estudos científicos.</p>
+                        <p className="text-[11px] text-muted-foreground">A inteligência artificial analisa o que foi captado e aponta sinais que merecem atenção.</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-black text-primary">3</div>
                       <div>
                         <p className="text-xs font-bold text-foreground">Resultado</p>
-                        <p className="text-[11px] text-muted-foreground">Receba um parecer técnico com patologias detectadas, recomendações e conexão com cannabis medicinal.</p>
+                        <p className="text-[11px] text-muted-foreground">Você recebe o resultado da triagem na hora e pode levar o relatório para a consulta com o médico.</p>
                       </div>
                     </div>
                   </div>

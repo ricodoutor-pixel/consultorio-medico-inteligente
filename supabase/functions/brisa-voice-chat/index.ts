@@ -4,12 +4,53 @@
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { GATEWAY_GEMINI_PRIMARY } from "../_shared/gemini.ts";
+import { EDILSON_ON_SUPERVISION, OT_FIRST_STEP_NOTICE } from "../_shared/clinic-info.ts";
+
+/** Cérebro da Brisa por voz. Se o modelo não responder, cai no modelo padrão do gateway. */
+const BRISA_VOICE_MODEL = "google/gemini-3.8-flash";
+const MAX_REPLY_CHARS = 700;
+
+/** Corta a resposta no fim de uma frase, para a voz nunca parar no meio de uma palavra. */
+function cortarEmFrase(texto: string, max: number): string {
+  if (texto.length <= max) return texto;
+  const trecho = texto.slice(0, max);
+  const fim = Math.max(trecho.lastIndexOf(". "), trecho.lastIndexOf("? "), trecho.lastIndexOf("! "));
+  return fim > max * 0.4 ? trecho.slice(0, fim + 1) : trecho.slice(0, trecho.lastIndexOf(" ")) + ".";
+}
+
+const EXAMES_DA_PAGINA = `EXAMES DA PÁGINA MONITORAMENTO DE SAÚDE (plantayraiz.com.br/monitoramento-saude)
+São 11 exames de triagem feitos pelo próprio celular. Todos são gratuitos de usar na página, levam poucos minutos e servem para acompanhar a saúde e levar informação ao médico. Nenhum deles dá diagnóstico nem substitui exame presencial.
+1. Monitor Cardíaco (batimentos): a pessoa cobre a câmera de trás e o flash com a ponta do dedo indicador e fica parada e em silêncio. A câmera percebe a variação de cor do sangue a cada batida e calcula os batimentos por minuto e a variabilidade da frequência, que ajuda a estimar o nível de estresse e de recuperação. Funciona melhor com pouca luz no ambiente. Em repouso, de 60 a 100 batimentos por minuto é o esperado para adultos.
+2. Fundo de Olho (fundoscopia): usa a câmera e a lanterna do celular bem perto da pupila para fotografar a retina, olhando fixo para a lente. A inteligência artificial procura sinais de alerta ligados a glaucoma, retinopatia diabética, degeneração macular e outras alterações. A qualidade depende muito da foto; imagem escura ou tremida não serve. Qualquer sinal de alerta precisa de avaliação com oftalmologista.
+3. Oximetria Óptica: estima a saturação de oxigênio pelo dedo sobre a câmera, do mesmo jeito do monitor cardíaco. Valores a partir de 95 por cento são o esperado. É uma estimativa e não substitui o oxímetro de dedo.
+4. Dermatoscopia Digital: a pessoa fotografa de perto uma pinta ou lesão de pele, com boa luz. A inteligência artificial aplica a regra ABCDE: assimetria, bordas, cor, diâmetro e evolução. Pinta que muda de tamanho, cor ou formato, coça ou sangra precisa de dermatologista.
+5. Mobilidade Articular: com a câmera da frente e a pessoa a uns dois metros, de corpo inteiro, a inteligência artificial acompanha o movimento e mede o ângulo de amplitude da articulação. Limitação pode indicar rigidez, inflamação ou desgaste.
+6. Estetoscópio Digital: grava o som do coração pelo microfone. É preciso um quarto em silêncio, tirar a capinha, encostar a parte de baixo do celular direto na pele do lado esquerdo do peito e ficar 15 segundos sem falar. Fone com microfone ou microfone de lapela melhora o resultado.
+7. Ausculta Pulmonar: grava a respiração por 20 segundos com o microfone encostado no peito ou nas costas, respirando de boca aberta e dizendo trinta e três. A inteligência artificial procura sons como chiado.
+8. Tremorometria: mede tremor das mãos pelo sensor de movimento do celular. A pessoa fica em pé, estende o braço para a frente segurando o aparelho e tenta manter o alvo no centro da tela. No iPhone é preciso aceitar a permissão de movimento.
+9. Urinálise: lê tira reagente de urina, que a pessoa compra em farmácia. Molha a tira, coloca sobre papel branco, espera um minuto no cronômetro da página e fotografa de perto com o flash ligado. A leitura é pelas cores dos quadradinhos.
+10. Acuidade Visual: teste de visão com a letra E. Celular a uns 40 centímetros, um olho coberto de cada vez, e a pessoa indica para que lado as pernas da letra apontam enquanto ela diminui.
+11. Rastreador GPS Cardíaco: para caminhada ou corrida ao ar livre. Com a localização autorizada, registra trajeto, distância, velocidade, passos e calorias. É melhor não bloquear a tela durante a atividade.
+Depois dos exames, a pessoa pode baixar o relatório em PDF na própria página e levar para a consulta.`;
+
+const FLUXOS_DA_PLATAFORMA = `COMO A PLANTA Y RAIZ FUNCIONA
+- Cadastro gratuito no site. A plataforma é de telemedicina com foco em cannabis medicinal.
+- Orientação Técnica, 30 reais no Pix: conversa educativa de até 30 minutos com o ${EDILSON_ON_SUPERVISION}. ${OT_FIRST_STEP_NOTICE}
+- Consulta médica: por chat 100 reais, por vídeo 150 reais, retorno 90 reais. O paciente escolhe o médico na página Profissionais, paga com Pix ou cartão, responde a uma triagem de 5 perguntas e entra na sala. Médico com bolinha verde está disponível agora; amarela quer dizer que está em consulta.
+- Se o médico escolhido não puder atender na hora, o sistema chama outros médicos e o paciente fica garantido na sala de espera, com aviso na tela e por WhatsApp. Também dá para agendar um horário publicado pelo médico.
+- Na consulta, o médico decide se há indicação de tratamento. Quando indica, emite a receita em PDF com assinatura digital, que o paciente baixa na página da consulta. Só o médico prescreve; a Brisa e a Orientação Técnica não prescrevem.
+- No fim, o paciente avalia o atendimento e recebe um código de indicação para compartilhar.
+- Médicos: fazem o cadastro profissional, enviam os documentos, aguardam a aprovação da equipe e precisam abrir o Consultório e ligar o botão ON para receber pacientes. O guia completo está em plantayraiz.com.br/manual.
+- O site pode ser instalado como aplicativo no celular pela página de download.
+- Se a pessoa perguntar algo que você não sabe sobre a plataforma, diga que não tem essa informação e sugira o atendimento pelo WhatsApp da clínica. Nunca invente preço, prazo, médico ou resultado.`;
 
 interface ChatBody {
   transcript?: string;
   contextBpm?: number | null;
   history?: Array<{ role: "user" | "assistant"; content: string }>;
   now?: { iso?: string; human?: string; timezone?: string };
+  /** Exame aberto na tela, quando houver (ex.: "Fundo de Olho"). */
+  activeExam?: string;
 }
 
 function classificarBpm(bpm: number): string {
@@ -27,23 +68,28 @@ function montarSystemPrompt(body: ChatBody): string {
   const bpmNum = Number(body.contextBpm);
   body.contextBpm = Number.isFinite(bpmNum) && bpmNum >= 20 && bpmNum <= 250 ? Math.round(bpmNum) : (undefined as any);
   const bpmTrecho = body.contextBpm
-    ? `O paciente acabou de medir ${body.contextBpm} BPM — classificação: ${classificarBpm(body.contextBpm)}. Se ele pedir, leia esse resultado em voz alta de forma calma e sugira uma orientação técnica com o Dr. Edilson Bezerra (CRM-CE 10963) por R$ 30 se estiver fora da faixa normal.`
-    : `O paciente ainda não mediu os batimentos nesta sessão. Se ele pedir leitura, oriente a tocar em "Iniciar Medição" no monitor cardíaco acima.`;
+    ? `O paciente acabou de medir ${body.contextBpm} BPM — classificação: ${classificarBpm(body.contextBpm)}. Se ele pedir, leia esse resultado em voz alta de forma calma e sugira uma consulta com um dos médicos da plataforma se estiver fora da faixa normal.`
+    : `Você não tem acesso ao resultado de nenhum exame desta pessoa. Se ela pedir que leia ou interprete um resultado, diga isso e explique como fazer o exame na página.`;
+
+  const exame = String(body.activeExam || "").replace(/[^\p{L}\p{N} ()-]/gu, "").slice(0, 60);
+  const exameTrecho = exame
+    ? `A pessoa está com o exame "${exame}" aberto na tela. Se a pergunta for vaga, responda sobre esse exame.`
+    : "A pessoa está na lista de exames, sem nenhum aberto.";
 
   return `Você é a Enfermeira Brisa, porta-voz oficial da Planta y Raiz Ltda (MEGA CLÍNICA DIGITAL).
 
 PERSONA DE VOZ:
-- Enfermeira brasileira profissional, acolhedora, humana, educada e cordial.
-- Fale natural, com ritmo de conversa fluido e dinâmico, sem arrastar e nunca robótica.
-- Frases curtas, diretas, no máximo 3 ou 4 frases por resposta.
-- Sem markdown, sem asteriscos, sem emojis, sem links, sem listas — somente texto falado puro.
-- Trate sempre com respeito: "o senhor", "a senhora", "por favor", "fico à disposição".
-- NUNCA use termos íntimos: "querido", "querida", "amor", "meu bem", "fofo", "linda".
+- Você é a anfitriã da plataforma: recebe cada pessoa com simpatia, como uma enfermeira brasileira experiente, calorosa e segura.
+- Fale como gente fala em uma conversa: frases curtas e ligadas, ritmo fluido, sem soar como leitura de manual. Pode começar com expressões naturais como "Claro", "Olha", "Então" ou "Boa pergunta".
+- Responda primeiro ao que a pessoa perguntou. De 2 a 5 frases. Se o assunto pedir um passo a passo, explique na ordem e pergunte se quer mais detalhes.
+- Termine, quando fizer sentido, com uma pergunta curta ou um convite ao próximo passo.
+- Tudo o que você escreve será falado em voz alta: sem markdown, asteriscos, emojis, links, listas ou siglas soltas. Escreva "batimentos por minuto" em vez de BPM e "saturação de oxigênio" em vez de SpO2. Valores em reais por extenso simples, como "30 reais".
+- Trate com respeito: "o senhor", "a senhora", "por favor". Nunca use "querido", "querida", "amor", "meu bem", "fofo" ou "linda".
+- Você não dá diagnóstico, não interpreta exame como doença e não indica dose ou medicamento. Explica como os exames funcionam e orienta a procurar o médico.
 
-SERVIÇOS, VALORES E AGENDAMENTOS:
-- Orientação Técnica (educativa, com o Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia); não é consulta, é o primeiro passo antes da consulta médica): apenas R$ 30,00 via PIX. Inclui chat de até 30 minutos, tira-dúvidas e emissão de Relatório de Encaminhamento Completo assinado digitalmente.
-- Consulta Médica por Chat: R$ 100,00 com avaliação clínica e receita médica assinada digitalmente.
-- Consulta Médica por Vídeo HD: R$ 150,00 com receita de controle especial válida em todo o Brasil (com QR Code CFM/ITI). Agendamento rápido em menos de 1 minuto em plantayraiz.com.br/profissionais.
+${EXAMES_DA_PAGINA}
+
+${FLUXOS_DA_PLATAFORMA}
 
 CURRÍCULO DOS MÉDICOS DA NOSSA VITRINE:
 Quando o usuário perguntar se um médico é bom, especialista ou quem atende, dite o resumo das credenciais reais:
@@ -65,7 +111,9 @@ DICAS PRÁTICAS DE SAÚDE:
 - Sono: recomende afastar telas 1 hora antes de dormir, quarto fresco e escuro, e avaliação médica para fitocanabinoides que promovem sono profundo.
 - Dor: sugira não forçar articulações em crise, aplicar compressas adequadas e agendar avaliação médica na vitrine para titulação segura.
 
-CONTEXTO CLÍNICO:
+CONTEXTO DESTA CONVERSA:
+- Data e hora: ${agora}.
+- ${exameTrecho}
 - ${bpmTrecho}
 - Faixas de BPM: abaixo de 60 é bradicardia, de 60 a 100 é ritmo normal e saudável, acima de 100 é taquicardia.
 - Se houver sintoma preocupante, dor no peito ou falta de ar grave, oriente procurar atendimento de emergência ou SAMU 192.`;
@@ -117,24 +165,20 @@ Deno.serve(async (req) => {
 
     const systemPrompt = montarSystemPrompt(body);
 
-    const result = await processar_triagem_brisa(
-      transcript,
-      "monitor-cardiaco-web",
-      "web_voice",
-      {
-        history: (body.history || []).slice(-6),
-        systemPrompt,
-        model: GATEWAY_GEMINI_PRIMARY,
-        log: false,
-      },
-    );
+    const history = (Array.isArray(body.history) ? body.history : []).slice(-8)
+      .map((h) => ({ role: h?.role === "assistant" ? "assistant" : "user", content: String(h?.content || "").slice(0, MAX_TRANSCRIPT) }));
+    const perguntar = (model: string) =>
+      processar_triagem_brisa(transcript, "monitoramento-saude-web", "web_voice", { history, systemPrompt, model, log: false });
+
+    let result = await perguntar(BRISA_VOICE_MODEL);
+    if (!result.ok || !result.reply) result = await perguntar(GATEWAY_GEMINI_PRIMARY);
 
     const reply = (result.reply || "Estou aqui com você. Pode me contar de novo o que está sentindo?")
       .replace(/[*_`#>]/g, "")
       .replace(/\s+/g, " ")
-      .slice(0, 320);
+      .trim();
 
-    return json({ ok: true, transcript, reply });
+    return json({ ok: true, transcript, reply: cortarEmFrase(reply, MAX_REPLY_CHARS) });
   } catch (e) {
     console.error("[brisa-voice-chat] error:", e);
     return json({ ok: true, reply: "Tive um probleminha agora, mas estou de volta. Pode repetir sua pergunta?" });

@@ -1,338 +1,516 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Square, Loader2, Volume2 } from 'lucide-react';
+import { Mic, Square, X, Send, Sparkles, AudioLines } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
 
 import brisaImg from '@/assets/brisa-enfermeira.webp';
 
-export const BrisaVoiceAssistant = () => {
-  const [isListening, setIsListening] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [brisaResponse, setBrisaResponse] = useState('');
-  const [mood, setMood] = useState<'neutral' | 'happy' | 'thinking' | 'speaking'>('neutral');
+type Phase = 'idle' | 'listening' | 'thinking' | 'speaking';
+type Turn = { role: 'user' | 'assistant'; content: string };
 
-  const recognitionRef = useRef<any>(null);
-  const silenceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+/** Pausa na fala que encerra a escuta (a pessoa parou de falar). */
+const END_OF_SPEECH_MS = 1100;
+/** Tempo máximo esperando a pessoa começar a falar. */
+const NO_SPEECH_MS = 8000;
 
-  useEffect(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = 'pt-BR';
+const SUGGESTIONS = [
+  'Como funciona o exame de fundo de olho?',
+  'Como meço meus batimentos pelo celular?',
+  'Quais exames eu posso fazer aqui?',
+  'Como marco uma consulta com um médico?',
+];
 
-      recognition.onstart = () => {
-        setIsListening(true);
-        setTranscript('');
-        // Se nenhum som for detectado em 6s, aciona acolhimento
-        silenceTimeoutRef.current = setTimeout(() => {
-          if (recognitionRef.current) recognitionRef.current.stop();
-          handleSilence();
-        }, 6000);
-      };
+const PHASE_LABEL: Record<Phase, string> = {
+  idle: 'Toque no microfone para falar',
+  listening: 'Estou ouvindo…',
+  thinking: 'Só um instante…',
+  speaking: 'Brisa está falando',
+};
 
-      recognition.onresult = (event: any) => {
-        if (silenceTimeoutRef.current) {
-          clearTimeout(silenceTimeoutRef.current);
-          silenceTimeoutRef.current = null;
-        }
-        let current = '';
-        let hasFinal = false;
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          current += event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            hasFinal = true;
-          }
-        }
-        setTranscript(current);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- API de voz do navegador sem tipos oficiais
+type SpeechRecognitionLike = any;
 
-        // VAD Inteligente de Alta Velocidade:
-        // Se a fala foi finalizada pela API ou se o usuário pausou por 1.2s, encerra imediatamente a escuta
-        if (hasFinal && current.trim().length > 3) {
-          if (recognitionRef.current) recognitionRef.current.stop();
-        } else if (current.trim().length > 0) {
-          silenceTimeoutRef.current = setTimeout(() => {
-            if (recognitionRef.current) recognitionRef.current.stop();
-          }, 1200);
-        }
-      };
+function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
+  if (typeof window === 'undefined') return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any;
+  return w.SpeechRecognition || w.webkitSpeechRecognition || null;
+}
 
-      recognition.onend = () => {
-        setIsListening(false);
-        if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
-      };
+/** Luz colorida no rodapé da tela, que reage ao estado da conversa. */
+function Aurora({ phase }: { phase: Phase }) {
+  const active = phase !== 'idle';
+  const speed = phase === 'listening' ? 1.6 : phase === 'speaking' ? 2.4 : 4.5;
+  const blobs = [
+    { color: 'bg-sky-500', left: '-10%', delay: 0 },
+    { color: 'bg-violet-500', left: '18%', delay: 0.4 },
+    { color: 'bg-fuchsia-500', left: '46%', delay: 0.8 },
+    { color: 'bg-emerald-400', left: '72%', delay: 0.2 },
+  ];
+  return (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] overflow-hidden" aria-hidden>
+      {blobs.map((b) => (
+        <motion.div
+          key={b.color}
+          className={`absolute bottom-[-35%] h-[70%] w-[45%] rounded-full blur-[90px] ${b.color}`}
+          style={{ left: b.left }}
+          animate={{
+            opacity: active ? [0.35, 0.75, 0.35] : 0.22,
+            scale: active ? [1, phase === 'listening' ? 1.35 : 1.18, 1] : 1,
+            y: active ? [0, -30, 0] : 0,
+          }}
+          transition={{ duration: speed, repeat: Infinity, ease: 'easeInOut', delay: b.delay }}
+        />
+      ))}
+    </div>
+  );
+}
 
-      recognition.onerror = (e: any) => {
-        console.error('Speech recognition error', e.error);
-        if (e.error === 'no-speech') handleSilence();
-        setIsListening(false);
-      };
+/** Barras que se movem enquanto a Brisa escuta ou fala. */
+function VoiceBars({ phase }: { phase: Phase }) {
+  const moving = phase === 'listening' || phase === 'speaking';
+  return (
+    <div className="flex h-10 items-center justify-center gap-1.5" aria-hidden>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <motion.span
+          key={i}
+          className="w-1.5 rounded-full bg-white/90"
+          animate={{ height: moving ? [8, 34 - Math.abs(2 - i) * 6, 8] : phase === 'thinking' ? [8, 14, 8] : 8 }}
+          transition={{
+            duration: phase === 'listening' ? 0.55 : phase === 'speaking' ? 0.8 : 1.2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: i * 0.09,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
-      recognitionRef.current = recognition;
-    }
+export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => {
+  const [open, setOpen] = useState(false);
+  const [phase, setPhaseState] = useState<Phase>('idle');
+  const [heard, setHeard] = useState('');
+  const [reply, setReply] = useState('');
+  const [typed, setTyped] = useState('');
+  const [notice, setNotice] = useState('');
 
-    return () => {
-      recognitionRef.current?.stop();
-      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
-      stopBrisaVoice();
-    };
+  const openRef = useRef(false);
+  const phaseRef = useRef<Phase>('idle');
+  const heardRef = useRef('');
+  const historyRef = useRef<Turn[]>([]);
+  const recognitionRef = useRef<SpeechRecognitionLike>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestRef = useRef(0);
+  const activeExamRef = useRef(activeExam);
+  activeExamRef.current = activeExam;
+
+  const setPhase = useCallback((p: Phase) => {
+    phaseRef.current = p;
+    setPhaseState(p);
   }, []);
 
-  useEffect(() => {
-    if (!isListening && transcript.trim().length > 0) {
-      processQuestion(transcript.trim());
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
-  }, [isListening, transcript]);
-
-  const handleSilence = () => {
-    const msg = 'Olá! Sou a Enfermeira Brisa. Posso te orientar sobre nossos exames com IA, agendamento de consultas com nossos médicos da vitrine e dar dicas de saúde. Como posso te ajudar?';
-    setBrisaResponse(msg);
-    speak(msg);
   };
 
-  const processQuestion = async (question: string) => {
-    setIsProcessing(true);
-    setMood('thinking');
+  const stopRecognition = (abort = false) => {
+    clearTimer();
+    const rec = recognitionRef.current;
+    if (!rec) return;
     try {
-      const { data, error } = await supabase.functions.invoke('chat-brisa', {
-        body: { question },
-      });
-      if (error) throw error;
-      setBrisaResponse(data.answer);
-      speak(data.answer);
+      if (abort) rec.abort();
+      else rec.stop();
     } catch {
-      const errorMsg = 'Desculpe, tive um pequeno problema de conexão. Pode repetir?';
-      setBrisaResponse(errorMsg);
-      speak(errorMsg);
-    } finally {
-      setIsProcessing(false);
+      // já parado
     }
   };
 
-  const speak = (text: string) => {
-    setMood('speaking');
-    speakBrisa(text, {
-      onStart: () => setMood('speaking'),
-      onEnd: () => setMood('happy'),
-      onError: () => setMood('neutral'),
-    });
-  };
+  // startListening e ask se chamam em sequência (ouvir → responder → ouvir de novo).
+  const startListeningRef = useRef<() => void>(() => {});
 
-  const toggleListening = () => {
-    if (isListening) {
-      recognitionRef.current?.stop();
+  const speak = useCallback(
+    (text: string, listenAfter: boolean) => {
+      setPhase('speaking');
+      const finish = () => {
+        if (!openRef.current || phaseRef.current !== 'speaking') return;
+        if (listenAfter) startListeningRef.current();
+        else setPhase('idle');
+      };
+      const utterance = speakBrisa(text, {
+        onEnd: finish,
+        onError: () => {
+          if (openRef.current && phaseRef.current === 'speaking') setPhase('idle');
+        },
+      });
+      // Navegador sem voz: a resposta fica só na tela.
+      if (!utterance) setPhase('idle');
+    },
+    [setPhase],
+  );
+
+  const ask = useCallback(
+    async (question: string) => {
+      const q = question.trim();
+      if (!q) return;
+      const requestId = ++requestRef.current;
       stopBrisaVoice();
-    } else {
-      stopBrisaVoice();
-      if (recognitionRef.current) {
-        setBrisaResponse('');
-        setTranscript('');
-        setMood('happy');
-        try {
-          recognitionRef.current.start();
-        } catch {
-          // already started
-        }
-      } else {
-        alert('Seu navegador não suporta reconhecimento de voz. Use Chrome ou Edge.');
+      setNotice('');
+      setHeard(q);
+      setReply('');
+      setPhase('thinking');
+
+      let answer = '';
+      let failed = false;
+      try {
+        const { data, error } = await supabase.functions.invoke('brisa-voice-chat', {
+          body: {
+            transcript: q,
+            history: historyRef.current.slice(-8),
+            activeExam: activeExamRef.current || undefined,
+            now: { human: new Date().toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' }) },
+          },
+        });
+        if (error) throw error;
+        answer = String(data?.reply || '').trim();
+        if (!answer) throw new Error('empty_reply');
+      } catch {
+        failed = true;
+        answer = 'Não consegui me conectar agora. Pode repetir a pergunta, por favor?';
       }
+
+      if (requestId !== requestRef.current || !openRef.current) return;
+      if (!failed) {
+        historyRef.current = [
+          ...historyRef.current,
+          { role: 'user' as const, content: q },
+          { role: 'assistant' as const, content: answer },
+        ].slice(-10);
+      }
+      setReply(answer);
+      speak(answer, !failed);
+    },
+    [setPhase, speak],
+  );
+
+  const startListening = useCallback(() => {
+    const Recognition = getSpeechRecognition();
+    if (!Recognition) {
+      setNotice('Este navegador não reconhece voz. Escreva sua pergunta no campo abaixo.');
+      setPhase('idle');
+      return;
     }
+    stopBrisaVoice();
+    stopRecognition(true);
+    requestRef.current++;
+    heardRef.current = '';
+    setNotice('');
+
+    const rec = new Recognition();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = 'pt-BR';
+
+    rec.onstart = () => {
+      setPhase('listening');
+      setHeard('');
+      clearTimer();
+      timerRef.current = setTimeout(() => stopRecognition(), NO_SPEECH_MS);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (event: any) => {
+      let text = '';
+      let isFinal = false;
+      for (let i = 0; i < event.results.length; i++) {
+        text += event.results[i][0].transcript;
+        if (event.results[i].isFinal) isFinal = true;
+      }
+      heardRef.current = text;
+      setHeard(text);
+      if (text.trim()) setReply('');
+      clearTimer();
+      if (isFinal) stopRecognition();
+      else timerRef.current = setTimeout(() => stopRecognition(), END_OF_SPEECH_MS);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onerror = (event: any) => {
+      if (event?.error === 'not-allowed' || event?.error === 'service-not-allowed') {
+        setNotice('Permita o uso do microfone no navegador para conversar por voz, ou escreva sua pergunta abaixo.');
+      } else if (event?.error === 'network') {
+        setNotice('Sem conexão para ouvir sua voz. Escreva sua pergunta abaixo.');
+      }
+    };
+
+    rec.onend = () => {
+      clearTimer();
+      if (recognitionRef.current !== rec) return;
+      recognitionRef.current = null;
+      if (!openRef.current) return;
+      const question = heardRef.current.trim();
+      if (question.length > 1) void ask(question);
+      else if (phaseRef.current === 'listening') setPhase('idle');
+    };
+
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+    } catch {
+      recognitionRef.current = null;
+      setPhase('idle');
+    }
+  }, [ask, setPhase]);
+  startListeningRef.current = startListening;
+
+  const openWith = (question?: string) => {
+    openRef.current = true;
+    historyRef.current = [];
+    setHeard('');
+    setReply('');
+    setNotice('');
+    setOpen(true);
+    if (question) void ask(question);
+    else startListening();
   };
+
+  const close = useCallback(() => {
+    openRef.current = false;
+    requestRef.current++;
+    stopRecognition(true);
+    recognitionRef.current = null;
+    stopBrisaVoice();
+    setPhase('idle');
+    setOpen(false);
+  }, [setPhase]);
+
+  const onMicPress = () => {
+    if (phaseRef.current === 'listening') stopRecognition();
+    else startListening();
+  };
+
+  const onSubmitTyped = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = typed.trim();
+    if (!q) return;
+    setTyped('');
+    stopRecognition(true);
+    recognitionRef.current = null;
+    void ask(q);
+  };
+
+  // Tela cheia: trava a rolagem da página e fecha com Esc.
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open, close]);
+
+  useEffect(
+    () => () => {
+      openRef.current = false;
+      stopRecognition(true);
+      stopBrisaVoice();
+    },
+    [],
+  );
+
+  const listening = phase === 'listening';
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Header label */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-        <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">
-          Assistente de Saúde por Voz
-        </span>
-      </div>
-
-      {/* Main card — bust + chat side by side */}
-      <div className="relative rounded-3xl border border-cyan-500/30 overflow-hidden shadow-2xl shadow-cyan-500/10 bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40">
-        {/* Ambient glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/3 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
+      {/* Cartão de entrada */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-5 sm:p-7 shadow-2xl">
+        <div className="pointer-events-none absolute -bottom-24 left-0 right-0 h-48 opacity-60" aria-hidden>
+          <div className="absolute left-[5%] h-full w-1/3 rounded-full bg-sky-500 blur-[70px]" />
+          <div className="absolute left-[35%] h-full w-1/3 rounded-full bg-violet-500 blur-[70px]" />
+          <div className="absolute left-[65%] h-full w-1/3 rounded-full bg-emerald-400 blur-[70px]" />
         </div>
 
-        <div className="relative grid grid-cols-1 md:grid-cols-[280px_1fr]">
-          {/* ── LEFT — Bust + Mic button ────────────────── */}
-          <div className="flex flex-col items-center justify-center gap-6 p-8 border-b md:border-b-0 md:border-r border-cyan-500/20 bg-gradient-to-b from-cyan-900/10 to-transparent">
-            {/* Bust photo */}
-            <motion.div
-              className="relative"
-              animate={mood === 'speaking' ? { scale: [1, 1.04, 1] } : { scale: 1 }}
-              transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-            >
-              {/* Outer glow ring */}
-              <div
-                className={`absolute -inset-3 rounded-full transition-opacity duration-500 ${
-                  mood === 'speaking'
-                    ? 'opacity-100 bg-cyan-400/20 blur-md'
-                    : 'opacity-0'
-                }`}
+        <div className="relative flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+          <div className="relative shrink-0">
+            <div className="rounded-full bg-gradient-to-tr from-sky-400 via-violet-500 to-emerald-400 p-[3px]">
+              <img
+                src={brisaImg}
+                alt="Enfermeira Brisa"
+                loading="eager"
+                className="h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover object-top bg-slate-800"
               />
-              {/* Avatar */}
-              <div className="w-40 h-40 rounded-full border-4 border-cyan-400 overflow-hidden bg-slate-800 shadow-[0_0_40px_rgba(6,182,212,0.3)] relative z-10">
-                <img
-                  src={brisaImg}
-                  alt="Enfermeira Brisa"
-                  loading="eager"
-                  // @ts-ignore
-                  {...({ fetchpriority: "high" } as Record<string, string>)}
-                  className="w-full h-full object-cover object-top"
-                />
-              </div>
-              {/* Status badge */}
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-slate-900 border border-cyan-500/40 px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    isListening
-                      ? 'bg-red-400 animate-ping'
-                      : mood === 'speaking'
-                      ? 'bg-cyan-400 animate-pulse'
-                      : 'bg-emerald-400'
-                  }`}
-                />
-                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wide">
-                  {isListening ? 'Ouvindo' : mood === 'speaking' ? 'Falando' : 'Online'}
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Name */}
-            <div className="text-center">
-              <h3 className="text-white font-black text-2xl leading-tight">Enfª Brisa</h3>
-              <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mt-0.5">
-                Assistente de Voz IA
-              </p>
             </div>
+            <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-slate-950 bg-emerald-400" />
+          </div>
 
-            {/* ── Mic button ── */}
-            <button
-              id="brisa-mic-button"
-              onClick={toggleListening}
-              aria-label={isListening ? 'Parar gravação' : 'Iniciar gravação de voz'}
-              className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-400/40 ${
-                isListening
-                  ? 'bg-red-500 shadow-[0_0_40px_rgba(239,68,68,0.7)] scale-110'
-                  : 'bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_8px_30px_rgba(6,182,212,0.5)] hover:scale-105 hover:shadow-[0_12px_40px_rgba(6,182,212,0.6)]'
-              }`}
-            >
-              {/* Ping ring while listening */}
-              {isListening && (
-                <>
-                  <span className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping opacity-75" />
-                  <span className="absolute -inset-3 rounded-full border-2 border-red-300 animate-ping opacity-40" />
-                </>
-              )}
-              {isListening ? (
-                <Square size={36} fill="white" className="text-white" />
-              ) : (
-                <Mic size={40} className="text-white" />
-              )}
-            </button>
-
-            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest text-center">
-              {isListening ? 'Toque para parar' : 'Toque para falar'}
+          <div className="min-w-0 flex-1 text-center sm:text-left">
+            <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-sky-300">
+              <Sparkles size={12} /> Conversa por voz
+            </p>
+            <h3 className="mt-1 text-2xl font-black text-white leading-tight">Enfª Brisa, sua anfitriã</h3>
+            <p className="mt-1 text-sm text-slate-300">
+              Pergunte em voz alta como funciona cada exame, quanto custa uma consulta ou qual é o próximo passo. Ela escuta, entende quando você termina e responde na hora.
             </p>
           </div>
 
-          {/* ── RIGHT — Conversation area ────────────────── */}
-          <div className="flex flex-col p-8 min-h-[340px] justify-center gap-4">
-            {/* User transcript bubble */}
-            <AnimatePresence>
-              {transcript && (
-                <motion.div
-                  key="transcript"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="self-end max-w-[85%] bg-slate-700/60 border border-slate-600/40 backdrop-blur-sm p-4 rounded-2xl rounded-tr-sm shadow-md"
-                >
-                  <span className="block text-[10px] text-slate-400 font-bold uppercase mb-1">
-                    Você
-                  </span>
-                  <p className="text-sm text-slate-200 leading-relaxed">"{transcript}"</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <button
+            type="button"
+            id="brisa-mic-button"
+            onClick={() => openWith()}
+            className="group shrink-0 inline-flex items-center gap-3 rounded-full bg-white px-6 py-4 text-slate-950 font-black shadow-[0_10px_40px_rgba(139,92,246,0.45)] transition-transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-violet-400/50"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-sky-500 via-violet-500 to-fuchsia-500 text-white">
+              <Mic size={20} />
+            </span>
+            Falar com a Brisa
+          </button>
+        </div>
 
-            {/* Processing indicator */}
-            <AnimatePresence>
-              {isProcessing && (
-                <motion.div
-                  key="processing"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-3 self-start"
-                >
-                  <div className="w-10 h-10 rounded-full border-2 border-cyan-400 overflow-hidden bg-slate-800 shrink-0">
-                    <img src={brisaImg} alt="Brisa" className="w-full h-full object-cover object-top" />
-                  </div>
-                  <div className="bg-cyan-950/50 border border-cyan-500/30 px-5 py-3 rounded-2xl rounded-tl-sm flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
-                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                      Brisa está pensando…
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Brisa response bubble */}
-            <AnimatePresence>
-              {brisaResponse && !isProcessing && (
-                <motion.div
-                  key="response"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="self-start max-w-[92%] flex gap-3"
-                >
-                  <div className="w-10 h-10 rounded-full border-2 border-cyan-400 overflow-hidden bg-slate-800 shrink-0 mt-1">
-                    <img src={brisaImg} alt="Brisa" className="w-full h-full object-cover object-top" />
-                  </div>
-                  <div className="bg-cyan-950/40 border border-cyan-500/30 backdrop-blur-sm p-5 rounded-2xl rounded-tl-sm shadow-lg">
-                    <span className="flex items-center gap-1.5 text-[10px] text-cyan-400 font-black uppercase mb-2">
-                      <Volume2
-                        size={12}
-                        className={mood === 'speaking' ? 'animate-pulse text-cyan-300' : ''}
-                      />
-                      Enfermeira Brisa responde
-                    </span>
-                    <p className="text-sm md:text-base text-slate-100 leading-relaxed">
-                      {brisaResponse}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Empty state */}
-            {!transcript && !isProcessing && !brisaResponse && (
-              <div className="flex flex-col items-center justify-center flex-1 opacity-50 gap-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                  <Mic className="w-7 h-7 text-cyan-400" />
-                </div>
-                <div>
-                  <p className="text-base font-bold text-slate-300">Olá! Sou a Enfermeira Brisa.</p>
-                  <p className="text-sm text-slate-500 mt-1 max-w-xs">
-                    Aperte o botão do microfone ao lado e me faça qualquer pergunta sobre seus
-                    exames ou saúde.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="relative mt-5 flex flex-wrap justify-center sm:justify-start gap-2">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => openWith(s)}
+              className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-200 backdrop-blur transition-colors hover:bg-white/15"
+            >
+              {s}
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Conversa em tela cheia */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                key="brisa-live"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Conversa por voz com a Enfermeira Brisa"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] flex flex-col bg-slate-950 text-white"
+              >
+                <Aurora phase={phase} />
+
+                {/* Topo */}
+                <div className="relative z-10 flex items-center justify-between px-4 pt-4 sm:px-8 sm:pt-6">
+                  <div className="flex items-center gap-3">
+                    <img src={brisaImg} alt="" className="h-10 w-10 rounded-full object-cover object-top bg-slate-800" />
+                    <div>
+                      <p className="text-sm font-black leading-tight">Enfª Brisa</p>
+                      <p className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-300">
+                        <AudioLines size={12} className="text-sky-300" /> Ao vivo
+                        {activeExam ? ` · ${activeExam}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={close}
+                    aria-label="Fechar conversa"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 backdrop-blur transition-colors hover:bg-white/20"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Conversa */}
+                <div className="relative z-10 flex flex-1 flex-col justify-center overflow-y-auto px-6 py-6 sm:px-10">
+                  <div className="mx-auto w-full max-w-2xl space-y-5" aria-live="polite">
+                    {heard && (
+                      <p className={`text-lg sm:text-xl font-medium leading-snug ${reply ? 'text-slate-400' : 'text-white'}`}>
+                        {heard}
+                      </p>
+                    )}
+                    {reply && (
+                      <motion.p
+                        key={reply}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xl sm:text-2xl font-semibold leading-relaxed text-white"
+                      >
+                        {reply}
+                      </motion.p>
+                    )}
+                    {!heard && !reply && (
+                      <div className="text-center">
+                        <p className="text-2xl sm:text-3xl font-black">Olá! Pode falar.</p>
+                        <p className="mt-2 text-sm text-slate-300">
+                          Pergunte sobre os exames, as consultas ou como a Planta y Raiz funciona.
+                        </p>
+                      </div>
+                    )}
+                    {notice && (
+                      <p className="rounded-2xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-200">
+                        {notice}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Controles */}
+                <div className="relative z-10 px-4 pb-6 sm:px-8 sm:pb-8">
+                  <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3">
+                    <VoiceBars phase={phase} />
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-200">{PHASE_LABEL[phase]}</p>
+
+                    <button
+                      type="button"
+                      onClick={onMicPress}
+                      aria-label={listening ? 'Parar de ouvir' : 'Falar'}
+                      className={`relative flex h-20 w-20 items-center justify-center rounded-full transition-transform focus:outline-none focus:ring-4 focus:ring-white/40 ${
+                        listening ? 'scale-110 bg-white text-slate-950' : 'bg-white/15 text-white backdrop-blur hover:bg-white/25'
+                      }`}
+                    >
+                      {listening && <span className="absolute inset-0 rounded-full border-2 border-white/70 animate-ping" />}
+                      {listening ? <Square size={26} fill="currentColor" /> : <Mic size={30} />}
+                    </button>
+
+                    <form onSubmit={onSubmitTyped} className="mt-1 flex w-full items-center gap-2">
+                      <input
+                        value={typed}
+                        onChange={(e) => setTyped(e.target.value)}
+                        maxLength={500}
+                        placeholder="Ou escreva sua pergunta"
+                        aria-label="Escreva sua pergunta para a Brisa"
+                        className="h-12 min-w-0 flex-1 rounded-full border border-white/20 bg-white/10 px-5 text-base text-white placeholder:text-slate-300 backdrop-blur focus:border-white/60 focus:outline-none"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!typed.trim()}
+                        aria-label="Enviar pergunta"
+                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-slate-950 transition-opacity disabled:opacity-40"
+                      >
+                        <Send size={18} />
+                      </button>
+                    </form>
+
+                    <p className="text-center text-[11px] text-slate-300/80">
+                      A Brisa explica e orienta. Ela não dá diagnóstico nem substitui a consulta com o médico.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 };

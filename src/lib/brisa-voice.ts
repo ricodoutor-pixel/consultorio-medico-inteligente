@@ -90,7 +90,7 @@ if (typeof window !== "undefined") {
  */
 export function getBrisaVoiceConfig(): BrisaVoiceConfig {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    return { voice: null, pitch: 1.03, rate: 1.10, isCertifiedFemale: false };
+    return { voice: null, pitch: 1.08, rate: 1.16, isCertifiedFemale: false };
   }
 
   let voices = cachedVoices;
@@ -112,7 +112,7 @@ export function getBrisaVoiceConfig(): BrisaVoiceConfig {
 
   if (ptVoices.length === 0) {
     // Se não há vozes em português cadastradas, usa pitch ligeiramente elevado para tom acolhedor
-    return { voice: null, pitch: 1.06, rate: 1.10, isCertifiedFemale: false };
+    return { voice: null, pitch: 1.1, rate: 1.16, isCertifiedFemale: false };
   }
 
   // 1. Blacklist ativa: remove sumariamente qualquer voz masculina identificada
@@ -142,10 +142,10 @@ export function getBrisaVoiceConfig(): BrisaVoiceConfig {
     const isCertifiedFemale = bestScore >= 70;
     return {
       voice: bestVoice,
-      // Vozes femininas certificadas usam pitch acústico natural (1.03); vozes neutras recebem leve ajuste (1.08)
-      // Cadência de 1.10 garante ritmo de fala humana dinâmica, sem arrastar nem soar robótica
-      pitch: isCertifiedFemale ? 1.03 : 1.08,
-      rate: 1.10,
+      // Vozes neurais (Edge "Natural") já soam humanas: tom natural e ritmo de conversa.
+      // As demais ganham um pouco mais de tom e de velocidade para não soarem arrastadas.
+      pitch: bestScore >= 100 ? 1.04 : isCertifiedFemale ? 1.1 : 1.14,
+      rate: bestScore >= 100 ? 1.12 : 1.18,
       isCertifiedFemale,
     };
   }
@@ -154,8 +154,8 @@ export function getBrisaVoiceConfig(): BrisaVoiceConfig {
   // aplicamos ajuste de pitch equilibrado (1.12) sem distorcer o processador de áudio
   return {
     voice: ptVoices[0],
-    pitch: 1.12,
-    rate: 1.10,
+    pitch: 1.2,
+    rate: 1.16,
     isCertifiedFemale: false,
   };
 }
@@ -182,18 +182,56 @@ export function cleanBrisaSpeechText(rawText: string): string {
     .trim();
 }
 
-// Referência ao timer do keep-alive anti-bug do Chromium
-let chromiumKeepAliveTimer: any = null;
+// Cada fala recebe um número; uma fala nova (ou stopBrisaVoice) invalida as anteriores.
+let speechGeneration = 0;
 
-function clearKeepAlive(): void {
-  if (chromiumKeepAliveTimer) {
-    clearInterval(chromiumKeepAliveTimer);
-    chromiumKeepAliveTimer = null;
+/**
+ * Divide o texto em trechos curtos, sempre no fim de uma frase.
+ * O Chromium trava falas com mais de ~15 s; trechos curtos evitam o problema sem
+ * pausar e retomar a voz no meio da frase (o que deixava a fala picada).
+ */
+export function splitBrisaSpeech(text: string, maxLen = 220): string[] {
+  const sentences = text.match(/[^.!?…]+[.!?…]+["”')]*|[^.!?…]+$/g) || [text];
+  const chunks: string[] = [];
+  let current = "";
+  for (const raw of sentences) {
+    const sentence = raw.trim();
+    if (!sentence) continue;
+    if (current && (current + " " + sentence).length > maxLen) {
+      chunks.push(current);
+      current = sentence;
+    } else {
+      current = current ? current + " " + sentence : sentence;
+    }
+    // Frase única longa demais: quebra na vírgula ou no espaço mais próximo.
+    while (current.length > maxLen) {
+      const slice = current.slice(0, maxLen);
+      const cut = Math.max(slice.lastIndexOf(", "), slice.lastIndexOf("; "));
+      const at = cut > maxLen * 0.4 ? cut + 1 : slice.lastIndexOf(" ");
+      if (at <= 0) break;
+      chunks.push(current.slice(0, at).trim());
+      current = current.slice(at).trim();
+    }
   }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
+/** Ajusta siglas e abreviações que o sintetizador lê de forma estranha. */
+function normalizeForSpeech(text: string): string {
+  return text
+    .replace(/\bEnf[ªa]\.?(?=\s)/gi, "Enfermeira")
+    .replace(/\bDra\.(?=\s)/g, "Doutora")
+    .replace(/\bDr\.(?=\s)/g, "Doutor")
+    .replace(/\bSpO2\b/gi, "saturação de oxigênio")
+    .replace(/\bBPM\b/g, "batimentos por minuto")
+    .replace(/\bIA\b/g, "inteligência artificial")
+    .replace(/R\$\s?(\d+)(?:,00)?(?![\d,])/g, "$1 reais");
 }
 
 /**
- * Fala o texto com a voz oficial feminina da Brisa.
+ * Fala o texto com a voz oficial feminina da Brisa, frase a frase e sem cortes.
+ * onStart dispara no início da primeira frase e onEnd no fim da última.
  */
 export function speakBrisa(
   text: string,
@@ -203,61 +241,56 @@ export function speakBrisa(
     return null;
   }
 
-  const cleanedText = cleanBrisaSpeechText(text);
+  const cleanedText = normalizeForSpeech(cleanBrisaSpeechText(text));
   if (!cleanedText) return null;
 
   try {
-    // Cancela qualquer fala anterior e limpa timers
-    clearKeepAlive();
+    const generation = ++speechGeneration;
     window.speechSynthesis.cancel();
 
     const config = getBrisaVoiceConfig();
-    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    const chunks = splitBrisaSpeech(cleanedText);
+    const utterances = chunks.map((chunk, index) => {
+      const utterance = new SpeechSynthesisUtterance(chunk);
+      utterance.lang = "pt-BR";
+      if (config.voice) utterance.voice = config.voice;
+      utterance.pitch = options?.pitch ?? config.pitch;
+      utterance.rate = options?.rate ?? config.rate;
+      utterance.volume = options?.volume ?? 1;
 
-    utterance.lang = "pt-BR";
-    if (config.voice) {
-      utterance.voice = config.voice;
-    }
-    utterance.pitch = options?.pitch ?? config.pitch;
-    utterance.rate = options?.rate ?? config.rate;
-    utterance.volume = options?.volume ?? 1;
-
-    utterance.onstart = () => {
-      options?.onStart?.();
-
-      // Bug do Chromium: se a fala durar mais de 15s, o navegador congela silenciosamente.
-      // Solução: pausar e retomar a cada 10s mantém o stream ativo.
-      clearKeepAlive();
-      chromiumKeepAliveTimer = setInterval(() => {
-        if (!window.speechSynthesis.speaking) {
-          clearKeepAlive();
-        } else {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
-        }
-      }, 10000);
-    };
-
-    utterance.onend = () => {
-      clearKeepAlive();
-      options?.onEnd?.();
-    };
-
-    utterance.onerror = (e) => {
-      clearKeepAlive();
-      options?.onError?.(e);
-    };
+      if (index === 0) {
+        utterance.onstart = () => {
+          if (generation === speechGeneration) options?.onStart?.();
+        };
+      }
+      if (index === chunks.length - 1) {
+        utterance.onend = () => {
+          if (generation === speechGeneration) options?.onEnd?.();
+        };
+      }
+      utterance.onerror = (e) => {
+        // "interrupted"/"canceled" acontecem quando uma fala nova substitui esta: não é erro.
+        if (generation !== speechGeneration) return;
+        if (e.error === "interrupted" || e.error === "canceled") return;
+        speechGeneration++;
+        try { window.speechSynthesis.cancel(); } catch { /* ignora */ }
+        options?.onError?.(e);
+      };
+      return utterance;
+    });
 
     // Pequeno delay defensivo para evitar bug de corte imediato do cancel() no Chrome
     setTimeout(() => {
+      if (generation !== speechGeneration) return;
       try {
-        window.speechSynthesis.speak(utterance);
+        for (const utterance of utterances) window.speechSynthesis.speak(utterance);
       } catch (err) {
         console.warn("[brisa-voice] Falha ao sintetizar voz:", err);
+        options?.onError?.(err);
       }
     }, 20);
 
-    return utterance;
+    return utterances[0] ?? null;
   } catch (err) {
     console.error("[brisa-voice] Erro crítico:", err);
     return null;
@@ -269,7 +302,7 @@ export function speakBrisa(
  */
 export function stopBrisaVoice(): void {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  clearKeepAlive();
+  speechGeneration++;
   try {
     window.speechSynthesis.cancel();
   } catch {

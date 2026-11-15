@@ -21,6 +21,8 @@ import {
 
 export const Navbar = () => {
   const navbarRef = useRef<HTMLElement>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const [bannerHeight, setBannerHeight] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout, signingOut } = useAccount();
   const navigate = useNavigate();
@@ -35,10 +37,12 @@ export const Navbar = () => {
     if (!navbar || !container) return;
     const measureHeader = () => {
       container.style.setProperty("--site-header-height", `${Math.ceil(navbar.getBoundingClientRect().bottom)}px`);
+      setBannerHeight(Math.ceil(bannerRef.current?.getBoundingClientRect().height ?? 0));
     };
     measureHeader();
     const observer = new ResizeObserver(measureHeader);
     observer.observe(navbar);
+    if (bannerRef.current) observer.observe(bannerRef.current);
     return () => {
       observer.disconnect();
       container.style.removeProperty("--site-header-height");
@@ -94,7 +98,7 @@ export const Navbar = () => {
         role="navigation"
         aria-label="Navegação principal"
       >
-        <HolidayPlantaoBanner />
+        <div ref={bannerRef}><HolidayPlantaoBanner /></div>
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
@@ -202,6 +206,16 @@ export const Navbar = () => {
                <Button size="sm" className="hidden sm:inline-flex bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse shadow-lg shadow-secondary/40" asChild>
                 <NavLink to="/telemedicina">CONSULTA</NavLink>
               </Button>
+              {/* Sair/Cadastro ficam nesta mesma linha: uma segunda linha aumentava o cabeçalho fixo e cobria o topo das páginas. */}
+              {user ? (
+                <Button variant="ghost" size="sm" disabled={signingOut} onClick={() => void logout()} aria-label="Sair da conta" className="h-8 px-2 text-xs font-bold text-destructive flex-shrink-0">
+                  <LogOut size={15} /><span className="hidden sm:inline ml-1">Sair</span>
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" asChild className="h-8 px-2 text-[11px] font-black rounded-lg border-primary/50 text-primary flex-shrink-0">
+                  <Link to="/cadastro">Cadastro</Link>
+                </Button>
+              )}
               <button
                 className="p-2 text-foreground flex-shrink-0 relative z-[60]"
                 onClick={() => setIsOpen(!isOpen)}
@@ -212,10 +226,10 @@ export const Navbar = () => {
             </div>
           </div>
         </div>
-        <div className="2xl:hidden flex justify-end items-center px-3 pb-1">
-          {user ? <Button variant="ghost" size="sm" disabled={signingOut} onClick={() => void logout()} className="h-7 text-xs text-destructive"><LogOut size={14} className="mr-1" />Sair da conta</Button> : <Button variant="ghost" size="sm" asChild className="h-7 text-xs"><Link to="/cadastro">Cadastro</Link></Button>}
-        </div>
       </nav>
+      {/* As páginas reservam espaço só para o menu. A faixa de avisos entra aqui, medida, para não
+          cobrir o topo de nenhuma página. A página inicial já usa --site-header-height sozinha. */}
+      {location.pathname !== "/" && bannerHeight > 0 && <div aria-hidden style={{ height: bannerHeight }} />}
 
       {/* MOBILE MENU OVERLAY - Embutido e Padronizado */}
       <div 

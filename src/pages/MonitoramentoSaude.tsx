@@ -189,8 +189,7 @@ export default function MonitoramentoSaude() {
 
       <main className="min-h-dvh bg-gradient-to-b from-background to-slate-950">
         {/* Hero */}
-        {/* Folga do topo acompanha a altura real do cabeçalho fixo (faixa + menu). */}
-        <section className="pt-[calc(var(--site-header-height,11.5rem)_+_1.5rem)] pb-12 px-4">
+        <section className="pt-24 pb-12 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

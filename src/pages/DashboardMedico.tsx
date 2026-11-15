@@ -156,8 +156,14 @@ const DashboardMedico = () => {
     setIsOnline(val);
     if (doctorData) {
       await supabase.from("doctors").update({ is_online: val }).eq("id", doctorData.id);
-      
-      toast({ title: val ? "Você está Online ✅" : "Você está Offline" });
+
+      if (val) {
+        // A presença real só é enviada pelo Consultório aberto (batimento a cada 30 s).
+        toast({ title: "ON ligado ✅", description: "Mantenha o Consultório aberto para receber pacientes." });
+        navigate("/consultorio");
+        return;
+      }
+      toast({ title: "Você está Offline" });
     }
   };
 

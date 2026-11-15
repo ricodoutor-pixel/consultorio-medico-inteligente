@@ -17,12 +17,9 @@ const EXPECTED_SERVICES = [
   'growth-engine',
   'lead-harvesters-master',
   'meta-social-engine',
-  'apify-lead-sync',
   'anvisa-rdc660-rpa',
-  'brevo-multi-pipeline',
   'partner-meeting-scheduler',
   'organic-analytics-reporter',
-  'cannabis-young-doctors-hunter',
   'cadence-10min-inviter',
   'email-bounce-guardian'
 ];

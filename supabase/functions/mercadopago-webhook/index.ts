@@ -491,6 +491,23 @@ Deno.serve(async (req) => {
         const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
         const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
         const amount = (payment.transaction_amount || 30).toFixed(2);
+        const grossVal = Number(payment.transaction_amount) || 30;
+        const feeVal = Math.round(grossVal * 0.07 * 100) / 100;
+        const payoutVal = Math.round((grossVal - feeVal) * 100) / 100;
+
+        // Grava na tabela oficial de pagamentos (payments) para contabilização no painel
+        await supabase.from("payments").upsert({
+          mp_payment_id: String(payment.id),
+          patient_id: metadata.user_id || null,
+          doctor_id: null,
+          gross_amount: grossVal,
+          platform_fee_pct: 7.00,
+          platform_fee_amount: feeVal,
+          doctor_net_amount: payoutVal,
+          status: "paid",
+          payment_method: "mercadopago",
+          paid_at: new Date().toISOString(),
+        }, { onConflict: "mp_payment_id" }).then(({ error }: { error?: any }) => error && console.warn("[brisa-orientacao] payments upsert", error.message));
 
         // Abre a sessão imediatamente; a próxima mensagem do paciente já entra na orientação paga.
         if (orientacaoPhone) {
@@ -664,6 +681,20 @@ Deno.serve(async (req) => {
       }, { onConflict: "payment_id" });
 
       if (approvedOk) {
+        // 3b. Grava na tabela oficial de pagamentos (payments) para contabilização no painel
+        await supabase.from("payments").upsert({
+          mp_payment_id: String(payment.id),
+          patient_id: orientacaoUserId || null,
+          doctor_id: null,
+          gross_amount: totalAmount || 30,
+          platform_fee_pct: 7.00,
+          platform_fee_amount: platformFee,
+          doctor_net_amount: doctorPayout,
+          status: "paid",
+          payment_method: "mercadopago",
+          paid_at: new Date().toISOString(),
+        }, { onConflict: "mp_payment_id" }).then(({ error }: { error?: any }) => error && console.warn("[orientacao] payments upsert", error.message));
+
         // 4. Libera a sessão da Orientação Técnica no banco com status 'ready' (AGENTS.md)
         if (orientacaoUserId && existingOrder?.flow_status !== "aguardando_pagamento" && canEnterOrientation({ status: orderStatus }, existingOrder?.triagem || {})) {
           let triageObj: Record<string, unknown> = existingOrder?.triagem || {};
@@ -1075,6 +1106,30 @@ Deno.serve(async (req) => {
             appointment_id: appointmentId,
           });
           if (mrErr) console.error("Medical record insert error:", mrErr);
+
+          // 2c. Registra em consultations e payments para a contabilidade da plataforma
+          const { data: consultationRow } = await supabase.from("consultations").upsert({
+            appointment_id: appointmentId,
+            patient_id: appt.patient_id,
+            doctor_id: appt.doctor_id,
+            status: "scheduled",
+            modality: appt.type === "chat" ? "chat" : "video",
+            created_at: new Date().toISOString(),
+          }, { onConflict: "appointment_id" }).select("id").maybeSingle();
+
+          await supabase.from("payments").upsert({
+            mp_payment_id: String(payment.id),
+            consultation_id: consultationRow?.id || null,
+            patient_id: appt.patient_id,
+            doctor_id: appt.doctor_id,
+            gross_amount: totalAmount,
+            platform_fee_pct: 7.00,
+            platform_fee_amount: platformFee,
+            doctor_net_amount: doctorPayout,
+            status: "paid",
+            payment_method: "mercadopago",
+            paid_at: new Date().toISOString(),
+          }, { onConflict: "mp_payment_id" }).then(({ error }: { error?: any }) => error && console.warn("[consultation] payments upsert", error.message));
 
           // 3. Record escrow transaction for revenue tracking
           const { error: escrowErr } = await supabase.from("escrow_transactions").insert({

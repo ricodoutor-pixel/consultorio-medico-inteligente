@@ -309,3 +309,20 @@ export function stopBrisaVoice(): void {
     // Ignora
   }
 }
+
+/**
+ * Libera a voz no navegador. Safari (iPhone) e alguns Android só deixam falar depois de uma fala
+ * iniciada dentro de um toque; como a resposta da Brisa chega depois de uma espera, chame isto
+ * no próprio toque do botão.
+ */
+export function primeBrisaVoice(): void {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  try {
+    const silent = new SpeechSynthesisUtterance(" ");
+    silent.volume = 0;
+    silent.lang = "pt-BR";
+    window.speechSynthesis.speak(silent);
+  } catch {
+    // Ignora
+  }
+}

@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, X, Send, Sparkles, AudioLines, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
+import { primeBrisaVoice, speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
 import { brisaLinksFor, type BrisaLink } from '@/lib/brisa-links';
+import { BRISA_VOICE_FALLBACK_CONTEXT, cleanFallbackReply } from '@/lib/brisa-voice-fallback';
 
 import brisaImg from '@/assets/brisa-enfermeira.webp';
 
@@ -16,6 +17,71 @@ type Turn = { role: 'user' | 'assistant'; content: string };
 const END_OF_SPEECH_MS = 1100;
 /** Tempo máximo esperando a pessoa começar a falar. */
 const NO_SPEECH_MS = 8000;
+
+/** Espera máxima pela função de voz antes de usar a reserva. */
+const PRIMARY_TIMEOUT_MS = 7000;
+/** Depois de uma falha da função de voz, a reserva atende direto por este tempo. */
+const PRIMARY_COOLDOWN_MS = 5 * 60_000;
+let primaryDownUntil = 0;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('timeout')), ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (error) => { clearTimeout(timer); reject(error); },
+    );
+  });
+}
+
+/**
+ * Pergunta à Brisa. Tenta a função de voz; se ela falhar ou demorar, usa a função do chat
+ * escrito com o contexto da página, para a conversa não ficar muda.
+ */
+async function askBrisa(question: string, history: Turn[], activeExam?: string): Promise<string> {
+  if (Date.now() >= primaryDownUntil) {
+    try {
+      const { data, error } = await withTimeout(
+        supabase.functions.invoke('brisa-voice-chat', {
+          body: {
+            transcript: question,
+            history,
+            activeExam: activeExam || undefined,
+            now: { human: new Date().toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' }) },
+          },
+        }),
+        PRIMARY_TIMEOUT_MS,
+      );
+      if (error) throw error;
+      const reply = String(data?.reply || '').trim();
+      if (reply) return reply;
+      throw new Error('empty_reply');
+    } catch {
+      primaryDownUntil = Date.now() + PRIMARY_COOLDOWN_MS;
+    }
+  }
+
+  const context = activeExam
+    ? `${BRISA_VOICE_FALLBACK_CONTEXT}\n\nA pessoa está com o exame "${activeExam}" aberto na tela.`
+    : BRISA_VOICE_FALLBACK_CONTEXT;
+  const { data, error } = await withTimeout(
+    supabase.functions.invoke('brisa-web-chat', {
+      body: {
+        messages: [
+          { role: 'user', content: context },
+          { role: 'assistant', content: 'Entendido. Vou responder por voz seguindo essas regras.' },
+          ...history,
+          { role: 'user', content: question },
+        ],
+      },
+    }),
+    20_000,
+  );
+  if (error) throw error;
+  const reply = cleanFallbackReply(String(data?.text || ''));
+  if (!reply) throw new Error('empty_reply');
+  return reply;
+}
 
 const SUGGESTIONS = [
   'Como funciona o exame de fundo de olho?',
@@ -175,17 +241,7 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
       let answer = '';
       let failed = false;
       try {
-        const { data, error } = await supabase.functions.invoke('brisa-voice-chat', {
-          body: {
-            transcript: q,
-            history: historyRef.current.slice(-8),
-            activeExam: activeExamRef.current || undefined,
-            now: { human: new Date().toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' }) },
-          },
-        });
-        if (error) throw error;
-        answer = String(data?.reply || '').trim();
-        if (!answer) throw new Error('empty_reply');
+        answer = await askBrisa(q, historyRef.current.slice(-8), activeExamRef.current);
       } catch {
         failed = true;
         answer = 'Não consegui me conectar agora. Pode repetir a pergunta, por favor?';
@@ -280,6 +336,7 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
   startListeningRef.current = startListening;
 
   const openWith = (question?: string) => {
+    primeBrisaVoice();
     openRef.current = true;
     historyRef.current = [];
     setHeard('');
@@ -303,6 +360,7 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
   }, [setPhase]);
 
   const onMicPress = () => {
+    primeBrisaVoice();
     if (phaseRef.current === 'listening') stopRecognition();
     else startListening();
   };
@@ -311,6 +369,7 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
     e.preventDefault();
     const q = typed.trim();
     if (!q) return;
+    primeBrisaVoice();
     setTyped('');
     stopRecognition(true);
     recognitionRef.current = null;

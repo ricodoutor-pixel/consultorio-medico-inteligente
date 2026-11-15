@@ -11,7 +11,9 @@ const BRISA_VOICE_MODEL = "google/gemini-3.8-flash";
 const MAX_REPLY_CHARS = 700;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
 const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-/** Limite da tentativa rápida no modelo principal antes de usar o caminho de reserva. */
+const GEMINI_API_KEY = Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") || Deno.env.get("GEMINI_API_KEY") || "";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+/** Limite de cada tentativa rápida antes de passar para a próxima. */
 const FAST_TIMEOUT_MS = 8000;
 
 /** Corta a resposta no fim de uma frase, para a voz nunca parar no meio de uma palavra. */
@@ -176,48 +178,58 @@ Deno.serve(async (req) => {
     const perguntar = (model: string) =>
       processar_triagem_brisa(transcript, "monitoramento-saude-web", "web_voice", { history, systemPrompt, model, log: false });
 
-    // Voz precisa de resposta rápida: uma tentativa direta no modelo principal, com limite de
-    // tempo. Se falhar ou demorar, entra o caminho padrão (com repetição e provedores de reserva).
+    // Voz precisa de resposta rápida: tentativas únicas, cada uma com limite de tempo, primeiro
+    // direto no Google (não depende dos créditos do gateway) e depois no gateway. Só se todas
+    // falharem entra o caminho padrão, que repete e usa provedores de reserva.
     const t0 = Date.now();
-    let usedModel = BRISA_VOICE_MODEL;
-    let firstError = "";
-    let fastReply = "";
-    if (LOVABLE_API_KEY) {
-      try {
-        const res = await fetch(LOVABLE_URL, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          signal: AbortSignal.timeout(FAST_TIMEOUT_MS),
-          body: JSON.stringify({
-            model: BRISA_VOICE_MODEL,
-            messages: [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: transcript }],
-            temperature: 0.8,
-            top_p: 0.95,
-            max_tokens: 600,
-            reasoning: GATEWAY_NO_REASONING,
-          }),
+    const messages = [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: transcript }];
+    const tentativas: Array<{ nome: string; url: string; key: string; body: Record<string, unknown>; ms: number }> = [];
+    if (GEMINI_API_KEY) {
+      for (const model of ["gemini-3.8-flash", "gemini-2.5-flash"]) {
+        tentativas.push({
+          nome: "google/" + model, url: GEMINI_URL, key: GEMINI_API_KEY, ms: FAST_TIMEOUT_MS,
+          body: { model, messages, temperature: 0.8, top_p: 0.95, max_tokens: 600, reasoning_effort: "none" },
         });
-        if (res.ok) {
-          const data = await res.json();
-          fastReply = String(data?.choices?.[0]?.message?.content || "").trim();
-          if (!fastReply) firstError = "empty";
-        } else {
-          firstError = `http_${res.status}`;
-          console.error("[brisa-voice-chat] modelo principal", res.status, (await res.text().catch(() => "")).slice(0, 200));
-        }
-      } catch (e) {
-        firstError = e instanceof Error ? e.name : "exception";
       }
-    } else {
-      firstError = "no_gateway_key";
+    }
+    if (LOVABLE_API_KEY) {
+      tentativas.push({
+        nome: "gateway/" + BRISA_VOICE_MODEL, url: LOVABLE_URL, key: LOVABLE_API_KEY, ms: FAST_TIMEOUT_MS,
+        body: { model: BRISA_VOICE_MODEL, messages, temperature: 0.8, top_p: 0.95, max_tokens: 600, reasoning: GATEWAY_NO_REASONING },
+      });
+    }
+
+    let usedModel = "";
+    let fastReply = "";
+    const falhas: string[] = [];
+    for (const t of tentativas) {
+      try {
+        const res = await fetch(t.url, {
+          method: "POST",
+          headers: { Authorization: "Bearer " + t.key, "Content-Type": "application/json" },
+          signal: AbortSignal.timeout(t.ms),
+          body: JSON.stringify(t.body),
+        });
+        if (!res.ok) {
+          falhas.push(t.nome + ":http_" + res.status);
+          console.error("[brisa-voice-chat]", t.nome, res.status, (await res.text().catch(() => "")).slice(0, 200));
+          continue;
+        }
+        const data = await res.json();
+        fastReply = String(data?.choices?.[0]?.message?.content || "").trim();
+        if (fastReply) { usedModel = t.nome; break; }
+        falhas.push(t.nome + ":empty");
+      } catch (e) {
+        falhas.push(t.nome + ":" + (e instanceof Error ? e.name : "exception"));
+      }
     }
 
     let result = { ok: Boolean(fastReply), reply: fastReply };
     if (!result.ok) {
-      usedModel = GATEWAY_GEMINI_PRIMARY;
+      usedModel = "padrao/" + GATEWAY_GEMINI_PRIMARY;
       result = await perguntar(GATEWAY_GEMINI_PRIMARY);
     }
-    const meta = { model: usedModel, ms: Date.now() - t0, first_error: firstError || undefined };
+    const meta = { model: usedModel, ms: Date.now() - t0, falhas: falhas.length ? falhas : undefined };
 
     const reply = (result.reply || "Estou aqui com você. Pode me contar de novo o que está sentindo?")
       .replace(/[*_`#>]/g, "")

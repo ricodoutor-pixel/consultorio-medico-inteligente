@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Professional } from "@/types/professional";
 import { professionals as baseProfessionals } from "@/data/professionals";
 import drCaioBonfaImg from "@/assets/dr-caio-bonfa.jpg";
+import draAlessandraAdamiImg from "@/assets/dra-alessandra-adami.jpg";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
@@ -50,6 +51,7 @@ interface DoctorRow {
  */
 const TREATED_AVATAR_FALLBACKS: Array<[string, string]> = [
   ["222711", drCaioBonfaImg],
+  ["184252", draAlessandraAdamiImg],
 ];
 
 export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: string | null): string {

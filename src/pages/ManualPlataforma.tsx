@@ -527,6 +527,22 @@ export default function ManualPlataforma() {
               ))}
             </div>
 
+            {/* ORIENTAÇÃO TÉCNICA: SÓ O DR. EDILSON BEZERRA ON */}
+            <ComicPanel color="amber">
+              <NarrationBox text="ORIENTAÇÃO TÉCNICA: SÓ O DR. EDILSON BEZERRA ON" color="amber" />
+              <p className="text-sm font-black text-amber-200 mb-3">
+                Você não atende, não oferece e não recebe pela Orientação Técnica. Essa modalidade é exclusiva do Dr. Edilson Bezerra ON.
+              </p>
+              <ul className="space-y-2 text-sm text-slate-200">
+                <li><strong className="text-white">O que é:</strong> uma conversa educativa de R$ 30 pelo chat. É a porta de entrada da plataforma para quem ainda não pode pagar uma consulta.</li>
+                <li><strong className="text-white">Quem atende:</strong> o Dr. Edilson Bezerra ON, um assistente de inteligência artificial supervisionado pelo Dr. Edilson Bezerra. Nenhum outro médico da vitrine realiza essa modalidade.</li>
+                <li><strong className="text-white">O que ela não faz:</strong> não é consulta, não dá diagnóstico e não emite receita. É só o início do cuidado.</li>
+                <li><strong className="text-white">Onde aparece:</strong> na página inicial e na página própria da Orientação Técnica. Ela não aparece no seu cartão nem no seu perfil.</li>
+                <li><strong className="text-white">O que chega até você:</strong> o paciente que precisa de consulta é orientado a escolher um médico na vitrine. Aí começa o seu trabalho, com consulta paga.</li>
+                <li><strong className="text-white">Os seus serviços:</strong> consulta por chat R$ 100, consulta por vídeo R$ 150 e retorno R$ 90, valores tabelados. Você escolhe apenas o valor da Consulta Premium (vídeo + chat), a partir de R$ 100.</li>
+              </ul>
+            </ComicPanel>
+
             {/* EXEMPLO DE GANHOS */}
             <ComicPanel color="purple">
               <NarrationBox text="EXEMPLO: QUANTO CHEGA NO SEU PIX" color="purple" />

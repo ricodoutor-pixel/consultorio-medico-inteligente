@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Professional } from "@/types/professional";
 import { professionals as baseProfessionals } from "@/data/professionals";
+import drCaioBonfaImg from "@/assets/dr-caio-bonfa.jpg";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
@@ -47,6 +48,10 @@ interface DoctorRow {
  * REGRA CRÍTICA: A imagem tratada oficial configurada tem prioridade absoluta.
  * Fotos informais ou fotos anexadas no cadastro NÃO podem sobrepor a foto tratada.
  */
+const TREATED_AVATAR_FALLBACKS: Array<[string, string]> = [
+  ["222711", drCaioBonfaImg],
+];
+
 export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: string | null): string {
   const n = (name || "").toLowerCase();
   const c = (crm || "").toLowerCase();
@@ -99,6 +104,10 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   // Se não é um profissional oficial tratado, usa o avatar atual se houver
   if (currentAvatar && currentAvatar.trim() !== "") {
     return currentAvatar;
+  }
+  // Médico sem foto anexada: usa a imagem preparada pela plataforma (uma linha por CRM).
+  for (const [crmNumber, image] of TREATED_AVATAR_FALLBACKS) {
+    if (c.includes(crmNumber)) return image;
   }
   return "";
 }

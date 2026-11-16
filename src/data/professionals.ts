@@ -7,6 +7,7 @@ import drSadiMentaImg from "@/assets/dr-sadi-menta.jpg";
 import cfmDrSadiMenta from "@/assets/cfm_prints/cfm-dr-sadi-menta.png";
 import draGeovanaTorresImg from "@/assets/dra-geovana-torres.jpg";
 import cfmDraGeovanaTorres from "@/assets/cfm_prints/cfm-dra-geovana-torres.png";
+import drCaioBonfaImg from "@/assets/dr-caio-bonfa.jpg";
 import draGeisellTorresImg from "@/assets/dra-geisell-torres.jpg";
 import cfmDraGeisellTorres from "@/assets/cfm_prints/cfm-dra-geisell-torres.png";
 import draGraceConceicaoImg from "@/assets/dra-grace-conceicao.jpg";
@@ -537,7 +538,7 @@ export const professionals: Professional[] = [
     rating: null,
     consults: 0,
     avatar: "CB",
-    imageUrl: "",
+    imageUrl: drCaioBonfaImg,
     online: false,
     cfmPrintUrl: "/cfm_prints/cfm-dr-caio-bonfa.png",
     paymentLink: "https://link.mercadopago.com.br/plantayraiz",

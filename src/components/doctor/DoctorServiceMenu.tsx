@@ -67,7 +67,7 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
   return (
     <div className="space-y-4">
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {SERVICE_MENU.map((item) => {
+        {SERVICE_MENU.filter((item) => item.sku !== "orientacao_tecnica").map((item) => {
           const Icon = ICONS[item.sku] ?? MessageSquare;
           const isLoading = loadingSku === item.sku;
           return (

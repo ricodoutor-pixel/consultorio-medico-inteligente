@@ -58,7 +58,7 @@ function useRotatingOnline(base: Professional[]): Professional[] {
 
 
 const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
-  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${name}`);
+  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta com ${name}`);
   return (
     <a
       href={`https://wa.me/${BRISA_WHATSAPP}?text=${message}`}
@@ -95,10 +95,14 @@ const getDoctorSealTier = (p: Professional) => {
 };
 
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
+// Cartões médicos mostram só consultas; a Orientação Técnica (R$ 30) é exclusiva do Dr. Edilson Bezerra ON.
+const DOCTOR_CARD_SERVICES = SERVICE_MENU.filter((s) => s.sku !== "orientacao_tecnica");
+const DOCTOR_CARD_FROM_PRICE = SERVICE_MENU.find((s) => s.sku === "consulta_chat")?.price ?? 100;
+
 const ServiceTagsRow = () => (
 
   <div className="flex flex-wrap gap-1 mb-3">
-    {SERVICE_MENU.map((s) => (
+    {DOCTOR_CARD_SERVICES.map((s) => (
       <span
         key={s.sku}
         className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary"
@@ -178,7 +182,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
         "bestRating": 5,
         "worstRating": 1
       } : undefined,
-      "priceRange": "R$ 30 - R$ 150",
+      "priceRange": "R$ 90 - R$ 180",
       "telephone": pro.whatsapp ? `+${pro.whatsapp}` : "+5511991363154",
       "address": {
         "@type": "PostalAddress",
@@ -273,7 +277,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
-              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {formatBRL(SERVICE_MENU[0].price)} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
+              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {formatBRL(DOCTOR_CARD_FROM_PRICE)} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
               <div className="space-y-2.5">
                 <Button
                   size="lg"
@@ -625,21 +629,20 @@ const Profissionais = () => {
 
                         {/* Footer do card */}
                         <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                          <span className="text-lg font-display font-black text-gradient-green">a partir de {formatBRL(SERVICE_MENU[0].price)}</span>
+                          <span className="text-lg font-display font-black text-gradient-green">a partir de {formatBRL(DOCTOR_CARD_FROM_PRICE)}</span>
                           <span className="text-[10px] text-primary font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
                             Ver perfil <ArrowRight size={12} />
                           </span>
                         </div>
 
-                        {/* Orientação Técnica → página única com pagamento, triagem e sala */}
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate("/orientacao-tecnica");
+                            navigate(`/agendamento?pro=${p.id}`);
                           }}
                           className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10 shadow-md shadow-green-600/20"
                         >
-                          <Zap size={14} /> Orientação Técnica — R$ 30
+                          <Calendar size={14} /> Agendar Consulta
                         </Button>
                         {/* Contato com a Enfª Brisa via WhatsApp (separado) */}
                         <Button

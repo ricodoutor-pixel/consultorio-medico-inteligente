@@ -78,6 +78,8 @@ export type Professional = {
   cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
+  /** Texto conferido pela plataforma: a apresentação escrita no cadastro não o substitui. */
+  bioLocked?: boolean;
 }
 
 export const COUNCIL_CONFIG: Record<string, {
@@ -524,7 +526,8 @@ export const professionals: Professional[] = [
     id: "med-caio-bonfa",
     name: "Dr. Caio Victor Lopes Bonfa",
     category: "Médicos Prescritores",
-    bio: "Médico graduado pela Universidade Federal de Minas Gerais (UFMG) em 2021. Inscrito no CRM 222711/SP desde 2021, com situação regular no CFM. Atua em Clínica Geral.",
+    bio: "Olá! Que bom ter você por aqui. Sou o Caio, médico formado pela Universidade Federal de Minas Gerais (UFMG) em 2021. Atuo em clínica geral e medicina de família e trabalho com medicina canábica desde 2023. Acredito que a medicina está em constante evolução, por isso estou sempre debruçado em novas evidências e estudos para construir o melhor plano de cuidado junto com cada paciente. Meu foco é o atendimento humanizado e centrado em você: mais do que tratar sintomas isolados, quero entender sua rotina, sua história e seus objetivos de vida para traçarmos um caminho que faça sentido de verdade. Será um prazer te ajudar nessa jornada rumo a mais qualidade de vida e bem-estar.",
+    bioLocked: true,
     flags: ["🇧🇷"],
     experience: "5 anos",
     tags: ["Clínica Geral", "Prescritor"],

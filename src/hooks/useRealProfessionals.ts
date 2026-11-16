@@ -293,7 +293,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         crm: registration,
         imageUrl: treatedAvatar || base.imageUrl,
         cfmPrintUrl: cfmPrint,
-        bio: (matchedDb.bio && matchedDb.bio.trim() !== "") ? matchedDb.bio.trim() : base.bio,
+        bio: (!base.bioLocked && matchedDb.bio && matchedDb.bio.trim() !== "") ? matchedDb.bio.trim() : base.bio,
         online: presence.isOnlineForVitrine,
         presenceState: presence.state,
         lastSeenOnline: matchedDb.last_seen_online ?? null,

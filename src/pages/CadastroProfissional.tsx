@@ -256,6 +256,7 @@ const CadastroProfissional = () => {
   });
 
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
   // KYC uploads
@@ -320,6 +321,26 @@ const CadastroProfissional = () => {
       return;
     }
     setKycFiles((p) => ({ ...p, [kind]: f }));
+  };
+
+  // Foto de rosto obrigatória: é a origem da imagem do cartão na vitrine.
+  const handleProfilePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    if (f && !/^image\/(jpeg|png|webp)$/.test(f.type)) {
+      toast({ title: "Envie uma foto em JPG ou PNG", description: "PDF e outros formatos não servem para a foto do perfil.", variant: "destructive" });
+      e.target.value = "";
+      return;
+    }
+    if (f && f.size > MAX_KYC_BYTES) {
+      toast({ title: "Foto muito grande", description: "Máximo 10MB.", variant: "destructive" });
+      e.target.value = "";
+      return;
+    }
+    setKycFiles((p) => ({ ...p, selfie: f }));
+    setProfilePhotoPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return f ? URL.createObjectURL(f) : null;
+    });
   };
 
   // Adjust document types when country changes
@@ -459,6 +480,15 @@ const CadastroProfissional = () => {
       return;
     }
 
+    if (!kycFiles["selfie"]) {
+      toast({
+        title: "Falta a sua foto de rosto",
+        description: "Anexe uma foto de frente, com boa luz e fundo claro. Ela aparece no seu cartão para os pacientes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validação de Documentos KYC
     if (isInternational) {
       if (!kycFiles["passport_signature"] && !kycFiles["id_front"]) {
@@ -522,6 +552,22 @@ const CadastroProfissional = () => {
         console.warn("[CadastroProfissional] referral link", e);
       }
 
+      let avatarPublicUrl: string | null = null;
+      const profilePhoto = kycFiles["selfie"];
+      if (profilePhoto) {
+        try {
+          const photoExt = (profilePhoto.name.split(".").pop() || "jpg").toLowerCase().slice(0, 5);
+          const { error: avatarErr, data: avatarData } = await supabase.storage
+            .from("avatars")
+            .upload(`${userId}/perfil_${Date.now()}.${photoExt}`, profilePhoto, { upsert: true, contentType: profilePhoto.type || undefined });
+          if (!avatarErr && avatarData?.path) {
+            avatarPublicUrl = supabase.storage.from("avatars").getPublicUrl(avatarData.path).data?.publicUrl || null;
+          }
+        } catch (err) {
+          console.warn("[CadastroProfissional] foto de perfil", err);
+        }
+      }
+
       // 2) Registrar perfil e dados do profissional via RPC
       const { error: rpcErr } = await (supabase.rpc as any)("register_new_doctor", {
         p_user_id: userId,
@@ -538,7 +584,7 @@ const CadastroProfissional = () => {
         p_document_type: documentType,
         p_plan_tier: form.plano || 'free',
         p_price_video_chat: Math.min(2000, Math.max(100, Number(form.pricePremium) || PREMIUM_SUGGESTED_PRICE)),
-        p_avatar_url: fotoPreview || null,
+        p_avatar_url: avatarPublicUrl || fotoPreview || null,
         p_pix_key: form.pixKey || null,
         p_pix_type: form.pixType || null
       });
@@ -1157,6 +1203,19 @@ const CadastroProfissional = () => {
 
                     {/* 🔐 Uploads de Documentos (Frente / Verso / Passaporte / Carimbo) */}
                     <div className="mt-4 space-y-3 border rounded-xl p-4 bg-muted/20">
+                      <div className="rounded-xl border border-primary/40 bg-primary/5 p-3 space-y-2">
+                        <Label htmlFor="profilePhoto" className="text-xs font-black text-foreground">Foto de rosto para o seu cartão *</Label>
+                        <div className="flex items-center gap-3">
+                          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-border bg-muted">
+                            {profilePhotoPreview && <img src={profilePhotoPreview} alt="Prévia da sua foto" className="h-full w-full object-cover" />}
+                          </div>
+                          <Input id="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp" onChange={handleProfilePhoto} className="bg-muted border-border text-xs" />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          Obrigatória. Foto de frente, só você, com boa luz e fundo claro, sem óculos escuros nem filtro. É a foto que os pacientes veem no seu cartão. Não envie a foto do CFM nem de documento.
+                        </p>
+                      </div>
+
                       <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
                         <Upload size={14} className="text-primary" /> Anexo de Documentos Comprobatórios (Frente & Verso)
                       </p>

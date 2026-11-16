@@ -33,7 +33,7 @@ export default function DoctorPlanViewerModal({ open, onClose, doctor }: Props) 
 
   if (!doctor) return null;
 
-  const isVictor = doctor.doctor_name.toLowerCase().includes("victor") || doctor.doctor_crm.includes("206873");
+  const isVictor = /victor.*fonseca|victor henrique/.test(doctor.doctor_name.toLowerCase() ?? "") || doctor.doctor_crm.includes("206873");
   const isMilton = doctor.doctor_name.toLowerCase().includes("milton") || doctor.doctor_crm.includes("58169");
   const isVip = isVictor || isMilton || Boolean(doctor.is_vip) || doctor.plan_tier === "vip" || doctor.plan_tier === "premium";
   

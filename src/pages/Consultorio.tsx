@@ -69,8 +69,8 @@ const Consultorio = () => {
         .maybeSingle()).data;
 
       const isVictorUser = Boolean(
-        user.email?.toLowerCase().includes("victor") ||
-        profileData?.full_name?.toLowerCase().includes("victor") ||
+        /victor.*fonseca|victor henrique/.test(user.email?.toLowerCase() ?? "") ||
+        /victor.*fonseca|victor henrique/.test(profileData?.full_name?.toLowerCase() ?? "") ||
         doctorData?.crm === "206873" ||
         doctorData?.id === "med-victor-fonseca"
       );

@@ -48,7 +48,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
   const list: (DoctorRecord & { docsCount?: number })[] = doctors && doctors.length > 0 
     ? doctors.map((d) => ({
         ...d,
-        docsCount: (d as any).docsCount ?? (d.name.toLowerCase().includes("victor") ? 8 : 0),
+        docsCount: (d as any).docsCount ?? (/victor.*fonseca|victor henrique/.test(d.name.toLowerCase() ?? "") ? 8 : 0),
       }))
     : dbDoctors.map((d) => ({
         id: d.id,
@@ -356,9 +356,9 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
                           doctor_name: d.name,
                           doctor_crm: d.crm,
                           doctor_crm_uf: d.crm_state || "SP",
-                          plan_tier: d.name.toLowerCase().includes("victor") ? "vip_prescritor" : "standard",
-                          is_vip: d.name.toLowerCase().includes("victor") || d.name.toLowerCase().includes("edilson") || d.name.toLowerCase().includes("suelen") || d.name.toLowerCase().includes("olivia"),
-                          subscription_status: d.name.toLowerCase().includes("victor") ? "active" : "pending",
+                          plan_tier: /victor.*fonseca|victor henrique/.test(d.name.toLowerCase() ?? "") ? "vip_prescritor" : "standard",
+                          is_vip: /victor.*fonseca|victor henrique/.test(d.name.toLowerCase() ?? "") || d.name.toLowerCase().includes("edilson") || d.name.toLowerCase().includes("suelen") || d.name.toLowerCase().includes("olivia"),
+                          subscription_status: /victor.*fonseca|victor henrique/.test(d.name.toLowerCase() ?? "") ? "active" : "pending",
                           payment_link: "https://www.asaas.com/c/planta-y-raiz-vip-medico",
                         })}
                         className="h-7 text-[10px] rounded-lg px-2 border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold"

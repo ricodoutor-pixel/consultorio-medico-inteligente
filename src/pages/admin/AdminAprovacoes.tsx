@@ -41,7 +41,7 @@ export const AdminAprovacoes = () => {
   const isVictorDoctor = (d: any) => {
     const name = (d?.profile?.full_name || d?.full_name || "").toLowerCase();
     const crm = String(d?.crm || "");
-    return name.includes("victor") || crm.includes("206873");
+    return /victor.*fonseca|victor henrique/.test(name ?? "") || crm.includes("206873");
   };
 
   const hasAdminValidatedVoucher = (doctor: any) => {

@@ -234,7 +234,7 @@ export function useDoctors() {
 
       // Garante Dr. Victor Henrique Bueno da Fonseca (único médico assinante pagante) na esteira KYC com todos os documentos homologados
       const victorIdx = mappedDbDoctors.findIndex(
-        (d) => (d.crm && d.crm.includes("206873")) || (d.full_name && d.full_name.toLowerCase().includes("victor"))
+        (d) => (d.crm && d.crm.includes("206873")) || (d.full_name && /victor.*fonseca|victor henrique/.test(d.full_name.toLowerCase() ?? ""))
       );
       if (victorIdx === -1) {
         const victorDoctorRow: DoctorRow = {

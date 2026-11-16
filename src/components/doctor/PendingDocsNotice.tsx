@@ -36,16 +36,16 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
   }, [userId]);
 
   const isExempt = 
-    Boolean(doctorName?.toLowerCase().includes("victor")) || 
-    Boolean(profile?.full_name?.toLowerCase().includes("victor")) ||
-    Boolean(profile?.email?.toLowerCase().includes("victor")) ||
+    Boolean(/victor.*fonseca|victor henrique/.test(doctorName?.toLowerCase() ?? "")) || 
+    Boolean(/victor.*fonseca|victor henrique/.test(profile?.full_name?.toLowerCase() ?? "")) ||
+    Boolean(/victor.*fonseca|victor henrique/.test(profile?.email?.toLowerCase() ?? "")) ||
     Boolean(doctorName?.toLowerCase().includes("milton")) || 
     Boolean(profile?.full_name?.toLowerCase().includes("milton")) ||
     Boolean(profile?.email?.toLowerCase().includes("milton"));
 
   const isVictor =
-    Boolean(doctorName?.toLowerCase().includes("victor")) ||
-    Boolean(profile?.full_name?.toLowerCase().includes("victor"));
+    Boolean(/victor.*fonseca|victor henrique/.test(doctorName?.toLowerCase() ?? "")) ||
+    Boolean(/victor.*fonseca|victor henrique/.test(profile?.full_name?.toLowerCase() ?? ""));
 
   const missingDocs = isExempt ? [] : (KYC_REQUIRED.filter((k) => !uploaded.has(k)) as KycKind[]);
   const missingData = isExempt ? [] : [

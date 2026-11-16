@@ -88,7 +88,7 @@ const isVipDoctor = (p: Professional) => {
 const getDoctorSealTier = (p: Professional) => {
   const name = (p.name || "").toLowerCase();
   const crm = (p.crm || "");
-  if (p.plan_tier === "vip" || p.plan_tier === "vip_prescritor" || p.plan_tier === "premium" || name.includes("victor") || name.includes("milton") || crm.includes("206873") || crm.includes("58169")) {
+  if (p.plan_tier === "vip" || p.plan_tier === "vip_prescritor" || p.plan_tier === "premium" || /victor.*fonseca|victor henrique/.test(name ?? "") || name.includes("milton") || crm.includes("206873") || crm.includes("58169")) {
     return "premium";
   }
   return "basic";

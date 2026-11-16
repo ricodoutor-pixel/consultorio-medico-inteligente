@@ -490,7 +490,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     // Médicos Assinantes VIP na vitrine médica (Dr. Victor #1 e Dr. Milton #2)
     // 1. Dr. Victor Henrique Bueno da Fonseca (posição 0)
     const victorIdx = medicos.findIndex(
-      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor")
+      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || /victor.*fonseca|victor henrique/.test(m.name.toLowerCase())
     );
     let victorDoc: typeof medicos[0] | null = null;
     if (victorIdx >= 0) {

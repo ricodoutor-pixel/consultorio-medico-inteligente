@@ -4,6 +4,7 @@
  * salvos em public/cfm_prints/ e src/assets/cfm_prints/
  */
 export const DOCTOR_CFM_PRINTS: Record<string, string> = {
+  "222711": "/cfm_prints/cfm-dr-caio-bonfa.png",
   "11867": "/cfm_prints/cfo-dr-jorge-luiz.png",
   "pb-11867": "/cfm_prints/cfo-dr-jorge-luiz.png",
   "pb-cd-11867": "/cfm_prints/cfo-dr-jorge-luiz.png",

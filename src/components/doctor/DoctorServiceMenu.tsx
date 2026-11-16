@@ -132,12 +132,6 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
         {FIXED_SERVICE_NOTICE} O pagamento vem sempre primeiro: após a confirmação você passa pela
         triagem da Enfª Brisa e é direcionado à consulta com {doctorName}.
       </p>
-      <p className="text-[11px] text-muted-foreground">
-        <strong className="text-foreground">Orientação Técnica</strong> é modalidade exclusiva do{" "}
-        <strong className="text-foreground">Dr. Edilson Bezerra ON</strong> (assistente de IA apoiado em
-        evidências científicas publicadas no PubMed e supervisionado em tempo real pelo Dr. Edilson Bezerra),
-        que orienta tecnicamente e encaminha ao especialista. Nenhum outro profissional da vitrine realiza essa modalidade.
-      </p>
     </div>
   );
 }

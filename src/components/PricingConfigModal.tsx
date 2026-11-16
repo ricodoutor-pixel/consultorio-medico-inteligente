@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign, Percent, TrendingUp, Lock } from "lucide-react";
-import { SERVICE_MENU, PREMIUM_SUGGESTED_PRICE, FIXED_SERVICE_NOTICE, formatBRL } from "@/lib/pricing";
+import { SERVICE_MENU, PREMIUM_SUGGESTED_PRICE, FIXED_SERVICE_NOTICE, ORIENTATION_EXCLUSIVE_NOTICE, formatBRL } from "@/lib/pricing";
 import { supabase as _supabase } from "@/integrations/supabase/client";
 const supabase: any = _supabase;
 import { toast } from "sonner";
@@ -95,7 +95,7 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
             Configurar Preços de Consulta
           </DialogTitle>
           <DialogDescription>
-            Os valores dos serviços 1 a 4 são padronizados pela plataforma. Você define apenas a Consulta Premium (Vídeo + Chat).
+            Consulta por chat, consulta por vídeo e retorno têm valor tabelado pela plataforma. Você escolhe apenas o valor da Consulta Premium (Vídeo + Chat).
           </DialogDescription>
         </DialogHeader>
 
@@ -106,7 +106,7 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
               <p className="text-xs font-black text-foreground flex items-center gap-1.5">
                 <Lock className="h-3.5 w-3.5" /> Tabela oficial (valores fixos)
               </p>
-              {SERVICE_MENU.filter((sv) => sv.fixed).map((sv, i) => (
+              {SERVICE_MENU.filter((sv) => sv.fixed && sv.sku !== "orientacao_tecnica").map((sv, i) => (
                 <div key={sv.sku} className="flex items-center justify-between gap-3 text-xs py-1 border-b border-border/50 last:border-0">
                   <span className="text-muted-foreground">
                     {i + 1}. <span className="text-foreground font-semibold">{sv.name}</span> · {sv.duration}
@@ -115,6 +115,7 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
                 </div>
               ))}
               <p className="text-[10px] text-muted-foreground">{FIXED_SERVICE_NOTICE}</p>
+              <p className="text-[11px] font-semibold text-foreground">{ORIENTATION_EXCLUSIVE_NOTICE}</p>
             </div>
 
             <div className="space-y-2">

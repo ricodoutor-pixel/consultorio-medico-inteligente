@@ -47,7 +47,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
 
   const cards = [
     { icon: DollarSign, label: "Ganhos Acumulados", value: `R$ ${earnings.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Total líquido recebido", color: "text-primary", glow: "shadow-primary/10", tooltip: "Soma de todos os honorários líquidos já recebidos via consultas e serviços na plataforma." },
-    { icon: TrendingUp, label: "Ganhos do Mês", value: `R$ ${earnings.monthConsultations.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Orientações Técnicas no mês atual", color: "text-primary", glow: "shadow-primary/10", tooltip: "Total de honorários recebidos no mês corrente por consultas finalizadas." },
+    { icon: TrendingUp, label: "Ganhos do Mês", value: `R$ ${earnings.monthConsultations.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Consultas no mês atual", color: "text-primary", glow: "shadow-primary/10", tooltip: "Total de honorários recebidos no mês corrente por consultas finalizadas." },
     { icon: Gift, label: "Bônus de Distribuição", value: `R$ ${earnings.distributionBonus.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "10% do lucro da plataforma", color: "text-amber-400", glow: "shadow-amber-400/10", tooltip: "Sua participação nos 10% de lucro global da plataforma, calculada pelo seu Score Ponderado e multiplicador do plano." },
     { icon: Percent, label: "Taxa de Intermediação", value: `${feeRate}%`, sub: `${100 - feeRate}% de cada consulta é seu`, color: "text-muted-foreground", glow: "", tooltip: `A plataforma retém ${feeRate}% de cada consulta como taxa de intermediação (tecnologia, pagamento e suporte); ${100 - feeRate}% são seus.` },
   ];

@@ -141,6 +141,8 @@ const DOCTOR_STEPS: DoctorStep[] = [
     items: [
       "Coloque foto, especialidade e uma apresentação curta. É o que o paciente lê antes de escolher você.",
       "Em Consultório → \"Horários & Consulta por Vídeo\", publique sua agenda. O paciente só consegue agendar nos horários que você publicar.",
+      "Seus valores são tabelados: consulta por chat R$ 100, consulta por vídeo R$ 150 e retorno R$ 90. Você escolhe apenas o valor da Consulta Premium (vídeo + chat), a partir de R$ 100.",
+      "A Orientação Técnica de R$ 30 é atendida somente pelo Dr. Edilson Bezerra ON. Ela não aparece no seu cartão e você não realiza nem recebe por essa modalidade.",
     ],
     link: { to: "/consultorio", label: "Abrir Consultório" },
   },

@@ -188,4 +188,8 @@ export const SERVICE_MENU: ServiceMenuItem[] = [
 ];
 
 export const FIXED_SERVICE_NOTICE =
-  "Valores dos serviços 1 a 4 são padronizados pela plataforma. Apenas a Consulta Premium é definida pelo profissional.";
+  "Consulta por chat, consulta por vídeo e retorno têm valor tabelado pela plataforma. Apenas a Consulta Premium é definida pelo profissional.";
+
+/** Aviso aos médicos: a Orientação Técnica não faz parte dos serviços deles. */
+export const ORIENTATION_EXCLUSIVE_NOTICE =
+  "A Orientação Técnica (R$ 30) é atendida somente pelo Dr. Edilson Bezerra ON. Os demais médicos não realizam nem recebem por essa modalidade.";

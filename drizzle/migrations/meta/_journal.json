@@ -372,6 +372,13 @@
       "when": 1794590252971,
       "tag": "0052_stop_free_vip_trial_new_doctors",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1794888629524,
+      "tag": "0053_doctor_directory_badge_facts",
+      "breakpoints": true
     }
   ]
 }

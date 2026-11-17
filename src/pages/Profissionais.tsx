@@ -73,26 +73,6 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
-/** Médicos com Plano Med VIP ativo (selo exibido no card). Apenas Dr. Victor, Dr. Edilson, Dra. Suelen e Dra. Olívia */
-const VIP_DOCTOR_MATCHERS = ["victor", "milton", "edilson", "suelen", "olivia"];
-const isVipDoctor = (p: Professional) => {
-  if (p.plan_tier === "vip" || p.plan_tier === "vip_prescritor" || p.plan_tier === "premium" || p.plan_tier === "basic") {
-    return true;
-  }
-  const name = (p.name || "").toLowerCase();
-  const crm = (p.crm || "");
-  if (crm.includes("206873") || crm.includes("58169")) return true;
-  return VIP_DOCTOR_MATCHERS.some((n) => name.includes(n));
-};
-
-const getDoctorSealTier = (p: Professional) => {
-  const name = (p.name || "").toLowerCase();
-  const crm = (p.crm || "");
-  if (p.plan_tier === "vip" || p.plan_tier === "vip_prescritor" || p.plan_tier === "premium" || /victor.*fonseca|victor henrique/.test(name ?? "") || name.includes("milton") || crm.includes("206873") || crm.includes("58169")) {
-    return "premium";
-  }
-  return "basic";
-};
 
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
 // Cartões médicos mostram só consultas; a Orientação Técnica (R$ 30) é exclusiva do Dr. Edilson Bezerra ON.
@@ -254,7 +234,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               )}
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className="text-sm text-muted-foreground">{pro.category}</p>
-                {isVipDoctor(pro) && <DoctorVIPSeal tier={getDoctorSealTier(pro)} />}
+                {pro.directoryBadge && <DoctorVIPSeal tier={pro.directoryBadge} />}
                 {pro.flags && pro.flags.map((flag, i) => (
                   <CountryFlag key={i} code={flag} />
                 ))}
@@ -578,7 +558,7 @@ const Profissionais = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h2 className="font-black text-foreground text-sm md:text-base">{p.name}</h2>
-                              {isVipDoctor(p) && <DoctorVIPSeal tier={getDoctorSealTier(p)} />}
+                              {p.directoryBadge && <DoctorVIPSeal tier={p.directoryBadge} />}
                               {p.flags && p.flags.map((flag, i) => (
                                 <CountryFlag key={i} code={flag} />
                               ))}

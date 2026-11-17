@@ -10453,6 +10453,15 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      doctor_directory_badge_facts: {
+        Args: never
+        Returns: {
+          doctor_id: string
+          documents_count: number
+          paid_until: string
+          registration_complete: boolean
+        }[]
+      }
       doctor_finance_monthly: {
         Args: { _months?: number }
         Returns: {

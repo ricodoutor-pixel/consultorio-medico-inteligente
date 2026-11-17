@@ -1,5 +1,9 @@
 # Roadmap
 
+## Redução de rotinas automáticas — 17/11/2026
+- [ ] Conferir rotinas frequentes e espaçar varreduras não críticas, preservando prazos de atendimento
+- [ ] Confirmar horários gravados e estimar redução de execuções; informar limites de hibernação
+
 ## Selos e ordem da vitrine — 17/11/2026
 - [x] Separar Premium pago e vigente de VIP por cadastro e documentos completos, sem conceder plano
 - [x] Ordenar Premium, VIP e demais por anexos reais; retirar privilégios por nome; 15 testes aprovados e card de Caio conferido sem selo

@@ -7,13 +7,13 @@ import { professionals as baseProfessionals } from "@/data/professionals";
 import drCaioBonfaImg from "@/assets/dr-caio-bonfa.jpg";
 import draAlessandraAdamiImg from "@/assets/dra-alessandra-adami.jpg";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
-import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
+import { compareDirectoryDoctors, directoryBadge, type DirectoryFacts } from "@/lib/doctor-directory-badges";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
 import { isPublicProfessionalVisible } from "@/lib/public-professional-visibility";
 import { evaluateDoctorPresence } from "@/lib/doctor-presence";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
-const DOCTORS_CACHE_KEY = "__pyr_doctors_cache_v1";
+const DOCTORS_CACHE_KEY = "__pyr_doctors_cache_v2";
 
 interface DoctorRow {
   id: string;
@@ -42,6 +42,7 @@ interface DoctorRow {
   council_type?: string | null;
   council_number?: string | null;
   kyc_docs_count?: number | null;
+  directoryFacts?: DirectoryFacts;
 }
 
 /**
@@ -175,11 +176,12 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     const fetchDoctors = async () => {
       try {
-        const [publicRes, activeApptsRes] = await Promise.allSettled([
+        const [publicRes, activeApptsRes, badgeRes] = await Promise.allSettled([
           supabase.from("doctors_public" as never).select("*"),
           // Luz amarela: médicos atendendo agora (função pública 0044; visitantes não leem appointments).
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- função nova ainda fora dos tipos gerados
           (supabase.rpc as any)("doctors_in_consultation"),
+          supabase.rpc("doctor_directory_badge_facts"),
         ]);
         if (!active) return;
 
@@ -198,8 +200,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
           activeAppts.map((a) => String(a.doctor_id ?? "")).filter(Boolean),
         );
 
+        const badgeRows = badgeRes.status === "fulfilled" && !badgeRes.value.error ? badgeRes.value.data ?? [] : [];
+        const factsById = new Map(badgeRows.map(row => [row.doctor_id, row]));
         const mergedRows: DoctorRow[] = publicDocs.map((doc) => ({
           ...doc,
+          directoryFacts: factsById.get(doc.id),
           in_consultation: busyIds.has(doc.id),
         }));
         setDbDoctors(mergedRows);
@@ -275,6 +280,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         // Vitrine nunca mostra médico como online se não estiver logado com presença ativa no banco
         return {
           ...base,
+          directoryBadge: null,
+          documentsCount: 0,
           online: false,
           presenceState: "offline",
           lastSeenOnline: null,
@@ -300,6 +307,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       // Enriquece com informações em tempo real do banco de dados
       return {
         ...base,
+        directoryBadge: directoryBadge(matchedDb.directoryFacts),
+        documentsCount: matchedDb.directoryFacts?.documents_count ?? 0,
         dbId: matchedDb.id,
         crm: registration,
         imageUrl: treatedAvatar || base.imageUrl,
@@ -425,6 +434,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
       newlyAddedFromDb.push({
         id: `db-${doc.id}`,
+        directoryBadge: directoryBadge(doc.directoryFacts),
+        documentsCount: doc.directoryFacts?.documents_count ?? 0,
         dbId: doc.id,
         name: fullName,
         category,
@@ -491,36 +502,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const medicos = deduplicatedList.filter((p) => p && p.category === MEDICOS_CATEGORY);
     const nonMedicos = deduplicatedList.filter((p) => p && p.category !== MEDICOS_CATEGORY);
 
-    medicos.sort((a, b) =>
-      compareDoctorsByCompleteness(
-        { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
-        { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
-      ),
-    );
-
-    // Médicos Assinantes VIP na vitrine médica (Dr. Victor #1 e Dr. Milton #2)
-    // 1. Dr. Victor Henrique Bueno da Fonseca (posição 0)
-    const victorIdx = medicos.findIndex(
-      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || /victor.*fonseca|victor henrique/.test(m.name.toLowerCase())
-    );
-    let victorDoc: typeof medicos[0] | null = null;
-    if (victorIdx >= 0) {
-      [victorDoc] = medicos.splice(victorIdx, 1);
-    }
-
-    // 2. Dr. Milton Dimas Tadeu Urban (posição 1)
-    const miltonIdx = medicos.findIndex(
-      (m) => m.id === "med-milton-urban" || (m.crm && m.crm.includes("58169")) || m.name.toLowerCase().includes("milton")
-    );
-    let miltonDoc: typeof medicos[0] | null = null;
-    if (miltonIdx >= 0) {
-      [miltonDoc] = medicos.splice(miltonIdx, 1);
-    }
-
-    // Insere os dois assinantes VIP no topo absoluto da vitrine
-    // Ordem: assinante mais recente (Dr. Milton) em 1º, Dr. Victor em 2º
-    if (victorDoc) medicos.unshift(victorDoc);
-    if (miltonDoc) medicos.unshift(miltonDoc);
+    medicos.sort(compareDirectoryDoctors);
 
     // Nota exibida = só a nota real; sem avaliações suficientes, a vitrine mostra "Ainda sem avaliações".
     const withRealRating = (p: Professional): Professional => {

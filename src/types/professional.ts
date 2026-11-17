@@ -30,5 +30,7 @@ export type Professional = {
   cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
+  directoryBadge?: "premium" | "vip" | null;
+  documentsCount?: number;
   specialty?: string;
 };

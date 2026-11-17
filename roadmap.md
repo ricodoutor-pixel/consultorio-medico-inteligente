@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Selos e ordem da vitrine — 17/11/2026
-- [ ] Separar Premium pago e vigente de VIP por cadastro e documentos completos, sem conceder plano
-- [ ] Ordenar Premium, VIP e demais por anexos reais; retirar privilégios por nome e conferir testes e telas
+- [x] Separar Premium pago e vigente de VIP por cadastro e documentos completos, sem conceder plano
+- [x] Ordenar Premium, VIP e demais por anexos reais; retirar privilégios por nome; 15 testes aprovados e card de Caio conferido sem selo
 
 ## Implantação das consultas — 12/11/2026
 - [ ] Aplicar migrações 0021–0026 em ordem e verificar os resultados no Cloud

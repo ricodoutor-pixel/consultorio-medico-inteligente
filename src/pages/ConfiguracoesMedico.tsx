@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, ArrowLeft, Save, Upload, User, Loader2, FileSpreadsheet, CalendarClock } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Save, Upload, User, Loader2, FileSpreadsheet, CalendarClock, FolderUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
@@ -187,6 +187,13 @@ export default function ConfiguracoesMedico() {
               <h1 className="text-3xl font-black text-white">Configuração do <span className="text-primary">Card Médico</span></h1>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={() => navigate('/atualizar-documentos-medico')}
+                className="bg-amber-500 hover:bg-amber-400 text-black font-extrabold shadow-md text-xs sm:text-sm"
+              >
+                <FolderUp className="w-4 h-4 mr-2" />
+                Anexar Documentos KYC
+              </Button>
               <Button
                 onClick={() => setProntuarioModalOpen(true)}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md text-xs sm:text-sm"
@@ -374,9 +381,9 @@ export default function ConfiguracoesMedico() {
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/atualizar-documentos-medico')}
-                  className="border-slate-700 text-slate-300 hover:text-white"
+                  className="border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 font-bold"
                 >
-                  <Upload className="mr-2 h-4 w-4" /> Atualizar dados de cadastro medico
+                  <FolderUp className="mr-2 h-4 w-4" /> 📎 Anexar Documentos KYC & Atualizar Cadastro
                 </Button>
                 <Button 
                   onClick={handleSave} 

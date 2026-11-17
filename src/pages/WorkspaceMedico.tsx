@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, MessageSquare, BookOpen, Brain, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, MessageSquare, BookOpen, Brain, Sparkles, Loader2, FolderUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
@@ -391,8 +391,17 @@ const WorkspaceMedico = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <ManualMedicoModal />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/atualizar-documentos-medico")}
+            className="text-xs h-8 px-2.5 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 hidden md:inline-flex items-center gap-1.5"
+            title="Atualizar dados de cadastro ou anexar documentos KYC"
+          >
+            <FolderUp size={13} /> Cadastro & KYC
+          </Button>
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-background border border-border">
             <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
             <span className="text-xs font-bold mr-2">{isOnline ? "Online" : "Offline"}</span>

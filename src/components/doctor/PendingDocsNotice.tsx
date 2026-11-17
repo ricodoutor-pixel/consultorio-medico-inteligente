@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Upload, ArrowRight, FileCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   userId: string;
@@ -16,6 +18,7 @@ interface Props {
  * dados de cadastro ainda faltam para liberar o card médico público.
  */
 export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
+  const navigate = useNavigate();
   const [uploaded, setUploaded] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
 
@@ -74,6 +77,17 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
               ? "Plano Médico VIP Ativo. Documentação completa (CRM 206873/SP conferido no CFM, certificação WeCann e contrato assinado). Seu consultório está 100% pronto para atender o primeiro paciente."
               : "Todos os documentos e dados obrigatórios foram recebidos. Seu card médico está apto à publicação pela Diretoria Técnica."}
           </p>
+          <div className="mt-2.5">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => navigate('/atualizar-documentos-medico')}
+              className="border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/20 text-xs h-7 px-3 rounded-lg flex items-center gap-1.5"
+            >
+              <FileCheck size={13} />
+              Revisar / Atualizar Documentos Anexados
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -121,6 +135,24 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
               </div>
             </div>
           )}
+
+          <div className="mt-4 pt-3 border-t border-amber-500/20 flex flex-wrap items-center gap-2">
+            <Button
+              onClick={() => navigate('/atualizar-documentos-medico')}
+              className="bg-amber-500 hover:bg-amber-400 text-black font-black text-xs px-4 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition-transform hover:scale-105"
+            >
+              <Upload size={14} className="stroke-[2.5]" />
+              Anexar Documentos & Atualizar Cadastro
+              <ArrowRight size={14} />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/configuracoes-medico')}
+              className="border-amber-500/40 text-amber-300 hover:bg-amber-500/10 text-xs px-3 py-2 rounded-xl"
+            >
+              Configurações do Perfil
+            </Button>
+          </div>
         </div>
       </div>
     </div>

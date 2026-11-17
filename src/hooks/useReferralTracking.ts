@@ -13,8 +13,13 @@ export function useReferralTracking() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Capture ref from URL (?ref=CODE or ?ref_id=CODE)
-    const refCode = searchParams.get("ref") || searchParams.get("ref_id");
+    // Capture ref from URL (?ref=CODE or ?ref_id=CODE or ?referral=CODE or ?ref_code=CODE or ?indicacao=CODE)
+    const refCode =
+      searchParams.get("ref") ||
+      searchParams.get("ref_id") ||
+      searchParams.get("referral") ||
+      searchParams.get("ref_code") ||
+      searchParams.get("indicacao");
     if (refCode) {
       setCookie(REFERRAL_COOKIE_KEY, refCode, REFERRAL_COOKIE_DAYS);
       console.log(`[Referral] Captured ref code: ${refCode}`);
@@ -58,6 +63,32 @@ export async function linkReferralOnSignup(newUserId: string) {
           .ilike("code", `%${codeSuffix}`)
           .maybeSingle();
         referrer = fallbackRef;
+      }
+    }
+
+    // 3. Fallback: Check if cleanRef is a direct UUID (user_id or doctor_id)
+    if (!referrer && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanRef)) {
+      const { data: byUser } = await supabase
+        .from("referral_links")
+        .select("user_id, referred_by")
+        .eq("user_id", cleanRef)
+        .maybeSingle();
+      if (byUser) {
+        referrer = byUser;
+      } else {
+        const { data: doc } = await supabase
+          .from("doctors")
+          .select("user_id")
+          .eq("id", cleanRef)
+          .maybeSingle();
+        if (doc?.user_id) {
+          const { data: byDocUser } = await supabase
+            .from("referral_links")
+            .select("user_id, referred_by")
+            .eq("user_id", doc.user_id)
+            .maybeSingle();
+          referrer = byDocUser;
+        }
       }
     }
 

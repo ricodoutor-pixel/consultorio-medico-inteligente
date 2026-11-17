@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Copy, Link2, Loader2, MessageSquare, Stethoscope, Users, Video } from "lucide-react";
+import { Copy, Link2, Loader2, MessageSquare, Stethoscope, Users, Video, Share2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -33,11 +33,37 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
     );
   };
 
+  const shareWhatsApp = (text: string, url: string) => {
+    const full = `${text}\n${url}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(full)}`, "_blank");
+  };
+
   const rows = links
     ? [
-        { icon: MessageSquare, label: "Pacientes — consulta por chat comigo", url: links.chat },
-        { icon: Video, label: "Pacientes — consulta por vídeo comigo", url: links.video },
-        { icon: Users, label: "Colegas — cadastro de profissional", url: links.colleague },
+        { 
+          icon: Video, 
+          label: "Pacientes — consulta por vídeo comigo", 
+          url: links.video,
+          shareText: "Olá! Você pode agendar uma teleconsulta diretamente comigo pelo consultório virtual da Planta y Raíz:"
+        },
+        { 
+          icon: MessageSquare, 
+          label: "Pacientes — consulta por chat comigo", 
+          url: links.chat,
+          shareText: "Olá! Se preferir atendimento ágil por chat, inicie sua consulta comigo através deste link:"
+        },
+        { 
+          icon: Users, 
+          label: "Colegas — cadastro de profissional", 
+          url: links.colleague,
+          shareText: "Olá, colega médico! Convido você a fazer parte da equipe de telemedicina da Planta y Raíz com consultório inteligente:"
+        },
+        { 
+          icon: UserPlus, 
+          label: "Pacientes — cadastro geral na plataforma", 
+          url: links.patient,
+          shareText: "Cadastre-se na plataforma Planta y Raíz para acompanhar orientações e consultas de saúde:"
+        },
       ]
     : [];
 
@@ -58,7 +84,7 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
             <Loader2 size={14} className="animate-spin" /> Carregando seus links...
           </p>
         )}
-        {rows.map(({ icon: Icon, label, url }) => (
+        {rows.map(({ icon: Icon, label, url, shareText }) => (
           <div key={url} className="space-y-1">
             <p className="text-xs font-bold text-foreground inline-flex items-center gap-1.5">
               <Icon size={13} className="text-emerald-600" /> {label}
@@ -72,6 +98,16 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
               />
               <Button size="sm" variant="outline" onClick={() => copy(url)} title="Copiar link">
                 <Copy size={14} />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="border-emerald-600/40 text-emerald-600 hover:bg-emerald-600/10" 
+                onClick={() => shareWhatsApp(shareText, url)} 
+                title="Compartilhar no WhatsApp"
+              >
+                <Share2 size={14} className="mr-1" />
+                <span className="hidden sm:inline text-xs">WhatsApp</span>
               </Button>
             </div>
           </div>

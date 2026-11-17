@@ -7,5 +7,6 @@ export function doctorShareLinks(origin: string, doctorId: string, referralCode:
     chat: `${base}/consulta/consulta_chat?doctor=${doctor}&ref=${ref}`,
     video: `${base}/consulta/consulta_video?doctor=${doctor}&ref=${ref}`,
     colleague: `${base}/cadastro-profissional?ref=${ref}`,
+    patient: `${base}/cadastro?ref=${ref}`,
   };
 }

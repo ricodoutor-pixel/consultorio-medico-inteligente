@@ -381,6 +381,14 @@ const Consultorio = () => {
               <CalendarRange size={15} /> 📅 Escolher Horários & Vídeo
             </button>
 
+            <Link
+              to="/atualizar-documentos-medico"
+              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-600/30 to-teal-600/30 text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/60 hover:scale-105"
+              title="Anexar documentos KYC, CRM, comprovação de especialidade e dados de cadastro"
+            >
+              <FolderUp size={15} /> 📎 Atualizar Cadastro & KYC
+            </Link>
+
             <button
               onClick={() => setShowCashOutModal(true)}
               data-testid="doctor-sacar-button"
@@ -543,7 +551,7 @@ const Consultorio = () => {
               🏆 Ranking & PlantaCoins
             </TabsTrigger>
             <TabsTrigger value="fila-assincrona" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Fila Assíncrona</TabsTrigger>
-            <TabsTrigger value="perfil" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Perfil e KYC</TabsTrigger>
+            <TabsTrigger value="perfil" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-amber-500/15 text-amber-400 data-[state=active]:bg-amber-600 data-[state=active]:text-white border border-amber-500/40">📎 Meu Cadastro & Documentos KYC</TabsTrigger>
             <TabsTrigger value="time" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Meu Time</TabsTrigger>
             <TabsTrigger value="educacao" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Educação Continuada</TabsTrigger>
           </TabsList>

@@ -60,6 +60,8 @@ export const DOCTOR_CFM_PRINTS: Record<string, string> = {
   "sc-38430": "/cfm_prints/cfm-dr-amir-ali.png",
   "57711": "/cfm_prints/cfm-dr-amir-ali.png",
   "pr-57711": "/cfm_prints/cfm-dr-amir-ali.png",
+  "31192": "/cfm_prints/cfm-dra-geisell-torres.png",
+  "ba-31192": "/cfm_prints/cfm-dra-geisell-torres.png",
 };
 
 export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
@@ -104,6 +106,7 @@ export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
   if ((str.includes("grace") && (str.includes("adriana") || str.includes("conceicao") || str.includes("conceição"))) || str.includes("190386") || str.includes("190.386") || str.includes("10372")) return "/cfm_prints/cfm-dra-grace-conceicao.png";
   if ((str.includes("otavio") || str.includes("otávio") || str.includes("bassete")) || str.includes("21907")) return "/cfm_prints/cfm-dr-otavio-bassete.png";
   if (str.includes("amir") || str.includes("hayel") || str.includes("38430") || str.includes("57711")) return "/cfm_prints/cfm-dr-amir-ali.png";
+  if (str.includes("geisell") || str.includes("martinez") || str.includes("31192")) return "/cfm_prints/cfm-dra-geisell-torres.png";
 
   return null;
 }

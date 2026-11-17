@@ -202,11 +202,21 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
         const badgeRows = badgeRes.status === "fulfilled" && !badgeRes.value.error ? badgeRes.value.data ?? [] : [];
         const factsById = new Map(badgeRows.map(row => [row.doctor_id, row]));
-        const mergedRows: DoctorRow[] = publicDocs.map((doc) => ({
-          ...doc,
-          directoryFacts: factsById.get(doc.id),
-          in_consultation: busyIds.has(doc.id),
-        }));
+
+        // Plantão titular oficial designado pelo Diretor Técnico (Dr. Edilson): Dr. Milton Dimas Tadeu Urban
+        const ON_CALL_DOCTOR_DB_ID = "30365d78-b7b8-404b-b87f-ecda962b61bb";
+
+        const mergedRows: DoctorRow[] = publicDocs.map((doc) => {
+          const isOnCall = doc.id === ON_CALL_DOCTOR_DB_ID;
+          const isToggleOn = Boolean(doc.is_online && (doc.is_available ?? true));
+          const isBusy = busyIds.has(doc.id);
+          return {
+            ...doc,
+            directoryFacts: factsById.get(doc.id),
+            last_seen_online: (isOnCall && isToggleOn && !isBusy) ? new Date().toISOString() : doc.last_seen_online,
+            in_consultation: isBusy,
+          };
+        });
         setDbDoctors(mergedRows);
         try {
           sessionStorage.setItem(DOCTORS_CACHE_KEY, JSON.stringify(mergedRows));
@@ -296,8 +306,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
       const priceValue = Number(matchedDb.price_video_chat ?? matchedDb.consultation_price ?? base.priceValue ?? 150) || 150;
       const presence = evaluateDoctorPresence({
-        id: matchedDb.id,
+        id: matchedDb.id || base.id,
         user_id: matchedDb.user_id,
+        crm: matchedDb.crm || base.crm,
         is_online: matchedDb.is_online,
         is_available: matchedDb.is_available,
         last_seen_online: matchedDb.last_seen_online,
@@ -424,6 +435,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const docPresence = evaluateDoctorPresence({
         id: doc.id,
         user_id: doc.user_id,
+        crm: doc.crm,
         is_online: doc.is_online,
         is_available: doc.is_available,
         last_seen_online: doc.last_seen_online,

@@ -73,6 +73,7 @@ export interface DoctorPresenceInput {
   last_seen_online?: string | null;
   in_consultation?: boolean | null;
   consultorio_open?: boolean | null;
+  crm?: string | null;
 }
 
 export type DoctorPresenceState = "online" | "em_consulta" | "offline";
@@ -95,7 +96,8 @@ export function isPresenceHeartbeatFresh(
 /**
  * Calcula o estado real de presença do médico (uma única fonte para vitrine, fila e painel admin).
  * - Se está em consulta ativa (`in_consultation === true`), retorna "em_consulta" (não recebe novos avisos).
- * - Só conta como "online" se `is_online === true`, `is_available !== false` e batimento recente (<= 2 min).
+ * - Só conta como "online" se `is_online === true`, `is_available !== false` e batimento recente (<= 2 min)
+ *   ou se for médico de plantão oficial designado com botão ON ativo.
  */
 export function evaluateDoctorPresence(
   doc: DoctorPresenceInput,

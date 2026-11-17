@@ -609,7 +609,7 @@ function isHumanRequested(text) {
 // Detecção estrita de solicitação de pausa da automação / conversa
 function isPauseRequested(text) {
   const low = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return /(vou pausar|pausar a automacao|pausar automacao|pausar a conversa|pausar conversa|pausar mensagens|pausar envio|parar de enviar|parar mensagens|pare de enviar|pare com as mensagens|nao quero mais mensagens|nao me envie mais|cancelar mensagens|silenciar robo|silenciar assistente|silenciar automacao|desativar robo|desativar assistente|desativar automacao|\bpausar\b|\bparar\b|\bpause\b|\bstop\b)/i.test(low);
+  return /(vou pausar|pausar a automacao|pausar automacao|pausando automacao|pausar a conversa|pausar conversa|pausar esta conversa|pausa esta conversa|pause esta conversa|silenciar conversa|parar automacao|pausar mensagens|pausar envio|parar de enviar|parar mensagens|pare de enviar|pare com as mensagens|nao quero mais mensagens|nao me envie mais|cancelar mensagens|silenciar robo|silenciar assistente|silenciar automacao|desativar robo|desativar assistente|desativar automacao|\bpausar\b|\bparar\b|\bpause\b|\bpausa\b|\bstop\b)/i.test(low);
 }
 
 // Filtro estrito de respostas automáticas de consultórios/robôs para evitar loops
@@ -1755,7 +1755,7 @@ async function loop() {
           const lastMsg = chat.lastMessage;
           const lastMsgText = (lastMsg?.message?.conversation || lastMsg?.message?.extendedTextMessage?.text || '').trim();
           const normLastText = lastMsgText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          const isExplicitPause = /vou pausar|pausar a automa[cç]|pausar automa[cç]|pausando automa[cç]|silenciar automa[cç]|pausa automa[cç]|pausar esta conversa|pausar conversa|parar automa[cç]/.test(normLastText);
+          const isExplicitPause = isPauseRequested(normLastText);
           const isHumanDemand = /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|equipe humana|nao quero (falar com )?(robo|bot|ia))/i.test(normLastText);
 
           const mem = getContactMemory(jid);
@@ -1990,13 +1990,28 @@ async function loop() {
                 continue;
               }
 
-              // 🚨 VERIFICAÇÃO 2: Solicitação de Atendente Humano OU Emojis de Raiva / Reclamação
-              if (isAngryOrDemandsHuman(combinedText) || isHumanRequested(combinedText) || isPauseRequested(combinedText)) {
+              // 🛑 VERIFICAÇÃO 1.5: Solicitação de Pausa Explícita ("pausar esta conversa", "pausar automação", etc.)
+              if (isPauseRequested(combinedText)) {
                 humanLocked.add(recipient);
                 humanLocked.add(canonical);
+                if (altJid) humanLocked.add(altJid);
                 saveHumanLocked(humanLocked);
                 registerHumanTakeover(jid, true, false, { permanent: true });
                 registerHumanTakeover(canonical, true, false, { permanent: true });
+                if (altJid) registerHumanTakeover(altJid, true, false, { permanent: true });
+                log(`🛑 [PAUSA SOLICITADA] Automação silenciada 100% (silêncio total, sem resposta) para ${canonical}`);
+                continue;
+              }
+
+              // 🚨 VERIFICAÇÃO 2: Solicitação de Atendente Humano OU Emojis de Raiva / Reclamação
+              if (isAngryOrDemandsHuman(combinedText) || isHumanRequested(combinedText)) {
+                humanLocked.add(recipient);
+                humanLocked.add(canonical);
+                if (altJid) humanLocked.add(altJid);
+                saveHumanLocked(humanLocked);
+                registerHumanTakeover(jid, true, false, { permanent: true });
+                registerHumanTakeover(canonical, true, false, { permanent: true });
+                if (altJid) registerHumanTakeover(altJid, true, false, { permanent: true });
                 upsertLeadToSupabase(canonical, senderName, 'unknown', 'handoff_humano', { last_message: combinedText.slice(0, 200) });
                 log(`🚨 [HUMANO SOLICITADO / RECLAMAÇÃO] Contato ${senderName} (${canonical}) pediu humano ou expressou insatisfação. Silenciando IA até liberação do operador.`);
 

@@ -20,7 +20,6 @@ git reset --hard origin/main
 echo "🗑️ 2. Eliminando arquivos de leads falsos residuais..."
 rm -f scripts/doctor_leads_collected.json
 rm -f scripts/generate-leads-part2.cjs
-rm -f scripts/PAUSE_AUTOMATION.flag
 
 # 3. Força IPv4 no ambiente do Node
 export NODE_OPTIONS="--dns-result-order=ipv4first"
@@ -29,15 +28,20 @@ export NODE_OPTIONS="--dns-result-order=ipv4first"
 echo "⚙️ 3. Aplicando nova configuração do PM2..."
 pm2 startOrReload ecosystem.config.cjs --update-env
 
-# Garante que os agentes bloqueados pelo Brevo ou Apify fiquem desligados
-echo "🛑 4. Desligando agentes com chaves bloqueadas ou sem serviço (Brevo 554 / Apify)..."
+# Garante que os agentes bloqueados pelo Brevo ou Apify e os disparadores frios fiquem desligados e excluídos do PM2
+echo "🛑 4. Desligando e excluindo agentes frios e bloqueados..."
+pm2 stop cadence-10min-inviter 2>/dev/null || true
+pm2 delete cadence-10min-inviter 2>/dev/null || true
+pm2 stop brevo-whatsapp-inviter 2>/dev/null || true
+pm2 delete brevo-whatsapp-inviter 2>/dev/null || true
 pm2 stop brevo-multi-pipeline 2>/dev/null || true
+pm2 delete brevo-multi-pipeline 2>/dev/null || true
 pm2 stop apify-lead-sync 2>/dev/null || true
+pm2 delete apify-lead-sync 2>/dev/null || true
 
 # Reinicia os agentes operacionais com IPv4 forçado
-echo "🔄 5. Reiniciando agentes operacionais (WhatsApp, Brisa, Monitor)..."
+echo "🔄 5. Reiniciando agentes operacionais (WhatsApp Brisa Live Responder, Monitor)..."
 pm2 restart brisa-live-responder --update-env 2>/dev/null || true
-pm2 restart cadence-10min-inviter --update-env 2>/dev/null || true
 pm2 restart email-bounce-guardian --update-env 2>/dev/null || true
 pm2 restart sysadmin-watchdog --update-env 2>/dev/null || true
 

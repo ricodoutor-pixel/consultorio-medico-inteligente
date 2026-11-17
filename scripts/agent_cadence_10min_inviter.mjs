@@ -13,6 +13,10 @@
  * - Persiste estado em scripts/medico_socio_campaign_state.json
  */
 
+// 🛑 DESATIVADO PERMANENTEMENTE: Conforme Manual Mestre e instrução do Dr. Edilson, disparos frios em massa estão suspensos.
+console.log('🛑 [CADENCE-INVITER] Script desativado permanentemente para proteger o WhatsApp da Planta y Raíz.');
+process.exit(0);
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

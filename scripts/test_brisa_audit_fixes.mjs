@@ -7,7 +7,8 @@ import {
   isAngryOrDemandsHuman,
   calculateStringSimilarity,
   checkSemanticRepetition,
-  isAutoReplyBot
+  isAutoReplyBot,
+  isPauseRequested
 } from './lib/brisa_security.mjs';
 
 console.log("=== INICIANDO BATERIA DE TESTES DA AUDITORIA ENFª BRISA ===");
@@ -91,6 +92,16 @@ assert(isAutoReplyBot("Mensagem automática: nosso horário de atendimento é de
 assert(isAutoReplyBot("Powered by Typebot / ChatGPT") === true, "Detecta powered by bot");
 assert(isAutoReplyBot("Boa tarde, doutor! Gostaria de saber como funciona o tratamento com canabidiol para ansiedade.") === false, "Mensagem de paciente real NÃO é bot");
 assert(isAutoReplyBot("Tenho dores crônicas na coluna e gostaria de marcar consulta com especialista.") === false, "Pergunta de saúde real NÃO é bot");
+
+// 10. NOVO TESTE: Detecção de Pausa da Automação (Dr. Edilson ou Contato)
+assert(isPauseRequested("vou pausar a automação para esta conversa !") === true, "Detecta 'vou pausar a automação para esta conversa !'");
+assert(isPauseRequested("pausar esta conversa") === true, "Detecta 'pausar esta conversa'");
+assert(isPauseRequested("pausar conversa") === true, "Detecta 'pausar conversa'");
+assert(isPauseRequested("vou pausar a automacao") === true, "Detecta 'vou pausar a automacao'");
+assert(isPauseRequested("silenciar automacao") === true, "Detecta 'silenciar automacao'");
+assert(isPauseRequested("pause") === true, "Detecta comando isolado 'pause'");
+assert(isPauseRequested("pausar") === true, "Detecta comando isolado 'pausar'");
+assert(isPauseRequested("Gostaria de marcar uma consulta") === false, "Pergunta normal NÃO dispara pausa");
 
 console.log(`\n=== RESULTADO: ${passed} PASSARAM, ${failed} FALHARAM ===`);
 if (failed > 0) process.exit(1);

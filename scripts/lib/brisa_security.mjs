@@ -689,6 +689,13 @@ export function isGeneralSpamOrUnrelated(text = '') {
   return { isSpam: isChain || isPolitics || isServiceOffer, isServiceOffer };
 }
 
+// Detecção estrita de solicitação de pausa da automação / conversa
+export function isPauseRequested(text = '') {
+  if (!text) return false;
+  const low = String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /(vou pausar|pausar a automacao|pausar automacao|pausando automacao|pausar a conversa|pausar conversa|pausar esta conversa|pausa esta conversa|pause esta conversa|silenciar conversa|parar automacao|pausar mensagens|pausar envio|parar de enviar|parar mensagens|pare de enviar|pare com as mensagens|nao quero mais mensagens|nao me envie mais|cancelar mensagens|silenciar robo|silenciar assistente|silenciar automacao|desativar robo|desativar assistente|desativar automacao|\bpausar\b|\bparar\b|\bpause\b|\bpausa\b|\bstop\b)/i.test(low);
+}
+
 // ============================================================================
 // GUARDA DE PRÉ-ENVIO (PRE-SEND GUARD)
 // Executado imediatamente antes do disparo na Evolution API

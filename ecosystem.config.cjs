@@ -1,21 +1,6 @@
 module.exports = {
   apps: [
     {
-      name: 'brevo-whatsapp-inviter',
-      node_args: '--dns-result-order=ipv4first',
-      script: 'scripts/agent_brevo_doctor_whatsapp_inviter.mjs',
-      cwd: '/opt/plantayraiz',
-      instances: 1,
-      exec_mode: 'fork',
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
-      restart_delay: 5000,
-      env: {
-        NODE_ENV: 'production'
-      }
-    },
-    {
       name: 'brisa-live-responder',
       node_args: '--dns-result-order=ipv4first',
       script: 'scripts/agent_evolution_brisa_live_responder.mjs',
@@ -227,21 +212,7 @@ module.exports = {
         NODE_ENV: 'production'
       }
     },
-    {
-      name: 'cadence-10min-inviter',
-      node_args: '--dns-result-order=ipv4first',
-      script: 'scripts/agent_cadence_10min_inviter.mjs',
-      cwd: '/opt/plantayraiz',
-      instances: 1,
-      exec_mode: 'fork',
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
-      restart_delay: 10000,
-      env: {
-        NODE_ENV: 'production'
-      }
-    },
+
     {
       name: 'email-bounce-guardian',
       node_args: '--dns-result-order=ipv4first',

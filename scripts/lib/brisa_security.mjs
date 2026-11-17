@@ -84,13 +84,20 @@ function lookupPhoneFromLid(lidJid) {
   try {
     if (fs.existsSync(CONTACTS_MAP_FILE)) {
       const map = JSON.parse(fs.readFileSync(CONTACTS_MAP_FILE, 'utf8'));
-      return map[lidJid] || null;
+      if (map[lidJid]) return map[lidJid];
+    }
+    const altFile = path.join(STATE_DIR, 'brisa_lid_phone_map.json');
+    if (fs.existsSync(altFile)) {
+      const alt = JSON.parse(fs.readFileSync(altFile, 'utf8'));
+      if (alt.lidToPhone && alt.lidToPhone[lidJid]) return alt.lidToPhone[lidJid];
+      if (alt[lidJid]) return alt[lidJid];
     }
   } catch (e) {}
   return null;
 }
 
 export function saveContactLidMapping(lidJid, phoneDigits) {
+  if (!lidJid || !phoneDigits) return;
   try {
     let map = {};
     if (fs.existsSync(CONTACTS_MAP_FILE)) {
@@ -99,6 +106,17 @@ export function saveContactLidMapping(lidJid, phoneDigits) {
     map[lidJid] = phoneDigits;
     map[phoneDigits] = lidJid;
     fs.writeFileSync(CONTACTS_MAP_FILE, JSON.stringify(map, null, 2));
+
+    const altFile = path.join(STATE_DIR, 'brisa_lid_phone_map.json');
+    let alt = { lidToPhone: {}, phoneToLid: {} };
+    if (fs.existsSync(altFile)) {
+      try { alt = JSON.parse(fs.readFileSync(altFile, 'utf8')); } catch (e) {}
+    }
+    if (!alt.lidToPhone) alt.lidToPhone = {};
+    if (!alt.phoneToLid) alt.phoneToLid = {};
+    alt.lidToPhone[lidJid] = phoneDigits;
+    alt.phoneToLid[phoneDigits] = lidJid;
+    fs.writeFileSync(altFile, JSON.stringify(alt, null, 2));
   } catch (e) {}
 }
 

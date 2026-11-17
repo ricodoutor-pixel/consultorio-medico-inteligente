@@ -1751,6 +1751,44 @@ async function loop() {
           const altJid = chat.lastMessage?.key?.remoteJidAlt || chat.remoteJidAlt || '';
           const canonical = getCanonicalContactId(jid, altJid);
 
+          // 🛡️ INTERVENÇÃO HUMANA IMEDIATA (DETECTA NO PRÓPRIO CHAT ANTES DE QUALQUER SKIP):
+          const lastMsg = chat.lastMessage;
+          const lastMsgText = (lastMsg?.message?.conversation || lastMsg?.message?.extendedTextMessage?.text || '').trim();
+          const normLastText = lastMsgText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          const isExplicitPause = /vou pausar|pausar a automa[cç]|pausar automa[cç]|pausando automa[cç]|silenciar automa[cç]|pausa automa[cç]|pausar esta conversa|pausar conversa|parar automa[cç]/.test(normLastText);
+          const isHumanDemand = /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|equipe humana|nao quero (falar com )?(robo|bot|ia))/i.test(normLastText);
+
+          const mem = getContactMemory(jid);
+          const isBotOrAutomation = 
+            (mem?.lastAnswerSent && lastMsgText.includes(mem.lastAnswerSent.slice(0, 30))) || 
+            lastMsgText.includes('assistente virtual') ||
+            lastMsgText.includes('Médicos Prescritores Sócios') ||
+            lastMsgText.includes('Relatório Diário') ||
+            lastMsgText.includes('AVISO PLANO VENCIDO') ||
+            lastMsgText.includes('Plano Médico VIP') ||
+            lastMsgText.includes('WeCann Planta y Raíz') ||
+            lastMsgText.includes('Enfª Brisa');
+
+          if ((lastMsg?.key?.fromMe === true && (isExplicitPause || !isBotOrAutomation && lastMsgText.length > 0)) || isExplicitPause || isHumanDemand) {
+            registerHumanTakeover(jid, true, false, { permanent: true });
+            registerHumanTakeover(canonical, true, false, { permanent: true });
+            humanLocked.add(jid);
+            humanLocked.add(canonical);
+            if (altJid) {
+              registerHumanTakeover(altJid, true, false, { permanent: true });
+              humanLocked.add(altJid);
+            }
+            saveHumanLocked(humanLocked);
+            log(`🛑 [ASSUMIU HUMANO / PAUSA] Chat ${canonical} (${jid}) travado imediatamente. Texto: "${lastMsgText.slice(0, 60)}"`);
+          }
+
+          // Checa se já está pausado / modo humano
+          const pauseCheck = checkAiPause(jid);
+          const pauseCheckCanonical = checkAiPause(canonical);
+          if (pauseCheck.paused || pauseCheckCanonical.paused || humanLocked.has(jid) || humanLocked.has(canonical) || (altJid && humanLocked.has(altJid))) {
+            continue;
+          }
+
           // Se a conversa já foi respondida por nós e não há mensagens novas não lidas, ignorar
           if (chat.lastMessage?.key?.fromMe === true && (!chat.unreadCount || chat.unreadCount === 0)) {
             continue;

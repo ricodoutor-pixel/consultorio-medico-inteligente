@@ -1,5 +1,9 @@
 # Roadmap
 
+## Selos e ordem da vitrine — 17/11/2026
+- [ ] Separar Premium pago e vigente de VIP por cadastro e documentos completos, sem conceder plano
+- [ ] Ordenar Premium, VIP e demais por anexos reais; retirar privilégios por nome e conferir testes e telas
+
 ## Implantação das consultas — 12/11/2026
 - [ ] Aplicar migrações 0021–0026 em ordem e verificar os resultados no Cloud
 - [ ] Confirmar consultation_queue_sweep ativo e consultation-files privado

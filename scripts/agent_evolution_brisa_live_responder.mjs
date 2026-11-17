@@ -1002,9 +1002,17 @@ async function ingestIncomingDoc(msg, recipient, senderName) {
     if (!doctor && senderName) {
       doctor = findDoctorByName(senderName);
     }
-    if (!doctor && recipient.includes('@lid')) {
+    if (!doctor && (recipient.includes('@lid') || cleanPhone.includes('7591462018') || cleanPhone.includes('212988065788005'))) {
       const doctors = loadKnownDoctors();
-      if (recipient.includes('66516175310923')) {
+      if (recipient.includes('212988065788005') || cleanPhone.includes('7591462018')) {
+        doctor = doctors.find(d => d.crm === '31192' || (d.name && d.name.toLowerCase().includes('geisell'))) || {
+          id: 'a98b68b3-3efa-42d2-8959-e8be8d6466f7',
+          user_id: '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3',
+          crm: '31192',
+          name: 'Dra. Geisell Martinez Torres',
+          phone: '557591462018',
+        };
+      } else if (recipient.includes('66516175310923')) {
         doctor = doctors.find(d => d.crm === '135012-9' || (d.name && d.name.includes('Mariana Alves')));
       } else if (recipient.includes('70373206949947')) {
         doctor = doctors.find(d => d.crm === '58169' || (d.name && d.name.includes('Urban')));
@@ -1208,14 +1216,22 @@ function classifyAudience(jid, senderName, text) {
   const invitedDoc = findInvitedDoctor(cleanPhone);
   let doctorObj = docByPhone || docByName;
 
-  if (!doctorObj && (jid || '').includes('@lid')) {
+  if (!doctorObj && ((jid || '').includes('@lid') || cleanPhone.includes('7591462018'))) {
     const doctors = loadKnownDoctors();
-    if (jid.includes('66516175310923')) doctorObj = doctors.find(d => d.crm === '135012-9' || (d.name && d.name.includes('Mariana Alves')));
+    if ((jid || '').includes('212988065788005') || cleanPhone.includes('7591462018')) {
+      doctorObj = doctors.find(d => d.crm === '31192' || (d.name && d.name.toLowerCase().includes('geisell'))) || {
+        id: 'a98b68b3-3efa-42d2-8959-e8be8d6466f7',
+        user_id: '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3',
+        crm: '31192',
+        name: 'Dra. Geisell Martinez Torres',
+        phone: '557591462018',
+      };
+    } else if (jid.includes('66516175310923')) doctorObj = doctors.find(d => d.crm === '135012-9' || (d.name && d.name.includes('Mariana Alves')));
     else if (jid.includes('70373206949947')) doctorObj = doctors.find(d => d.crm === '58169' || (d.name && d.name.includes('Urban')));
     else if (jid.includes('129076786409510')) doctorObj = doctors.find(d => d.crm === '98083' || (d.name && d.name.includes('Geovana')));
     else if (jid.includes('157342100390139')) doctorObj = doctors.find(d => d.crm === '206873' || (d.name && d.name.includes('Victor')));
     else if (jid.includes('206219281190998')) doctorObj = doctors.find(d => d.name && d.name.includes('Abbade'));
-    else if (jid.includes('16673096659146')) doctorObj = doctors.find(d => d.name && d.name.includes('Menta')));
+    else if (jid.includes('16673096659146')) doctorObj = doctors.find(d => d.name && d.name.includes('Menta'));
     else if (jid.includes('4952130879556')) doctorObj = doctors.find(d => d.crm === '9727' || (d.name && d.name.includes('Edna')));
     else if (jid.includes('202469137248373')) doctorObj = doctors.find(d => (d.name && d.name.includes('Verônica')) || (d.name && d.name.includes('Veronica')));
     else if (jid.includes('199218014748755')) doctorObj = doctors.find(d => d.crm === '54892' || (d.name && d.name.includes('Frederico')));
@@ -1786,6 +1802,18 @@ async function loop() {
           const pauseCheck = checkAiPause(jid);
           const pauseCheckCanonical = checkAiPause(canonical);
           if (pauseCheck.paused || pauseCheckCanonical.paused || humanLocked.has(jid) || humanLocked.has(canonical) || (altJid && humanLocked.has(altJid))) {
+            // Mesmo com a conversa pausada para resposta da IA, o agente colhedor de documentos KYC continua recolhendo anexos silenciosamente
+            if (
+              lastMsg &&
+              !lastMsg.key?.fromMe &&
+              lastMsg.key?.id &&
+              !processedSet.has(lastMsg.key.id) &&
+              (lastMsg.message?.imageMessage || lastMsg.message?.documentMessage || lastMsg.message?.documentWithCaptionMessage)
+            ) {
+              processedSet.add(lastMsg.key.id);
+              saveProcessed(processedSet);
+              await ingestIncomingDoc(lastMsg).catch((e) => log(`⚠️ [KYC SILENT HARVEST] ${e.message}`));
+            }
             continue;
           }
 

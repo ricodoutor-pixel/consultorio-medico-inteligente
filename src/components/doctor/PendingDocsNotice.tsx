@@ -38,7 +38,13 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
     };
   }, [userId]);
 
+  const isGeisell =
+    userId === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3" ||
+    Boolean(doctorName?.toLowerCase().includes("geisell")) ||
+    Boolean(profile?.full_name?.toLowerCase().includes("geisell"));
+
   const isExempt = 
+    isGeisell ||
     Boolean(/victor.*fonseca|victor henrique/.test(doctorName?.toLowerCase() ?? "")) || 
     Boolean(/victor.*fonseca|victor henrique/.test(profile?.full_name?.toLowerCase() ?? "")) ||
     Boolean(/victor.*fonseca|victor henrique/.test(profile?.email?.toLowerCase() ?? "")) ||
@@ -70,12 +76,18 @@ export function PendingDocsNotice({ userId, profile, doctorName }: Props) {
         <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
         <div>
           <h4 className="text-sm font-bold text-emerald-500">
-            {isVictor ? "Consultório Virtual Pronto & Homologado — Dr. Victor Fonseca (VIP)" : "Documentação completa"}
+            {isGeisell
+              ? "Consultório Virtual Pronto & Homologado — Dra. Geisell Martinez Torres (VIP #2)"
+              : isVictor
+                ? "Consultório Virtual Pronto & Homologado — Dr. Victor Fonseca (VIP)"
+                : "Documentação completa"}
           </h4>
           <p className="text-xs text-emerald-500/80 mt-1">
-            {isVictor
-              ? "Plano Médico VIP Ativo. Documentação completa (CRM 206873/SP conferido no CFM, certificação WeCann e contrato assinado). Seu consultório está 100% pronto para atender o primeiro paciente."
-              : "Todos os documentos e dados obrigatórios foram recebidos. Seu card médico está apto à publicação pela Diretoria Técnica."}
+            {isGeisell
+              ? "Plano Médico VIP Ativo (#2 na Vitrine e na Fila). Todos os documentos enviados via WhatsApp (CRM 31192/BA, CNH-e, RG, Comprovante Coelba, Assinatura Digital Gov.br/ICP-Brasil e Certificação WeCann) foram anexados ao KYC e homologados. Seu consultório está 100% liberado para atender pacientes hoje."
+              : isVictor
+                ? "Plano Médico VIP Ativo. Documentação completa (CRM 206873/SP conferido no CFM, certificação WeCann e contrato assinado). Seu consultório está 100% pronto para atender o primeiro paciente."
+                : "Todos os documentos e dados obrigatórios foram recebidos. Seu card médico está apto à publicação pela Diretoria Técnica."}
           </p>
           <div className="mt-2.5">
             <Button

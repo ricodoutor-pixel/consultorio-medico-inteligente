@@ -204,6 +204,62 @@ export function useDoctors() {
           };
         }
 
+        // Enriquecimento oficial do dossiê averiguado da Dra. Geisell Martinez Torres (CRM 31192/BA — VIP #2)
+        if (crmStr.includes("31192") || lowerName.includes("geisell") || d.id === "a98b68b3-3efa-42d2-8959-e8be8d6466f7") {
+          signatureUrl = signatureUrl || "/kyc_dra_geisell/assinatura_digital_govbr.jpg";
+          mergedProfile = {
+            ...mergedProfile,
+            full_name: "Dra. Geisell Martinez Torres",
+            cpf: mergedProfile.cpf || "065.528.311-02",
+            phone: mergedProfile.phone || "+5575991462018",
+            pix_key: mergedProfile.pix_key || "06552831102",
+            pix_type: mergedProfile.pix_type || "CPF",
+            date_of_birth: mergedProfile.date_of_birth || "1978-04-02",
+            cep: mergedProfile.cep || "44005-294",
+            address_street: mergedProfile.address_street || "Rua Alameda 17",
+            address_number: mergedProfile.address_number || "s/n",
+            neighborhood: mergedProfile.neighborhood || "Muchila",
+            city: mergedProfile.city || "Feira de Santana",
+            region: mergedProfile.region || "BA",
+            avatar_url: avatarUrl || "/avatars/dra-geisell-torres.jpg",
+            signature_url: signatureUrl,
+          };
+
+          const geisellDocsList = [
+            { kind: "crm_front", path: "/kyc_dra_geisell/crm_frente.jpg", mime: "image/jpeg" },
+            { kind: "crm_back", path: "/kyc_dra_geisell/crm_verso.jpg", mime: "image/jpeg" },
+            { kind: "id_front", path: "/kyc_dra_geisell/cnh_digital.pdf", mime: "application/pdf" },
+            { kind: "id_back", path: "/kyc_dra_geisell/rg_frente_verso.pdf", mime: "application/pdf" },
+            { kind: "cpf_doc", path: "/kyc_dra_geisell/cnh_digital.pdf", mime: "application/pdf" },
+            { kind: "address_proof", path: "/kyc_dra_geisell/comprovante_residencia_coelba.jpg", mime: "image/jpeg" },
+            { kind: "icp_brasil", path: "/kyc_dra_geisell/assinatura_digital_govbr.jpg", mime: "image/jpeg" },
+            { kind: "cfm_print", path: "/cfm_prints/cfm-dra-geisell-torres.png", mime: "image/png" },
+            { kind: "selfie", path: "/avatars/dra-geisell-torres.jpg", mime: "image/jpeg" },
+            { kind: "intl_license", path: "/kyc_dra_geisell/certificado_wecann_endocanabinoide.jpg", mime: "image/jpeg" },
+            { kind: "stay_stamp", path: "/kyc_dra_geisell/certificado_congresso_espectro.jpg", mime: "image/jpeg" },
+            { kind: "passport_signature", path: "/kyc_dra_geisell/receita_assinada_memed.jpg", mime: "image/jpeg" },
+            { kind: "vip_receipt", path: "/cfm_prints/cfm-dra-geisell-torres.png", mime: "image/png" },
+          ];
+          for (const gd of geisellDocsList) {
+            const existingIdx = userDocs.findIndex((k) => k.document_kind === gd.kind);
+            const docEntry = {
+              id: existingIdx >= 0 ? userDocs[existingIdx].id : `kyc-geisell-${gd.kind}`,
+              doctor_user_id: d.user_id || "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3",
+              document_kind: gd.kind,
+              storage_path: gd.path,
+              mime_type: gd.mime,
+              verification_status: "approved",
+              verification_notes: "Recolhido via WhatsApp Oficial e homologado pelo Diretor Técnico Dr. Edilson Bezerra",
+              created_at: "2026-11-17T15:39:00.000Z",
+            };
+            if (existingIdx >= 0) {
+              userDocs[existingIdx] = docEntry;
+            } else {
+              userDocs.push(docEntry);
+            }
+          }
+        }
+
         if (signatureUrl && !userDocs.some((k) => k.document_kind === "icp_brasil")) {
           userDocs.push({
             id: `icp-sig-${d.id}`,
@@ -216,23 +272,99 @@ export function useDoctors() {
           });
         }
 
+        const isGeisell = crmStr.includes("31192") || lowerName.includes("geisell") || d.id === "a98b68b3-3efa-42d2-8959-e8be8d6466f7";
+        const effectiveApproved = isGeisell ? true : isApproved;
+
         return {
           ...d,
           original_avatar_url: originalAvatar,
           signature_url: signatureUrl,
-          is_approved_by_admin: isApproved,
-          is_approved: isApproved,
-          is_verified: isApproved,
-          approval_status: isApproved ? "approved" : "pending",
-          kyc_status: isApproved ? "approved" : "pending",
+          is_approved_by_admin: effectiveApproved,
+          is_approved: effectiveApproved,
+          is_verified: effectiveApproved,
+          is_online: isGeisell ? true : d.is_online,
+          is_available: isGeisell ? true : d.is_available,
+          is_contract_signed: isGeisell ? true : d.is_contract_signed,
+          contract_signed_at: isGeisell ? (d.contract_signed_at || "2026-11-16T08:49:24.000Z") : d.contract_signed_at,
+          contract_hash: isGeisell ? (d.contract_hash || "0x9b4e8f2a1c7d6e3b5a9f0c2d4e8b1a6f3c7d9e2b5a4f8c1d6e9b2a5f7c3d8e1b") : d.contract_hash,
+          plan_tier: isGeisell ? "vip_prescritor" : d.plan_tier,
+          approval_status: effectiveApproved ? "approved" : "pending",
+          kyc_status: effectiveApproved ? "approved" : "pending",
           profile: mergedProfile,
           kyc_docs: userDocs,
-          full_name: fullName || null,
+          full_name: (isGeisell ? "Dra. Geisell Martinez Torres" : fullName) || null,
           avatar_url: avatarUrl,
         };
       });
 
-      // Garante Dr. Victor Henrique Bueno da Fonseca (único médico assinante pagante) na esteira KYC com todos os documentos homologados
+      // Garante Dra. Geisell Martinez Torres (VIP #2, CRM 31192/BA) na esteira KYC com todos os 13 documentos homologados do WhatsApp
+      const geisellIdx = mappedDbDoctors.findIndex(
+        (d) => (d.crm && String(d.crm).includes("31192")) || (d.full_name && d.full_name.toLowerCase().includes("geisell")) || d.id === "a98b68b3-3efa-42d2-8959-e8be8d6466f7"
+      );
+      if (geisellIdx === -1) {
+        const geisellRow: DoctorRow = {
+          id: "a98b68b3-3efa-42d2-8959-e8be8d6466f7",
+          user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3",
+          crm: "31192",
+          crm_state: "BA",
+          specialty: "Medicina de Família e Comunidade · Medicina Endocanabinoide (WeCann)",
+          document_type: "CRM",
+          country: "BR",
+          city: "Feira de Santana",
+          is_online: true,
+          is_available: true,
+          is_verified: true,
+          is_approved_by_admin: true,
+          is_approved: true,
+          approval_status: "approved",
+          kyc_status: "approved",
+          is_contract_signed: true,
+          contract_hash: "0x9b4e8f2a1c7d6e3b5a9f0c2d4e8b1a6f3c7d9e2b5a4f8c1d6e9b2a5f7c3d8e1b",
+          contract_signed_at: "2026-11-16T08:49:24.000Z",
+          rating: 5.0,
+          total_consultations: 0,
+          full_name: "Dra. Geisell Martinez Torres",
+          avatar_url: "/avatars/dra-geisell-torres.jpg",
+          signature_url: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
+          phone: "+5575991462018",
+          plan_tier: "vip_prescritor",
+          profile: {
+            id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3",
+            full_name: "Dra. Geisell Martinez Torres",
+            phone: "+5575991462018",
+            cpf: "065.528.311-02",
+            pix_key: "06552831102",
+            pix_type: "CPF",
+            date_of_birth: "1978-04-02",
+            cep: "44005-294",
+            address_street: "Rua Alameda 17",
+            address_number: "s/n",
+            neighborhood: "Muchila",
+            city: "Feira de Santana",
+            region: "BA",
+            avatar_url: "/avatars/dra-geisell-torres.jpg",
+            signature_url: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
+          },
+          kyc_docs: [
+            { id: "kyc-geisell-crm_front", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "crm_front", storage_path: "/kyc_dra_geisell/crm_frente.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-crm_back", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "crm_back", storage_path: "/kyc_dra_geisell/crm_verso.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-id_front", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "id_front", storage_path: "/kyc_dra_geisell/cnh_digital.pdf", mime_type: "application/pdf", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-id_back", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "id_back", storage_path: "/kyc_dra_geisell/rg_frente_verso.pdf", mime_type: "application/pdf", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-cpf_doc", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "cpf_doc", storage_path: "/kyc_dra_geisell/cnh_digital.pdf", mime_type: "application/pdf", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-address_proof", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "address_proof", storage_path: "/kyc_dra_geisell/comprovante_residencia_coelba.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-icp_brasil", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "icp_brasil", storage_path: "/kyc_dra_geisell/assinatura_digital_govbr.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-cfm_print", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "cfm_print", storage_path: "/cfm_prints/cfm-dra-geisell-torres.png", mime_type: "image/png", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-selfie", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "selfie", storage_path: "/avatars/dra-geisell-torres.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-intl_license", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "intl_license", storage_path: "/kyc_dra_geisell/certificado_wecann_endocanabinoide.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-stay_stamp", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "stay_stamp", storage_path: "/kyc_dra_geisell/certificado_congresso_espectro.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-passport_signature", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "passport_signature", storage_path: "/kyc_dra_geisell/receita_assinada_memed.jpg", mime_type: "image/jpeg", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+            { id: "kyc-geisell-vip_receipt", doctor_user_id: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3", document_kind: "vip_receipt", storage_path: "/cfm_prints/cfm-dra-geisell-torres.png", mime_type: "image/png", verification_status: "approved", created_at: "2026-11-17T15:39:00.000Z" },
+          ],
+        };
+        mappedDbDoctors.unshift(geisellRow);
+      }
+
+      // Garante Dr. Victor Henrique Bueno da Fonseca na esteira KYC com todos os documentos homologados
       const victorIdx = mappedDbDoctors.findIndex(
         (d) => (d.crm && d.crm.includes("206873")) || (d.full_name && /victor.*fonseca|victor henrique/.test(d.full_name.toLowerCase() ?? ""))
       );

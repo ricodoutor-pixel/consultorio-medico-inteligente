@@ -40,6 +40,80 @@ serve(async (req) => {
     senderName = body.confirmedName || body.senderName || "";
     phoneDigits = String(body.phone || "").replace(/\D/g, "");
 
+    const PAUSED_WHATSAPP_CONTACTS = new Set([
+      "557591462018",
+      "7591462018",
+      "5575991462018",
+      "75991462018",
+      "212988065788005",
+      "5511987131241",
+    ]);
+
+    const normQ = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normSender = String(senderName || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // 🛑 Se a conversa no WhatsApp está pausada pelo Dr. Edilson ou pelo contato, suprime imediatamente
+    if (
+      (phoneDigits && PAUSED_WHATSAPP_CONTACTS.has(phoneDigits)) ||
+      (phoneDigits && (normSender.includes("geisell") || /^dra\s+g\b/.test(normSender))) ||
+      /\b(vou pausar|pausar a automacao|pausar esta conversa|pausar conversa|pausa a automacao|pausar ia)\b/.test(normQ)
+    ) {
+      return new Response(JSON.stringify({ answer: "", suppressed: true, reason: "human_paused_conversation" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 🛑 Se veio do WhatsApp (phoneDigits presente), checa na Evolution API se o Dr. Edilson assumiu a conversa manualmente nas últimas 24h
+    if (phoneDigits.length >= 10) {
+      try {
+        const evoUrl = Deno.env.get("EVOLUTION_API_URL") || "https://whatsapp.plantayraiz.com.br";
+        const evoKey = Deno.env.get("EVOLUTION_API_KEY") || "39d3c0208169d52717027e27477cdc9f63d70fda54296c501fbe409c10562a59";
+        const evoInst = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
+        const jid = phoneDigits.length >= 14 && !phoneDigits.startsWith("55")
+          ? `${phoneDigits}@lid`
+          : `${phoneDigits}@s.whatsapp.net`;
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 2200);
+        const evoRes = await fetch(`${evoUrl}/chat/findMessages/${evoInst}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: evoKey },
+          body: JSON.stringify({ where: { key: { remoteJid: jid } }, limit: 15, page: 1 }),
+          signal: ctrl.signal,
+        });
+        clearTimeout(timer);
+        if (evoRes.ok) {
+          const evoData = await evoRes.json().catch(() => ({}));
+          const recs = evoData?.messages?.records || [];
+          const cutoffSec = Math.floor(Date.now() / 1000) - 24 * 3600;
+          for (const m of recs) {
+            if ((m.messageTimestamp || 0) < cutoffSec) continue;
+            const mText = String(
+              m.message?.conversation ||
+              m.message?.extendedTextMessage?.text ||
+              m.message?.imageMessage?.caption ||
+              ""
+            ).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (/\b(reativar_ia|retomar_ia|ativar_ia|liberar_ia)\b/.test(mText)) break;
+            if (
+              /\b(vou pausar|pausar a automacao|pausar esta conversa|pausar conversa|pausa a automacao|preciso falar com humano|falar com humano|atendente humano)\b/.test(mText) ||
+              (m.key?.fromMe && (m.source === "android" || m.source === "ios"))
+            ) {
+              return new Response(JSON.stringify({ answer: "", suppressed: true, reason: "human_paused_conversation" }), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              });
+            }
+          }
+        }
+      } catch {
+        // Continua normalmente se a checagem Evolution exceder timeout
+      }
+    }
+
+    // 🧑‍⚕️ Se o nome do remetente já começa com Dr. / Dra., classifica como médico
+    if (/^(dr\.?|dra\.?|doutor|doutora)\s+/i.test(String(senderName || "").trim())) {
+      rawRole = "doctor";
+    }
+
     // 🧑‍⚕️ Verificação oficial: se o telefone pertence a um médico cadastrado, NUNCA tratar como paciente
     let verifiedDoctor = false;
     if (phoneDigits.length >= 8) {
@@ -67,7 +141,6 @@ serve(async (req) => {
       }
     }
 
-    const normQ = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const sentHistory = Array.isArray(body.sentHistory24h) ? body.sentHistory24h : [];
     if (phoneDigits && LOOPING_BOT_NUMBERS.has(phoneDigits)) {
       return new Response(JSON.stringify({ answer: '', suppressed: true, reason: 'looping_bot_blacklisted' }), {

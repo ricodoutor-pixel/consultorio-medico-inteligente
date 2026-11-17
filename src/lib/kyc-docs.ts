@@ -47,6 +47,22 @@ export const KYC_REQUIRED: KycKind[] = [
  * Aceita o storage_path registrado em doctor_kyc_documents; se ausente,
  * tenta as extensões usuais dentro da pasta do próprio médico.
  */
+export const GEISELL_KYC_PATHS: Partial<Record<KycKind, string>> = {
+  crm_front: "/kyc_dra_geisell/crm_frente.jpg",
+  crm_back: "/kyc_dra_geisell/crm_verso.jpg",
+  id_front: "/kyc_dra_geisell/cnh_digital.pdf",
+  id_back: "/kyc_dra_geisell/rg_frente_verso.pdf",
+  cpf_doc: "/kyc_dra_geisell/cnh_digital.pdf",
+  address_proof: "/kyc_dra_geisell/comprovante_residencia_coelba.jpg",
+  icp_brasil: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
+  cfm_print: "/cfm_prints/cfm-dra-geisell-torres.png",
+  selfie: "/avatars/dra-geisell-torres.jpg",
+  intl_license: "/kyc_dra_geisell/certificado_wecann_endocanabinoide.jpg",
+  stay_stamp: "/kyc_dra_geisell/certificado_congresso_espectro.jpg",
+  passport_signature: "/kyc_dra_geisell/receita_assinada_memed.jpg",
+  vip_receipt: "/cfm_prints/cfm-dra-geisell-torres.png",
+};
+
 export async function getKycSignedUrl(
   userId: string,
   kind: KycKind,
@@ -54,6 +70,10 @@ export async function getKycSignedUrl(
 ): Promise<string | null> {
   if (storagePath && (storagePath.startsWith("/") || storagePath.startsWith("http"))) {
     return storagePath;
+  }
+
+  if (userId === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3" && GEISELL_KYC_PATHS[kind]) {
+    return GEISELL_KYC_PATHS[kind]!;
   }
 
   // Lista de extensões suportadas

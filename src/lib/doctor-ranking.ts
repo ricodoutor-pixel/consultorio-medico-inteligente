@@ -10,7 +10,8 @@
  */
 
 const PINNED: Array<{ names: string[]; registrations: string[] }> = [
-  { names: ["victor henrique bueno da fonseca", "victor henrique", "victor fonseca", "victor"], registrations: ["206873"] },
+  { names: ["victor henrique bueno da fonseca", "victor henrique", "victor fonseca", "victor", "milton urban"], registrations: ["206873", "58169"] },
+  { names: ["geisell martinez torres", "geisell martinez", "geisell torres", "geisell"], registrations: ["31192"] },
 ];
 
 function normalize(value: string | null | undefined): string {

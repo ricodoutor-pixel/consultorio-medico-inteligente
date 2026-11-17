@@ -17,6 +17,15 @@
       "active": true,
       "welcomeSentAt": "2026-11-09T05:12:56.037Z",
       "adminNotifiedAt": "2026-11-09T05:12:56.037Z"
+    },
+    "med-geisell-torres": {
+      "welcomeSent": true,
+      "adminNotified": true,
+      "expirationNotified": false,
+      "currentTier": "vip",
+      "active": true,
+      "welcomeSentAt": "2026-11-17T15:40:00.000Z",
+      "adminNotifiedAt": "2026-11-17T15:40:00.000Z"
     }
   },
   "history": []

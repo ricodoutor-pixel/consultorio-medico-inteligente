@@ -62,7 +62,7 @@ export const DEFAULT_QUEUE_ROUTING_CONFIG: QueueRoutingConfig = {
   urgentDeadlineMinutes: 60,
   subscriberTiers: ["vip", "vip_prescritor", "premium", "basic", "assinante", "pro", "plano_medico", "ouro", "platina", "diamante", "elite", "black"],
   subscriberOrder: "priority_then_rotation",
-  prioritySubscriberCrms: ["58169", "206873"],
+  prioritySubscriberCrms: ["58169", "31192", "206873"],
 };
 
 export interface DoctorPresenceInput {

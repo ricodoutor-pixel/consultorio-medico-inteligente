@@ -10,7 +10,7 @@ export const SystemHealthGrid = ({ health }: SystemHealthGridProps) => {
   const nodes = [
     { name: "Supabase DB & RLS", status: health?.database || "ONLINE · 12ms", icon: Database, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
     { name: "Edge Functions (Deno)", status: health?.edge_functions || "ONLINE · 24ms", icon: Cpu, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
-    { name: "Google Gemini AI Studio", status: health?.gemini_ai || "ONLINE · 99.8% SLA", icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
+    { name: "Google Gemini 3.8 Flash (Cérebro Brisa)", status: health?.gemini_ai || "ONLINE · 99.8% SLA", icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
     { name: "Brevo CRM & SMTP", status: health?.brevo_crm || "ONLINE · Sincronizado", icon: Mail, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
     { name: "Mercado Pago & Split API", status: health?.mercado_pago || "ONLINE · Webhooks OK", icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
     { name: "Servidor Hostinger & SSL", status: health?.hostinger || "ONLINE · SSL A+ Ativo", icon: Server, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },

@@ -1,12 +1,13 @@
 // 🌿 Planta y Raiz — Single Source of Truth para Modelos Gemini AI nas Edge Functions (2026)
-// CORRIGIDO: gemini-1.5-* e gemini-2.0-flash foram DESCONTINUADOS pelo Google
-// (confirmado: toda chamada a eles retorna HTTP 404). Migrado para gemini-2.5-*,
-// a geracao atual e estavel.
+// Cérebro Unificado Oficial da Enfª Brisa: google/gemini-3.8-flash
+// Suportado com fallback automático em cascata (gemini-3.8-flash -> gemini-3.6-flash -> gemini-2.5-flash -> gemini-2.5-pro)
 
-export const GEMINI_PRIMARY_MODEL = "gemini-2.5-flash";
-export const GEMINI_FALLBACK_MODEL = "gemini-2.5-pro";
+export const GEMINI_PRIMARY_MODEL = "gemini-3.8-flash";
+export const GEMINI_FALLBACK_MODEL = "gemini-2.5-flash";
 
 export const GEMINI_MODELS_FALLBACK_CHAIN = [
+  "gemini-3.8-flash",
+  "gemini-3.6-flash",
   "gemini-2.5-flash",
   "gemini-2.5-pro",
 ] as const;
@@ -17,7 +18,7 @@ export function getGeminiEndpoint(modelName = GEMINI_PRIMARY_MODEL): string {
 
 /**
  * Executa chamada HTTP à API da Google Gemini com fallback automático em cascata
- * (gemini-2.5-flash -> gemini-2.5-pro) se retornar 404, 429 ou 5xx.
+ * (gemini-3.8-flash -> gemini-3.6-flash -> gemini-2.5-flash -> gemini-2.5-pro) se retornar 404, 429 ou 5xx.
  */
 export async function callGeminiApiWithFallback(
   apiKey: string,
@@ -53,9 +54,10 @@ export async function callGeminiApiWithFallback(
 // ── Lovable AI Gateway (melhor Gemini disponível — 2026) ─────────────────
 // Usado como cérebro primário da Enfª Brisa / Dr. Edilson On.
 // Ids validados na listagem viva do gateway (google/*).
-export const GATEWAY_GEMINI_PRIMARY = "google/gemini-2.5-flash";
-export const GATEWAY_GEMINI_FALLBACK = "google/gemini-2.5-pro";
+export const GATEWAY_GEMINI_PRIMARY = "google/gemini-3.8-flash";
+export const GATEWAY_GEMINI_FALLBACK = "google/gemini-2.5-flash";
 export const GATEWAY_GEMINI_CHAIN = [
+  "google/gemini-3.8-flash",
   "google/gemini-2.5-flash",
   "google/gemini-2.5-pro",
 ] as const;

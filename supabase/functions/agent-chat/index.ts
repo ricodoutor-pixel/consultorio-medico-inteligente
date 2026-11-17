@@ -38,23 +38,36 @@ serve(async (req) => {
     const { data: agent } = await supa.from("agent_registry").select("name, system_prompt").eq("slug", slug).maybeSingle();
     if (!agent) return new Response(JSON.stringify({ error: "agent not found" }), { status: 404, headers: corsHeaders });
 
-    const aiRes = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gemini-2.5-flash",
-        messages: [
-          { role: "system", content: agent.system_prompt + "\n\nContexto: você está conversando com o admin (Dr. Edilson) via painel ADM. Responda objetivo, em PT-BR, com sugestões acionáveis." },
-          ...messages.slice(-10),
-        ],
-      }),
-    });
+    let reply = "";
+    for (const modelToTry of ["gemini-3.8-flash", "gemini-2.5-flash"]) {
+      try {
+        const aiRes = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: modelToTry,
+            messages: [
+              { role: "system", content: agent.system_prompt + "\n\nContexto: você está conversando com o admin (Dr. Edilson) via painel ADM. Responda objetivo, em PT-BR, com sugestões acionáveis." },
+              ...messages.slice(-10),
+            ],
+          }),
+        });
 
-    if (aiRes.status === 429) return new Response(JSON.stringify({ error: "google_rate_limit" }), { status: 429, headers: corsHeaders });
-    if (!aiRes.ok) return new Response(JSON.stringify({ error: `google_gemini_${aiRes.status}` }), { status: 502, headers: corsHeaders });
+        if (aiRes.ok) {
+          const data = await aiRes.json();
+          reply = data.choices?.[0]?.message?.content || "";
+          if (reply) break;
+        } else if (aiRes.status === 429) {
+          console.warn(`[agent-chat] Rate limit em ${modelToTry}, tentando fallback...`);
+        }
+      } catch (err: any) {
+        console.warn(`[agent-chat] Erro ao chamar ${modelToTry}:`, err?.message);
+      }
+    }
 
-    const data = await aiRes.json();
-    const reply = data.choices?.[0]?.message?.content || "(sem resposta)";
+    if (!reply) {
+      return new Response(JSON.stringify({ error: "ai_generation_failed" }), { status: 502, headers: corsHeaders });
+    }
 
     return new Response(JSON.stringify({ reply, agent: agent.name }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -25,7 +25,7 @@ interface HealthData {
   status: "healthy" | "degraded" | "down";
   checks: {
     database: ServiceCheck;
-// ManyChat removed
+    gemini_api?: ServiceCheck;
     mercadopago: ServiceCheck;
     edge_functions: ServiceCheck;
     automations: AutomationStats;
@@ -36,7 +36,7 @@ interface HealthData {
 
 const SERVICE_CONFIG = [
   { key: "database", label: "Database", icon: Database, critical: true },
-// ManyChat removed
+  { key: "gemini_api", label: "Google Gemini 3.8 Flash (Cérebro Brisa)", icon: Activity, critical: true },
   { key: "mercadopago", label: "Mercado Pago", icon: CreditCard, critical: true },
   { key: "edge_functions", label: "Edge Functions", icon: Wifi, critical: true },
 ] as const;

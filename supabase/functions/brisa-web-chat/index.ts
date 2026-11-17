@@ -72,29 +72,40 @@ COMPLIANCE OBRIGATÓRIO:
       parts: [{ text: String(m.content ?? "") }],
     }));
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    let reply = "";
+    const modelsToTry = ["gemini-3.8-flash", "gemini-2.5-flash"];
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: geminiMessages,
-        generationConfig: {
-          maxOutputTokens: 450,
-          temperature: 0.7,
-        },
-      }),
-    });
+    for (const model of modelsToTry) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: geminiMessages,
+            generationConfig: {
+              maxOutputTokens: 450,
+              temperature: 0.7,
+            },
+          }),
+        });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini erro:", errorText);
-      throw new Error(`Erro no Gemini: ${response.status}`);
+        if (response.ok) {
+          const data = await response.json();
+          reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          if (reply) break;
+        } else {
+          console.warn(`[brisa-web-chat] Modelo ${model} retornou ${response.status}. Tentando fallback...`);
+        }
+      } catch (err: any) {
+        console.warn(`[brisa-web-chat] Falha na requisição ao modelo ${model}:`, err?.message);
+      }
     }
 
-    const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, tive uma instabilidade. Como posso ajudar?";
+    if (!reply) {
+      reply = "Desculpe, tive uma instabilidade momentânea. Pode repetir sua pergunta ou falar direto com a equipe médica?";
+    }
 
     return new Response(JSON.stringify({ text: reply }), { headers: { ...cors, "Content-Type": "application/json" } });
 

@@ -3,8 +3,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
-// Fallback chain definition
-const MODELS = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-1.5-pro"];
+// Fallback chain definition — Gemini 3.8 Flash como cérebro primário
+const MODELS = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
 
 const SYSTEM_PROMPT = `Você é a Enfermeira Brisa, assistente virtual humanizada, especialista clínica, consultora regulatória e agente de Comércio Agêntico da Plataforma Planta y Raiz.
 Sua missão é atuar com empatia, acolhimento, excelência técnica, compliance regulatório e agilidade no atendimento de pacientes, médicos e farmácias.

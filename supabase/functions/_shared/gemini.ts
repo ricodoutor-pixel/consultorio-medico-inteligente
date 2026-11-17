@@ -1,13 +1,11 @@
 // 🌿 Planta y Raiz — Single Source of Truth para Modelos Gemini AI nas Edge Functions (2026)
-// Cérebro Unificado Oficial da Enfª Brisa: google/gemini-3.8-flash
-// Suportado com fallback automático em cascata (gemini-3.8-flash -> gemini-3.6-flash -> gemini-2.5-flash -> gemini-2.5-pro)
+// Cérebro Unificado Oficial da Enfª Brisa no AI Gateway: google/gemini-3.8-flash
+// Modelo para API direta do Google AI Studio: gemini-2.5-flash
 
-export const GEMINI_PRIMARY_MODEL = "gemini-3.8-flash";
-export const GEMINI_FALLBACK_MODEL = "gemini-2.5-flash";
+export const GEMINI_PRIMARY_MODEL = "gemini-2.5-flash";
+export const GEMINI_FALLBACK_MODEL = "gemini-2.5-pro";
 
 export const GEMINI_MODELS_FALLBACK_CHAIN = [
-  "gemini-3.8-flash",
-  "gemini-3.6-flash",
   "gemini-2.5-flash",
   "gemini-2.5-pro",
 ] as const;

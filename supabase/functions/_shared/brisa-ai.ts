@@ -137,10 +137,12 @@ async function callProvider(provider: "lovable" | "gemini", body: Record<string,
     });
   }
 
+  const rawTarget = stripPrefix(String((body as any).model || DEFAULT_MODEL));
+  const googleModel = rawTarget.startsWith("gemini-3") ? "gemini-2.5-flash" : rawTarget;
   return fetch(GEMINI_URL, {
     method: "POST",
     headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ ...body, model: stripPrefix(String((body as any).model || DEFAULT_MODEL)) }),
+    body: JSON.stringify({ ...body, model: googleModel }),
   });
 }
 

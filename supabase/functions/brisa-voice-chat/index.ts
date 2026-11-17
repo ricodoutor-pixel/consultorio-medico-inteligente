@@ -184,18 +184,16 @@ Deno.serve(async (req) => {
     const t0 = Date.now();
     const messages = [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: transcript }];
     const tentativas: Array<{ nome: string; url: string; key: string; body: Record<string, unknown>; ms: number }> = [];
-    if (GEMINI_API_KEY) {
-      for (const model of ["gemini-3.8-flash", "gemini-2.5-flash"]) {
-        tentativas.push({
-          nome: "google/" + model, url: GEMINI_URL, key: GEMINI_API_KEY, ms: FAST_TIMEOUT_MS,
-          body: { model, messages, temperature: 0.8, top_p: 0.95, max_tokens: 600, reasoning_effort: "none" },
-        });
-      }
-    }
     if (LOVABLE_API_KEY) {
       tentativas.push({
         nome: "gateway/" + BRISA_VOICE_MODEL, url: LOVABLE_URL, key: LOVABLE_API_KEY, ms: FAST_TIMEOUT_MS,
         body: { model: BRISA_VOICE_MODEL, messages, temperature: 0.8, top_p: 0.95, max_tokens: 600, reasoning: GATEWAY_NO_REASONING },
+      });
+    }
+    if (GEMINI_API_KEY) {
+      tentativas.push({
+        nome: "google/gemini-2.5-flash", url: GEMINI_URL, key: GEMINI_API_KEY, ms: FAST_TIMEOUT_MS,
+        body: { model: "gemini-2.5-flash", messages, temperature: 0.8, top_p: 0.95, max_tokens: 600, reasoning_effort: "none" },
       });
     }
 

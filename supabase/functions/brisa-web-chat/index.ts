@@ -3,6 +3,7 @@ import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || '';
+const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY') || '';
 
 // SECURITY: Sanitize all user-supplied fields before interpolating into system prompt
 // Prevents prompt injection attacks that could override CFM/ANVISA directives
@@ -31,10 +32,6 @@ serve(async (req: Request) => {
 
   try {
     const { messages, leadInfo } = await req.json();
-
-    if (!GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Gemini API Key missing" }), { status: 500, headers: cors });
-    }
 
     const safeName = sanitizePromptInput(leadInfo?.name, 80);
     const safePhone = sanitizePromptInput(leadInfo?.phone, 30);
@@ -65,19 +62,51 @@ COMPLIANCE OBRIGATÓRIO:
 - Você NÃO dá diagnósticos, NÃO prescreve e NÃO indica doses. Encaminhe sempre ao profissional habilitado.
 - Supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR).`;
 
-    // IMPORTANTE: a API v1beta NÃO aceita role "system" dentro de contents.
-    // O prompt mestre precisa ir em systemInstruction, senão retorna HTTP 400.
-    const geminiMessages = (messages ?? []).map((m: any) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: String(m.content ?? "") }],
-    }));
-
     let reply = "";
-    const modelsToTry = ["gemini-3.8-flash", "gemini-2.5-flash"];
 
-    for (const model of modelsToTry) {
+    // 1. Tentar Lovable AI Gateway com google/gemini-3.8-flash (Cérebro Primário)
+    if (LOVABLE_API_KEY) {
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        const gwMessages = [
+          { role: "system", content: systemPrompt },
+          ...(messages ?? []).map((m: any) => ({
+            role: m.role === "assistant" ? "assistant" : "user",
+            content: String(m.content ?? ""),
+          })),
+        ];
+
+        const gwRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3.8-flash",
+            messages: gwMessages,
+            temperature: 0.7,
+            max_tokens: 500,
+          }),
+        });
+
+        if (gwRes.ok) {
+          const gwData = await gwRes.json();
+          reply = gwData?.choices?.[0]?.message?.content?.trim() || "";
+        }
+      } catch (err: any) {
+        console.warn("[brisa-web-chat] Erro no gateway Lovable:", err?.message);
+      }
+    }
+
+    // 2. Tentar Google AI Studio direto com gemini-2.5-flash (Fallback)
+    if (!reply && GEMINI_API_KEY) {
+      try {
+        const geminiMessages = (messages ?? []).map((m: any) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: String(m.content ?? "") }],
+        }));
+
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,24 +122,34 @@ COMPLIANCE OBRIGATÓRIO:
 
         if (response.ok) {
           const data = await response.json();
-          reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          if (reply) break;
-        } else {
-          console.warn(`[brisa-web-chat] Modelo ${model} retornou ${response.status}. Tentando fallback...`);
+          reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
         }
       } catch (err: any) {
-        console.warn(`[brisa-web-chat] Falha na requisição ao modelo ${model}:`, err?.message);
+        console.warn("[brisa-web-chat] Erro no Google direto:", err?.message);
       }
     }
 
+    // 3. Repertório Clínico Determinado (caso ambos os gateways estejam inacessíveis)
     if (!reply) {
-      reply = "Desculpe, tive uma instabilidade momentânea. Pode repetir sua pergunta ou falar direto com a equipe médica?";
+      const lastUserMsg = String((messages ?? []).slice(-1)[0]?.content || "").toLowerCase();
+      if (/cadastro|cadastrar|conta|login/i.test(lastUserMsg)) {
+        reply = "O cadastro na Planta y Raiz é 100% gratuito e leva menos de 1 minuto! Você pode criar sua conta em plantayraiz.com.br/cadastro para acessar seus exames e consultas.";
+      } else if (/consulta|m[eé]dico|valor|pre[çc]o|agend/i.test(lastUserMsg)) {
+        reply = "Para consultar com nossos médicos especialistas, temos atendimento por chat por R$ 100 ou por vídeo ao vivo por R$ 150. Acesse plantayraiz.com.br/agendamento para escolher o profissional de sua preferência!";
+      } else if (/orienta[çc][ãa]o/i.test(lastUserMsg)) {
+        reply = "A Orientação Técnica custa R$ 30 e é o início do cuidado, com triagem e educação em saúde conduzida pelo Dr. Edilson Bezerra ON em plantayraiz.com.br/orientacao-tecnica.";
+      } else {
+        reply = "Olá! Sou a Enfermeira Brisa da Planta y Raiz. Posso te orientar sobre o cadastro gratuito, nossos 11 exames de triagem pelo celular, a Orientação Técnica a R$ 30 ou o agendamento de consultas médicas. Como posso te ajudar hoje?";
+      }
     }
 
     return new Response(JSON.stringify({ text: reply }), { headers: { ...cors, "Content-Type": "application/json" } });
 
   } catch (error: any) {
     console.error("Erro na função brisa-web-chat:", error);
-    return new Response(JSON.stringify({ error: error?.message }), { status: 500, headers: cors });
+    return new Response(JSON.stringify({ 
+      text: "Olá! Sou a Enfermeira Brisa da Planta y Raiz. Estou à disposição para orientar sobre exames, cadastro ou agendamento de teleconsultas. Como posso te acolher hoje?" 
+    }), { headers: { ...cors, "Content-Type": "application/json" } });
+  }
   }
 });

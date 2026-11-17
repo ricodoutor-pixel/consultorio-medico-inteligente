@@ -6,22 +6,22 @@ import { Mic, Square, X, Send, Sparkles, AudioLines, ArrowRight } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import { primeBrisaVoice, speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
 import { brisaLinksFor, type BrisaLink } from '@/lib/brisa-links';
-import { BRISA_VOICE_FALLBACK_CONTEXT, cleanFallbackReply } from '@/lib/brisa-voice-fallback';
+import { BRISA_VOICE_FALLBACK_CONTEXT, cleanFallbackReply, getBrisaRepertoireAnswer } from '@/lib/brisa-voice-fallback';
 
 import brisaImg from '@/assets/brisa-enfermeira.webp';
 
 type Phase = 'idle' | 'listening' | 'thinking' | 'speaking';
 type Turn = { role: 'user' | 'assistant'; content: string };
 
-/** Pausa na fala que encerra a escuta (a pessoa parou de falar). */
-const END_OF_SPEECH_MS = 1100;
+/** Pausa na fala que encerra a escuta rápida (a pessoa parou de falar). */
+const END_OF_SPEECH_MS = 600;
 /** Tempo máximo esperando a pessoa começar a falar. */
-const NO_SPEECH_MS = 8000;
+const NO_SPEECH_MS = 7000;
 
-/** Espera máxima pela função de voz antes de usar a reserva. */
-const PRIMARY_TIMEOUT_MS = 7000;
-/** Depois de uma falha da função de voz, a reserva atende direto por este tempo. */
-const PRIMARY_COOLDOWN_MS = 5 * 60_000;
+/** Espera máxima pela função de voz antes de usar a resposta instantânea (máx 2.5s). */
+const PRIMARY_TIMEOUT_MS = 2500;
+/** Cooldown curto em caso de falha de rede. */
+const PRIMARY_COOLDOWN_MS = 15_000;
 let primaryDownUntil = 0;
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -35,10 +35,24 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 }
 
 /**
- * Pergunta à Brisa. Tenta a função de voz; se ela falhar ou demorar, usa a função do chat
- * escrito com o contexto da página, para a conversa não ficar muda.
+ * Pergunta à Brisa.
+ * Resposta ultra-rápida:
+ * 1. Perguntas de sugestão ou alta correspondência têm resposta instantânea (<50ms).
+ * 2. Consultas livres tentam a nuvem com limite rigoroso de 2.5s.
+ * 3. Se a nuvem demorar ou falhar, devolve IMEDIATAMENTE o repertório clínico correspondente.
  */
 async function askBrisa(question: string, history: Turn[], activeExam?: string): Promise<string> {
+  const trimmed = question.trim().toLowerCase();
+
+  // 1. Dúvidas frequentes de alta precisão têm resposta INSTANTÂNEA (sem fazer o usuário esperar)
+  const isDirectSuggestion = SUGGESTIONS.some(s => s.toLowerCase() === trimmed) ||
+    /^(como funciona o exame de fundo de olho|como me[cç]o meus batimentos|quais exames eu posso fazer|como marco uma consulta|quero me cadastrar|o que [eé] orienta[cç][aã]o t[eé]cnica)\??$/i.test(trimmed);
+
+  if (isDirectSuggestion) {
+    return getBrisaRepertoireAnswer(question, activeExam);
+  }
+
+  // 2. Chamada rápida à IA (máx 2.5s)
   if (Date.now() >= primaryDownUntil) {
     try {
       const { data, error } = await withTimeout(
@@ -52,35 +66,17 @@ async function askBrisa(question: string, history: Turn[], activeExam?: string):
         }),
         PRIMARY_TIMEOUT_MS,
       );
-      if (error) throw error;
-      const reply = String(data?.reply || '').trim();
-      if (reply) return reply;
-      throw new Error('empty_reply');
+      if (!error && data?.reply) {
+        const cleaned = cleanFallbackReply(String(data.reply));
+        if (cleaned) return cleaned;
+      }
     } catch {
       primaryDownUntil = Date.now() + PRIMARY_COOLDOWN_MS;
     }
   }
 
-  const context = activeExam
-    ? `${BRISA_VOICE_FALLBACK_CONTEXT}\n\nA pessoa está com o exame "${activeExam}" aberto na tela.`
-    : BRISA_VOICE_FALLBACK_CONTEXT;
-  const { data, error } = await withTimeout(
-    supabase.functions.invoke('brisa-web-chat', {
-      body: {
-        messages: [
-          { role: 'user', content: context },
-          { role: 'assistant', content: 'Entendido. Vou responder por voz seguindo essas regras.' },
-          ...history,
-          { role: 'user', content: question },
-        ],
-      },
-    }),
-    20_000,
-  );
-  if (error) throw error;
-  const reply = cleanFallbackReply(String(data?.text || ''));
-  if (!reply) throw new Error('empty_reply');
-  return reply;
+  // 3. Devolve IMEDIATAMENTE o repertório clínico correspondente (sem espera)
+  return getBrisaRepertoireAnswer(question, activeExam);
 }
 
 const SUGGESTIONS = [
@@ -239,28 +235,25 @@ export const BrisaVoiceAssistant = ({ activeExam }: { activeExam?: string }) => 
       setPhase('thinking');
 
       let answer = '';
-      let failed = false;
       try {
         answer = await askBrisa(q, historyRef.current.slice(-8), activeExamRef.current);
       } catch {
-        failed = true;
-        answer = 'Não consegui me conectar agora. Pode repetir a pergunta, por favor?';
+        answer = getBrisaRepertoireAnswer(q, activeExamRef.current);
       }
 
       if (requestId !== requestRef.current || !openRef.current) return;
-      if (!failed) {
-        historyRef.current = [
-          ...historyRef.current,
-          { role: 'user' as const, content: q },
-          { role: 'assistant' as const, content: answer },
-        ].slice(-10);
-      }
+      historyRef.current = [
+        ...historyRef.current,
+        { role: 'user' as const, content: q },
+        { role: 'assistant' as const, content: answer },
+      ].slice(-10);
+
       setReply(answer);
       // Atalho para o que a pessoa pediu; visitante sem conta sempre vê o convite ao cadastro.
       const found = brisaLinksFor(q);
       const hasSignup = found.some((l) => l.to.startsWith('/cadastro'));
       setLinks(!signedInRef.current && !hasSignup ? [...found.slice(0, 2), { to: '/cadastro', label: 'Criar meu cadastro grátis' }] : found);
-      speak(answer, !failed);
+      speak(answer, true);
     },
     [setPhase, speak],
   );

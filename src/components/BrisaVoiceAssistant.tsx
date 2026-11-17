@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import brisaPortrait from "@/assets/enf-brisa-portrait.jpeg";
 import { speakBrisa, stopBrisaVoice } from "@/lib/brisa-voice";
+import { getBrisaRepertoireAnswer } from "@/lib/brisa-voice-fallback";
 
 interface Props {
   contextBpm?: number | null;
@@ -173,7 +174,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           setStatus("processing");
           cleanupTimers();
           recognition.stop();
-        }, 1200);
+        }, 600);
       }
     };
 
@@ -235,6 +236,20 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
 
     setStatus("processing");
 
+    // Resposta instantânea (<50ms) para consultas comuns do monitor cardíaco e da plataforma
+    const trimmed = cleanedTranscript.toLowerCase();
+    const isDirectMatch = /^(como me[cç]o meus batimentos|como funciona o monitor|quais exames eu posso fazer|como marco uma consulta|quero me cadastrar|o que [eé] orienta[cç][aã]o t[eé]cnica|oi|ol[aá]|bom dia|boa tarde|boa noite)\??$/i.test(trimmed);
+
+    if (isDirectMatch) {
+      const instantReply = getBrisaRepertoireAnswer(cleanedTranscript, "Monitor Cardíaco");
+      historyRef.current.push(
+        { role: "user", content: cleanedTranscript },
+        { role: "assistant", content: instantReply },
+      );
+      speakReply(instantReply);
+      return;
+    }
+
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brisa-voice-chat`;
       const response = await fetch(url, {
@@ -243,6 +258,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
+        signal: AbortSignal.timeout(2500),
         body: JSON.stringify({
           transcript: cleanedTranscript,
           contextBpm: contextBpm ?? null,
@@ -255,32 +271,30 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
         }),
       });
 
-      if (response.status === 429) {
-        finalizeError(sessionId, "Muitas perguntas seguidas. Espere alguns segundos.");
-        return;
-      }
-
-      if (response.status === 402) {
-        finalizeError(sessionId, "O serviço de voz está indisponível no momento.");
-        return;
+      if (!response.ok) {
+        throw new Error(`voice_chat_status_${response.status}`);
       }
 
       const data = await response.json();
-      if (!response.ok || !data?.reply) {
-        console.error("Brisa backend error", data);
-        finalizeError(sessionId, "A Brisa não conseguiu responder agora. Toque e fale novamente.");
-        return;
+      const reply = data?.reply ? String(data.reply).trim() : "";
+      if (!reply) {
+        throw new Error("empty_reply");
       }
 
       historyRef.current.push(
         { role: "user", content: cleanedTranscript },
-        { role: "assistant", content: data.reply },
+        { role: "assistant", content: reply },
       );
 
-      speakReply(data.reply);
+      speakReply(reply);
     } catch (error) {
-      console.error("Brisa conversation failed", error);
-      finalizeError(sessionId, "A Brisa não conseguiu responder agora. Toque e fale novamente.");
+      console.warn("Brisa cloud voice fallback to clinical repertoire:", error);
+      const fallbackReply = getBrisaRepertoireAnswer(cleanedTranscript, "Monitor Cardíaco");
+      historyRef.current.push(
+        { role: "user", content: cleanedTranscript },
+        { role: "assistant", content: fallbackReply },
+      );
+      speakReply(fallbackReply);
     }
   };
 

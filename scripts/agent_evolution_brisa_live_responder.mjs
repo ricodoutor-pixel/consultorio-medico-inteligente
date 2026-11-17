@@ -1664,6 +1664,12 @@ async function loop() {
 
   while (true) {
     try {
+      if (isGlobalPauseActive()) {
+        log(`⏸️ [PAUSA GLOBAL ATIVA] PAUSE_AUTOMATION.flag detectado. Automação WhatsApp suspensa globalmente.`);
+        await new Promise(r => setTimeout(r, 10000));
+        continue;
+      }
+
       // 1. Checar estado da conexão
       const stateRes = await fetch(`${EVO_URL}/instance/connectionState/${INSTANCE}`, {
         headers: { 'apikey': EVO_KEY }

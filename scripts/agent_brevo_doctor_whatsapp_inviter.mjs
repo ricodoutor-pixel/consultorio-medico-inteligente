@@ -29,7 +29,13 @@ function isGlobalPauseActive() {
 function loadHumanLocked() {
   try {
     if (fs.existsSync(HUMAN_LOCK_FILE)) {
-      return new Set(JSON.parse(fs.readFileSync(HUMAN_LOCK_FILE, 'utf8')));
+      const raw = JSON.parse(fs.readFileSync(HUMAN_LOCK_FILE, 'utf8'));
+      if (Array.isArray(raw)) {
+        return new Set(raw.map(item => (typeof item === 'string' ? item : item?.jid || '')).filter(Boolean));
+      }
+      if (raw && typeof raw === 'object') {
+        return new Set(Object.keys(raw));
+      }
     }
   } catch (e) {}
   return new Set();

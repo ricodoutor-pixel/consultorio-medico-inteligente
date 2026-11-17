@@ -260,7 +260,13 @@ function saveProcessed(set) {
 function loadHumanLocked() {
   try {
     if (fs.existsSync(HUMAN_LOCK_FILE)) {
-      return new Set(JSON.parse(fs.readFileSync(HUMAN_LOCK_FILE, 'utf8')));
+      const raw = JSON.parse(fs.readFileSync(HUMAN_LOCK_FILE, 'utf8'));
+      if (Array.isArray(raw)) {
+        return new Set(raw.map(item => (typeof item === 'string' ? item : item?.jid || '')).filter(Boolean));
+      }
+      if (raw && typeof raw === 'object') {
+        return new Set(Object.keys(raw));
+      }
     }
   } catch (e) {}
   return new Set();
@@ -268,7 +274,27 @@ function loadHumanLocked() {
 
 function saveHumanLocked(set) {
   try {
-    fs.writeFileSync(HUMAN_LOCK_FILE, JSON.stringify(Array.from(set), null, 2));
+    const list = Array.from(set || []);
+    let existingObj = {};
+    if (fs.existsSync(HUMAN_LOCK_FILE)) {
+      try {
+        const raw = JSON.parse(fs.readFileSync(HUMAN_LOCK_FILE, 'utf8'));
+        if (raw && typeof raw === 'object' && !Array.isArray(raw)) existingObj = raw;
+      } catch (e) {}
+    }
+    const now = new Date().toISOString();
+    for (const key of list) {
+      if (!existingObj[key]) {
+        existingObj[key] = {
+          jid: key,
+          paused: true,
+          pausedAt: now,
+          pausedBy: 'operador_humano',
+          expiresAt: null
+        };
+      }
+    }
+    fs.writeFileSync(HUMAN_LOCK_FILE, JSON.stringify(existingObj, null, 2));
   } catch (e) {}
 }
 
@@ -577,13 +603,13 @@ function isOptOutRequested(text) {
 // Detecção rigorosa de solicitação de humano
 function isHumanRequested(text) {
   const low = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com (alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|falar com (alguem|a equipe|o suporte|o edilson)|equipe humana|nao quero (falar com )?(robo|bot|ia)|voce e (um )?robo)/i.test(low);
+  return /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|equipe humana|nao quero (falar com )?(robo|bot|ia)|voce e (um )?robo)/i.test(low);
 }
 
 // Detecção estrita de solicitação de pausa da automação / conversa
 function isPauseRequested(text) {
-  const low = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return /(pausar a automacao|pausar automacao|pausar a conversa|pausar conversa|pausar mensagens|pausar envio|parar de enviar|parar mensagens|pare de enviar|pare com as mensagens|nao quero mais mensagens|nao me envie mais|cancelar mensagens|silenciar robo|silenciar assistente|desativar robo|desativar assistente|\bpausar\b|\bparar\b|\bpause\b|\bstop\b)/i.test(low);
+  const low = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /(vou pausar|pausar a automacao|pausar automacao|pausar a conversa|pausar conversa|pausar mensagens|pausar envio|parar de enviar|parar mensagens|pare de enviar|pare com as mensagens|nao quero mais mensagens|nao me envie mais|cancelar mensagens|silenciar robo|silenciar assistente|silenciar automacao|desativar robo|desativar assistente|desativar automacao|\bpausar\b|\bparar\b|\bpause\b|\bstop\b)/i.test(low);
 }
 
 // Filtro estrito de respostas automáticas de consultórios/robôs para evitar loops
@@ -1773,13 +1799,16 @@ async function loop() {
                     text.includes('WeCann Planta y Raíz') ||
                     text.includes('Enfª Brisa');
                   
-                  if (!isBotOrAutomation && !humanLocked.has(canonical) && !humanLocked.has(jid)) {
-                    registerHumanTakeover(jid, true, false);
-                    registerHumanTakeover(canonical, true, false);
+                  const normFromMe = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                  const isExplicitPause = /vou pausar|pausar a automa[cç]|pausar automa[cç]|pausando automa[cç]|silenciar automa[cç]|pausa automa[cç]/.test(normFromMe);
+
+                  if ((isExplicitPause || !isBotOrAutomation) && (!humanLocked.has(canonical) || !humanLocked.has(jid))) {
+                    registerHumanTakeover(jid, true, false, { permanent: true });
+                    registerHumanTakeover(canonical, true, false, { permanent: true });
                     humanLocked.add(jid);
                     humanLocked.add(canonical);
                     saveHumanLocked(humanLocked);
-                    log(`🛑 [ASSUMIU HUMANO 24H] Mensagem manual enviada pela equipe no chat ${canonical}. IA silenciada por 24h.`);
+                    log(`🛑 [ASSUMIU HUMANO] Mensagem manual enviada pela equipe/Dr. Edilson no chat ${canonical} ("${text.slice(0, 60)}"). Automação silenciada permanentemente até liberação do operador.`);
                   }
                 }
               }

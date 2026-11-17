@@ -58,7 +58,7 @@ export function quickResponse({ question = '', senderName = '', role = 'patient'
   const q = normalizeText(question);
   // Emergency takes priority over sales, media and human handoff.
   if (/suicid|me matar|tirar minha vida|me machucar|infarto|falta de ar|dor forte|dor.*peito|socorro urgente|\bsamu\b|\b192\b/.test(q)) return { answer: 'Ligue agora para 192 (SAMU) ou procure o pronto-socorro mais próximo. Não espere atendimento por aqui.', model: 'safety-emergency' };
-  if (/atendente|humano|pessoa real|pessoa de verdade|falar com (alguem|uma pessoa|a equipe|o suporte|o dr|a dra|o edilson)|nao quero (falar com )?(robo|bot|ia)|reclamacao|absurdo|estou irritad/.test(q)) return { answer: 'Vou passar para nossa equipe. Retornamos por aqui.', handoff: true, model: 'human-handoff' };
+  if (/\b(atendente|humano|pessoa real|pessoa de verdade)\b|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|a equipe|o suporte|o dr|a dra|o edilson)|vou pausar|pausar a automa[cç]|pausar automa[cç]|silenciar automa[cç]|nao quero (falar com )?(robo|bot|ia)|reclamacao|absurdo|estou irritad/.test(q)) return { answer: 'Vou passar para nossa equipe. Retornamos por aqui.', handoff: true, model: 'human-handoff' };
   if (/voce e.*(robo|ia|enfermeira|medica)|quem e voce/.test(q)) return { answer: 'Sou a assistente virtual da Planta y Raiz. A equipe humana acompanha o atendimento. Como posso ajudar?', model: 'identity' };
   if (isAudio || q === 'audio' || q === '[audio recebido]') return { answer: 'Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?', model: 'audio-response' };
   if (isCall) return { answer: 'Por aqui não atendemos ligações. Pode escrever sua dúvida?', model: 'call-response' };

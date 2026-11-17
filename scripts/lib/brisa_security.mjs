@@ -109,8 +109,8 @@ export function loadHumanLocked() {
   try {
     if (fs.existsSync(HUMAN_LOCK_FILE)) {
       const raw = JSON.parse(fs.readFileSync(HUMAN_LOCK_FILE, 'utf8'));
-      if (Array.isArray(raw)) return new Map(raw.map(item => typeof item === 'string' ? [item, { expiresAt: Date.now() + 24 * 3600 * 1000 }] : [item.jid, item]));
-      if (typeof raw === 'object') return new Map(Object.entries(raw));
+      if (Array.isArray(raw)) return new Map(raw.map(item => typeof item === 'string' ? [item, { jid: item, paused: true, reason: 'pausa_solicitada', expiresAt: null }] : [item.jid, item]));
+      if (raw && typeof raw === 'object') return new Map(Object.entries(raw));
     }
   } catch (e) {}
   return new Map();

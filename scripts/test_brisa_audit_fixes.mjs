@@ -76,6 +76,8 @@ assert(checkSemanticRepetition(msg2, testJid, history24h) === true, "Trava anti-
 // 8. Teste de Emojis de Raiva e Pedido de Humano (Modo Humano e Pausa)
 assert(isAngryOrDemandsHuman("😡 que demora") === true, "Detecta emoji de raiva 😡");
 assert(isAngryOrDemandsHuman("quero falar com um atendente agora") === true, "Detecta pedido de atendente");
+assert(isAngryOrDemandsHuman("preciso falar com humano") === true, "Detecta 'preciso falar com humano'");
+assert(isAngryOrDemandsHuman("preciso de um humano") === true, "Detecta 'preciso de um humano'");
 assert(isAngryOrDemandsHuman("isso aqui é um golpe ou o que?") === true, "Detecta reclamação/golpe");
 assert(isAngryOrDemandsHuman("Quero uma pessoa de verdade") === true, "Detecta pedido de pessoa humana");
 assert(isAngryOrDemandsHuman("Olá, como funciona a consulta?") === false, "Mensagem normal não ativa modo de raiva");

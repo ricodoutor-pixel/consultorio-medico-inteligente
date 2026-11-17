@@ -25,6 +25,8 @@ describe('Brisa response safety rules', () => {
   });
   it('hands off to a human but answers identity questions honestly', () => {
     expect(quickResponse({ question: 'quero falar com o Dr Edilson' })?.handoff).toBe(true);
+    expect(quickResponse({ question: 'preciso falar com humano' })?.handoff).toBe(true);
+    expect(quickResponse({ question: 'vou pausar a automacao para esta conversa' })?.handoff).toBe(true);
     expect(quickResponse({ question: 'voce e um robo' })?.model).toBe('identity');
   });
   it('never promotes doctor ads for a pure greeting', () => {

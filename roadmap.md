@@ -1,5 +1,10 @@
 # Roadmap
 
+## Redução de rotinas automáticas — 17/11/2026
+- [x] Saúde do sistema, Mercado Pago, uptime, alert-monitor e consultation_guardian espaçados para 30 min; listagem confirma 672 → 240 execuções programadas/dia (432 a menos)
+- [x] email_queue_dispatch não existe no inventário atual; nenhuma rotina desativada foi reativada; hibernação não garantida enquanto persistirem rotinas frequentes
+- [ ] Espaçar filas e rotinas de atendimento — aguarda confirmação do Dr. Edilson: consultation_queue_sweep usa rodízio de 5 min, e appointment-automation tem janela de confirmação de 10 min; não alterar para 15/30 min sem revisão desses prazos
+
 ## Selos e ordem da vitrine — 17/11/2026
 - [x] Separar Premium pago e vigente de VIP por cadastro e documentos completos, sem conceder plano
 - [x] Ordenar Premium, VIP e demais por anexos reais; retirar privilégios por nome; 15 testes aprovados e card de Caio conferido sem selo

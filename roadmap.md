@@ -1,5 +1,13 @@
 # Roadmap
 
+## Conferência solicitada — 18/11/2026
+- [x] Consultar cadastros atuais: 49 registros profissionais, 31 aprovados, 17 pendentes, um rejeitado e seis novos nos últimos sete dias; lista não equivale à vitrine nem só a médicos humanos
+- [x] Executar testes existentes: 277 passaram e um teste externo foi omitido
+- [x] Conferir vitrine, Orientação, monitoramento e Produtos no navegador; site publicado usa fonte oficial, sem os nomes antigos nas páginas conferidas
+- [x] Identificar resposta genérica da Brisa à pergunta sobre privacidade e avisos indevidos de supervisão da Dra. Suelen no monitoramento/rodapé; apenas diagnóstico, sem mudanças
+- [x] Conferir horários atuais: fila a cada minuto, ofertas a cada dois, lembretes a cada dez e guardian a cada trinta; nenhum horário alterado
+- [x] Entregar lista e limites da conferência: acesso admin indisponível para a conta própria; áudio físico, exames reais e consulta completa com pagamento/receita/repasse não comprovados
+
 ## Redução de rotinas automáticas — 17/11/2026
 - [x] Saúde do sistema, Mercado Pago, uptime, alert-monitor e consultation_guardian espaçados para 30 min; listagem confirma 672 → 240 execuções programadas/dia (432 a menos)
 - [x] email_queue_dispatch não existe no inventário atual; nenhuma rotina desativada foi reativada; hibernação não garantida enquanto persistirem rotinas frequentes

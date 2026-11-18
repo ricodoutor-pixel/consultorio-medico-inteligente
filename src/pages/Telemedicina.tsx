@@ -868,7 +868,7 @@ const Telemedicina = () => {
                     {consultPix && !consultPaid && (
                       <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
                         <p className="text-sm text-foreground">
-                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {consultPix.amount.toFixed(2).replace(".", ",")} · Recebedor: <strong>{consultPix.receiver_name || "Planta y Raiz Ltda"}</strong>
+                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {Number(consultPix.amount || (selectedServiceMode === "video" ? 150 : 100)).toFixed(2).replace(".", ",")} · Recebedor: <strong>{consultPix.receiver_name || "Planta y Raiz Ltda"}</strong>
                         </p>
                         <img src={`data:image/png;base64,${consultPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2 shadow-md" />
                         <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto bg-muted/40 p-2 rounded-xl">{consultPix.qr_code}</p>

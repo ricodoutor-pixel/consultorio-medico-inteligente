@@ -69,9 +69,11 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     void refresh();
     const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) void refresh(); };
     window.addEventListener("pageshow", onPageShow);
-    if (sessionStorage.getItem("account-logout-notice")) {
-      sessionStorage.removeItem("account-logout-notice"); toast.success("Você saiu da conta.");
-    }
+    try {
+      if (typeof window !== "undefined" && window.sessionStorage?.getItem("account-logout-notice")) {
+        window.sessionStorage.removeItem("account-logout-notice"); toast.success("Você saiu da conta.");
+      }
+    } catch {}
     return () => { alive = false; generation++; subscription.unsubscribe(); window.removeEventListener("pageshow", onPageShow); };
   }, [queryClient]);
 
@@ -88,14 +90,29 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         setUser(null); setIsAdmin(false); setWarning(false);
         await queryClient.cancelQueries(); queryClient.clear();
         await supabase.removeAllChannels();
-        for (const store of [localStorage, sessionStorage]) {
-          for (const key of Object.keys(store)) if (isAccountStorageKey(key)) store.removeItem(key);
-        }
-        for (const cookie of document.cookie.split(";")) {
-          const name = cookie.split("=")[0].trim();
-          if (isAccountStorageKey(name)) document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
-        }
-        sessionStorage.setItem("account-logout-notice", "1");
+        try {
+          if (typeof window !== "undefined") {
+            const stores: Storage[] = [];
+            try { if (window.localStorage) stores.push(window.localStorage); } catch {}
+            try { if (window.sessionStorage) stores.push(window.sessionStorage); } catch {}
+            for (const store of stores) {
+              try {
+                for (const key of Object.keys(store)) if (isAccountStorageKey(key)) store.removeItem(key);
+              } catch {}
+            }
+          }
+        } catch {}
+        try {
+          if (typeof document !== "undefined" && document.cookie) {
+            for (const cookie of document.cookie.split(";")) {
+              const name = cookie.split("=")[0].trim();
+              if (isAccountStorageKey(name)) document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
+            }
+          }
+        } catch {}
+        try {
+          if (typeof window !== "undefined") window.sessionStorage?.setItem("account-logout-notice", "1");
+        } catch {}
       }, () => window.location.replace("/"));
     } catch {
       toast.error("Não foi possível sair. Verifique sua conexão e tente novamente.");

@@ -9,10 +9,13 @@ import "./index.css";
 // console.error é mantido para que Sentry/observability capturem erros reais.
 // Opt-out: ?debug=1 na URL ou localStorage.PR_DEBUG === "1".
 if (import.meta.env.PROD) {
-  const debugForced =
-    typeof window !== "undefined" &&
-    (new URLSearchParams(window.location.search).get("debug") === "1" ||
-      window.localStorage?.getItem("PR_DEBUG") === "1");
+  let debugForced = false;
+  try {
+    debugForced =
+      typeof window !== "undefined" &&
+      (new URLSearchParams(window.location.search).get("debug") === "1" ||
+        window.localStorage?.getItem("PR_DEBUG") === "1");
+  } catch {}
   if (!debugForced) {
     const noop = () => {};
     console.log = noop;
@@ -35,10 +38,14 @@ const clearRuntimeCaches = async () => {
   }
 };
 const reloadOnce = () => {
-  if (!sessionStorage.getItem(RELOAD_KEY)) {
-    sessionStorage.setItem(RELOAD_KEY, "1");
-    devlog.warn("⚠️ Chunk falhou ao carregar. Recarregando…");
-    void clearRuntimeCaches().finally(() => window.location.reload());
+  try {
+    if (typeof window !== "undefined" && !window.sessionStorage?.getItem(RELOAD_KEY)) {
+      window.sessionStorage?.setItem(RELOAD_KEY, "1");
+      devlog.warn("⚠️ Chunk falhou ao carregar. Recarregando…");
+      void clearRuntimeCaches().finally(() => window.location.reload());
+    }
+  } catch {
+    window.location.reload();
   }
 };
 // 🛡️ Previne que rejeições de extensões do navegador (MetaMask, Phantom, etc.) crashem o app ou o preview da Lovable
@@ -79,7 +86,9 @@ window.addEventListener("error", (e) => {
       m.includes("Importing a module script failed")) reloadOnce();
 });
 window.addEventListener("load", () => {
-  setTimeout(() => sessionStorage.removeItem(RELOAD_KEY), 5000);
+  setTimeout(() => {
+    try { window.sessionStorage?.removeItem(RELOAD_KEY); } catch {}
+  }, 5000);
 });
 
 // PWA: Guard against service workers in preview/iframe contexts

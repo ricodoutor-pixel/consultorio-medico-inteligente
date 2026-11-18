@@ -140,7 +140,11 @@ export const WhatsAppButton = () => {
       setShowHint(false);
       return;
     }
-    if (isDenseCatalogRoute || sessionStorage.getItem("pyr_brisa_hint_shown")) return;
+    let alreadyShown = false;
+    try {
+      alreadyShown = typeof window !== "undefined" && !!window.sessionStorage?.getItem("pyr_brisa_hint_shown");
+    } catch {}
+    if (isDenseCatalogRoute || alreadyShown) return;
     // Badge "Oi! Posso ajudar?" após 3s como solicitado pelo usuário
     const t = setTimeout(() => setShowHint(true), 3000);
     return () => clearTimeout(t);
@@ -155,7 +159,9 @@ export const WhatsAppButton = () => {
   useEffect(() => {
     if (isOpen) {
       setShowHint(false);
-      sessionStorage.setItem("pyr_brisa_hint_shown", "1");
+      try {
+        if (typeof window !== "undefined") window.sessionStorage?.setItem("pyr_brisa_hint_shown", "1");
+      } catch {}
     }
   }, [isOpen]);
 

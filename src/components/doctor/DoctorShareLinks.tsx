@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Copy, Link2, Loader2, MessageSquare, Stethoscope, Users, Video, Share2, UserPlus } from "lucide-react";
+import { Copy, Link2, Loader2, MessageSquare, Stethoscope, Users, Video, Share2, UserPlus, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -42,21 +42,21 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
     ? [
         { 
           icon: Video, 
-          label: "Pacientes — consulta por vídeo comigo", 
+          label: "Pacientes — consulta por vídeo comigo (cai direto)", 
           url: links.video,
           shareText: "Olá! Você pode agendar uma teleconsulta diretamente comigo pelo consultório virtual da Planta y Raíz:"
         },
         { 
           icon: MessageSquare, 
-          label: "Pacientes — consulta por chat comigo", 
+          label: "Pacientes — consulta por chat comigo (cai direto)", 
           url: links.chat,
           shareText: "Olá! Se preferir atendimento ágil por chat, inicie sua consulta comigo através deste link:"
         },
         { 
           icon: Users, 
-          label: "Colegas — cadastro de profissional", 
+          label: "Colegas médicos — convite & comissões em 3 gerações", 
           url: links.colleague,
-          shareText: "Olá, colega médico! Convido você a fazer parte da equipe de telemedicina da Planta y Raíz com consultório inteligente:"
+          shareText: "Olá, colega médico! Convido você a fazer parte da equipe de telemedicina da Planta y Raíz com consultório inteligente e comissões vitalícias em até 3 gerações:"
         },
         { 
           icon: UserPlus, 
@@ -78,6 +78,20 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
           Envie aos seus pacientes: a consulta já abre com você escolhido. Se você não puder atender na hora, o paciente
           segue na fila oficial (assinantes → plantão online → sala de espera).
         </p>
+
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="space-y-0.5">
+            <span className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
+              <Sparkles size={13} /> Renda Mensal Vitalícia em 3 Gerações (Médico Sócio)
+            </span>
+            <p className="text-[11px] text-emerald-200/90 leading-tight">
+              Indique colegas e pacientes. Ganhe comissões vitalícias em cascata toda vez que sua rede atende, assina ou expande novos membros!
+            </p>
+          </div>
+          <Button size="sm" variant="outline" className="h-7 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 shrink-0" asChild>
+            <a href="/indicacoes">Simulador & Extrato <ArrowRight size={12} className="ml-1" /></a>
+          </Button>
+        </div>
         {error && <p className="text-sm text-red-600">Não foi possível carregar seus links agora. Recarregue a página.</p>}
         {!links && !error && (
           <p className="text-sm text-muted-foreground inline-flex items-center gap-2">

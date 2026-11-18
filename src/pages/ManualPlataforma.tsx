@@ -38,9 +38,25 @@ import {
   AlertTriangle,
   MessageCircle,
   UserPlus,
+  Users,
+  TrendingUp,
+  Crown,
+  DollarSign,
+  Layers,
+  Network,
+  Copy,
+  Percent,
+  Flame,
+  Zap,
+  Share2,
+  CheckCircle2,
   type LucideIcon
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Slider } from "@/components/ui/slider";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { loadPermanentReferralCode } from "@/lib/referral-code";
 
 const ComicPanel = ({ children, className = "", color = "emerald" }: { children: React.ReactNode, className?: string, color?: "emerald" | "sky" | "purple" | "amber" }) => {
   const borderMap = {
@@ -206,14 +222,18 @@ const DOCTOR_STEPS: DoctorStep[] = [
     link: { to: "/consultorio", label: "Ver meu saldo" },
   },
   {
-    icon: Link2,
-    title: "Traga seus pacientes e colegas",
+    icon: Network,
+    title: "Traga seus pacientes e colegas — Renda Mensal Vitalícia em 3 Gerações",
+    highlight: true,
     items: [
-      "Em Consultório → Perfil e KYC → \"Meus links personalizados\", copie seus links de consulta por chat e por vídeo. Com eles, o paciente cai direto com você.",
-      "O link de convite cadastra colegas médicos ligados à sua indicação.",
-      "Planos pagos (a partir de R$ 99/mês) dão prioridade na fila de consultas e mais uso das ferramentas de IA. Eles são opcionais.",
+      "No Consultório ou no topo do Dashboard Médico, acesse seus 4 Links Personalizados exclusivos vinculados ao seu CRM e ao seu código permanente no servidor (ensure_referral_code).",
+      "Link de Pacientes (Vídeo ou Chat): o paciente entra direto com você para consulta ou renovação de receita, sem passar pela fila geral da plataforma.",
+      "Link de Colegas Médicos: cadastra novos médicos que viram sua 1ª Geração no programa Médico Sócio.",
+      "Renda Mensal Vitalícia até a 3ª Geração: toda vez que seus colegas atendem, assinam planos ou indicam novos colegas (2ª e 3ª geração), você recebe comissões perpétuas em cascata caindo no Pix.",
+      "Exemplo real (efeito viral): indicando apenas 1 colega que indica 3 até a 3ª geração (13 médicos na rede), você gera de R$ 1.160 a R$ 2.450/mês de salário vitalício!",
     ],
-    link: { to: "/planos", label: "Ver planos" },
+    note: "Cada indicação fica gravada perpetuamente ao seu código no banco de dados. Nunca expira!",
+    link: { to: "/indicacoes", label: "Abrir Painel de Indicações & Simulador" },
   },
 ];
 
@@ -233,6 +253,70 @@ export default function ManualPlataforma() {
     setActiveTab(value);
     setSearchParams({ tab: value });
   };
+
+  // Simulador de Indicações em 3 Gerações (Médico Sócio)
+  const [docDirects, setDocDirects] = useState(3);
+  const [docPerColleague, setDocPerColleague] = useState(3);
+
+  // Simulador de Indicações para Pacientes
+  const [patientDirects, setPatientDirects] = useState(5);
+  const [patientPerFriend, setPatientPerFriend] = useState(3);
+
+  // Código permanente do usuário logado
+  const [userCode, setUserCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          const code = await loadPermanentReferralCode(session.user.id).catch(() => null);
+          if (code) setUserCode(code);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const copyText = (text: string, label: string) => {
+    void navigator.clipboard.writeText(text).then(
+      () => toast.success(`${label} copiado com sucesso!`),
+      () => toast.error("Não foi possível copiar o link."),
+    );
+  };
+
+  const shareWhatsApp = (text: string, url: string) => {
+    const full = `${text}\n${url}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(full)}`, "_blank");
+  };
+
+  // Cálculos do simulador médico
+  const gen1Docs = docDirects;
+  const gen2Docs = gen1Docs * docPerColleague;
+  const gen3Docs = gen2Docs * docPerColleague;
+  const totalNetworkDocs = gen1Docs + gen2Docs + gen3Docs;
+
+  // Comissões mensais sobre assinaturas de planos médicos:
+  // G1: R$ 50/mês | G2: R$ 15/mês | G3: R$ 10/mês
+  const subEarnings = (gen1Docs * 50) + (gen2Docs * 15) + (gen3Docs * 10);
+  // Volume clínico estimado da rede (15 atendimentos/mês por médico ativo a R$ 5/atendimento em comissão de rede)
+  const clinicalNetworkEarnings = totalNetworkDocs * 15 * 5;
+  const totalDocMonthlySalary = subEarnings + clinicalNetworkEarnings;
+
+  // Cálculos do simulador paciente
+  const gen1Patients = patientDirects;
+  const gen2Patients = gen1Patients * patientPerFriend;
+  const gen3Patients = gen2Patients * patientPerFriend;
+  const totalNetworkPatients = gen1Patients + gen2Patients + gen3Patients;
+  // Assinatura média de R$ 50/mês: G1 (50% = R$ 25), G2 (5% = R$ 2.5), G3 (2% = R$ 1)
+  const patientEarnings = (gen1Patients * 25) + (gen2Patients * 2.5) + (gen3Patients * 1);
+
+  const colleagueShareLink = userCode 
+    ? `${typeof window !== "undefined" ? window.location.origin : "https://plantayraiz.com.br"}/cadastro-profissional?ref=${encodeURIComponent(userCode)}`
+    : `${typeof window !== "undefined" ? window.location.origin : "https://plantayraiz.com.br"}/cadastro-profissional`;
+
+  const patientShareLink = userCode
+    ? `${typeof window !== "undefined" ? window.location.origin : "https://plantayraiz.com.br"}/cadastro?ref=${encodeURIComponent(userCode)}`
+    : `${typeof window !== "undefined" ? window.location.origin : "https://plantayraiz.com.br"}/cadastro`;
 
   return (
     <div className="min-h-dvh bg-background text-foreground flex flex-col">
@@ -460,6 +544,140 @@ export default function ManualPlataforma() {
                 </div>
               </ComicPanel>
 
+              {/* ETAPA 4: INDIQUE AMIGOS & FAMILIARES - RENDA MENSAL VITALÍCIA VIA PIX */}
+              <ComicPanel color="purple" className="md:col-span-2 ring-2 ring-purple-400/60 bg-purple-950/20">
+                <NarrationBox text="ETAPA 4: INDIQUE AMIGOS & FAMILIARES — RENDA MENSAL VITALÍCIA VIA PIX" color="purple" />
+                
+                <div className="flex flex-col lg:flex-row gap-6 items-start">
+                  <div className="flex-1 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Flame className="text-purple-400" size={24} />
+                      <h3 className="text-lg sm:text-xl font-black text-white">
+                        Ganhe Comissões Recorrentes Todo Mês Indicando Saúde!
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm font-bold text-slate-200 leading-relaxed">
+                      Compartilhe seu link exclusivo com amigos, familiares e contatos. Toda vez que alguém se cadastra pelo seu link e assina um plano ou realiza atendimentos na plataforma, você recebe comissões perpétuas caindo direto no seu Pix em até 3 gerações:
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="bg-slate-950/90 border-2 border-purple-500/50 p-3.5 rounded-2xl">
+                        <span className="text-xs font-black uppercase text-purple-300 flex items-center gap-1.5">
+                          <Crown size={14} className="text-amber-400" /> 1ª Geração (Diretos)
+                        </span>
+                        <p className="text-2xl font-black text-white mt-1">50%</p>
+                        <p className="text-[11px] font-bold text-purple-200">De comissão mensal recorrente</p>
+                      </div>
+
+                      <div className="bg-slate-950/90 border-2 border-sky-500/50 p-3.5 rounded-2xl">
+                        <span className="text-xs font-black uppercase text-sky-300 flex items-center gap-1.5">
+                          <Layers size={14} className="text-sky-400" /> 2ª Geração (Indiretos)
+                        </span>
+                        <p className="text-2xl font-black text-white mt-1">5%</p>
+                        <p className="text-[11px] font-bold text-sky-200">Dos amigos dos seus amigos</p>
+                      </div>
+
+                      <div className="bg-slate-950/90 border-2 border-emerald-500/50 p-3.5 rounded-2xl">
+                        <span className="text-xs font-black uppercase text-emerald-300 flex items-center gap-1.5">
+                          <Network size={14} className="text-emerald-400" /> 3ª Geração (Rede)
+                        </span>
+                        <p className="text-2xl font-black text-white mt-1">2%</p>
+                        <p className="text-[11px] font-bold text-emerald-200">Expansão viral perpétua</p>
+                      </div>
+                    </div>
+
+                    {/* Simulador Interativo Paciente */}
+                    <div className="bg-slate-950/90 border-2 border-purple-500/60 p-4 rounded-2xl space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-black text-purple-300 text-sm flex items-center gap-1.5">
+                          <TrendingUp size={16} /> SIMULADOR DE RENDA PASSIVA PARA USUÁRIOS
+                        </h4>
+                        <span className="text-xs font-extrabold bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full border border-purple-500/40">
+                          3 Gerações Ativas
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold text-slate-300">
+                            <span>Amigos indicados diretamente (G1):</span>
+                            <span className="text-purple-400 font-black text-sm">{patientDirects} amigos</span>
+                          </div>
+                          <Slider 
+                            value={[patientDirects]} 
+                            min={1} 
+                            max={20} 
+                            step={1} 
+                            onValueChange={(val) => setPatientDirects(val[0])}
+                            className="py-2" 
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold text-slate-300">
+                            <span>Quantos cada amigo indica (G2 e G3):</span>
+                            <span className="text-sky-400 font-black text-sm">{patientPerFriend} amigos</span>
+                          </div>
+                          <Slider 
+                            value={[patientPerFriend]} 
+                            min={1} 
+                            max={10} 
+                            step={1} 
+                            onValueChange={(val) => setPatientPerFriend(val[0])}
+                            className="py-2" 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="bg-purple-950/40 border border-purple-500/40 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <div className="text-xs font-bold text-slate-300 text-center sm:text-left">
+                          <p>Rede total: <strong className="text-white">{totalNetworkPatients} usuários</strong> ({gen1Patients} na G1 + {gen2Patients} na G2 + {gen3Patients} na G3)</p>
+                          <p className="text-[11px] text-purple-200">Comissões mensais creditadas no seu saldo e sacáveis via Pix</p>
+                        </div>
+                        <div className="text-center sm:text-right shrink-0">
+                          <span className="text-[11px] font-black uppercase text-purple-300 block">Sua Renda Mensal Vitalícia</span>
+                          <span className="text-2xl font-black text-emerald-400">
+                            R$ {patientEarnings.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mês
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botões de Ação */}
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                      <Button 
+                        size="sm"
+                        onClick={() => copyText(patientShareLink, "Seu Link de Paciente")}
+                        className="bg-purple-600 hover:bg-purple-500 text-white font-black rounded-xl text-xs"
+                      >
+                        <Copy size={14} className="mr-1.5" /> Copiar Meu Link de Indicação
+                      </Button>
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        onClick={() => shareWhatsApp(
+                          "Olha que incrível a Planta y Raíz! Criei minha conta para cuidar da minha saúde e renovar receitas direto com médicos especialistas. Cadastre-se pelo meu link:",
+                          patientShareLink
+                        )}
+                        className="border-emerald-500/60 text-emerald-300 hover:bg-emerald-500/10 font-black rounded-xl text-xs"
+                      >
+                        <Share2 size={14} className="mr-1.5" /> Enviar no WhatsApp
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        asChild
+                        className="text-purple-300 hover:text-white font-black text-xs"
+                      >
+                        <Link to="/indicacoes">
+                          <Network size={14} className="mr-1.5" /> Ver Painel Completo de Indicações
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </ComicPanel>
+
             </div>
           </TabsContent>
 
@@ -526,6 +744,343 @@ export default function ManualPlataforma() {
                 </ComicPanel>
               ))}
             </div>
+
+            {/* ============================================================ */}
+            {/* CAPÍTULO ESPECIAL: PROGRAMA MÉDICO SÓCIO — RENDA VITALÍCIA */}
+            {/* ============================================================ */}
+            <ComicPanel color="emerald" className="ring-2 ring-emerald-400 border-2 border-emerald-400 bg-emerald-950/20">
+              <NarrationBox text="CAPÍTULO ESPECIAL: PROGRAMA MÉDICO SÓCIO — RENDA MENSAL VITALÍCIA EM 3 GERAÇÕES" color="emerald" />
+
+              <div className="space-y-6">
+                {/* HERO DO PROGRAMA */}
+                <div className="flex flex-col md:flex-row items-center gap-4 bg-slate-950/90 border-2 border-emerald-500/50 p-5 rounded-2xl shadow-xl">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30">
+                    <Crown size={36} className="text-slate-950" />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 text-xs font-black uppercase px-3 py-0.5 rounded-full border border-emerald-500/40 mb-1.5">
+                      <Zap size={13} /> O Motor de Crescimento da Plataforma — Faça a Roda Girar!
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                      Crie um Salário Robusto e Vitalício no seu Pix Compartilhando seu Link
+                    </h3>
+                    <p className="text-xs sm:text-sm font-bold text-emerald-200 mt-1 leading-relaxed">
+                      Você não precisa viver apenas do tempo gasto atendendo consultas: no programa <strong className="text-white">Médico Sócio</strong>, cada colega médico e paciente que você indica fica registrado permanentemente ao seu CRM no servidor. Você recebe comissões perpétuas em cascata até a <strong className="text-emerald-400">3ª Geração</strong> toda vez que eles assinam planos, atendem ou renovam receitas!
+                    </p>
+                  </div>
+                </div>
+
+                {/* AS 3 GERAÇÕES EXPLICADAS */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-slate-950/95 border-2 border-emerald-400 p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Crown size={15} /> 1ª Geração
+                        </span>
+                        <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-400/40">
+                          DIRETO
+                        </span>
+                      </div>
+                      <h4 className="text-base font-black text-white">Médicos Indicados por Você</h4>
+                      <p className="text-xs font-bold text-slate-300 leading-relaxed">
+                        Colegas que criam a conta pelo seu link exclusivo.
+                      </p>
+                      <div className="pt-2 space-y-1.5 text-xs font-black">
+                        <p className="text-emerald-300 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
+                          <span>R$ 50,00/mês por plano ativo</span>
+                        </p>
+                        <p className="text-teal-300 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-teal-400 shrink-0" />
+                          <span>+ comissão sobre consultas realizadas</span>
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] font-bold text-slate-400 mt-3 pt-3 border-t border-slate-800">
+                      Vínculo definitivo com trava no banco de dados.
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-950/95 border-2 border-sky-400 p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Layers size={15} /> 2ª Geração
+                        </span>
+                        <span className="bg-sky-500/20 text-sky-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-sky-400/40">
+                          INDIRETO
+                        </span>
+                      </div>
+                      <h4 className="text-base font-black text-white">Indicados dos Seus Colegas</h4>
+                      <p className="text-xs font-bold text-slate-300 leading-relaxed">
+                        Médicos trazidos pelos colegas da sua 1ª geração.
+                      </p>
+                      <div className="pt-2 space-y-1.5 text-xs font-black">
+                        <p className="text-sky-300 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-sky-400 shrink-0" />
+                          <span>R$ 15,00/mês por plano ativo</span>
+                        </p>
+                        <p className="text-sky-200 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-sky-300 shrink-0" />
+                          <span>+ comissão perpétua sobre atendimentos</span>
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] font-bold text-slate-400 mt-3 pt-3 border-t border-slate-800">
+                      Você ganha sem precisar conhecer o novo médico.
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-950/95 border-2 border-purple-400 p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Network size={15} /> 3ª Geração
+                        </span>
+                        <span className="bg-purple-500/20 text-purple-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-purple-400/40">
+                          EXPANSÃO VIRAL
+                        </span>
+                      </div>
+                      <h4 className="text-base font-black text-white">Rede Expandida da 2ª Geração</h4>
+                      <p className="text-xs font-bold text-slate-300 leading-relaxed">
+                        A multiplicação geométrica da rede médica pelo Brasil.
+                      </p>
+                      <div className="pt-2 space-y-1.5 text-xs font-black">
+                        <p className="text-purple-300 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-purple-400 shrink-0" />
+                          <span>R$ 10,00/mês por plano ativo</span>
+                        </p>
+                        <p className="text-purple-200 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-purple-300 shrink-0" />
+                          <span>+ comissão perpétua sobre atendimentos</span>
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] font-bold text-slate-400 mt-3 pt-3 border-t border-slate-800">
+                      Efeito bola de neve: faturamento passivo 24h por dia.
+                    </p>
+                  </div>
+                </div>
+
+                {/* EXEMPLO CONCRETO EXATO: 1 MÉDICO QUE INDICA 3 ATÉ A 3ª GERAÇÃO */}
+                <div className="rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-950/40 via-slate-950 to-slate-950 p-5 sm:p-6 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Flame className="text-amber-400" size={24} />
+                    <h4 className="text-lg sm:text-xl font-black text-amber-300">
+                      Exemplo Concreto: Indicando apenas 1 colega médico que indica mais 3 até a 3ª geração
+                    </h4>
+                  </div>
+                  <p className="text-xs sm:text-sm font-bold text-slate-200 leading-relaxed mb-4">
+                    Veja como o poder da multiplicação exponencial em 3 níveis transforma um único convite inicial em um salário mensal robusto e permanente:
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center mb-4">
+                    <div className="bg-slate-950 border-2 border-emerald-500/50 p-3.5 rounded-xl">
+                      <p className="text-[11px] font-black text-emerald-400 uppercase">1ª Geração</p>
+                      <p className="text-2xl font-black text-white mt-0.5">1 Médico</p>
+                      <p className="text-[11px] font-bold text-slate-300">Convidado por você</p>
+                      <p className="text-xs font-black text-emerald-300 mt-1">R$ 50,00/mês</p>
+                    </div>
+
+                    <div className="bg-slate-950 border-2 border-sky-500/50 p-3.5 rounded-xl">
+                      <p className="text-[11px] font-black text-sky-400 uppercase">2ª Geração (1 × 3)</p>
+                      <p className="text-2xl font-black text-white mt-0.5">3 Médicos</p>
+                      <p className="text-[11px] font-bold text-slate-300">Ele indicou 3 colegas</p>
+                      <p className="text-xs font-black text-sky-300 mt-1">R$ 45,00/mês</p>
+                    </div>
+
+                    <div className="bg-slate-950 border-2 border-purple-500/50 p-3.5 rounded-xl">
+                      <p className="text-[11px] font-black text-purple-400 uppercase">3ª Geração (3 × 3)</p>
+                      <p className="text-2xl font-black text-white mt-0.5">9 Médicos</p>
+                      <p className="text-[11px] font-bold text-slate-300">Os 3 indicaram 3 cada</p>
+                      <p className="text-xs font-black text-purple-300 mt-1">R$ 90,00/mês</p>
+                    </div>
+
+                    <div className="bg-emerald-950/70 border-2 border-emerald-400 p-3.5 rounded-xl flex flex-col justify-center">
+                      <p className="text-[11px] font-black text-emerald-300 uppercase">Total na Sua Rede</p>
+                      <p className="text-2xl font-black text-emerald-300 mt-0.5">13 Médicos</p>
+                      <p className="text-[11px] font-bold text-emerald-200">Trabalhando & Atendendo</p>
+                      <p className="text-xs font-black text-emerald-400 mt-1">100% vitalício</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950/90 border border-amber-500/40 rounded-xl p-4 space-y-2.5">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-2">
+                      <span className="text-xs font-bold text-slate-300">Comissão fixa mensal de planos médicos (1×50 + 3×15 + 9×10):</span>
+                      <span className="text-sm font-black text-amber-300">R$ 185,00 / mês</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-2">
+                      <span className="text-xs font-bold text-slate-300">Comissão clínica estimada (13 médicos × 15 atendimentos/mês = 195 consultas a ~R$ 5 médio de repasse de rede):</span>
+                      <span className="text-sm font-black text-emerald-300">+ R$ 975,00 / mês</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-1">
+                      <span className="text-sm font-black text-white">SALÁRIO MENSAL ESTIMADO PARA VOCÊ NO PIX:</span>
+                      <span className="text-2xl font-black text-emerald-400">R$ 1.160,00 a R$ 2.135,00 / mês</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] font-bold text-amber-200/90 mt-3 text-center sm:text-left">
+                    💡 <strong>E se você convidar 3 colegas diretos que façam o mesmo?</strong> Sua rede sobe para 39 médicos e sua renda mensal passa de <strong>R$ 3.480,00 a R$ 6.400,00/mês</strong>. Com 5 médicos, supera <strong>R$ 10.000,00/mês</strong> de renda vitalícia!
+                  </p>
+                </div>
+
+                {/* SIMULADOR INTERATIVO COM SLIDERS */}
+                <div className="bg-slate-950/95 border-2 border-emerald-500/60 p-5 sm:p-6 rounded-2xl space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                      <h4 className="text-lg font-black text-white flex items-center gap-2">
+                        <TrendingUp className="text-emerald-400" size={20} />
+                        Simulador Interativo de Ganhos Médicos em 3 Gerações
+                      </h4>
+                      <p className="text-xs font-bold text-slate-400 mt-0.5">
+                        Arraste os controles abaixo para simular qualquer tamanho de rede e ver o faturamento mensal projetado:
+                      </p>
+                    </div>
+                    <span className="text-xs font-extrabold bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/40 shrink-0">
+                      Cálculo em Tempo Real
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm font-bold text-slate-200">
+                          1. Quantos colegas você convida diretamente (1ª Geração)?
+                        </span>
+                        <span className="text-base font-black text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-lg border border-emerald-500/40">
+                          {docDirects} médicos
+                        </span>
+                      </div>
+                      <Slider 
+                        value={[docDirects]} 
+                        min={1} 
+                        max={20} 
+                        step={1} 
+                        onValueChange={(val) => setDocDirects(val[0])}
+                        className="py-3" 
+                      />
+                      <p className="text-[11px] font-bold text-slate-400">
+                        Cada colega direto gera R$ 50/mês em plano + comissão de atendimento.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm font-bold text-slate-200">
+                          2. Quantos médicos cada colega indica (2ª e 3ª Geração)?
+                        </span>
+                        <span className="text-base font-black text-sky-400 bg-sky-500/20 px-2.5 py-0.5 rounded-lg border border-sky-500/40">
+                          {docPerColleague} médicos
+                        </span>
+                      </div>
+                      <Slider 
+                        value={[docPerColleague]} 
+                        min={1} 
+                        max={10} 
+                        step={1} 
+                        onValueChange={(val) => setDocPerColleague(val[0])}
+                        className="py-3" 
+                      />
+                      <p className="text-[11px] font-bold text-slate-400">
+                        Multiplicação automática da sua rede em cascata.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* RESULTADO DO SIMULADOR */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div className="bg-slate-900/90 border border-emerald-500/40 p-3 rounded-xl">
+                      <p className="text-[10px] font-bold text-emerald-400 uppercase">1ª Geração</p>
+                      <p className="text-xl font-black text-white">{gen1Docs}</p>
+                      <p className="text-[10px] font-bold text-slate-400">médicos diretos</p>
+                    </div>
+                    <div className="bg-slate-900/90 border border-sky-500/40 p-3 rounded-xl">
+                      <p className="text-[10px] font-bold text-sky-400 uppercase">2ª Geração</p>
+                      <p className="text-xl font-black text-white">{gen2Docs}</p>
+                      <p className="text-[10px] font-bold text-slate-400">médicos indiretos</p>
+                    </div>
+                    <div className="bg-slate-900/90 border border-purple-500/40 p-3 rounded-xl">
+                      <p className="text-[10px] font-bold text-purple-400 uppercase">3ª Geração</p>
+                      <p className="text-xl font-black text-white">{gen3Docs}</p>
+                      <p className="text-[10px] font-bold text-slate-400">médicos na rede</p>
+                    </div>
+                    <div className="bg-emerald-950/80 border-2 border-emerald-400 p-3 rounded-xl">
+                      <p className="text-[10px] font-bold text-emerald-300 uppercase">Rede Total</p>
+                      <p className="text-xl font-black text-emerald-300">{totalNetworkDocs}</p>
+                      <p className="text-[10px] font-bold text-emerald-200">médicos ativos</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-emerald-950/70 border-2 border-emerald-400 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+                    <div>
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center justify-center sm:justify-start gap-1.5">
+                        <DollarSign size={16} /> Salário Mensal Estimado no Pix (Planos + Atendimentos)
+                      </span>
+                      <p className="text-3xl sm:text-4xl font-black text-white mt-1">
+                        R$ {totalDocMonthlySalary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <span className="text-sm font-bold text-emerald-300"> / mês</span>
+                      </p>
+                      <p className="text-xs font-bold text-slate-300 mt-1">
+                        Sendo R$ {subEarnings.toLocaleString("pt-BR")} fixos em planos + ~R$ {clinicalNetworkEarnings.toLocaleString("pt-BR")} de volume clínico da rede
+                      </p>
+                    </div>
+
+                    <div className="shrink-0 flex flex-col items-center sm:items-end gap-1">
+                      <span className="text-[11px] font-extrabold text-emerald-300 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/40">
+                        ⚡ Saque Direto no Pix
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        Sem burocracia • Sem intermediários
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* COMPARTILHAMENTO EM 1 CLIQUE */}
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="text-xs font-bold text-slate-200">
+                        <strong className="text-white">Seu Link Personalizado de Convite Médico:</strong>
+                        <p className="text-[11px] text-slate-400 font-normal truncate max-w-lg mt-0.5">
+                          {colleagueShareLink}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button 
+                          size="sm"
+                          onClick={() => copyText(colleagueShareLink, "Link de Colega Médico")}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs"
+                        >
+                          <Copy size={14} className="mr-1.5" /> Copiar Link
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          onClick={() => shareWhatsApp(
+                            "Olá colega! Estou convidando você para fazer parte do corpo clínico da Planta y Raíz, a maior plataforma de medicina canabinoide e telemedicina do Brasil. Cadastre-se pelo meu link de médico sócio:",
+                            colleagueShareLink
+                          )}
+                          className="border-emerald-500/60 text-emerald-300 hover:bg-emerald-500/10 font-black rounded-xl text-xs"
+                        >
+                          <Share2 size={14} className="mr-1.5" /> WhatsApp
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center pt-2">
+                    <Button 
+                      className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl px-8 h-12 text-sm shadow-xl shadow-emerald-500/20"
+                      asChild
+                    >
+                      <Link to="/indicacoes">
+                        <Network className="mr-2" size={18} /> Acessar Meu Painel Completo de Indicações & Rede
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </ComicPanel>
 
             {/* ORIENTAÇÃO TÉCNICA: SÓ O DR. EDILSON BEZERRA ON */}
             <ComicPanel color="amber">

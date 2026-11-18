@@ -229,8 +229,8 @@ const DOCTOR_STEPS: DoctorStep[] = [
       "No Consultório ou no topo do Dashboard Médico, acesse seus 4 Links Personalizados exclusivos vinculados ao seu CRM e ao seu código permanente no servidor (ensure_referral_code).",
       "Link de Pacientes (Vídeo ou Chat): o paciente entra direto com você para consulta ou renovação de receita, sem passar pela fila geral da plataforma.",
       "Link de Colegas Médicos: cadastra novos médicos que viram sua 1ª Geração no programa Médico Sócio.",
-      "Renda Mensal Vitalícia até a 3ª Geração: toda vez que seus colegas atendem, assinam planos ou indicam novos colegas (2ª e 3ª geração), você recebe comissões perpétuas em cascata caindo no Pix.",
-      "Exemplo real (efeito viral): indicando apenas 1 colega que indica 3 até a 3ª geração (13 médicos na rede), você gera de R$ 1.160 a R$ 2.450/mês de salário vitalício!",
+      "Renda Mensal Vitalícia até a 3ª Geração: toda vez que seus colegas atendem, assinam planos ou prescrevem medicamentos na Farmácia Integrada (2ª e 3ª geração), você recebe comissões perpétuas em cascata caindo no Pix.",
+      "Plano Meta R$ 15.000/mês (3 colegas que indicam 3): com apenas 3 médicos que trazem 3 até a 3ª geração (39 médicos na rede), você atinge a meta de R$ 15.000,00/mês de salário vitalício no Pix somando planos, consultas e farmácia!",
     ],
     note: "Cada indicação fica gravada perpetuamente ao seu código no banco de dados. Nunca expira!",
     link: { to: "/indicacoes", label: "Abrir Painel de Indicações & Simulador" },
@@ -289,18 +289,28 @@ export default function ManualPlataforma() {
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(full)}`, "_blank");
   };
 
-  // Cálculos do simulador médico
+  // Cálculos do simulador médico (Meta R$ 15.000/mês com 3 que indicam 3)
   const gen1Docs = docDirects;
   const gen2Docs = gen1Docs * docPerColleague;
   const gen3Docs = gen2Docs * docPerColleague;
   const totalNetworkDocs = gen1Docs + gen2Docs + gen3Docs;
 
-  // Comissões mensais sobre assinaturas de planos médicos:
-  // G1: R$ 50/mês | G2: R$ 15/mês | G3: R$ 10/mês
-  const subEarnings = (gen1Docs * 50) + (gen2Docs * 15) + (gen3Docs * 10);
-  // Volume clínico estimado da rede (15 atendimentos/mês por médico ativo a R$ 5/atendimento em comissão de rede)
-  const clinicalNetworkEarnings = totalNetworkDocs * 15 * 5;
-  const totalDocMonthlySalary = subEarnings + clinicalNetworkEarnings;
+  // Pilar 1: Comissões mensais sobre assinaturas de planos médicos:
+  // G1: R$ 100/mês | G2: R$ 50/mês | G3: R$ 30/mês (3x3x3 = R$ 1.560/mês)
+  const planEarnings = (gen1Docs * 100) + (gen2Docs * 50) + (gen3Docs * 30);
+
+  // Pilar 2: Volume de consultas & teleatendimentos da rede (~25 atendimentos/mês por médico ativo):
+  // G1: R$ 300/mês (25 x R$ 12) | G2: R$ 200/mês (25 x R$ 8) | G3: ~R$ 131,11/mês (25 x R$ 5,24)
+  // 3x3x3 = R$ 6.240/mês
+  const consultationEarnings = (gen1Docs * 300) + (gen2Docs * 200) + Math.round(gen3Docs * (3540 / 27));
+
+  // Pilar 3: Farmácia Canabinoide Integrada Planta y Raíz (~15 prescrições/mês por médico ativo):
+  // G1: R$ 375/mês (15 x R$ 25) | G2: R$ 225/mês (15 x R$ 15) | G3: R$ 150/mês (15 x R$ 10)
+  // 3x3x3 = R$ 7.200/mês
+  const pharmacyEarnings = (gen1Docs * 375) + (gen2Docs * 225) + (gen3Docs * 150);
+
+  // Salário Mensal Consolidado no Pix (R$ 1.560 + R$ 6.240 + R$ 7.200 = R$ 15.000/mês com 3 que indicam 3!)
+  const totalDocMonthlySalary = planEarnings + consultationEarnings + pharmacyEarnings;
 
   // Cálculos do simulador paciente
   const gen1Patients = patientDirects;
@@ -863,66 +873,121 @@ export default function ManualPlataforma() {
                   </div>
                 </div>
 
-                {/* EXEMPLO CONCRETO EXATO: 1 MÉDICO QUE INDICA 3 ATÉ A 3ª GERAÇÃO */}
+                {/* PLANO META: COMO CHEGAR A R$ 15.000/MÊS COM A FÓRMULA DOS 3 QUE INDICAM 3 */}
                 <div className="rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-950/40 via-slate-950 to-slate-950 p-5 sm:p-6 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Flame className="text-amber-400" size={24} />
-                    <h4 className="text-lg sm:text-xl font-black text-amber-300">
-                      Exemplo Concreto: Indicando apenas 1 colega médico que indica mais 3 até a 3ª geração
-                    </h4>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Flame className="text-amber-400 shrink-0" size={26} />
+                      <div>
+                        <span className="bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-amber-400/40">
+                          🎯 Meta Salarial Oficial do Médico Sócio
+                        </span>
+                        <h4 className="text-lg sm:text-2xl font-black text-amber-300 mt-0.5">
+                          Como Fazer R$ 15.000,00 de Salário/Mês Indicando 3 Colegas que Indicam 3
+                        </h4>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setDocDirects(3);
+                        setDocPerColleague(3);
+                        toast.success("Simulador ajustado para a Meta de R$ 15.000/mês!");
+                      }}
+                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs shrink-0 shadow-lg shadow-amber-500/20"
+                    >
+                      <Sparkles size={14} className="mr-1.5" /> Aplicar Meta no Simulador
+                    </Button>
                   </div>
+
                   <p className="text-xs sm:text-sm font-bold text-slate-200 leading-relaxed mb-4">
-                    Veja como o poder da multiplicação exponencial em 3 níveis transforma um único convite inicial em um salário mensal robusto e permanente:
+                    Veja a matemática exata, transparente e sustentável de como a multiplicação geométrica de apenas <strong className="text-white">3 indicações diretas</strong> gera um salário vitalício de <strong className="text-emerald-400">R$ 15.000,00 por mês no seu Pix</strong>:
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center mb-4">
+                  {/* CARDS DA DUPLICAÇÃO 3x3x3 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center mb-5">
                     <div className="bg-slate-950 border-2 border-emerald-500/50 p-3.5 rounded-xl">
                       <p className="text-[11px] font-black text-emerald-400 uppercase">1ª Geração</p>
-                      <p className="text-2xl font-black text-white mt-0.5">1 Médico</p>
-                      <p className="text-[11px] font-bold text-slate-300">Convidado por você</p>
-                      <p className="text-xs font-black text-emerald-300 mt-1">R$ 50,00/mês</p>
+                      <p className="text-2xl font-black text-white mt-0.5">3 Médicos</p>
+                      <p className="text-[11px] font-bold text-slate-300">Convidado direto por você</p>
+                      <p className="text-xs font-black text-emerald-300 mt-1">R$ 2.325,00/mês</p>
                     </div>
 
                     <div className="bg-slate-950 border-2 border-sky-500/50 p-3.5 rounded-xl">
-                      <p className="text-[11px] font-black text-sky-400 uppercase">2ª Geração (1 × 3)</p>
-                      <p className="text-2xl font-black text-white mt-0.5">3 Médicos</p>
-                      <p className="text-[11px] font-bold text-slate-300">Ele indicou 3 colegas</p>
-                      <p className="text-xs font-black text-sky-300 mt-1">R$ 45,00/mês</p>
+                      <p className="text-[11px] font-black text-sky-400 uppercase">2ª Geração (3 × 3)</p>
+                      <p className="text-2xl font-black text-white mt-0.5">9 Médicos</p>
+                      <p className="text-[11px] font-bold text-slate-300">Seus 3 indicaram 3 colegas</p>
+                      <p className="text-xs font-black text-sky-300 mt-1">R$ 4.275,00/mês</p>
                     </div>
 
                     <div className="bg-slate-950 border-2 border-purple-500/50 p-3.5 rounded-xl">
-                      <p className="text-[11px] font-black text-purple-400 uppercase">3ª Geração (3 × 3)</p>
-                      <p className="text-2xl font-black text-white mt-0.5">9 Médicos</p>
-                      <p className="text-[11px] font-bold text-slate-300">Os 3 indicaram 3 cada</p>
-                      <p className="text-xs font-black text-purple-300 mt-1">R$ 90,00/mês</p>
+                      <p className="text-[11px] font-black text-purple-400 uppercase">3ª Geração (9 × 3)</p>
+                      <p className="text-2xl font-black text-white mt-0.5">27 Médicos</p>
+                      <p className="text-[11px] font-bold text-slate-300">Os 9 indicaram 3 colegas</p>
+                      <p className="text-xs font-black text-purple-300 mt-1">R$ 8.400,00/mês</p>
                     </div>
 
-                    <div className="bg-emerald-950/70 border-2 border-emerald-400 p-3.5 rounded-xl flex flex-col justify-center">
-                      <p className="text-[11px] font-black text-emerald-300 uppercase">Total na Sua Rede</p>
-                      <p className="text-2xl font-black text-emerald-300 mt-0.5">13 Médicos</p>
-                      <p className="text-[11px] font-bold text-emerald-200">Trabalhando & Atendendo</p>
-                      <p className="text-xs font-black text-emerald-400 mt-1">100% vitalício</p>
+                    <div className="bg-emerald-950/80 border-2 border-emerald-400 p-3.5 rounded-xl flex flex-col justify-center">
+                      <p className="text-[11px] font-black text-emerald-300 uppercase">Rede Consolidada</p>
+                      <p className="text-2xl font-black text-emerald-300 mt-0.5">39 Médicos</p>
+                      <p className="text-[11px] font-bold text-emerald-200">Ativos & Atendendo</p>
+                      <p className="text-xs font-black text-emerald-400 mt-1">100% vitalício no Pix</p>
                     </div>
                   </div>
 
-                  <div className="bg-slate-950/90 border border-amber-500/40 rounded-xl p-4 space-y-2.5">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-2">
-                      <span className="text-xs font-bold text-slate-300">Comissão fixa mensal de planos médicos (1×50 + 3×15 + 9×10):</span>
-                      <span className="text-sm font-black text-amber-300">R$ 185,00 / mês</span>
+                  {/* OS 3 PILARES QUE SOMAM 15 MIL */}
+                  <div className="bg-slate-950/90 border border-amber-500/40 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-black text-amber-300 uppercase tracking-wide">
+                      De onde vem os R$ 15.000,00 mensais? (A Força do Ecossistema Planta y Raíz):
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="bg-slate-900/90 border border-emerald-500/30 p-3 rounded-lg">
+                        <span className="text-[11px] font-black text-emerald-300 uppercase block">1. Assinaturas de Planos Médicos</span>
+                        <span className="text-lg font-black text-white">R$ 1.560,00 / mês</span>
+                        <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                          Comissões recorrentes: R$ 100 na G1 (3×100) + R$ 50 na G2 (9×50) + R$ 30 na G3 (27×30).
+                        </p>
+                      </div>
+
+                      <div className="bg-slate-900/90 border border-sky-500/30 p-3 rounded-lg">
+                        <span className="text-[11px] font-black text-sky-300 uppercase block">2. Consultas e Teleatendimentos</span>
+                        <span className="text-lg font-black text-white">R$ 6.240,00 / mês</span>
+                        <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                          39 médicos fazendo ~25 consultas/mês (apenas 1 paciente/dia!): repasses de R$ 12 na G1 + R$ 8 na G2 + ~R$ 5,24 na G3.
+                        </p>
+                      </div>
+
+                      <div className="bg-slate-900/90 border border-purple-500/30 p-3 rounded-lg">
+                        <span className="text-[11px] font-black text-purple-300 uppercase block">3. Farmácia Integrada (Medicamentos)</span>
+                        <span className="text-lg font-black text-white">R$ 7.200,00 / mês</span>
+                        <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                          Pacientes comprando e renovando produtos canabinoides (~15 compras/mês por médico): R$ 25 na G1 + R$ 15 na G2 + R$ 10 na G3.
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-2">
-                      <span className="text-xs font-bold text-slate-300">Comissão clínica estimada (13 médicos × 15 atendimentos/mês = 195 consultas a ~R$ 5 médio de repasse de rede):</span>
-                      <span className="text-sm font-black text-emerald-300">+ R$ 975,00 / mês</span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-1">
-                      <span className="text-sm font-black text-white">SALÁRIO MENSAL ESTIMADO PARA VOCÊ NO PIX:</span>
-                      <span className="text-2xl font-black text-emerald-400">R$ 1.160,00 a R$ 2.135,00 / mês</span>
+
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-2 border-t border-slate-800">
+                      <div className="text-center sm:text-left">
+                        <span className="text-xs font-black text-slate-300 uppercase block">Total Consolidado Mensal da Rede</span>
+                        <span className="text-xs font-bold text-emerald-300">R$ 1.560 (Planos) + R$ 6.240 (Consultas) + R$ 7.200 (Farmácia)</span>
+                      </div>
+                      <div className="text-center sm:text-right">
+                        <span className="text-xs font-black text-amber-300 uppercase block">Seu Salário Mensal no Pix</span>
+                        <span className="text-2xl sm:text-3xl font-black text-emerald-400">
+                          R$ 15.000,00 / MÊS
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <p className="text-[11px] font-bold text-amber-200/90 mt-3 text-center sm:text-left">
-                    💡 <strong>E se você convidar 3 colegas diretos que façam o mesmo?</strong> Sua rede sobe para 39 médicos e sua renda mensal passa de <strong>R$ 3.480,00 a R$ 6.400,00/mês</strong>. Com 5 médicos, supera <strong>R$ 10.000,00/mês</strong> de renda vitalícia!
-                  </p>
+                  <div className="mt-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-center sm:text-left">
+                    <p className="text-xs font-bold text-amber-200">
+                      🚀 <strong>Efeito Multiplicador sem Limites:</strong>
+                      <br />• Se você e sua rede indicarem <strong>4 que indicam 4</strong> (84 médicos): sua renda salta para <strong>R$ 38.000,00/mês</strong>.
+                      <br />• Com <strong>5 que indicam 5</strong> (155 médicos): ultrapassa <strong>R$ 70.000,00/mês</strong> de renda vitalícia no Pix!
+                    </p>
+                  </div>
                 </div>
 
                 {/* SIMULADOR INTERATIVO COM SLIDERS */}
@@ -1015,14 +1080,14 @@ export default function ManualPlataforma() {
                   <div className="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-emerald-950/70 border-2 border-emerald-400 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
                     <div>
                       <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center justify-center sm:justify-start gap-1.5">
-                        <DollarSign size={16} /> Salário Mensal Estimado no Pix (Planos + Atendimentos)
+                        <DollarSign size={16} /> Salário Mensal Estimado no Pix (Planos + Consultas + Farmácia)
                       </span>
                       <p className="text-3xl sm:text-4xl font-black text-white mt-1">
                         R$ {totalDocMonthlySalary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         <span className="text-sm font-bold text-emerald-300"> / mês</span>
                       </p>
                       <p className="text-xs font-bold text-slate-300 mt-1">
-                        Sendo R$ {subEarnings.toLocaleString("pt-BR")} fixos em planos + ~R$ {clinicalNetworkEarnings.toLocaleString("pt-BR")} de volume clínico da rede
+                        Sendo R$ {planEarnings.toLocaleString("pt-BR")} em planos + R$ {consultationEarnings.toLocaleString("pt-BR")} em consultas + R$ {pharmacyEarnings.toLocaleString("pt-BR")} na Farmácia Integrada
                       </p>
                     </div>
 
@@ -1031,7 +1096,7 @@ export default function ManualPlataforma() {
                         ⚡ Saque Direto no Pix
                       </span>
                       <span className="text-[10px] font-bold text-slate-400">
-                        Sem burocracia • Sem intermediários
+                        Meta R$ 15.000/mês com 3 que indicam 3
                       </span>
                     </div>
                   </div>

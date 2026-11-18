@@ -56,7 +56,7 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
           icon: Users, 
           label: "Colegas médicos — convite & comissões em 3 gerações", 
           url: links.colleague,
-          shareText: "Olá, colega médico! Convido você a fazer parte da equipe de telemedicina da Planta y Raíz com consultório inteligente e comissões vitalícias em até 3 gerações:"
+          shareText: "Olá, colega médico! Convido você a fazer parte da equipe da Planta y Raíz. Conheça nosso programa Médico Sócio onde 3 indicações que duplicam até a 3ª geração geram uma meta de R$ 15.000/mês de renda vitalícia no Pix:"
         },
         { 
           icon: UserPlus, 
@@ -82,10 +82,10 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
         <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="space-y-0.5">
             <span className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
-              <Sparkles size={13} /> Renda Mensal Vitalícia em 3 Gerações (Médico Sócio)
+              <Sparkles size={13} /> Meta R$ 15.000/mês: Renda Vitalícia em 3 Gerações (Médico Sócio)
             </span>
             <p className="text-[11px] text-emerald-200/90 leading-tight">
-              Indique colegas e pacientes. Ganhe comissões vitalícias em cascata toda vez que sua rede atende, assina ou expande novos membros!
+              Indique 3 colegas médicos que indicam 3 até a 3ª geração (39 médicos na rede) e alcance a meta de <strong>R$ 15.000,00/mês</strong> no seu Pix somando planos, consultas e farmácia!
             </p>
           </div>
           <Button size="sm" variant="outline" className="h-7 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 shrink-0" asChild>

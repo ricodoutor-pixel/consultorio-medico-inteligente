@@ -14,26 +14,43 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle, Loader2, MessageCircle, X, CreditCard, Wallet, Users, Info, HelpCircle, Star, MapPin, Sparkles, Award } from "lucide-react";
+import { 
+  Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Activity, Shield, 
+  FileText, Scale, Loader2, X, CreditCard, Users, HelpCircle, Star, Sparkles 
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import ReactMarkdown from "react-markdown";
 import { createConsultationCheckout, isConsultationPaid, type ConsultationPix } from "@/lib/telemedicine-checkout";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { formatPaymentName } from "../../supabase/functions/_shared/payment-catalog";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
-const OFFICIAL_OT_WHATSAPP = (import.meta.env.VITE_DOCTOR_WHATSAPP_NUMBER || "5511991363154").replace(/\D/g, "");
+function safeGetLocal(key: string): string | null {
+  try { return typeof window !== "undefined" ? localStorage.getItem(key) : null; } catch { return null; }
+}
+function safeSetLocal(key: string, value: string): void {
+  try { if (typeof window !== "undefined") localStorage.setItem(key, value); } catch {}
+}
+function safeRemoveLocal(key: string): void {
+  try { if (typeof window !== "undefined") localStorage.removeItem(key); } catch {}
+}
+function safeGetSession(key: string): string | null {
+  try { return typeof window !== "undefined" ? sessionStorage.getItem(key) : null; } catch { return null; }
+}
+function safeSetSession(key: string, value: string): void {
+  try { if (typeof window !== "undefined") sessionStorage.setItem(key, value); } catch {}
+}
+function safeRemoveSession(key: string): void {
+  try { if (typeof window !== "undefined") sessionStorage.removeItem(key); } catch {}
+}
 
 function isValidCpf(value: string): boolean {
-  const cpf = value.replace(/\D/g, "");
+  const cpf = (value || "").replace(/\D/g, "");
   if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
   const digit = (length: number) => {
     let sum = 0;
@@ -102,7 +119,7 @@ const BrisaAvatar = () => {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [chat, setChat] = useState<{ role: "user" | "assistant"; content: string }[]>([
-    { role: "assistant", content: "Olá! Sou a Enfª Brisa 🌿. Como posso te ajudar com sua triagem ou dúvidas sobre o tratamento?" },
+    { role: "assistant", content: "Olá! Sou a Enfª Brisa 🌿. Estou aqui para acolher sua triagem antes do médico entrar ao vivo." },
   ]);
 
   const sendMessage = async () => {
@@ -122,14 +139,13 @@ const BrisaAvatar = () => {
     } catch {
       setChat([...next, {
         role: "assistant",
-        content: "Minhas conexões oscilaram, mas continuo aqui. Você pode iniciar a Triagem abaixo ou falar comigo pelo WhatsApp.",
+        content: "Minhas conexões oscilaram, mas continuo aqui. Responda às 5 perguntas abaixo para seu médico.",
       }]);
     } finally {
       setSending(false);
       setMood("happy");
     }
   };
-
 
   return (
     <div className="relative flex flex-col items-center mb-6">
@@ -141,7 +157,7 @@ const BrisaAvatar = () => {
         whileHover={{ scale: 1.05 }}
       >
         <div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full border-4 border-primary/30 overflow-hidden bg-muted shadow-2xl relative z-10">
+        <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full border-4 border-primary/30 overflow-hidden bg-muted shadow-2xl relative z-10">
           <img 
             src={brisaImg} 
             alt="Brisa - Enfermeira IA" 
@@ -158,7 +174,7 @@ const BrisaAvatar = () => {
             )}
           </AnimatePresence>
         </div>
-        <div className="absolute -bottom-2 -right-2 bg-secondary text-secondary-foreground text-[10px] font-black px-2 py-1 rounded-lg shadow-lg z-20 border border-background animate-bounce">
+        <div className="absolute -bottom-2 -right-2 bg-secondary text-secondary-foreground text-[10px] font-black px-2 py-1 rounded-lg shadow-lg z-20 border border-background">
           BRISA IA
         </div>
       </motion.div>
@@ -166,11 +182,10 @@ const BrisaAvatar = () => {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-4 text-center"
+        className="mt-3 text-center"
       >
-        <p className="text-sm font-black text-foreground">Olá, eu sou a Brisa!</p>
-        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Sua Enfermeira Virtual de Triagem</p>
-        <p className="text-[11px] text-primary font-medium mt-1 italic">"Estou aqui para cuidar de você com todo carinho."</p>
+        <p className="text-sm font-black text-foreground">Enfª Brisa 🌿</p>
+        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Triagem Clínica Humanizada Prévia</p>
       </motion.div>
 
       <AnimatePresence>
@@ -232,25 +247,21 @@ const BrisaAvatar = () => {
 
 const Telemedicina = () => {
   const { professionals } = useRealProfessionals();
-  const dynamicPrice = 30;
-  const dynamicSymbol = "R$";
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showTCLE, setShowTCLE] = useState(false);
   const [showFlowInfo, setShowFlowInfo] = useState(false);
+  
+  // Fluxo Oficial Planta y Raíz:
+  // -1: Landing Hero com seleção da modalidade (Vídeo R$ 150 / Chat R$ 100)
+  //  0: Checkout & Pagamento Pix (Mercado Pago)
+  //  1: Identificação do Paciente (após pagamento confirmado)
+  //  2..6: As 5 Perguntas Clínicas da Enfª Brisa (1 a 5)
   const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
-  const [sliderValue, setSliderValue] = useState([50]);
-  const [showPrescription, setShowPrescription] = useState(false);
-  const [showWearables, setShowWearables] = useState(false);
   const [tcleAccepted, setTcleAccepted] = useState(() => {
-    try {
-      return !!localStorage.getItem("pyr_guest_tcle");
-    } catch {
-      return false;
-    }
+    return !!safeGetLocal("pyr_guest_tcle");
   });
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
   const [selectedPathology, setSelectedPathology] = useState("");
@@ -260,23 +271,6 @@ const Telemedicina = () => {
   const [appointmentId, setAppointmentId] = useState<string | null>(null);
   const [consultPix, setConsultPix] = useState<ConsultationPix | null>(null);
   const [consultPaid, setConsultPaid] = useState(false);
-  // Conferência automática do Pix (fonte: pagamento registrado pelo servidor, nunca o botão).
-  useEffect(() => {
-    if (!consultPix || !appointmentId || consultPaid) return;
-    const t = setInterval(() => {
-      isConsultationPaid(appointmentId).then((ok) => {
-        if (ok) {
-          setConsultPaid(true);
-          sessionStorage.removeItem("telemedicine_pending_checkout");
-          toast({
-            title: "Pagamento confirmado!",
-            description: triageId ? "Acesse seu consultório para iniciar o atendimento." : "Prossiga para a identificação e triagem.",
-          });
-        }
-      }).catch(() => undefined);
-    }, 5000);
-    return () => clearInterval(t);
-  }, [consultPix, appointmentId, consultPaid, triageId, toast]);
 
   const [patientData, setPatientData] = useState({
     nome: "",
@@ -286,7 +280,26 @@ const Telemedicina = () => {
     telefone: "",
   });
 
-  // 🔗 PERSONALIZAÇÃO DE LINK (Modalidade, Paciente e Telefone)
+  // Conferência automática do Pix (fonte: confirmação do servidor/banco)
+  useEffect(() => {
+    if (!consultPix || !appointmentId || consultPaid) return;
+    const t = setInterval(() => {
+      isConsultationPaid(appointmentId).then((ok) => {
+        if (ok) {
+          setConsultPaid(true);
+          safeRemoveSession("telemedicine_pending_checkout");
+          toast({
+            title: "Pagamento confirmado! 🌿",
+            description: "Prossiga para a identificação e triagem de 5 perguntas com a Enfª Brisa.",
+          });
+          setStep(1); // Avança imediatamente para o Passo 1 (Identificação & Triagem)
+        }
+      }).catch(() => undefined);
+    }, 5000);
+    return () => clearInterval(t);
+  }, [consultPix, appointmentId, consultPaid, toast]);
+
+  // URL Params: modalidade, paciente, tel, email
   useEffect(() => {
     const modalidade = searchParams.get("modalidade");
     if (modalidade === "chat" || modalidade === "video") {
@@ -306,55 +319,37 @@ const Telemedicina = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("triage_condition");
+    const saved = safeGetSession("triage_condition");
     if (saved) {
       setSelectedPathology(saved);
-      // Pre-fill first triage question with the pathology
       setAnswers(prev => ({ ...prev, 1: `Condição principal: ${saved}. ` }));
-      sessionStorage.removeItem("triage_condition");
+      safeRemoveSession("triage_condition");
     }
   }, []);
 
-  // Restore triage draft after login redirect (guest flow)
+  // Scroll suave automático para a seção de Orientação Técnica
   useEffect(() => {
-    const draft = localStorage.getItem("ot_triage_draft");
-    if (!draft) return;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session?.user) return;
-      try {
-        const d = JSON.parse(draft);
-        if (d.answers) setAnswers(d.answers);
-        if (d.patientData) setPatientData(d.patientData);
-        if (d.selectedPathology) setSelectedPathology(d.selectedPathology);
-        if (Array.isArray(d.sliderValue)) setSliderValue(d.sliderValue);
-        localStorage.removeItem("ot_triage_draft");
-        setStep(5);
-        toast({ title: "Triagem recuperada", description: "Clique em Concluir Triagem para prosseguir ao pagamento." });
-      } catch {
-        localStorage.removeItem("ot_triage_draft");
-      }
-    });
-  }, []);
-
-  // 🎯 Scroll suave automático para a seção explicativa de Orientação Técnica
-  useEffect(() => {
-    if (window.location.hash === "#orientacao-tecnica") {
+    if (typeof window !== "undefined" && window.location.hash === "#orientacao-tecnica") {
       const el = document.getElementById("orientacao-tecnica");
-      if (el) {
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 200);
-      }
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 200);
     }
   }, []);
 
-  const currentQ = interviewQuestions[step - 1];
-  const progress = step <= 0 ? 0 : step > 5 ? 100 : Math.round((step / 5) * 100);
-  
-  // 🛡️ REGRA CFM/ARQUITETURA: Exclusão estrita de médicos veterinários da vitrine e lista de telemedicina humana
-  const medicos = professionals.filter(
+  // Parâmetro de consulta já agendada (?appointment=<id>)
+  useEffect(() => {
+    const id = searchParams.get("appointment");
+    if (!id) return;
+    setAppointmentId(id);
+    setShowTCLE(false);
+    setTcleAccepted(true);
+    setStep(0);
+    void verifyConsultationPayment(id);
+  }, [searchParams]);
+
+  // Filtro de médicos humanos credenciados para o contador
+  const medicos = (professionals || []).filter(
     (p) =>
-      p.category === "Médicos Prescritores" &&
+      p?.category === "Médicos Prescritores" &&
       !p.name?.toLowerCase().includes("veterin") &&
       !p.bio?.toLowerCase().includes("veterin") &&
       p.crm !== "CRMV" &&
@@ -362,32 +357,94 @@ const Telemedicina = () => {
   );
   const onlineDoctors = medicos.filter((doctor) => doctor.online).length;
 
+  // Perguntas Brisa: quando step está entre 2 e 6
+  // step 2 = Q1, step 3 = Q2, step 4 = Q3, step 5 = Q4, step 6 = Q5
+  const questionIndex = step >= 2 && step <= 6 ? step - 2 : 0;
+  const currentQ = interviewQuestions[questionIndex];
+  const questionNumber = questionIndex + 1;
+  const triageProgress = Math.round((questionNumber / 5) * 100);
+
   const handleCheckbox = (option: string, checked: boolean) => {
-    const current = (answers[step] as string[]) || [];
+    const current = (answers[questionNumber] as string[]) || [];
     if (option === "Nenhuma" && checked) {
-      setAnswers({ ...answers, [step]: ["Nenhuma"] });
+      setAnswers({ ...answers, [questionNumber]: ["Nenhuma"] });
     } else {
       const filtered = current.filter(c => c !== "Nenhuma");
-      setAnswers({ ...answers, [step]: checked ? [...filtered, option] : filtered.filter(c => c !== option) });
+      setAnswers({ ...answers, [questionNumber]: checked ? [...filtered, option] : filtered.filter(c => c !== option) });
     }
   };
 
   const isAnswered = () => {
     if (!currentQ) return false;
-    const val = answers[step];
+    const val = answers[questionNumber];
     if (currentQ.type === "checkbox") return Array.isArray(val) && val.length > 0;
-    if (currentQ.type === "slider") return true;
     return !!val;
   };
 
   const isPatientDataValid = () => {
-    return patientData.nome.trim().length >= 3 &&
+    return (
+      (patientData.nome || "").trim().length >= 3 &&
       isValidCpf(patientData.cpf) &&
-      patientData.dataNascimento &&
-      patientData.email.includes("@") &&
-      patientData.telefone.replace(/\D/g, "").length >= 10;
+      !!patientData.dataNascimento &&
+      (patientData.email || "").includes("@") &&
+      (patientData.telefone || "").replace(/\D/g, "").length >= 10
+    );
   };
 
+  // Iniciar Checkout Pix Mercado Pago
+  const initiatePixCheckout = async (mode: "video" | "chat") => {
+    setAiLoading(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+      if (!user) {
+        safeSetSession("telemed_selected_mode", mode);
+        toast({ title: "Identificação necessária", description: "Faça login ou crie sua conta para gerar o pagamento seguro." });
+        navigate(`/login?redirect=${encodeURIComponent("/telemedicina")}`);
+        return;
+      }
+
+      let pending: { appointmentId?: string; mode?: string } = {};
+      try {
+        const raw = safeGetSession("telemedicine_pending_checkout");
+        if (raw) pending = JSON.parse(raw);
+      } catch {}
+
+      const id = appointmentId || (pending.mode === mode ? pending.appointmentId : null);
+      const checkout = await createConsultationCheckout(mode, triageId || "", id);
+      setAppointmentId(checkout.appointmentId);
+      setConsultPix(checkout.pix);
+    } catch (error) {
+      toast({
+        title: "Pagamento não iniciado",
+        description: error instanceof Error ? error.message : "Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const verifyConsultationPayment = async (id: string) => {
+    if (aiLoading) return;
+    setAiLoading(true);
+    try {
+      if (await isConsultationPaid(id)) {
+        setConsultPaid(true);
+        safeRemoveSession("telemedicine_pending_checkout");
+        toast({ title: "Pagamento confirmado! 🌿", description: "Prossiga para a identificação e triagem com a Enfª Brisa." });
+        setStep(1); // Vai para o preenchimento de dados e triagem
+      } else {
+        toast({ title: "Pagamento ainda não confirmado", description: "Aguarde a confirmação do Mercado Pago e tente novamente." });
+      }
+    } catch (error) {
+      toast({ title: "Não foi possível verificar o pagamento", description: error instanceof Error ? error.message : "Tente novamente.", variant: "destructive" });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // Concluir Triagem (5/5) e despachar para o rodízio de médicos assinantes
   const completeTriage = async () => {
     if (!isAnswered() || aiLoading) return;
     setAiLoading(true);
@@ -395,16 +452,11 @@ const Telemedicina = () => {
       const { data: sessionData } = await supabase.auth.getSession();
       const user = sessionData.session?.user;
       if (!user) {
-        localStorage.setItem("ot_triage_draft", JSON.stringify({
-          answers,
-          patientData,
-          selectedPathology,
-          sliderValue,
-        }));
-        toast({ title: "Crie sua conta para concluir", description: "Suas 5 respostas ficam salvas. Entre para finalizar o pagamento." });
+        toast({ title: "Sessão expirada", description: "Faça login para salvar suas respostas." });
         navigate(`/login?redirect=${encodeURIComponent("/telemedicina")}`);
         return;
       }
+
       const completeAnswers = { ...answers };
       const answerText = interviewQuestions
         .map((question) => {
@@ -412,8 +464,8 @@ const Telemedicina = () => {
           return `${question.id}. ${question.question}\n${Array.isArray(answer) ? answer.join(", ") : answer || ""}`;
         })
         .join("\n\n");
-      
-      // 🔒 REGRA AGENTS.md: Armazena triagem completa no banco ANTES de criar pedido de pagamento Mercado Pago
+
+      // 🔒 Salva a triagem completa no banco Supabase
       const { data, error } = await supabase.from("brisa_triages").insert({
         patient_id: user.id,
         symptoms: String(completeAnswers[1] || "Triagem clínica em 5 perguntas"),
@@ -433,37 +485,39 @@ const Telemedicina = () => {
       }).select("id").single();
 
       if (error || !data?.id) throw new Error(error?.message || "Não foi possível salvar a triagem.");
-      localStorage.removeItem("ot_triage_draft");
-
-      // 🔒 REGRA CFM/LGPD: Sincroniza consentimento prévio do visitante com o prontuário no Supabase
-      const guestTcle = localStorage.getItem("pyr_guest_tcle");
-      if (guestTcle) {
-        try {
-          const parsedTcle = JSON.parse(guestTcle);
-          await supabase.from("tcle_consents").insert({
-            user_id: user.id,
-            doctor_name: parsedTcle.doctorName || "Corpo Clínico Planta y Raíz",
-            version: parsedTcle.version || "2026.1",
-            checks: parsedTcle.checks,
-            user_agent: parsedTcle.userAgent,
-          });
-          localStorage.removeItem("pyr_guest_tcle");
-        } catch { /* ignore sync error */ }
-      }
+      safeRemoveLocal("ot_triage_draft");
 
       setAnswers(completeAnswers);
       setTriageId(data.id);
 
-      // Pagamento primeiro: com a consulta já paga, a triagem é ligada a ela e o paciente segue para a sala de espera.
-      if (appointmentId && consultPaid) {
-        await supabase.from("appointments").update({ notes: `Triagem: ${data.id}` }).eq("id", appointmentId).eq("patient_id", user.id);
-        sessionStorage.removeItem("telemedicine_pending_checkout");
-        toast({ title: "Triagem concluída (5/5)!", description: "O médico já foi avisado. Aguarde o início da consulta." });
-        navigate("/consultas");
+      // 🔒 Vincula à consulta paga e aciona a fila de rodízio de médicos assinantes
+      if (appointmentId) {
+        await supabase
+          .from("appointments")
+          .update({ notes: `Triagem: ${data.id}` })
+          .eq("id", appointmentId)
+          .eq("patient_id", user.id);
+
+        try {
+          // Dispara a notificação de rodízio (médicos assinantes em dia, depois médicos online)
+          await supabase.functions.invoke("consultation-offer", {
+            body: { action: "dispatch", appointment_id: appointmentId },
+          });
+        } catch (offerErr) {
+          console.warn("[consultation-offer] dispatch warning:", offerErr);
+        }
+
+        safeRemoveSession("telemedicine_pending_checkout");
+        toast({
+          title: "Triagem concluída (5/5)! 🩺",
+          description: "Médicos assinantes em rodízio foram acionados. Entrando na sala de espera...",
+        });
+        navigate(`/sala-espera?appt=${encodeURIComponent(appointmentId)}`);
         return;
       }
-      setStep(6);
-      toast({ title: "Entrevista Prévia Concluída (5/5)!", description: "Escolha sua modalidade de atendimento para prosseguir." });
+
+      toast({ title: "Triagem concluída!", description: "Acesse suas consultas." });
+      navigate("/consultas");
     } catch (error) {
       toast({
         title: "Não foi possível concluir a triagem",
@@ -475,56 +529,34 @@ const Telemedicina = () => {
     }
   };
 
-  const verifyConsultationPayment = async (id: string) => {
-    if (aiLoading) return;
-    setAiLoading(true);
-    try {
-      if (await isConsultationPaid(id)) {
-        setConsultPaid(true);
-        sessionStorage.removeItem("telemedicine_pending_checkout");
-        if (triageId) {
-          toast({ title: "Pagamento confirmado!", description: "Redirecionando para o seu consultório..." });
-          navigate("/consultas");
-        } else {
-          toast({ title: "Pagamento confirmado!", description: "Prossiga com a identificação e triagem." });
-          setStep(0);
-        }
-      } else {
-        toast({ title: "Pagamento ainda não confirmado", description: "Aguarde a confirmação do Mercado Pago e tente novamente." });
-      }
-    } catch (error) {
-      toast({ title: "Não foi possível verificar o pagamento", description: error instanceof Error ? error.message : "Tente novamente.", variant: "destructive" });
-    } finally {
-      setAiLoading(false);
+  const handleStartPayment = (mode: "video" | "chat") => {
+    setSelectedServiceMode(mode);
+    if (!tcleAccepted) {
+      setShowTCLE(true);
+      return;
     }
+    setStep(0);
+    void initiatePixCheckout(mode);
   };
-
-  useEffect(() => {
-    const id = searchParams.get("appointment");
-    if (!id) return;
-    setAppointmentId(id);
-    setShowTCLE(false);
-    setTcleAccepted(true);
-    setStep(6);
-    void verifyConsultationPayment(id);
-  }, [searchParams]);
 
   return (
     <div className="min-h-dvh bg-background">
       <Navbar />
 
-      {/* TCLE Modal - Shown on entry */}
+      {/* TCLE Modal - Termo legal obrigatório CFM 2.314/2022 */}
       <TCLEConsentModal
         open={showTCLE && !tcleAccepted}
         onAccept={() => {
           setTcleAccepted(true);
           setShowTCLE(false);
+          safeSetLocal("pyr_guest_tcle", JSON.stringify({ accepted: true, at: new Date().toISOString() }));
           setStep(0);
-          toast({ title: "TCLE aceito com sucesso!", description: "Prossiga com a identificação." });
+          void initiatePixCheckout(selectedServiceMode);
+          toast({ title: "TCLE aceito com sucesso!", description: "Gerando pagamento seguro da consulta..." });
         }}
         onDecline={() => {
           setShowTCLE(false);
-          toast({ title: "Termo de Consentimento", description: "Você pode navegar pelo site e ler o termo quando desejar iniciar." });
+          toast({ title: "Termo de Consentimento", description: "Você pode navegar pela plataforma e iniciar quando desejar." });
         }}
         patientName={patientData.nome || "Paciente"}
       />
@@ -537,18 +569,18 @@ const Telemedicina = () => {
                 <Stethoscope size={24} className="text-primary" />
               </div>
               <span className="text-xs md:text-sm font-bold text-primary uppercase tracking-wide">
-                Plataforma de Gestão Clínica e Telemedicina para Médicos Prescritores do Sistema Endocanabinoide
+                Plataforma de Gestão Clínica e Telemedicina para Médicos Prescritores
               </span>
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
-              Inicie Sua <span className="text-gradient-green">Teleconsulta Médica Direta</span>
+              Teleconsulta Médica <span className="text-gradient-green">Ao Vivo com Especialistas</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium mb-3 mx-auto">
-              Entrevista clínica prévia com a <strong>Enf. Brisa</strong> → Conexão Segura ao Consultório → Atendimento Médico ao Vivo com Especialista Credenciado.
+              Escolha sua modalidade → Pagamento Seguro → Triagem com Enfª Brisa (5 Perguntas) → Conexão com Médico Credenciado em Rodízio Inteligente.
             </p>
             <p className="text-xs text-muted-foreground/80 max-w-xl mx-auto mb-6 flex items-center justify-center gap-1.5">
               <Shield className="w-4 h-4 text-primary shrink-0" />
-              <span>Consultas médicas em conformidade com a Resolução CFM nº 2.314/2022 e RDCs ANVISA 660 e 327. Proteção de dados sob a LGPD (Lei 13.709/2018).</span>
+              <span>Conforme Resolução CFM nº 2.314/2022 e RDCs ANVISA 660 e 327. Proteção LGPD (Lei 13.709/2018).</span>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
@@ -557,7 +589,6 @@ const Telemedicina = () => {
                   size="lg"
                   className="relative h-14 px-6 rounded-2xl font-black text-base bg-card border-2 border-emerald-400/60 hover:border-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.45)] hover:shadow-[0_0_40px_rgba(52,211,153,0.75)] transition-shadow"
                 >
-                  <span className="absolute -inset-1 rounded-2xl bg-emerald-400/30 blur-md animate-pulse pointer-events-none" />
                   <span className="relative flex items-center gap-2">
                     <Users size={20} className="text-emerald-400" />
                     <span className="text-gradient-green">Médicos Prescritores Online Agora</span>
@@ -586,7 +617,7 @@ const Telemedicina = () => {
         </div>
       </section>
 
-
+      {/* Modal Explicativo de Fluxo */}
       <AnimatePresence>
         {showFlowInfo && (
           <motion.div
@@ -605,53 +636,32 @@ const Telemedicina = () => {
             >
               <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
                 <div className="flex items-center gap-2">
-                  <Info size={22} className="text-primary" />
-                  <h3 className="text-lg font-display font-black text-foreground">Como funciona o fluxo</h3>
+                  <Stethoscope size={22} className="text-primary" />
+                  <h3 className="text-lg font-display font-black text-foreground">Fluxo Unificado de Telemedicina</h3>
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => setShowFlowInfo(false)}><X size={18} /></Button>
               </div>
-              <div className="p-6 space-y-5 text-sm text-foreground">
-                <p className="text-muted-foreground">
-                  Todo paciente passa primeiro pela <strong>Triagem da Enf. Brisa</strong>. Os dados são enviados para o médico escolhido — ou para o <strong>Dr. Edilson Bezerra ON</strong> em caso de Orientação Técnica.
-                </p>
-
-                <div className="space-y-3">
-                  <p className="text-xs font-black uppercase tracking-widest text-primary">Você tem 3 caminhos até a receita:</p>
-
-                  <div className="rounded-2xl border border-border p-4 bg-muted/30">
-                    <p className="font-black text-foreground mb-1">1 · Triagem + Consulta</p>
-                    <p className="text-xs text-muted-foreground">Brisa faz a triagem → você escolhe o médico prescritor → consulta e receita.</p>
-                  </div>
-
-                  <div className="rounded-2xl border border-border p-4 bg-muted/30">
-                    <p className="font-black text-foreground mb-1">2 · Triagem + Orientação Técnica + Consulta</p>
-                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação com Dr. Edilson Bezerra ON → consulta com médico prescritor → receita.</p>
-                  </div>
-
-                  <div className="rounded-2xl border border-border p-4 bg-muted/30">
-                    <p className="font-black text-foreground mb-1">3 · Triagem + Orientação Técnica Educativa</p>
-                    <p className="text-xs text-muted-foreground">Enf. Brisa triagem → Orientação Técnica com o <strong>Dr. Edilson Bezerra ON</strong> (supervisionado) → relatório informativo em PDF revisado pelo Dr. Edilson e encaminhamento para médicos da vitrine (não substitui consulta médica).</p>
-                  </div>
+              <div className="p-6 space-y-4 text-sm text-foreground">
+                <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-xs font-semibold text-primary">
+                  1. Escolha sua modalidade (Vídeo R$ 150 ou Chat R$ 100) e faça o pagamento seguro.
                 </div>
-
-                <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-xs">
-                  <strong className="text-primary">Importante:</strong> qualquer clique em "Consulta" ou nos cards de médicos passa antes pela Triagem da Enf. Brisa. Os dados coletados seguem com você até o médico escolhido.
+                <div className="rounded-2xl border border-border p-4 bg-muted/30 text-xs">
+                  2. Após o Pix aprovado, você faz a triagem de 5 perguntas com a Enfª Brisa IA.
                 </div>
-
-                <Button
-                  className="w-full h-12 rounded-2xl font-black bg-primary text-primary-foreground"
+                <div className="rounded-2xl border border-border p-4 bg-muted/30 text-xs">
+                  3. O sistema avisa o médico assinante em rodízio (e médicos online com consultório virtual ON).
+                </div>
+                <div className="rounded-2xl border border-border p-4 bg-muted/30 text-xs">
+                  4. O médico atende você ao vivo com emissão de receita oficial digital ICP-Brasil.
+                </div>
+                <Button 
+                  className="w-full h-12 rounded-2xl font-black bg-primary text-primary-foreground" 
                   onClick={() => {
                     setShowFlowInfo(false);
-                    if (step === -1) {
-                      if (tcleAccepted) {
-                        setStep(0);
-                      } else {
-                        setShowTCLE(true);
-                      }
-                    }
+                    handleStartPayment(selectedServiceMode);
                   }}
                 >
-                  Entendi, iniciar triagem <ArrowRight size={16} className="ml-2" />
+                  Entendi, escolher modalidade e iniciar <ArrowRight size={16} className="ml-2" />
                 </Button>
               </div>
             </motion.div>
@@ -662,122 +672,142 @@ const Telemedicina = () => {
       <section className="py-4 pb-20">
         <div className="container mx-auto px-4">
           
-          {/* Brisa IA no Topo da Triagem (Passos 0 a 5) */}
-          {step >= 0 && step <= 5 && <BrisaAvatar />}
-
-          {/* Stepper Superior (Passos 6 a 9) */}
-          {step >= 6 && (
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-3xl mx-auto mb-8 bg-card/90 backdrop-blur border border-border p-4 rounded-3xl shadow-sm">
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
-                <div className="flex flex-col items-center p-2 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                  <CheckCircle2 size={16} className="mb-1" />
-                  <span className="font-black text-[10px] uppercase">1. Entrevista (5/5)</span>
-                  <span className="text-[9px] text-muted-foreground">Concluída</span>
-                </div>
-                <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step === 6 ? 'bg-primary/15 text-primary border border-primary/40 font-black scale-105' : step > 6 ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
-                  <CreditCard size={16} className="mb-1" />
-                  <span className="font-bold text-[10px] uppercase">2. Pagamento</span>
-                  <span className="text-[9px]">{step === 6 ? 'Atual' : step > 6 ? 'Confirmado' : 'Pendente'}</span>
-                </div>
-                <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step === 7 ? 'bg-primary/15 text-primary border border-primary/40 font-black scale-105' : step > 7 ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
-                  <Activity size={16} className="mb-1" />
-                  <span className="font-bold text-[10px] uppercase">3. Triagem Uber</span>
-                  <span className="text-[9px]">{step === 7 ? 'Buscando médico' : step > 7 ? 'Conectado' : 'Fila'}</span>
-                </div>
-                <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step === 8 ? 'bg-primary/15 text-primary border border-primary/40 font-black scale-105' : step > 8 ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
-                  <Stethoscope size={16} className="mb-1" />
-                  <span className="font-bold text-[10px] uppercase">4. Teleconsulta</span>
-                  <span className="text-[9px]">{step === 8 ? 'Ao vivo' : step > 8 ? 'Realizada' : 'Aguardando'}</span>
-                </div>
-                <div className="flex flex-col items-center p-2 rounded-2xl transition-all text-muted-foreground">
-                  <Star size={16} className="mb-1" />
-                  <span className="font-bold text-[10px] uppercase">5. Avaliação & PIX</span>
-                  <span className="text-[9px]">Aguardando consulta</span>
-                </div>
+          {/* Stepper Superior Unificado */}
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-3xl mx-auto mb-8 bg-card/90 backdrop-blur border border-border p-4 rounded-3xl shadow-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
+              <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step <= 0 ? 'bg-primary/15 text-primary border border-primary/40 font-black scale-105' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                <CreditCard size={16} className="mb-1" />
+                <span className="font-bold text-[10px] uppercase">1. Modalidade & Pagamento</span>
+                <span className="text-[9px]">{consultPaid || step > 0 ? 'Confirmado ✅' : step === 0 ? 'Atual' : 'Aguardando'}</span>
               </div>
-            </motion.div>
-          )}
+              <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step === 1 ? 'bg-primary/15 text-primary border border-primary/40 font-black scale-105' : step > 1 ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
+                <CheckCircle2 size={16} className="mb-1" />
+                <span className="font-bold text-[10px] uppercase">2. Identificação</span>
+                <span className="text-[9px]">{step > 1 ? 'Concluída ✅' : step === 1 ? 'Atual' : 'Pendente'}</span>
+              </div>
+              <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step >= 2 && step <= 6 ? 'bg-primary/15 text-primary border border-primary/40 font-black scale-105' : step > 6 ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
+                <Activity size={16} className="mb-1" />
+                <span className="font-bold text-[10px] uppercase">3. Triagem Brisa (5/5)</span>
+                <span className="text-[9px]">{step >= 2 && step <= 6 ? `Pergunta ${questionNumber}/5` : step > 6 ? 'Concluída ✅' : 'Pendente'}</span>
+              </div>
+              <div className="flex flex-col items-center p-2 rounded-2xl transition-all text-muted-foreground">
+                <Users size={16} className="mb-1" />
+                <span className="font-bold text-[10px] uppercase">4. Rodízio Inteligente</span>
+                <span className="text-[9px]">Avisando Médicos</span>
+              </div>
+              <div className="flex flex-col items-center p-2 rounded-2xl transition-all text-muted-foreground">
+                <Stethoscope size={16} className="mb-1" />
+                <span className="font-bold text-[10px] uppercase">5. Teleconsulta</span>
+                <span className="text-[9px]">Ao Vivo</span>
+              </div>
+            </div>
+          </motion.div>
 
-          {/* Progresso das 5 Perguntas Iniciais */}
-          {step >= 0 && step <= 5 && (
+          {/* Brisa Avatar no topo dos passos de triagem */}
+          {step >= 1 && step <= 6 && <BrisaAvatar />}
+
+          {/* Barra de Progresso da Triagem */}
+          {step >= 2 && step <= 6 && (
             <div className="max-w-2xl mx-auto mb-8">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground font-bold">Progresso da entrevista médica</span>
-                <span className="text-xs text-primary font-bold">{progress}%</span>
+                <span className="text-xs text-muted-foreground font-bold">Progresso da entrevista com Enfª Brisa</span>
+                <span className="text-xs text-primary font-bold">{triageProgress}%</span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden" role="progressbar">
-                <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
+                <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${triageProgress}%` }} />
               </div>
             </div>
           )}
 
-          {/* Banner de Encaminhamento Personalizado WhatsApp */}
-          {searchParams.get("origem") === "whatsapp" && (
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-2xl mx-auto mb-6">
-              <div className="bg-primary/10 border-2 border-primary/30 rounded-2xl p-4 flex items-center gap-3 text-left">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-                  <Sparkles className="text-primary" size={20} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-foreground text-sm">
-                    Olá{patientData.nome ? `, ${patientData.nome}` : ""}! Atendimento Encaminhado pela Enfª Brisa 🌿
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Modalidade pré-selecionada: <strong>{selectedServiceMode === "video" ? "Teleconsulta por Vídeo HD (R$ 150)" : "Consulta Médica por Chat (R$ 100)"}</strong>. Preencha as 5 perguntas para conectar com seu médico especialista.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
           <div className="max-w-2xl mx-auto">
-            {/* Landing Hero & Call to Action (Passo Inicial) */}
+            {/* =========================================================================
+                PASSO INICIAL (-1): HERO + ESCOLHA DA MODALIDADE DE TELEMEDICINA
+               ========================================================================= */}
             {step === -1 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-                <Card className="border-border shadow-2xl bg-card/95 backdrop-blur overflow-hidden">
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
+                <Card className="border-primary/30 bg-gradient-to-br from-card to-primary/5 shadow-2xl overflow-hidden">
                   <div className="h-2 bg-gradient-to-r from-emerald-500 via-primary to-teal-400" />
-                  <CardContent className="p-6 sm:p-10 text-center space-y-6">
-                    <div className="w-16 h-16 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary shadow-inner">
-                      <Stethoscope size={32} />
-                    </div>
-                    <div className="space-y-3">
-                      <Badge className="bg-primary/20 text-primary border-primary/30 text-xs px-3 py-1 font-bold uppercase tracking-wider">
-                        Telemedicina Segura · Res. CFM nº 2.314/2022
+                  <CardContent className="p-6 sm:p-10 space-y-6">
+                    <div className="text-center space-y-2">
+                      <Badge className="bg-primary/20 text-primary border-primary/30 uppercase text-[10px] px-3 py-1 font-bold">
+                        Passo 1 de 5 · Escolha sua Modalidade
                       </Badge>
-                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground tracking-tight">
-                        Consulta Médica Online & <span className="text-gradient-green">Orientação Clínica</span>
+                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground">
+                        Inicie sua <span className="text-gradient-green">Teleconsulta Médica</span>
                       </h2>
-                      <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-                        Acolhimento humanizado com médicos especialistas credenciados. Faça a triagem clínica prévia em 5 perguntas com a <strong>Enfª Brisa IA</strong> e realize sua teleconsulta com emissão de receita digital válida em todo o Brasil, caso indicada após avaliação médica.
+                      <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto">
+                        Selecione como deseja ser atendido(a). O pagamento garante sua vaga e aciona a triagem clínica prévia com a Enfª Brisa.
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto pt-2">
+                    {/* Cards Interativos das Modalidades */}
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {/* 1. Teleconsulta Vídeo HD (R$ 150) */}
+                      <div 
+                        onClick={() => setSelectedServiceMode("video")}
+                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "video" ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border bg-card hover:border-primary/40"}`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge className="bg-primary/20 text-primary text-[10px] font-bold">Mais Escolhida · Recomendada</Badge>
+                            <span className="font-black text-primary text-xl">R$ 150</span>
+                          </div>
+                          <h3 className="font-black text-base text-foreground mb-1">Teleconsulta por Vídeo HD</h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Consulta médica ao vivo com médico especialista prescritor, emissão de receita oficial digital ANVISA/CFM com QR Code e retorno clínico incluso no protocolo.
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-border/50 text-[11px] text-primary font-bold flex items-center gap-1.5">
+                          <CheckCircle2 size={14} /> Atendimento médico completo + Receita oficial válida em todo o Brasil
+                        </div>
+                      </div>
+
+                      {/* 2. Consulta Chat (R$ 100) */}
+                      <div 
+                        onClick={() => setSelectedServiceMode("chat")}
+                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "chat" ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border bg-card hover:border-primary/40"}`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge variant="outline" className="text-[10px] font-bold border-primary/30 text-primary">Atendimento Ágil</Badge>
+                            <span className="font-black text-primary text-xl">R$ 100</span>
+                          </div>
+                          <h3 className="font-black text-base text-foreground mb-1">Consulta Médica por Chat</h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Atendimento clínico ágil por chat seguro na plataforma, análise da anamnese e emissão de prescrição digital homologada pelo especialista.
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-border/50 text-[11px] text-primary font-bold flex items-center gap-1.5">
+                          <CheckCircle2 size={14} /> Prontuário eletrônico completo + Prescrição digital
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botão de Ação Principal */}
+                    <div className="pt-2">
                       <Button
                         size="lg"
-                        className="h-14 font-black rounded-2xl bg-primary text-primary-foreground text-base shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
-                        onClick={() => {
-                          if (tcleAccepted) {
-                            setStep(0);
-                          } else {
-                            setShowTCLE(true);
-                          }
-                        }}
+                        className="w-full h-14 font-black rounded-2xl bg-primary text-primary-foreground text-base sm:text-lg shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
+                        onClick={() => handleStartPayment(selectedServiceMode)}
                       >
-                        <Sparkles size={18} /> Iniciar Triagem Prévia
+                        <CreditCard size={20} />
+                        Pagar {selectedServiceMode === "video" ? "R$ 150,00 (Vídeo HD)" : "R$ 100,00 (Chat)"} e Iniciar Atendimento
                       </Button>
-                      <Link to="/orientacao-tecnica" className="w-full">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="w-full h-14 font-bold rounded-2xl border-primary/40 text-primary hover:bg-primary/10 text-sm"
-                        >
-                          Orientação Técnica (R$ 30)
+                    </div>
+
+                    {/* Link para Orientação Técnica em Nuvem (Dr. Edilson On - R$ 30) */}
+                    <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                      <div className="text-xs text-muted-foreground leading-relaxed">
+                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra ON (consulta PubMed/NCBI em tempo real)?</span>
+                      </div>
+                      <Link to="/orientacao-tecnica">
+                        <Button variant="outline" size="sm" className="text-xs font-black border-primary text-primary hover:bg-primary/10 gap-1 rounded-xl shrink-0">
+                          Orientação Técnica em Nuvem (R$ 30) <ArrowRight size={13} />
                         </Button>
                       </Link>
                     </div>
 
-                    <div className="pt-6 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-muted-foreground text-left sm:text-center">
+                    <div className="pt-4 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-muted-foreground text-center">
                       <div className="flex items-center gap-2 justify-center">
                         <Shield size={16} className="text-primary shrink-0" />
                         <span>Conforme CFM 2.314/2022</span>
@@ -796,28 +826,123 @@ const Telemedicina = () => {
               </motion.div>
             )}
 
+            {/* =========================================================================
+                PASSO 0: CHECKOUT & PAGAMENTO PIX (MERCADO PAGO)
+               ========================================================================= */}
             {step === 0 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-                <div className="mb-3">
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
+                <div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setStep(-1)}
-                    className="text-xs text-muted-foreground hover:text-foreground -ml-2"
+                    className="text-xs text-muted-foreground hover:text-foreground -ml-2 mb-2"
                   >
-                    <ArrowLeft size={14} className="mr-1" /> Voltar ao início
+                    <ArrowLeft size={14} className="mr-1" /> Voltar à seleção de modalidade
                   </Button>
                 </div>
-                <Card className="border-border">
+
+                <Card className="border-primary/30 bg-gradient-to-br from-card to-primary/5 shadow-2xl">
+                  <CardContent className="p-5 sm:p-8 space-y-6">
+                    <div className="text-center space-y-2">
+                      <Badge className="bg-primary/20 text-primary border-primary/30 uppercase text-[10px]">
+                        Passo 1 de 5 · Pagamento Seguro
+                      </Badge>
+                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground">
+                        Pagamento via <span className="text-gradient-green">Mercado Pago (PIX)</span>
+                      </h2>
+                      <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto">
+                        Modalidade: <strong>{selectedServiceMode === "video" ? "Teleconsulta por Vídeo HD (R$ 150,00)" : "Consulta Médica por Chat (R$ 100,00)"}</strong>.
+                        Após a confirmação pelo banco, você segue diretamente para a triagem com a Enfª Brisa.
+                      </p>
+                    </div>
+
+                    {consultPaid && (
+                      <PaymentConfirmedNotice
+                        pix
+                        label="Iniciar Triagem da Enfª Brisa (5 Perguntas)"
+                        onContinue={() => setStep(1)}
+                      />
+                    )}
+
+                    {consultPix && !consultPaid && (
+                      <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
+                        <p className="text-sm text-foreground">
+                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {consultPix.amount.toFixed(2).replace(".", ",")} · Recebedor: <strong>{consultPix.receiver_name || "Planta y Raiz Ltda"}</strong>
+                        </p>
+                        <img src={`data:image/png;base64,${consultPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2 shadow-md" />
+                        <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto bg-muted/40 p-2 rounded-xl">{consultPix.qr_code}</p>
+                        <Button variant="outline" className="w-full font-bold h-11 rounded-xl" onClick={async () => {
+                          try { await navigator.clipboard.writeText(consultPix.qr_code); toast({ title: "Código Pix copiado!" }); }
+                          catch { toast({ title: "Erro ao copiar", description: "Selecione o código e copie manualmente.", variant: "destructive" }); }
+                        }}>
+                          Copiar Código Pix (Copia e Cola)
+                        </Button>
+                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
+                          <Loader2 className="animate-spin text-primary" size={14} /> Aguardando confirmação do banco em tempo real…
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="space-y-3 pt-2">
+                      {!consultPix && !consultPaid && (
+                        <Button 
+                          className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base shadow-lg hover:shadow-xl transition-all"
+                          onClick={() => void initiatePixCheckout(selectedServiceMode)}
+                          disabled={aiLoading}
+                        >
+                          {aiLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : <CreditCard className="mr-2" size={18} />}
+                          Gerar Código PIX — {selectedServiceMode === "video" ? "R$ 150,00" : "R$ 100,00"}
+                        </Button>
+                      )}
+
+                      {consultPix && !consultPaid && (
+                        <Button
+                          variant="outline"
+                          className="w-full h-12 border-emerald-500/30 text-emerald-500 font-bold rounded-2xl text-xs sm:text-sm hover:bg-emerald-500/10"
+                          disabled={aiLoading}
+                          onClick={() => {
+                            let savedId: string | undefined;
+                            try {
+                              const raw = safeGetSession("telemedicine_pending_checkout");
+                              if (raw) savedId = JSON.parse(raw).appointmentId;
+                            } catch {}
+                            const id = appointmentId || savedId;
+                            if (!id) {
+                              toast({ title: "Nenhum pagamento iniciado", description: "Gere o código Pix para pagar.", variant: "destructive" });
+                              return;
+                            }
+                            void verifyConsultationPayment(id);
+                          }}
+                        >
+                          <CheckCircle2 className="mr-2" size={16} />
+                          Já paguei / Verificar confirmação
+                        </Button>
+                      )}
+                    </div>
+
+                    <p className="text-center text-[10px] text-muted-foreground flex items-center justify-center gap-1">
+                      <Shield size={12} /> Pagamento auditado com proteção e estorno garantido até a avaliação da consulta.
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* =========================================================================
+                PASSO 1: IDENTIFICAÇÃO DO PACIENTE (PÓS-PAGAMENTO CONFIRMADO)
+               ========================================================================= */}
+            {step === 1 && (
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-4">
+                <Card className="border-border shadow-xl">
                   <CardContent className="p-4 sm:p-8 space-y-4 sm:space-y-6">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <h2 className="text-lg sm:text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
-                      <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">
-                        <CheckCircle2 size={10} className="mr-1" /> TCLE Aceito
+                      <Badge variant="outline" className="border-emerald-500/40 text-emerald-500 text-[10px]">
+                        <CheckCircle2 size={10} className="mr-1" /> Consulta Paga ({selectedServiceMode === "video" ? "R$ 150" : "R$ 100"})
                       </Badge>
                     </div>
 
-                    {/* Pathology Badge */}
                     {selectedPathology && (
                       <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
@@ -855,253 +980,85 @@ const Telemedicina = () => {
                         <Input id="tele-email" name="email" placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-12 rounded-xl" />
                       </div>
                     </div>
-                     <Button 
-                       className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-sm sm:text-lg"
-                       disabled={!isPatientDataValid()}
-                       onClick={() => setStep(1)}
-                     >
-                       Iniciar Entrevista com Brisa (5 Perguntas) <ArrowRight className="ml-2" size={18} />
-                     </Button>
-                   </CardContent>
-                 </Card>
-               </motion.div>
-             )}
 
-            {/* Monitor Cardíaco - PPG */}
-            {step === 0 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mt-6">
-                <Card className="border-border shadow-xl">
+                    <Button 
+                      className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-sm sm:text-lg"
+                      disabled={!isPatientDataValid()}
+                      onClick={() => setStep(2)}
+                    >
+                      Iniciar Entrevista com Brisa (5 Perguntas) <ArrowRight className="ml-2" size={18} />
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Monitor Cardíaco PPG Opcional */}
+                <Card className="border-border shadow-md">
                   <CardContent className="p-4 sm:p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Activity size={20} className="text-primary" />
-                      <h3 className="text-sm font-bold text-foreground">Monitoramento Cardíaco ao Vivo</h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Activity size={18} className="text-primary" />
+                      <h3 className="text-sm font-bold text-foreground">Monitoramento Cardíaco ao Vivo (Opcional)</h3>
                     </div>
                     <Suspense fallback={null}>
-                      <div className="max-w-full">
-                        <WidgetMonitorRapido />
-                      </div>
+                      <WidgetMonitorRapido />
                     </Suspense>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
 
-            {/* As 5 Perguntas Clínicas Essenciais */}
-            {step >= 1 && step <= 5 && currentQ && (
+            {/* =========================================================================
+                PASSOS 2 A 6: AS 5 PERGUNTAS CLÍNICAS DA ENFª BRISA IA
+               ========================================================================= */}
+            {step >= 2 && step <= 6 && currentQ && (
               <motion.div key={step} initial="hidden" animate="visible" variants={fadeUp}>
-                 <Card className="border-border shadow-xl">
-                   <CardContent className="p-4 sm:p-8">
-                     <div className="flex items-center justify-between mb-4">
-                       <span className="text-xs font-black text-primary uppercase tracking-wider">Pergunta {step} de 5</span>
-                       <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Triagem IA Brisa</Badge>
-                     </div>
-                     <h2 className="text-base sm:text-xl font-display font-black text-foreground mb-4 sm:mb-6">{currentQ.question}</h2>
-                    {/* Renderização dinâmica de campos de triagem */}
+                <Card className="border-border shadow-xl">
+                  <CardContent className="p-4 sm:p-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-xs font-black text-primary uppercase tracking-wider">Pergunta {questionNumber} de 5</span>
+                      <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Triagem IA Brisa</Badge>
+                    </div>
+                    <h2 className="text-base sm:text-xl font-display font-black text-foreground mb-4 sm:mb-6">{currentQ.question}</h2>
+
                     {currentQ.type === "textarea" && (
                       <Textarea 
                         placeholder={currentQ.placeholder} 
                         className="min-h-[140px] rounded-2xl border-border focus:border-primary text-sm"
-                        value={answers[step] || ""}
-                        onChange={(e) => setAnswers({...answers, [step]: e.target.value})}
+                        value={answers[questionNumber] || ""}
+                        onChange={(e) => setAnswers({...answers, [questionNumber]: e.target.value})}
                       />
                     )}
                     {currentQ.type === "select" && (
-                      <Select value={typeof answers[step] === "string" ? String(answers[step]) : ""} onValueChange={(value) => setAnswers({ ...answers, [step]: value })}>
+                      <Select value={typeof answers[questionNumber] === "string" ? String(answers[questionNumber]) : ""} onValueChange={(value) => setAnswers({ ...answers, [questionNumber]: value })}>
                         <SelectTrigger className="h-12 rounded-xl text-sm"><SelectValue placeholder="Selecione uma resposta" /></SelectTrigger>
                         <SelectContent>{currentQ.options?.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
                       </Select>
                     )}
                     {currentQ.type === "radio" && (
-                      <RadioGroup value={typeof answers[step] === "string" ? String(answers[step]) : ""} onValueChange={(value) => setAnswers({ ...answers, [step]: value })} className="space-y-3">
+                      <RadioGroup value={typeof answers[questionNumber] === "string" ? String(answers[questionNumber]) : ""} onValueChange={(value) => setAnswers({ ...answers, [questionNumber]: value })} className="space-y-3">
                         {currentQ.options?.map((option) => <label key={option} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer hover:border-primary/50 transition-colors"><RadioGroupItem value={option} /><span className="text-sm text-foreground">{option}</span></label>)}
                       </RadioGroup>
                     )}
                     {currentQ.type === "checkbox" && (
-                      <div className="space-y-3">{currentQ.options?.map((option) => <label key={option} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer hover:border-primary/50 transition-colors"><Checkbox checked={Array.isArray(answers[step]) && answers[step].includes(option)} onCheckedChange={(checked) => handleCheckbox(option, Boolean(checked))} /><span className="text-sm text-foreground">{option}</span></label>)}</div>
+                      <div className="space-y-3">{currentQ.options?.map((option) => <label key={option} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer hover:border-primary/50 transition-colors"><Checkbox checked={Array.isArray(answers[questionNumber]) && answers[questionNumber].includes(option)} onCheckedChange={(checked) => handleCheckbox(option, Boolean(checked))} /><span className="text-sm text-foreground">{option}</span></label>)}</div>
                     )}
-                     <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8">
-                       <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-10 sm:h-12 rounded-xl font-bold text-sm">
-                         <ArrowLeft className="mr-1 sm:mr-2" size={16} /> Voltar
-                       </Button>
-                       <Button 
-                         className="flex-1 h-10 sm:h-12 bg-primary text-primary-foreground font-black rounded-xl text-sm shadow-md"
+
+                    <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8">
+                      <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-10 sm:h-12 rounded-xl font-bold text-sm">
+                        <ArrowLeft className="mr-1 sm:mr-2" size={16} /> Voltar
+                      </Button>
+                      <Button 
+                        className="flex-1 h-10 sm:h-12 bg-primary text-primary-foreground font-black rounded-xl text-sm shadow-md"
                         disabled={!isAnswered() || aiLoading}
-                        onClick={() => step === 5 ? void completeTriage() : setStep(step + 1)}
+                        onClick={() => questionNumber === 5 ? void completeTriage() : setStep(step + 1)}
                       >
                         {aiLoading ? <Loader2 className="mr-2 animate-spin" size={18} /> : null}
-                        {step === 5 ? "Concluir Entrevista (5/5) e Avançar" : "Próxima Pergunta"} <ArrowRight className="ml-2" size={16} />
+                        {questionNumber === 5 ? "Concluir Triagem (5/5) e Conectar com o Médico" : "Próxima Pergunta"} <ArrowRight className="ml-2" size={16} />
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
-
-            {/* PASSO 2: PAGAMENTO & ESCOLHA DA MODALIDADE (Passo 6) */}
-            {step === 6 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
-                <div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setStep(triageId ? 5 : 0)}
-                    className="text-xs text-muted-foreground hover:text-foreground -ml-2 mb-2"
-                  >
-                    <ArrowLeft size={14} className="mr-1" /> Voltar {triageId ? "às perguntas da triagem" : "à identificação"}
-                  </Button>
-                </div>
-                <Card className="border-primary/30 bg-gradient-to-br from-card to-primary/5 shadow-2xl">
-                  <CardContent className="p-5 sm:p-8 space-y-6">
-                    <div className="text-center space-y-2">
-                      <Badge className="bg-primary/20 text-primary border-primary/30 uppercase text-[10px]">
-                        Passo 2 de 5 · Pagamento Seguro
-                      </Badge>
-                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground">
-                        Escolha sua <span className="text-gradient-green">Modalidade de Atendimento</span>
-                      </h2>
-                      <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto">
-                        {triageId
-                          ? "Triagem clínica em 5 perguntas concluída! Escolha a modalidade desejada para prosseguir ao atendimento médico."
-                          : "Escolha como prefere ser atendido(a). Após a confirmação, seu atendimento é liberado imediatamente."}
-                      </p>
-                    </div>
-
-                    {/* Cards das Modalidades de Teleconsulta Médica */}
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {/* 1. Teleconsulta Vídeo HD */}
-                      <div 
-                        onClick={() => { if (!appointmentId) setSelectedServiceMode("video"); }}
-                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "video" ? "border-primary bg-primary/10 shadow-lg scale-[1.01]" : "border-border bg-card hover:border-primary/40"}`}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge className="bg-primary/20 text-primary text-[10px] font-bold">Mais Escolhida · Recomendada</Badge>
-                            <span className="font-black text-primary text-xl">R$ 150</span>
-                          </div>
-                          <h3 className="font-black text-base text-foreground mb-1">Teleconsulta por Vídeo HD</h3>
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            Consulta médica ao vivo com médico especialista prescritor, emissão de receita oficial digital ANVISA/CFM com QR Code e direito a retorno clínico incluso no protocolo.
-                          </p>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-border/50 text-[11px] text-primary font-bold flex items-center gap-1.5">
-                          <CheckCircle2 size={14} /> Atendimento médico completo + Receita oficial válida em todo o Brasil
-                        </div>
-                      </div>
-
-                      {/* 2. Consulta Chat */}
-                      <div 
-                        onClick={() => { if (!appointmentId) setSelectedServiceMode("chat"); }}
-                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "chat" ? "border-primary bg-primary/10 shadow-lg scale-[1.01]" : "border-border bg-card hover:border-primary/40"}`}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge variant="outline" className="text-[10px] font-bold border-primary/30 text-primary">Atendimento Ágil</Badge>
-                            <span className="font-black text-primary text-xl">R$ 100</span>
-                          </div>
-                          <h3 className="font-black text-base text-foreground mb-1">Consulta Médica por Chat</h3>
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            Atendimento clínico ágil por chat seguro na plataforma, análise da anamnese e emissão de prescrição médica digital homologada pelo especialista.
-                          </p>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-border/50 text-[11px] text-primary font-bold flex items-center gap-1.5">
-                          <CheckCircle2 size={14} /> Prontuário eletrônico completo + Prescrição digital
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Link para Orientação Técnica em Nuvem (Dr. Edilson On - R$ 30) */}
-                    <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-                      <div className="text-xs text-muted-foreground leading-relaxed">
-                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra ON (consulta em tempo real ao acervo PubMed/NCBI)?</span>
-                      </div>
-                      <Link to="/orientacao-tecnica">
-                        <Button variant="outline" size="sm" className="text-xs font-black border-primary text-primary hover:bg-primary/10 gap-1 rounded-xl shrink-0">
-                          Ir para Orientação Técnica em Nuvem (R$ 30) <ArrowRight size={13} />
-                        </Button>
-                      </Link>
-                    </div>
-
-                    {consultPaid && (
-                      <PaymentConfirmedNotice
-                        pix
-                        label={triageId ? "Acessar Consultório / Minhas Consultas" : "Continuar para a triagem"}
-                        onContinue={() => {
-                          if (triageId) {
-                            navigate("/consultas");
-                          } else {
-                            setStep(0);
-                          }
-                        }}
-                      />
-                    )}
-                    {consultPix && !consultPaid && (
-                      <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
-                        <p className="text-sm text-foreground">
-                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {consultPix.amount.toFixed(2).replace(".", ",")} · Recebedor: <strong>{consultPix.receiver_name || "Planta y Raiz Ltda"}</strong>
-                        </p>
-                        <img src={`data:image/png;base64,${consultPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2" />
-                        <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto">{consultPix.qr_code}</p>
-                        <Button variant="outline" className="w-full" onClick={async () => {
-                          try { await navigator.clipboard.writeText(consultPix.qr_code); toast({ title: "Código Pix copiado!" }); }
-                          catch { toast({ title: "Erro ao copiar", description: "Selecione o código e copie manualmente.", variant: "destructive" }); }
-                        }}>Copiar Código Pix (Copia e Cola)</Button>
-                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="animate-spin" size={14} /> Aguardando confirmação do banco…</p>
-                      </div>
-                    )}
-                    {/* Botões de Pagamento */}
-                    <div className={`space-y-3 pt-2 ${consultPix ? "hidden" : ""}`}>
-                      <Button 
-                        className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base shadow-lg hover:shadow-xl transition-all"
-                        onClick={async () => {
-                          setAiLoading(true);
-                          try {
-                            let pending: { appointmentId?: string; mode?: string; triageId?: string } = {};
-                            try { pending = JSON.parse(sessionStorage.getItem("telemedicine_pending_checkout") || "{}"); } catch { /* discard invalid draft */ }
-                            const id = appointmentId || (pending.mode === selectedServiceMode && pending.triageId === triageId ? pending.appointmentId : null);
-                                                        const checkout = await createConsultationCheckout(selectedServiceMode, triageId || "", id);
-                            setAppointmentId(checkout.appointmentId);
-                            setConsultPix(checkout.pix);
-                          } catch (error) {
-                            toast({ title: "Pagamento não iniciado", description: error instanceof Error ? error.message : "Tente novamente.", variant: "destructive" });
-                          } finally {
-                            setAiLoading(false);
-                          }
-                        }}
-                        disabled={aiLoading}
-                      >
-                        {aiLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : <CreditCard className="mr-2" size={18} />}
-                        Pagar {selectedServiceMode === "video" ? "R$ 150" : "R$ 100"} via Mercado Pago (Cartão ou PIX)
-                      </Button>
-
-                      {/* Botão de Liberação com Comprovante */}
-                      <Button
-                        variant="outline"
-                        className="w-full h-12 border-emerald-500/30 text-emerald-500 font-bold rounded-2xl text-xs sm:text-sm hover:bg-emerald-500/10"
-                        disabled={aiLoading}
-                        onClick={() => {
-                          let savedId: string | undefined;
-                          try { savedId = JSON.parse(sessionStorage.getItem("telemedicine_pending_checkout") || "{}").appointmentId; } catch { /* invalid draft */ }
-                          const id = appointmentId || savedId;
-                          if (!id) {
-                            toast({ title: "Nenhum pagamento iniciado", description: "Inicie o pagamento desta consulta pelo Mercado Pago.", variant: "destructive" });
-                            return;
-                          }
-                          void verifyConsultationPayment(id);
-                        }}
-                      >
-                        <CheckCircle2 className="mr-2" size={16} />
-                        Já paguei / Verificar confirmação
-                      </Button>
-                    </div>
-
-                    <p className="text-center text-[10px] text-muted-foreground flex items-center justify-center gap-1">
-                      <Shield size={12} /> Pagamento auditado com proteção e estorno garantido até a avaliação da consulta.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-
 
           </div>
         </div>
@@ -1146,7 +1103,6 @@ const Telemedicina = () => {
               </div>
             </div>
 
-            {/* Aviso de Compliance e Vedações */}
             <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-100/90 text-xs sm:text-sm leading-relaxed mb-8 flex items-start gap-3">
               <Scale size={20} className="text-amber-500 shrink-0 mt-0.5" />
               <div>
@@ -1154,17 +1110,16 @@ const Telemedicina = () => {
               </div>
             </div>
 
-            {/* Esteira de 4 Passos */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
-                <span className="text-2xl">👩‍⚕️</span>
-                <p className="text-xs font-black uppercase tracking-wider text-primary">1. Triagem Brisa</p>
-                <p className="text-[11px] text-muted-foreground">Queixas e histórico no WhatsApp</p>
+                <span className="text-2xl">💳</span>
+                <p className="text-xs font-black uppercase tracking-wider text-primary">1. Taxa R$ 30</p>
+                <p className="text-[11px] text-muted-foreground">Pagamento seguro Mercado Pago</p>
               </div>
               <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
-                <span className="text-2xl">💳</span>
-                <p className="text-xs font-black uppercase tracking-wider text-primary">2. Taxa R$ 30</p>
-                <p className="text-[11px] text-muted-foreground">Pagamento seguro Mercado Pago</p>
+                <span className="text-2xl">👩‍⚕️</span>
+                <p className="text-xs font-black uppercase tracking-wider text-primary">2. Triagem Brisa</p>
+                <p className="text-[11px] text-muted-foreground">Queixas e histórico no WhatsApp</p>
               </div>
               <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
                 <span className="text-2xl">💬</span>
@@ -1178,7 +1133,6 @@ const Telemedicina = () => {
               </div>
             </div>
 
-            {/* CTA Final em Destaque */}
             <div className="text-center pt-2">
               <Link to="/orientacao-tecnica">
                 <Button

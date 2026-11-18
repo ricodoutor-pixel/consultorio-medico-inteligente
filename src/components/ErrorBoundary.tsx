@@ -44,14 +44,23 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      if (this.state.error) {
+        console.error("[PlantaYRaiz ErrorBoundary caught runtime error]:", this.state.error);
+      }
       return (
         <div className="min-h-dvh bg-background flex items-center justify-center p-4">
-          <div className="text-center max-w-md">
+          <div className="text-center max-w-md w-full">
             <AlertTriangle size={48} className="text-destructive mx-auto mb-4" />
             <h1 className="text-2xl font-display font-black text-foreground mb-2">Algo deu errado</h1>
-            <p className="text-muted-foreground mb-6 text-sm">
+            <p className="text-muted-foreground mb-4 text-sm">
               Ocorreu um erro inesperado. Tente recarregar a página.
             </p>
+            {this.state.error?.message && (
+              <details className="mb-6 text-left bg-destructive/10 border border-destructive/30 rounded-xl p-3 text-xs text-destructive">
+                <summary className="cursor-pointer font-bold">Ver detalhes do erro</summary>
+                <p className="mt-2 font-mono break-all text-[11px]">{this.state.error.message}</p>
+              </details>
+            )}
             <Button onClick={() => window.location.reload()} className="bg-primary text-primary-foreground rounded-xl font-bold">
               Recarregar Página
             </Button>

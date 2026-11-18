@@ -250,7 +250,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     void fetchDoctors();
     const poll = setVisibleInterval(fetchDoctors, 30_000);
     const channel = supabase
-      .channel("public:doctors-status-real")
+      .channel(`public:doctors-status-real-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, fetchDoctors)
       .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, fetchDoctors)
       .subscribe();

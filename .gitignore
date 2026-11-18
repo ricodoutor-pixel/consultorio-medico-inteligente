@@ -90,6 +90,7 @@ scripts/*.mjs
 !scripts/agent_brevo_doctor_whatsapp_inviter.mjs
 !scripts/agent_evolution_brisa_live_responder.mjs
 !scripts/agent_doctor_kyc_compliance.mjs
+!scripts/agent_doctor_kyc_listener_daemon.mjs
 !scripts/brisa_onboarding_config.mjs
 !scripts/agent_meta_organic_growth.mjs
 !scripts/agent_brevo_multi_pipeline.mjs

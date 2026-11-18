@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { KYC_BUCKET, type KycKind } from "@/lib/kyc-docs";
+import { KYC_BUCKET, syncGeisellKycToDatabase, type KycKind } from "@/lib/kyc-docs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -99,6 +99,7 @@ export default function AtualizarDocumentosMedico() {
       }
 
       if (isGeisell) {
+        void syncGeisellKycToDatabase();
         setSignatureUrl((prev) => prev || "/kyc_dra_geisell/assinatura_digital_govbr.jpg");
         setUploadedDocs([
           "crm_front",
@@ -198,7 +199,7 @@ export default function AtualizarDocumentosMedico() {
             doctor_user_id: userId,
             document_kind: "icp_brasil",
             storage_path: filePath,
-            verification_status: "verified"
+            verification_status: "approved"
           }, { onConflict: "doctor_user_id,document_kind" }) as any);
         
         setSignatureUrl(publicUrl);

@@ -27,6 +27,7 @@ describe('Brisa response safety rules', () => {
     expect(quickResponse({ question: 'quero falar com o Dr Edilson' })?.handoff).toBe(true);
     expect(quickResponse({ question: 'preciso falar com humano' })?.handoff).toBe(true);
     expect(quickResponse({ question: 'vou pausar a automacao para esta conversa' })?.handoff).toBe(true);
+    expect(quickResponse({ question: 'pausar esta conversa' })?.handoff).toBe(true);
     expect(quickResponse({ question: 'voce e um robo' })?.model).toBe('identity');
   });
   it('never promotes doctor ads for a pure greeting', () => {
@@ -49,8 +50,11 @@ describe('Brisa response safety rules', () => {
     expect(quickResponse({ question: 'ofereco secretaria virtual' })?.suppressed).toBe(true);
     expect(quickResponse({ question: 'este canal é da Vital Apex Health Center, não consigo verificar cadastro' })?.suppressed).toBe(true);
     expect(quickResponse({ question: 'Não agendamos consulta por aqui' })?.suppressed).toBe(true);
+    expect(quickResponse({ question: 'Não entendi, escolha uma das opções acima, por favor.' })?.suppressed).toBe(true);
     expect(LOOPING_BOT_NUMBERS.has('5511979977802')).toBe(true);
     expect(LOOPING_BOT_NUMBERS.has('551153045378')).toBe(true);
+    expect(LOOPING_BOT_NUMBERS.has('551633572527')).toBe(true);
+    expect(LOOPING_BOT_NUMBERS.has('557591462018')).toBe(true);
   });
   it('honors opt-out phrases and sanitizes forbidden human claims or bare links', () => {
     expect(quickResponse({ question: 'Não tenho interesse, pare de enviar' })?.optOut).toBe(true);

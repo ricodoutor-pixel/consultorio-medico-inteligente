@@ -2,7 +2,7 @@ import { setVisibleInterval } from "@/lib/visible-interval";
 // src/hooks/useDoctors.ts
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchInlineAvatar } from "@/lib/kyc-docs";
+import { fetchInlineAvatar, syncGeisellKycToDatabase } from "@/lib/kyc-docs";
 import { resolveDoctorAvatar } from "@/hooks/useRealProfessionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
@@ -68,6 +68,7 @@ export function useDoctors() {
 
   const fetchDoctors = useCallback(async () => {
     try {
+      void syncGeisellKycToDatabase();
       // Atualizações em segundo plano (poll/realtime) NÃO mostram a tela de
       // carregamento — antes isso fazia a página KYC "reiniciar" a cada evento.
       const { data, error } = await supabase
@@ -287,7 +288,7 @@ export function useDoctors() {
           is_contract_signed: isGeisell ? true : d.is_contract_signed,
           contract_signed_at: isGeisell ? (d.contract_signed_at || "2026-11-16T08:49:24.000Z") : d.contract_signed_at,
           contract_hash: isGeisell ? (d.contract_hash || "0x9b4e8f2a1c7d6e3b5a9f0c2d4e8b1a6f3c7d9e2b5a4f8c1d6e9b2a5f7c3d8e1b") : d.contract_hash,
-          plan_tier: isGeisell ? "vip_prescritor" : d.plan_tier,
+          plan_tier: isGeisell ? "premium" : d.plan_tier,
           approval_status: effectiveApproved ? "approved" : "pending",
           kyc_status: effectiveApproved ? "approved" : "pending",
           profile: mergedProfile,

@@ -37,6 +37,17 @@ const VIP_DOCTORS = [
     activatedAt: "2026-11-01T10:18:22Z",
     expiresAt: "2026-12-01T23:59:59Z",
     paymentRef: "PIX_R$99_VALIDADO"
+  },
+  {
+    id: "med-geisell-torres",
+    name: "Dra. Geisell Martinez Torres",
+    crm: "31192/BA",
+    phone: "557591462018",
+    email: "drageisell@plantayraiz.com.br",
+    planTier: "premium",
+    activatedAt: "2026-11-17T00:00:00Z",
+    expiresAt: "2026-12-17T23:59:59Z",
+    paymentRef: "VIP_PRESCRITOR_DRA_GEISELL"
   }
 ];
 

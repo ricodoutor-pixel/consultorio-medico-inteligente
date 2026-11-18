@@ -22,7 +22,7 @@ import { useDoctors } from "@/hooks/useDoctors";
 import KycDocViewer from "@/components/admin/KycDocViewer";
 import DoctorContractViewerModal, { DoctorContractDetails } from "@/components/admin/DoctorContractViewerModal";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
-import { KYC_LABELS, KYC_REQUIRED, GEISELL_KYC_PATHS, type KycKind } from "@/lib/kyc-docs";
+import { KYC_LABELS, KYC_REQUIRED, GEISELL_KYC_PATHS, syncGeisellKycToDatabase, type KycKind } from "@/lib/kyc-docs";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness, doctorTierFromDocs, DOCTOR_TIER_LABEL } from "@/lib/doctor-ranking";
 
@@ -52,54 +52,12 @@ export const AdminAprovacoes = () => {
   };
 
   const isVipDoctor = (d: any) => {
-    return isVictorDoctor(d) || isGeisellDoctor(d) || d?.plan_tier === "vip" || d?.plan_tier === "vip_prescritor";
+    return isVictorDoctor(d) || isGeisellDoctor(d) || d?.plan_tier === "vip" || d?.plan_tier === "vip_prescritor" || d?.plan_tier === "premium";
   };
 
   // Sincroniza silenciosamente no banco os documentos KYC recolhidos no WhatsApp da Dra. Geisell
   useEffect(() => {
-    const geisellUid = "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3";
-    const geisellDocId = "a98b68b3-3efa-42d2-8959-e8be8d6466f7";
-    (async () => {
-      try {
-        await Promise.all([
-          (supabase.from("profiles") as any).update({
-            cpf: "065.528.311-02",
-            phone: "+5575991462018",
-            pix_key: "06552831102",
-            pix_type: "CPF",
-            date_of_birth: "1978-04-02",
-            cep: "44005-294",
-            address_street: "Rua Alameda 17",
-            neighborhood: "Muchila",
-            city: "Feira de Santana",
-            region: "BA",
-            signature_url: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
-          }).eq("id", geisellUid),
-          (supabase.from("doctors") as any).update({
-            is_approved_by_admin: true,
-            approval_status: "approved",
-            is_verified: true,
-            is_online: true,
-            is_available: true,
-            kyc_status: "approved",
-            is_contract_signed: true,
-            plan_tier: "vip_prescritor",
-            signature_url: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
-          }).eq("id", geisellDocId),
-        ]);
-        const rows = (Object.entries(GEISELL_KYC_PATHS) as [KycKind, string][]).map(([kind, path]) => ({
-          doctor_user_id: geisellUid,
-          document_kind: kind,
-          storage_path: path,
-          mime_type: path.endsWith(".pdf") ? "application/pdf" : path.endsWith(".png") ? "image/png" : "image/jpeg",
-          verification_status: "verified",
-          verification_notes: "Recolhido via WhatsApp Oficial e homologado pelo Diretor Técnico Dr. Edilson Bezerra",
-        }));
-        await (supabase.from("doctor_kyc_documents" as any).upsert(rows, { onConflict: "doctor_user_id,document_kind" }) as any);
-      } catch {
-        // Silencioso caso sessão ainda não tenha carregado
-      }
-    })();
+    void syncGeisellKycToDatabase();
   }, []);
 
   const hasAdminValidatedVoucher = (doctor: any) => {

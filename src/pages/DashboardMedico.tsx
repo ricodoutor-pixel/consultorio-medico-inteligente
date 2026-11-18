@@ -27,6 +27,7 @@ import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
 import { DoctorContractModal } from "@/components/doctor/DoctorContractModal";
 import { ConsultationOfferBanner } from "@/components/doctor/ConsultationOfferBanner";
+import { DoctorShareLinks } from "@/components/doctor/DoctorShareLinks";
 import { DoctorProntuarioImportExportModal } from "@/components/doctor/DoctorProntuarioImportExportModal";
 import { DoctorScheduleAndVideoModal } from "@/components/doctor/DoctorScheduleAndVideoModal";
 
@@ -387,6 +388,9 @@ const DashboardMedico = () => {
         <div className="container mx-auto px-4">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <ConsultationOfferBanner doctorId={doctorData?.id} />
+            {doctorData?.id && doctorData?.user_id && (
+              <DoctorShareLinks doctorId={doctorData.id} userId={doctorData.user_id} />
+            )}
             {/* Header */}
 
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">

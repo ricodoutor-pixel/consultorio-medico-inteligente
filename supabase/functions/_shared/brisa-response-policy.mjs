@@ -7,6 +7,14 @@ export const LOOPING_BOT_NUMBERS = new Set([
   '551153045378',
   '558381838356',
   '185405248905250',
+  '551633572527',
+  '1633572527',
+  '54589755789473',
+  '557591462018',
+  '7591462018',
+  '5575991462018',
+  '75991462018',
+  '212988065788005',
 ]);
 
 const GENERIC_PROFILE_NAMES = /^(paciente|usuario|cliente|doutor|doutora|consultorio|clinica|recepcao|agendamento|equipe|secretaria|central|espaco|instituto|vital|global|cards|atendimento|odontologia|veterinaria|contato)$/i;
@@ -58,13 +66,13 @@ export function quickResponse({ question = '', senderName = '', role = 'patient'
   const q = normalizeText(question);
   // Emergency takes priority over sales, media and human handoff.
   if (/suicid|me matar|tirar minha vida|me machucar|infarto|falta de ar|dor forte|dor.*peito|socorro urgente|\bsamu\b|\b192\b/.test(q)) return { answer: 'Ligue agora para 192 (SAMU) ou procure o pronto-socorro mais próximo. Não espere atendimento por aqui.', model: 'safety-emergency' };
-  if (/\b(atendente|humano|pessoa real|pessoa de verdade)\b|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|a equipe|o suporte|o dr|a dra|o edilson)|vou pausar|pausar a automa[cç]|pausar automa[cç]|silenciar automa[cç]|nao quero (falar com )?(robo|bot|ia)|reclamacao|absurdo|estou irritad/.test(q)) return { answer: 'Vou passar para nossa equipe. Retornamos por aqui.', handoff: true, model: 'human-handoff' };
+  if (/\b(atendente|humano|pessoa real|pessoa de verdade)\b|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|a equipe|o suporte|o dr|a dra|o edilson)|vou pausar|pausar a automa[cç]|pausar automa[cç]|silenciar automa[cç]|pausar esta conversa|pausa esta conversa|pausar conversa|pause esta conversa|vou pausar para esta conversa|parar automa[cç]|nao quero (falar com )?(robo|bot|ia)|reclamacao|absurdo|estou irritad/.test(q)) return { answer: 'Vou passar para nossa equipe. Retornamos por aqui.', handoff: true, model: 'human-handoff' };
   if (/voce e.*(robo|ia|enfermeira|medica)|quem e voce/.test(q)) return { answer: 'Sou a assistente virtual da Planta y Raiz. A equipe humana acompanha o atendimento. Como posso ajudar?', model: 'identity' };
   if (isAudio || q === 'audio' || q === '[audio recebido]') return { answer: 'Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?', model: 'audio-response' };
   if (isCall) return { answer: 'Por aqui não atendemos ligações. Pode escrever sua dúvida?', model: 'call-response' };
   if (/paguei|comprovante|pagamento (feito|realizado)|fiz o pix|mandei o pix|enviei.*(document|anexo)|mandei.*document/.test(q)) return { answer: 'Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar.', model: 'receipt-notice' };
   if (/secretaria virtual|aumente suas vendas|servico de marketing|venda de seguidores|disparador em massa/.test(q)) return { answer: '', suppressed: true, model: 'service-offer' };
-  if (/este canal e (da|do|de|exclusivo)|nao consigo verificar cadastro|nao agendamos consultas? por aqui|esta e uma resposta automatica|mensagem automatica|secretaria eletronica/.test(q)) return { answer: '', suppressed: true, model: 'auto-reply-suppressed' };
+  if (/este canal e (da|do|de|exclusivo)|nao consigo verificar cadastro|nao agendamos consultas? por aqui|esta e uma resposta automatica|mensagem automatica|secretaria eletronica|nao entendi,?\s*escolha uma das opco|escolha uma das opco|digite o numero da opca|seja muito bem vindo.*atendimento digital|triello/.test(q)) return { answer: '', suppressed: true, model: 'auto-reply-suppressed' };
   if (/^(0|pare|parar|sair|stop|chega|descadastrar)$|\b(nao quero receber|nao tenho interesse|sem interesse|pare de enviar|parar de enviar|nao me mande mais|nao envie mais|remover da lista|remover meu numero)\b/.test(q)) return { answer: 'Entendido, removi seu número e não enviaremos novas mensagens. Obrigada pela atenção.', optOut: true, model: 'opt-out' };
   if (/\b(corrente de oracao|compartilhe com 10|partido politico|bolsonaro|lula|versiculo|oracao de hoje)\b/.test(q)) return { answer: 'Aqui falamos só de atendimento e cadastro na Planta y Raiz.', model: 'off-topic' };
   if (/^(oi|ola|bom dia|boa tarde|boa noite|ok|qk|opa|oie|blz|tudo bem)[\s!?.\p{Emoji_Presentation}]*$/u.test(q)) {

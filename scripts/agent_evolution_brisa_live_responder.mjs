@@ -997,7 +997,7 @@ async function ingestIncomingDoc(msg, recipient, senderName) {
 
     const adminSupa = await getAdminSupabase();
 
-    const cleanPhone = recipient.replace(/\D/g, '');
+    const cleanPhone = String(recipient || '').replace(/\D/g, '');
     let doctor = findDoctorByPhone(cleanPhone);
     if (!doctor && senderName) {
       doctor = findDoctorByName(senderName);
@@ -1511,7 +1511,11 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
         body: JSON.stringify({
           question,
           role,
-          phone: String(recipient || '').includes('@lid') ? '' : String(recipient || '').replace(/\D/g, ''),
+          phone: (() => {
+            const resolved = resolveSenderPhone(recipient);
+            if (resolved && !resolved.includes('@')) return resolved.replace(/\D/g, '');
+            return String(recipient || '').replace(/\D/g, '');
+          })(),
           senderName: patientCleanName || senderName,
           history: mem?.turns ? mem.turns.slice(-8) : [],
           lastAnswer: mem?.lastAnswerSent || ''
@@ -1519,6 +1523,10 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
       });
       if (res.ok) {
         const data = await res.json();
+        if (data.suppressed) {
+          log(`🛑 [CHAT-BRISA SUPPRESSED] Resposta suprimida por política/pausa/bot (${data.reason || 'suppressed'}).`);
+          return "";
+        }
         const apiReply = data.answer || data.reply;
         if (data.handoff) {
           try {
@@ -1528,6 +1536,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
             registerHumanTakeover(recipient, true, false, { permanent: true });
             await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada para esta conversa até liberação do operador.`);
           } catch (e) { log(`Aviso handoff: ${e.message}`); }
+          return "";
         }
 
         const degradedPhrases = ['muitos atendimentos', 'não consegui responder', 'problema técnico', 'apenas monitoramento'];
@@ -1547,6 +1556,11 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
 
   // 3. Fallbacks de segurança se ainda não tiver resposta
   if (!reply) {
+    const locked = loadHumanLocked();
+    if (locked.has(recipient) || checkAiPause(recipient).paused || isPauseRequested(question)) {
+      log(`🛑 [FALLBACK SUPPRESSED] Conversa pausada ou bloqueada para ${recipient}. Silêncio total.`);
+      return "";
+    }
     if (role === 'doctor') {
       reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
     } else {
@@ -1812,7 +1826,7 @@ async function loop() {
             ) {
               processedSet.add(lastMsg.key.id);
               saveProcessed(processedSet);
-              await ingestIncomingDoc(lastMsg).catch((e) => log(`⚠️ [KYC SILENT HARVEST] ${e.message}`));
+              await ingestIncomingDoc(lastMsg, jid, chat.name || '').catch((e) => log(`⚠️ [KYC SILENT HARVEST] ${e.message}`));
             }
             continue;
           }

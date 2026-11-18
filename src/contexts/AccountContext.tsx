@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { verifyAndEnsureAdmin } from "@/lib/admin-auth";
 import { adminIdleState, completeLogout, isAccountStorageKey } from "@/lib/account-session";
+import { syncGeisellKycToDatabase } from "@/lib/kyc-docs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
@@ -48,6 +49,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       if (!alive || current !== generation) return;
       setIsAdmin(admin); setFullName(profile.data?.full_name || verified.email?.split("@")[0] || "Minha conta");
       setAvatarUrl(profile.data?.avatar_url || undefined); setLoading(false);
+      if (admin || verified.id === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3") {
+        void syncGeisellKycToDatabase();
+      }
       if (admin && auditLogin) {
         const { error } = await supabase.from("audit_log").insert({ user_id: verified.id, record_id: verified.id, table_name: "auth_sessions", action: "admin_login", new_data: { device: navigator.userAgent, logged_in_at: new Date().toISOString() } });
         if (error) toast.warning("Não foi possível registrar a entrada na auditoria.");

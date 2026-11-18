@@ -94,6 +94,7 @@ scripts/*.mjs
 !scripts/brisa_onboarding_config.mjs
 !scripts/agent_meta_organic_growth.mjs
 !scripts/agent_brevo_multi_pipeline.mjs
+!scripts/agent_hostinger_email_dispatcher.mjs
 !scripts/agent_partner_meeting_scheduler.mjs
 !scripts/agent_organic_analytics_reporter.mjs
 !scripts/agent_cannabis_and_young_doctors_hunter.mjs

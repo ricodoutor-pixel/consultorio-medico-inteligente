@@ -169,6 +169,21 @@ module.exports = {
       }
     },
     {
+      name: 'hostinger-email-dispatcher',
+      node_args: '--dns-result-order=ipv4first',
+      script: 'scripts/agent_hostinger_email_dispatcher.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '500M',
+      restart_delay: 15000,
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
       name: 'partner-meeting-scheduler',
       node_args: '--dns-result-order=ipv4first',
       script: 'scripts/agent_partner_meeting_scheduler.mjs',

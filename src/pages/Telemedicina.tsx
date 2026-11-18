@@ -265,11 +265,18 @@ const Telemedicina = () => {
     if (!consultPix || !appointmentId || consultPaid) return;
     const t = setInterval(() => {
       isConsultationPaid(appointmentId).then((ok) => {
-        if (ok) { setConsultPaid(true); sessionStorage.removeItem("telemedicine_pending_checkout"); }
+        if (ok) {
+          setConsultPaid(true);
+          sessionStorage.removeItem("telemedicine_pending_checkout");
+          toast({
+            title: "Pagamento confirmado!",
+            description: triageId ? "Acesse seu consultório para iniciar o atendimento." : "Prossiga para a identificação e triagem.",
+          });
+        }
       }).catch(() => undefined);
     }, 5000);
     return () => clearInterval(t);
-  }, [consultPix, appointmentId, consultPaid]);
+  }, [consultPix, appointmentId, consultPaid, triageId, toast]);
 
   const [patientData, setPatientData] = useState({
     nome: "",
@@ -474,7 +481,14 @@ const Telemedicina = () => {
     try {
       if (await isConsultationPaid(id)) {
         setConsultPaid(true);
-        setStep(0);
+        sessionStorage.removeItem("telemedicine_pending_checkout");
+        if (triageId) {
+          toast({ title: "Pagamento confirmado!", description: "Redirecionando para o seu consultório..." });
+          navigate("/consultas");
+        } else {
+          toast({ title: "Pagamento confirmado!", description: "Prossiga com a identificação e triagem." });
+          setStep(0);
+        }
       } else {
         toast({ title: "Pagamento ainda não confirmado", description: "Aguarde a confirmação do Mercado Pago e tente novamente." });
       }
@@ -624,7 +638,19 @@ const Telemedicina = () => {
                   <strong className="text-primary">Importante:</strong> qualquer clique em "Consulta" ou nos cards de médicos passa antes pela Triagem da Enf. Brisa. Os dados coletados seguem com você até o médico escolhido.
                 </div>
 
-                <Button className="w-full h-12 rounded-2xl font-black bg-primary text-primary-foreground" onClick={() => setShowFlowInfo(false)}>
+                <Button
+                  className="w-full h-12 rounded-2xl font-black bg-primary text-primary-foreground"
+                  onClick={() => {
+                    setShowFlowInfo(false);
+                    if (step === -1) {
+                      if (tcleAccepted) {
+                        setStep(0);
+                      } else {
+                        setShowTCLE(true);
+                      }
+                    }
+                  }}
+                >
                   Entendi, iniciar triagem <ArrowRight size={16} className="ml-2" />
                 </Button>
               </div>
@@ -732,7 +758,7 @@ const Telemedicina = () => {
                         className="h-14 font-black rounded-2xl bg-primary text-primary-foreground text-base shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                         onClick={() => {
                           if (tcleAccepted) {
-                            setStep(6);
+                            setStep(0);
                           } else {
                             setShowTCLE(true);
                           }
@@ -772,10 +798,20 @@ const Telemedicina = () => {
 
             {step === 0 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-                 <Card className="border-border">
-                   <CardContent className="p-4 sm:p-8 space-y-4 sm:space-y-6">
-                     <div className="flex items-center justify-between flex-wrap gap-2">
-                       <h2 className="text-lg sm:text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                <div className="mb-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setStep(-1)}
+                    className="text-xs text-muted-foreground hover:text-foreground -ml-2"
+                  >
+                    <ArrowLeft size={14} className="mr-1" /> Voltar ao início
+                  </Button>
+                </div>
+                <Card className="border-border">
+                  <CardContent className="p-4 sm:p-8 space-y-4 sm:space-y-6">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <h2 className="text-lg sm:text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
                       <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">
                         <CheckCircle2 size={10} className="mr-1" /> TCLE Aceito
                       </Badge>
@@ -904,6 +940,16 @@ const Telemedicina = () => {
             {/* PASSO 2: PAGAMENTO & ESCOLHA DA MODALIDADE (Passo 6) */}
             {step === 6 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
+                <div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setStep(triageId ? 5 : 0)}
+                    className="text-xs text-muted-foreground hover:text-foreground -ml-2 mb-2"
+                  >
+                    <ArrowLeft size={14} className="mr-1" /> Voltar {triageId ? "às perguntas da triagem" : "à identificação"}
+                  </Button>
+                </div>
                 <Card className="border-primary/30 bg-gradient-to-br from-card to-primary/5 shadow-2xl">
                   <CardContent className="p-5 sm:p-8 space-y-6">
                     <div className="text-center space-y-2">
@@ -914,7 +960,9 @@ const Telemedicina = () => {
                         Escolha sua <span className="text-gradient-green">Modalidade de Atendimento</span>
                       </h2>
                       <p className="text-xs sm:text-sm text-muted-foreground max-w-lg mx-auto">
-                        Escolha como prefere ser atendido(a). Depois do Pix confirmado, você faz a triagem de 5 perguntas com a Enfª Brisa.
+                        {triageId
+                          ? "Triagem clínica em 5 perguntas concluída! Escolha a modalidade desejada para prosseguir ao atendimento médico."
+                          : "Escolha como prefere ser atendido(a). Após a confirmação, seu atendimento é liberado imediatamente."}
                       </p>
                     </div>
 
@@ -974,7 +1022,17 @@ const Telemedicina = () => {
                     </div>
 
                     {consultPaid && (
-                      <PaymentConfirmedNotice pix label="Continuar para a triagem" onContinue={() => setStep(0)} />
+                      <PaymentConfirmedNotice
+                        pix
+                        label={triageId ? "Acessar Consultório / Minhas Consultas" : "Continuar para a triagem"}
+                        onContinue={() => {
+                          if (triageId) {
+                            navigate("/consultas");
+                          } else {
+                            setStep(0);
+                          }
+                        }}
+                      />
                     )}
                     {consultPix && !consultPaid && (
                       <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">

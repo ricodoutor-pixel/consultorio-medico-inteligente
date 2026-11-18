@@ -82,6 +82,14 @@ const Consultorio = () => {
         doctorData?.id === "med-milton-urban"
       );
 
+      const isGeisellUser = Boolean(
+        user.id === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3" ||
+        /geisell/i.test(user.email?.toLowerCase() ?? "") ||
+        /geisell/i.test(profileData?.full_name?.toLowerCase() ?? "") ||
+        doctorData?.crm === "31192" ||
+        doctorData?.id === "med-geisell-torres"
+      );
+
       if (isVictorUser) {
         doctorData = {
           id: doctorData?.id || "med-victor-fonseca",
@@ -122,6 +130,26 @@ const Consultorio = () => {
         doctorData.is_verified = true;
         doctorData.is_approved_by_admin = true;
         doctorData.plan_tier = "vip_prescritor";
+      } else if (isGeisellUser) {
+        doctorData = {
+          id: doctorData?.id || "med-geisell-torres",
+          user_id: user.id,
+          crm: "31192",
+          crm_state: "BA",
+          specialty: "Medicina de Família e Comunidade · Medicina Endocanabinoide (WeCann)",
+          is_online: true,
+          is_available: true,
+          is_verified: true,
+          is_approved_by_admin: true,
+          plan_tier: "vip_prescritor",
+          consultation_price: 150,
+          rating: 5.0,
+          total_consultations: 0,
+          ...(doctorData || {}),
+        } as typeof doctorData;
+        doctorData.is_verified = true;
+        doctorData.is_approved_by_admin = true;
+        doctorData.plan_tier = "vip_prescritor";
       }
 
       setProfile(profileData || (isVictorUser ? {
@@ -136,6 +164,12 @@ const Consultorio = () => {
         email: user.email || "drmiltonurban@gmail.com",
         phone: "5519999059665",
         avatar_url: "/avatars/dr-milton-urban.jpg",
+      } : isGeisellUser ? {
+        id: user.id,
+        full_name: "Dra. Geisell Martinez Torres",
+        email: user.email || "drageisell@gmail.com",
+        phone: "5575991462018",
+        avatar_url: "/avatars/dra-geisell.jpg",
       } : null));
 
       setDoctor(doctorData);

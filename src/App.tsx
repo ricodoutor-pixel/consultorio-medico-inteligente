@@ -432,7 +432,7 @@ const App = () => (
               <Route path="/dashboard-medico" element={<PrivateRoute><DashboardMedico /></PrivateRoute>} />
                 <Route path="/workspace-medico" element={<PrivateRoute><WorkspaceMedico /></PrivateRoute>} />
                 <Route path="/dashboard-afiliado" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
-                <Route path="/afiliados" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />
+                <Route path="/afiliados-gamificado" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />
                 <Route path="/lojistas" element={<PrivateRoute><LojistaDashboard /></PrivateRoute>} />
                 <Route path="/farmacia-virtual" element={<PrivateRoute><FarmaciaVirtual /></PrivateRoute>} />
                 <Route path="/entregador" element={<EntregadorGPS />} />

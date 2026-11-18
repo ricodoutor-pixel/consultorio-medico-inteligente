@@ -272,7 +272,7 @@ export default function ConfiguracoesMedico() {
                               doctor_user_id: user.id,
                               document_kind: "icp_brasil",
                               storage_path: path,
-                              verification_status: "verified",
+                              verification_status: "pending",
                             }, { onConflict: "doctor_user_id,document_kind" });
                             
                           toast.success("Assinatura anexada e sincronizada com sucesso!");

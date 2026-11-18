@@ -199,7 +199,7 @@ export default function AtualizarDocumentosMedico() {
             doctor_user_id: userId,
             document_kind: "icp_brasil",
             storage_path: filePath,
-            verification_status: "approved"
+            verification_status: "pending"
           }, { onConflict: "doctor_user_id,document_kind" }) as any);
         
         setSignatureUrl(publicUrl);

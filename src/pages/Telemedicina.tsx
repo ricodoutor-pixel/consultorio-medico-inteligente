@@ -356,6 +356,7 @@ const Telemedicina = () => {
       !p.crm?.startsWith("CRMV")
   );
   const onlineDoctors = medicos.filter((doctor) => doctor.online).length;
+  const approvedDoctors = medicos.length;
 
   // Perguntas Brisa: quando step está entre 2 e 6
   // step 2 = Q1, step 3 = Q2, step 4 = Q3, step 5 = Q4, step 6 = Q5
@@ -643,13 +644,13 @@ const Telemedicina = () => {
               </div>
               <div className="p-6 space-y-4 text-sm text-foreground">
                 <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-xs font-semibold text-primary">
-                  1. Escolha sua modalidade (Vídeo R$ 150 ou Chat R$ 100) e faça o pagamento seguro.
+                  1. Escolha sua modalidade (Vídeo R$ 150, Chat R$ 100 ou Retorno R$ 90) e faça o pagamento seguro.
                 </div>
                 <div className="rounded-2xl border border-border p-4 bg-muted/30 text-xs">
                   2. Após o Pix aprovado, você faz a triagem de 5 perguntas com a Enfª Brisa IA.
                 </div>
                 <div className="rounded-2xl border border-border p-4 bg-muted/30 text-xs">
-                  3. O sistema avisa o médico assinante em rodízio (e médicos online com consultório virtual ON).
+                  3. O sistema avisa primeiro os médicos assinantes online, em rodízio, e depois os médicos com o botão ON ligado.
                 </div>
                 <div className="rounded-2xl border border-border p-4 bg-muted/30 text-xs">
                   4. O médico atende você ao vivo com emissão de receita oficial digital ICP-Brasil.
@@ -795,7 +796,7 @@ const Telemedicina = () => {
                       </Button>
                     </div>
 
-                    {/* Link para Orientação Técnica em Nuvem (Dr. Edilson On - R$ 30) */}
+                    {/* Link para Orientação Técnica em Nuvem (Dr. Edilson Bezerra ON - R$ 30) */}
                     <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                       <div className="text-xs text-muted-foreground leading-relaxed">
                         <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra ON (consulta PubMed/NCBI em tempo real)?</span>
@@ -818,7 +819,7 @@ const Telemedicina = () => {
                       </div>
                       <div className="col-span-2 sm:col-span-1 flex items-center gap-2 justify-center">
                         <Users size={16} className="text-primary shrink-0" />
-                        <span>{onlineDoctors} Médicos Disponíveis</span>
+                        <span>{onlineDoctors > 0 ? `${onlineDoctors} ON agora · ${approvedDoctors} na vitrine` : `Nenhum médico ON agora — entre na fila · ${approvedDoctors} na vitrine`}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -868,7 +869,7 @@ const Telemedicina = () => {
                     {consultPix && !consultPaid && (
                       <div className="p-4 rounded-2xl border border-primary/30 bg-card space-y-3 text-center">
                         <p className="text-sm text-foreground">
-                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {Number(consultPix.amount || (selectedServiceMode === "video" ? 150 : 100)).toFixed(2).replace(".", ",")} · Recebedor: <strong>{consultPix.receiver_name || "Planta y Raiz Ltda"}</strong>
+                          Pagamento: <strong>{formatPaymentName(consultPix.description || (selectedServiceMode === "video" ? "Consulta por Vídeo" : "Consulta por Chat"))}</strong> · R$ {Number(consultPix.amount || (selectedServiceMode === "video" ? 150 : 100)).toFixed(2).replace(".", ",")}{consultPix.receiver_name ? <> · Recebedor: <strong>{consultPix.receiver_name}</strong></> : null}
                         </p>
                         <img src={`data:image/png;base64,${consultPix.qr_code_base64}`} alt="QR Code Pix" className="mx-auto w-52 h-52 rounded-lg bg-background p-2 shadow-md" />
                         <p className="text-[11px] break-all text-muted-foreground font-mono max-h-16 overflow-auto bg-muted/40 p-2 rounded-xl">{consultPix.qr_code}</p>

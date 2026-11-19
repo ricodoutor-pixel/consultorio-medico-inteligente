@@ -386,6 +386,13 @@
       "when": 1795035013551,
       "tag": "0054_fix_kyc_reupload_and_payment_upsert",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1795097211992,
+      "tag": "0055_doctor_heartbeat_server_time",
+      "breakpoints": true
     }
   ]
 }

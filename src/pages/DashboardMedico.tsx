@@ -444,11 +444,25 @@ const DashboardMedico = () => {
                   <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">
                     Consultório <span className="text-gradient-green">Virtual</span>
                   </h1>
-                  {profileData?.full_name && (
-                    <h2 className="text-xl md:text-2xl font-bold text-foreground mt-2">
-                      {profileData.full_name}
+                  <div className="flex flex-wrap items-center gap-3 mt-2">
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground">
+                      {profileData?.full_name || "Médico(a)"}
                     </h2>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => toggleOnline(!isOnline)}
+                      aria-pressed={isOnline}
+                      aria-label={isOnline ? "Você está ON. Toque para ficar OFF" : "Você está OFF. Toque para ficar ON"}
+                      className={`inline-flex items-center gap-2 rounded-full pl-1.5 pr-5 py-1.5 text-lg md:text-xl font-black tracking-wider border-2 transition-all hover:scale-105 ${
+                        isOnline
+                          ? "bg-primary text-primary-foreground border-primary shadow-glow"
+                          : "bg-muted text-muted-foreground border-border"
+                      }`}
+                    >
+                      <img src="/dr-verdinho.png" alt="" className={`w-9 h-9 rounded-full object-cover bg-background ${isOnline ? "" : "grayscale opacity-70"}`} />
+                      {isOnline ? "ON" : "OFF"}
+                    </button>
+                  </div>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <p className="text-muted-foreground font-medium text-sm">
                       {doctorData ? `${doctorData.specialty} CRM ${doctorData.crm} - ${doctorData.crm_state}` : "Configure seu perfil médico"}
@@ -687,7 +701,7 @@ const DashboardMedico = () => {
                     </div>
                     <div>
                       <p className="text-2xl font-display font-black text-foreground">{todayAppts.length}</p>
-                      <p className="text-xs text-muted-foreground font-bold">Orientações Técnicas Hoje</p>
+                      <p className="text-xs text-muted-foreground font-bold">Consultas Hoje</p>
                     </div>
                   </div>
                 </CardContent>
@@ -813,7 +827,7 @@ const DashboardMedico = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Calendar size={18} /> Orientações Técnicas por Dia
+                    <Calendar size={18} /> Consultas por Dia
                   </h3>
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={consultsByDay}>
@@ -855,7 +869,7 @@ const DashboardMedico = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Clock size={18} /> Próximas Orientações Técnicas
+                    <Clock size={18} /> Próximas Consultas
                   </h3>
                   {todayAppts.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje.</p>

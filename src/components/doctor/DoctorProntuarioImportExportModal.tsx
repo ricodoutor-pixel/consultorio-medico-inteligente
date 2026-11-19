@@ -119,24 +119,19 @@ export function loadDoctorPatientRecords(doctorId?: string | null): ImportedPati
     const raw = localStorage.getItem(key);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-    const fallbackRaw = localStorage.getItem(`${STORAGE_KEY_PREFIX}default`);
-    if (fallbackRaw) {
-      const parsed = JSON.parse(fallbackRaw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      // Remove os prontuários de exemplo antigos (pat-rec-*) que ficaram salvos no navegador.
+      if (Array.isArray(parsed)) return parsed.filter((r) => !/^pat-rec-\d+$/.test(String(r?.id ?? "")));
     }
   } catch (e) {
     console.warn("[ProntuarioImportExport] Erro ao ler registros locais:", e);
   }
-  return DEFAULT_DEMO_RECORDS;
+  return [];
 }
 
 export function saveDoctorPatientRecords(records: ImportedPatientRecord[], doctorId?: string | null) {
   const key = `${STORAGE_KEY_PREFIX}${doctorId || "default"}`;
   try {
     localStorage.setItem(key, JSON.stringify(records));
-    localStorage.setItem(`${STORAGE_KEY_PREFIX}default`, JSON.stringify(records));
     window.dispatchEvent(new CustomEvent("pyr_patient_records_updated", { detail: { doctorId, count: records.length } }));
   } catch (e) {
     console.warn("[ProntuarioImportExport] Erro ao salvar registros locais:", e);

@@ -207,7 +207,7 @@ export function DoctorRankingPlantaCoin() {
 
           <div className="mt-6 pt-4 border-t text-center">
             <p className="text-xs text-muted-foreground">
-              Continue realizando treinamentos com o <strong>Paciente Teste</strong> para acumular PlantaCoins diariamente!
+              Continue atendendo pacientes para acumular PlantaCoins.
             </p>
           </div>
         </Card>

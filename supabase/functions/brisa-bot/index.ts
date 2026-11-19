@@ -320,6 +320,24 @@ async function log(phone: string, inText: string, outText: string, via: string) 
 }
 
 // ── HANDLER PRINCIPAL ─────────────────────────────────────────────────────
+// ── Pausa humana: pedido de humano pausa a automação até liberação explícita do operador ──
+async function humanPauseActive(sb: ReturnType<typeof createClient>, phone: string): Promise<boolean> {
+  if (!phone) return false;
+  const { data } = await sb.from('brisa_unified_contacts').select('id, metadata').eq('phone_e164', phone).maybeSingle();
+  if (!data) return false;
+  if ((data.metadata as Record<string, unknown> | null)?.human_paused === true) return true;
+  const { data: t } = await sb.from('brisa_human_takeover').select('expires_at').eq('contact_id', data.id).gt('expires_at', new Date().toISOString()).maybeSingle();
+  return !!t;
+}
+async function setHumanPause(sb: ReturnType<typeof createClient>, phone: string, name: string, reason: string) {
+  if (!phone) return;
+  const { data } = await sb.from('brisa_unified_contacts').select('id, metadata').eq('phone_e164', phone).maybeSingle();
+  const metadata = { ...((data?.metadata as Record<string, unknown>) || {}), human_paused: true, human_paused_at: new Date().toISOString(), human_paused_reason: reason.slice(0, 200) };
+  if (data) await sb.from('brisa_unified_contacts').update({ metadata }).eq('id', data.id);
+  else await sb.from('brisa_unified_contacts').insert({ phone_e164: phone, display_name: name || null, last_channel: 'whatsapp', metadata });
+  await sb.from('system_alerts').insert({ alert_type: 'brisa_human_handoff', severity: 'warning', message: `Paciente pediu atendimento humano no WhatsApp (final ${phone.slice(-4)}). Automação pausada até liberação.` }).then(() => {}, () => {});
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
@@ -371,6 +389,19 @@ serve(async (req: Request): Promise<Response> => {
       status: claim === 'duplicate' ? 200 : 503,
       headers: { ...cors, 'Content-Type': 'application/json' },
     });
+  }
+
+  // ── PAUSA HUMANA ───────────────────────────────────────────────────────
+  const sbPause = serviceClient();
+  if (sbPause && await humanPauseActive(sbPause, phone)) {
+    await log(phone, text, '(silêncio: atendimento humano)', 'human_paused');
+    return new Response(JSON.stringify({ ok: true, ignored: 'human_paused' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+  if (sbPause && quick?.handoff) {
+    await setHumanPause(sbPause, phone, name || '', text);
+    const sentH = await sendMsg(chatId, phone, quick.answer);
+    await log(phone, text, quick.answer, 'human_handoff');
+    return new Response(JSON.stringify({ ok: true, sent: sentH, agent: 'human_handoff' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
   // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────

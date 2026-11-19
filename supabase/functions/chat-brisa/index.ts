@@ -66,7 +66,7 @@ serve(async (req) => {
     if (phoneDigits.length >= 10) {
       try {
         const evoUrl = Deno.env.get("EVOLUTION_API_URL") || "https://whatsapp.plantayraiz.com.br";
-        const evoKey = Deno.env.get("EVOLUTION_API_KEY") || "39d3c0208169d52717027e27477cdc9f63d70fda54296c501fbe409c10562a59";
+        const evoKey = Deno.env.get("EVOLUTION_API_KEY") || "";
         const evoInst = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
         const jid = phoneDigits.length >= 14 && !phoneDigits.startsWith("55")
           ? `${phoneDigits}@lid`

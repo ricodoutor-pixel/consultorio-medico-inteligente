@@ -205,30 +205,14 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
         // Plantão titular oficial designado pelo Diretor Técnico (Dr. Edilson): Dr. Milton Dimas Tadeu Urban
         const ON_CALL_DOCTOR_DB_ID = "30365d78-b7b8-404b-b87f-ecda962b61bb";
-        // Segundo no plantão oficial / médico sócio VIP ativo: Dra. Geisell Martinez Torres
-        const SECOND_ON_CALL_DOCTOR_DB_ID = "a98b68b3-3efa-42d2-8959-e8be8d6466f7";
-
         const mergedRows: DoctorRow[] = publicDocs.map((doc) => {
-          const isOnCall = doc.id === ON_CALL_DOCTOR_DB_ID || doc.id === SECOND_ON_CALL_DOCTOR_DB_ID;
-          const isGeisell = doc.id === SECOND_ON_CALL_DOCTOR_DB_ID || (doc.crm && doc.crm.includes("31192"));
-          const isToggleOn = Boolean(doc.is_online && (doc.is_available ?? true)) || isGeisell;
+          const isOnCall = doc.id === ON_CALL_DOCTOR_DB_ID;
+          const isToggleOn = Boolean(doc.is_online && (doc.is_available ?? true));
           const isBusy = busyIds.has(doc.id);
-
-          let facts = factsById.get(doc.id);
-          if (isGeisell) {
-            facts = {
-              doctor_id: doc.id,
-              paid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-              registration_complete: true,
-              documents_count: 8,
-            };
-          }
+          const facts = factsById.get(doc.id);
 
           return {
             ...doc,
-            is_online: isGeisell ? true : doc.is_online,
-            is_available: isGeisell ? true : doc.is_available,
-            plan_tier: isGeisell ? "vip" : doc.plan_tier,
             directoryFacts: facts,
             last_seen_online: (isOnCall && isToggleOn && !isBusy) ? new Date().toISOString() : doc.last_seen_online,
             in_consultation: isBusy,

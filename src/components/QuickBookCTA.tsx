@@ -40,15 +40,15 @@ export function QuickBookCTA({ variant = "inline", className = "" }: QuickBookCT
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className={`fixed bottom-20 right-4 z-40 md:bottom-6 ${className}`}
+        className={`fixed bottom-20 right-3 xl:bottom-6 xl:right-4 z-40 ${className}`}
       >
         <Link to="/falar-com-especialista">
           <Button
             size="lg"
-            className="bg-primary hover:bg-primary/90 rounded-full gap-2 font-bold shadow-2xl shadow-primary/40 px-6"
+            className="bg-primary hover:bg-primary/90 rounded-full gap-2 font-bold shadow-2xl shadow-primary/40 px-4 sm:px-6 text-xs sm:text-sm"
           >
-            <Calendar className="w-5 h-5" />
-            Orientação Técnicar R$30
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            Orientação Técnica R$30
           </Button>
         </Link>
       </motion.div>

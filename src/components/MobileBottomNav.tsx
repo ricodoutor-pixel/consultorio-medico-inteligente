@@ -25,23 +25,23 @@ export const MobileBottomNav = () => {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom,0px)] xl:hidden">
 
 
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="grid grid-cols-5 items-center h-16 px-1">
         {NAV_ITEMS.map(({ icon: Icon, label, path }) => {
           const isActive = location.pathname === path;
-          if (label === "Perfil") return <div key={path} className="h-full flex-1 min-w-0"><AccountMenu bottom /></div>;
+          if (label === "Perfil") return <div key={path} className="h-full min-w-0"><AccountMenu bottom /></div>;
           return (
             <Button variant="ghost"
               key={path}
               onClick={() => navigate(path)}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 w-full h-full transition-colors",
+                "relative flex flex-col items-center justify-center gap-0.5 w-full h-full px-1 min-w-0 rounded-none transition-colors",
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium leading-none">{label}</span>
+              <Icon className="h-5 w-5 shrink-0" />
+              <span className="text-[10px] font-medium leading-none truncate max-w-full">{label}</span>
               {isActive && (
                 <span className="absolute top-0 w-8 h-0.5 rounded-full bg-primary" />
               )}

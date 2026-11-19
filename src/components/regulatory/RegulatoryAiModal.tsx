@@ -382,14 +382,14 @@ export function RegulatoryAiFloatingButton() {
 
   return (
     <>
-      <div className="fixed bottom-6 left-6 z-40">
+      <div className="fixed bottom-20 left-3 xl:bottom-6 xl:left-6 z-40">
         <motion.button
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setOpen(true)}
-          className="group flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-950/90 text-white border border-emerald-500/40 shadow-xl shadow-emerald-950/40 backdrop-blur-xl hover:border-emerald-400 hover:bg-slate-900 transition-all cursor-pointer"
+          className="group flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-slate-950/90 text-white border border-emerald-500/40 shadow-xl shadow-emerald-950/40 backdrop-blur-xl hover:border-emerald-400 hover:bg-slate-900 transition-all cursor-pointer"
         >
           <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-inner">
             <Scale size={14} className="group-hover:rotate-12 transition-transform" />

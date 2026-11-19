@@ -21,7 +21,7 @@ export function ShoppingCart() {
     return (
       <button
         onClick={() => setShowCart(true)}
-        className="fixed bottom-6 left-6 bg-primary text-primary-foreground rounded-full p-4 shadow-lg hover:opacity-90 transition-all z-40"
+        className="fixed bottom-20 left-3 xl:bottom-6 xl:left-6 bg-primary text-primary-foreground rounded-full p-3.5 sm:p-4 shadow-lg hover:opacity-90 transition-all z-40"
         title="Minha Solicitação"
         aria-label="Minha Solicitação"
       >

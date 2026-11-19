@@ -4,8 +4,7 @@ import {
   X, Sparkles, ChevronRight, ChevronLeft, CheckCircle2, Stethoscope,
   Users, Store, ShoppingBag, ShieldCheck, DollarSign, FileText, Zap,
   Bot, Video, QrCode, ArrowRight, Play, Eye, RotateCcw, HeartPulse,
-  Award, Clock, Check,
-  X as CloseIcon
+  Award, Clock, Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -448,78 +447,93 @@ export const InteractiveTour3DModal = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-3xl max-h-[78dvh] sm:max-h-[88dvh] overflow-y-auto p-0 [&>button:last-child]:hidden border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
-        <button type="button" onClick={handleClose} aria-label="Fechar tour" className="fixed right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-lg hover:bg-muted">
-          <CloseIcon size={20} />
-        </button>
-        {/* Top Gradient Banner */}
-        <div className="sticky top-0 z-10 p-3 pr-14 sm:p-6 sm:pr-14 pb-3 sm:pb-4 border-b border-border/60 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-purple-950/30">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/10">
-                <Sparkles size={22} className="animate-pulse" />
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-[356px] sm:max-w-xl lg:max-w-2xl max-h-[78dvh] sm:max-h-[84dvh] flex flex-col gap-0 overflow-hidden p-0 border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-2xl sm:rounded-3xl z-[150] [&>button[data-dialog-close]]:hidden">
+        {/* Compact Sticky Header with always-visible X close button */}
+        <div className="shrink-0 p-3 sm:p-5 pb-2.5 sm:pb-3.5 border-b border-border/60 bg-gradient-to-r from-emerald-950/50 via-slate-900 to-purple-950/40">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 shadow-md shadow-emerald-500/10">
+                <Sparkles size={16} className="sm:w-5 sm:h-5 animate-pulse" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base md:text-2xl font-display font-black text-foreground tracking-tight">
-                    Tour Interativo 360° <span className="text-emerald-400">·</span> Planta y Raíz
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <h2 className="text-sm sm:text-lg font-display font-black text-white tracking-tight truncate">
+                    Tour Interativo <span className="text-emerald-400">·</span> Planta y Raiz
                   </h2>
-                  <Badge variant="outline" className="hidden sm:inline-flex bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
-                    3D STEP-BY-STEP
+                  <Badge variant="outline" className="hidden sm:inline-flex bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-bold shrink-0">
+                    PASSO A PASSO
                   </Badge>
                 </div>
-                <p className="hidden sm:block text-xs text-muted-foreground mt-0.5">
-                  Aprenda todo o fluxo passo a passo desde o primeiro contato até o atendimento e recebimento
+                <p className="hidden sm:block text-xs text-slate-300/80 mt-0.5 truncate">
+                  Entenda todo o fluxo desde o primeiro contato até o atendimento
                 </p>
               </div>
             </div>
 
-            {/* Category Selector Tabs */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-slate-800">
-              <button
-                onClick={() => selectRole("paciente")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  currentRole === "paciente"
-                    ? "bg-emerald-500 text-slate-950 shadow-md"
-                    : "text-muted-foreground hover:text-foreground hover:bg-slate-800/60"
-                }`}
-              >
-                <Users size={13} /> Paciente
-              </button>
-              <button
-                onClick={() => selectRole("medico")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  currentRole === "medico"
-                    ? "bg-sky-500 text-slate-950 shadow-md"
-                    : "text-muted-foreground hover:text-foreground hover:bg-slate-800/60"
-                }`}
-              >
-                <Stethoscope size={13} /> Médico (93% PIX)
-              </button>
-              <button
-                onClick={() => selectRole("farmacia")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  currentRole === "farmacia"
-                    ? "bg-amber-500 text-slate-950 shadow-md"
-                    : "text-muted-foreground hover:text-foreground hover:bg-slate-800/60"
-                }`}
-              >
-                <Store size={13} /> Farmácia
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              aria-label="Fechar tour interativo"
+              title="Fechar"
+              className="flex h-9 w-9 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full border border-slate-600/80 bg-slate-800/95 text-white hover:bg-slate-700 active:scale-95 transition-all shadow-md"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Category Selector Tabs — 3 equal columns so it never overflows 320px/360px screens */}
+          <div className="mt-2.5 grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900/90 border border-slate-800">
+            <button
+              type="button"
+              onClick={() => selectRole("paciente")}
+              className={`flex items-center justify-center gap-1 px-1.5 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all min-w-0 ${
+                currentRole === "paciente"
+                  ? "bg-emerald-500 text-slate-950 shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+              }`}
+            >
+              <Users size={12} className="shrink-0" />
+              <span className="truncate">Paciente</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => selectRole("medico")}
+              className={`flex items-center justify-center gap-1 px-1.5 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all min-w-0 ${
+                currentRole === "medico"
+                  ? "bg-sky-500 text-slate-950 shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+              }`}
+            >
+              <Stethoscope size={12} className="shrink-0" />
+              <span className="truncate">Médico</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => selectRole("farmacia")}
+              className={`flex items-center justify-center gap-1 px-1.5 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all min-w-0 ${
+                currentRole === "farmacia"
+                  ? "bg-amber-500 text-slate-950 shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+              }`}
+            >
+              <Store size={12} className="shrink-0" />
+              <span className="truncate">Farmácia</span>
+            </button>
           </div>
 
           {/* Progress step dots */}
-          <div className="mt-4 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-1">
+          <div className="mt-2.5 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 flex-1">
               {activeTour.steps.map((s, idx) => (
                 <button
                   key={s.stepNumber}
+                  type="button"
+                  aria-label={`Ir para o passo ${idx + 1}`}
                   onClick={() => setCurrentStepIndex(idx)}
-                  className={`flex-1 h-2 rounded-full transition-all duration-300 ${
+                  className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
                     idx === currentStepIndex
-                      ? "bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-md shadow-emerald-500/30 scale-105"
+                      ? "bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-sm shadow-emerald-500/30"
                       : idx < currentStepIndex
                       ? "bg-emerald-500/50"
                       : "bg-slate-800"
@@ -527,135 +541,132 @@ export const InteractiveTour3DModal = ({
                 />
               ))}
             </div>
-            <span className="text-[11px] font-mono font-bold text-muted-foreground shrink-0 ml-2">
-              Passo {currentStepIndex + 1} de {activeTour.steps.length}
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-slate-300 shrink-0">
+              {currentStepIndex + 1}/{activeTour.steps.length}
             </span>
           </div>
         </div>
 
-        {/* Modal Main Content with 3D Effect */}
-        <div className="p-3 sm:p-6 md:p-8">
+        {/* Scrollable Compact Main Content */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${currentRole}-${currentStepIndex}`}
-              initial={{ opacity: 0, x: 20, rotateY: 5 }}
-              animate={{ opacity: 1, x: 0, rotateY: 0 }}
-              exit={{ opacity: 0, x: -20, rotateY: -5 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start"
             >
-              {/* Left Column: Step Description & Details (7 cols) */}
-              <div className="lg:col-span-7 space-y-4">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-bold px-2.5 py-0.5">
+              {/* Step Description & Details */}
+              <div className="lg:col-span-7 space-y-2.5 sm:space-y-3.5 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] sm:text-xs font-bold px-2 py-0.5">
                     {step.badge}
                   </Badge>
-                  <span className="text-xs text-muted-foreground font-semibold flex items-center gap-1">
-                    <Clock size={12} className="text-emerald-400" /> {step.highlight}
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-semibold flex items-center gap-1">
+                    <Clock size={11} className="text-emerald-400 shrink-0" /> {step.highlight}
                   </span>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${step.bgGradient} border border-border flex items-center justify-center shrink-0 shadow-lg`}>
-                    <step.icon size={24} className={step.accentColor} />
+                <div className="flex items-start gap-2.5">
+                  <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br ${step.bgGradient} border border-border flex items-center justify-center shrink-0 shadow-md`}>
+                    <step.icon size={18} className={`sm:w-5 sm:h-5 ${step.accentColor}`} />
                   </div>
-                  <div>
-                    <h3 className="text-lg md:text-2xl font-display font-black text-foreground tracking-tight leading-tight">
+                  <div className="min-w-0">
+                    <h3 className="text-sm sm:text-lg font-display font-black text-white tracking-tight leading-snug">
                       {step.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
                       {step.shortDesc}
                     </p>
                   </div>
                 </div>
 
                 {/* Checklist points */}
-                <div className="p-4 rounded-2xl bg-slate-900/60 border border-border/80 space-y-2.5">
-                  <p className="text-xs font-bold text-foreground uppercase tracking-wider">Como funciona na prática:</p>
+                <div className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-900/70 border border-border/70 space-y-1.5 sm:space-y-2">
+                  <p className="text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider">Na prática:</p>
                   {step.details.map((detail, dIdx) => (
-                    <div key={dIdx} className="flex items-start gap-2 text-xs text-slate-300">
-                      <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5" />
-                      <span>{detail}</span>
+                    <div key={dIdx} className="flex items-start gap-1.5 text-[11px] sm:text-xs text-slate-300 leading-snug">
+                      <CheckCircle2 size={13} className="text-emerald-400 shrink-0 mt-0.5" />
+                      <span className="min-w-0">{detail}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Right Column: 3D Simulated Interactive Card Preview (5 cols) */}
-              <div className="hidden sm:block lg:col-span-5">
-                <motion.div
-                  whileHover={{ scale: 1.02, rotateY: -3, rotateX: 3 }}
-                  style={{ perspective: 1000 }}
-                  className="relative p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-emerald-500/30 shadow-2xl shadow-emerald-500/10 overflow-hidden"
-                >
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-
-                  <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                      <span className="text-[11px] font-mono font-bold text-emerald-400">{step.interactivePreview.status}</span>
+              {/* Simulated Interactive Card Preview — compact on mobile */}
+              <div className="lg:col-span-5 min-w-0">
+                <div className="relative p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-emerald-500/30 shadow-xl shadow-emerald-500/10 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-2 mb-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 truncate">{step.interactivePreview.status}</span>
                     </div>
-                    <Badge variant="secondary" className="text-[9px] font-bold bg-slate-800 text-slate-200">
+                    <Badge variant="secondary" className="text-[9px] font-bold bg-slate-800 text-slate-200 shrink-0 px-1.5 py-0">
                       {step.interactivePreview.tag}
                     </Badge>
                   </div>
 
-                  <p className="text-sm font-black text-foreground">{step.interactivePreview.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5 mb-4">{step.interactivePreview.sub}</p>
+                  <p className="text-xs sm:text-sm font-black text-white leading-tight">{step.interactivePreview.title}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 mb-2.5 truncate">{step.interactivePreview.sub}</p>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {step.interactivePreview.items.map((item, iIdx) => (
-                      <div key={iIdx} className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+                      <div key={iIdx} className="px-2.5 py-1.5 rounded-lg bg-slate-950/80 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between gap-2">
                         <span className="truncate">{item}</span>
-                        <Check size={14} className="text-emerald-400 shrink-0 ml-2" />
+                        <Check size={12} className="text-emerald-400 shrink-0" />
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span>Planta y Raíz · Telemedicina</span>
-                    <span className="text-emerald-400 font-bold">100% Conforme CFM/ANVISA</span>
+                  <div className="mt-2.5 pt-2 border-t border-border/50 flex items-center justify-between gap-2 text-[10px] text-slate-400">
+                    <span className="truncate">Planta y Raiz</span>
+                    <span className="text-emerald-400 font-bold shrink-0">CFM / ANVISA</span>
                   </div>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Footer Navigation Controls */}
-        <div className="p-5 px-6 md:px-8 border-t border-border/60 bg-slate-900/60 flex items-center justify-between flex-wrap gap-3">
+        {/* Sticky Compact Footer Navigation Controls */}
+        <div className="shrink-0 p-2.5 px-3 sm:p-4 sm:px-5 border-t border-border/60 bg-slate-900/90 flex items-center justify-between gap-2">
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="text-xs text-muted-foreground hover:text-foreground"
+            className="h-9 px-2.5 text-[11px] sm:text-xs text-slate-300 hover:text-white shrink-0"
           >
-            Pular / Concluir Depois
+            Fechar
           </Button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={handlePrev}
               disabled={currentStepIndex === 0}
-              className="text-xs rounded-xl border-border"
+              className="h-9 px-2.5 sm:px-3 text-[11px] sm:text-xs rounded-xl border-border"
             >
-              <ChevronLeft size={14} className="mr-1" /> Anterior
+              <ChevronLeft size={14} /> <span className="hidden xs:inline sm:inline ml-0.5">Anterior</span>
             </Button>
 
             <Button
+              type="button"
               size="sm"
               onClick={handleNext}
-              className="text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 shadow-md shadow-emerald-500/20"
+              className="h-9 px-3 sm:px-4 text-[11px] sm:text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 shadow-md shadow-emerald-500/20"
             >
               {currentStepIndex === activeTour.steps.length - 1 ? (
                 <>
-                  <CheckCircle2 size={14} className="mr-1.5" /> Concluir Tour
+                  <CheckCircle2 size={14} className="mr-1" /> Concluir
                 </>
               ) : (
                 <>
-                  Próximo Passo <ChevronRight size={14} className="ml-1" />
+                  Próximo <ChevronRight size={14} className="ml-0.5" />
                 </>
               )}
             </Button>

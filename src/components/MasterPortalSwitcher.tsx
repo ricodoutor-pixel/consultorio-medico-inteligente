@@ -38,17 +38,17 @@ export function MasterPortalSwitcher() {
     return (
       <button
         onClick={() => setMinimized(false)}
-        className="fixed bottom-4 left-4 z-50 bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 p-2.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-2 hover:scale-105 transition-all text-xs font-bold"
+        className="fixed bottom-20 left-3 xl:bottom-4 xl:left-4 z-50 bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 p-2 sm:p-2.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-1.5 sm:gap-2 hover:scale-105 transition-all text-xs font-bold"
         title="Abrir Seletor Chave Mestra"
       >
-        <KeyRound size={16} className="text-emerald-400 animate-pulse" />
+        <KeyRound size={15} className="text-emerald-400 animate-pulse" />
         <span>Chave Mestra</span>
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 bg-card/95 backdrop-blur-xl border border-emerald-500/40 rounded-2xl p-2.5 shadow-2xl flex items-center gap-1.5 flex-wrap max-w-lg">
+    <div className="fixed bottom-20 left-3 right-3 sm:right-auto xl:bottom-4 xl:left-4 z-50 bg-card/95 backdrop-blur-xl border border-emerald-500/40 rounded-2xl p-2 sm:p-2.5 shadow-2xl flex items-center gap-1.5 flex-wrap max-w-[calc(100vw-1.5rem)] sm:max-w-lg">
       <div className="flex items-center gap-1.5 pl-1 pr-2 border-r border-border/50">
         <KeyRound size={15} className="text-emerald-400 animate-pulse" />
         <span className="text-[11px] font-black text-foreground uppercase tracking-wider">Chave Mestra</span>

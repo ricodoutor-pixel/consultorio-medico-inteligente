@@ -210,7 +210,7 @@ ${patientContext}\
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(true)}
-        className={`fixed bottom-4 right-24 z-40 group flex items-center gap-2 px-4 py-3 rounded-2xl
+        className={`fixed bottom-20 right-16 sm:right-24 xl:bottom-4 z-40 group flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl
           bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-lg shadow-emerald-600/30
           border border-emerald-500/40 backdrop-blur-md hover:shadow-emerald-600/50 transition-all
           ${open ? "hidden" : ""}`}
@@ -234,7 +234,7 @@ ${patientContext}\
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-4 right-24 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[min(640px,calc(100vh-2rem))]"
+            className="fixed bottom-20 left-3 right-3 sm:left-auto sm:right-24 xl:bottom-4 z-50 sm:w-[420px] h-[min(560px,calc(100dvh-7rem))] xl:h-[min(640px,calc(100dvh-2rem))]"
           >
             <Card className="flex flex-col h-full bg-card/95 backdrop-blur-xl border-emerald-300/30 shadow-2xl shadow-emerald-600/20 overflow-hidden">
               {/* Header */}

@@ -12,9 +12,9 @@ export function AccountMenu({ bottom = false }: { bottom?: boolean }) {
   return <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" aria-label={bottom ? "Perfil" : "Abrir menu da conta"} className={bottom ? "h-full w-full flex-col gap-0.5 rounded-none text-muted-foreground" : "min-w-0 max-w-[150px] gap-1 px-2 text-foreground"}>
+        <Button variant="ghost" aria-label={bottom ? "Perfil" : "Abrir menu da conta"} className={bottom ? "h-full w-full min-w-0 px-1 flex-col gap-0.5 rounded-none text-muted-foreground" : "min-w-0 max-w-[140px] sm:max-w-[150px] gap-1 px-2 text-foreground"}>
           <User className="h-5 w-5 shrink-0" />
-          <span className={bottom ? "text-[10px]" : "truncate text-xs"}>{bottom ? "Perfil" : user ? fullName : "Entrar"}</span>
+          <span className={bottom ? "text-[10px] leading-none truncate max-w-full" : "truncate text-xs"}>{bottom ? "Perfil" : user ? fullName : "Entrar"}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side={bottom ? "top" : "bottom"} className="z-[80] max-w-[calc(100vw-24px)]">

@@ -584,19 +584,19 @@ const Telemedicina = () => {
               <span>Conforme Resolução CFM nº 2.314/2022 e RDCs ANVISA 660 e 327. Proteção LGPD (Lei 13.709/2018).</span>
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
-              <Link to="/profissionais">
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-center mb-4">
+              <Link to="/profissionais" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="relative h-14 px-6 rounded-2xl font-black text-base bg-card border-2 border-emerald-400/60 hover:border-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.45)] hover:shadow-[0_0_40px_rgba(52,211,153,0.75)] transition-shadow"
+                  className="relative w-full sm:w-auto max-w-full h-auto min-h-[3.25rem] py-2.5 px-4 sm:px-6 whitespace-normal text-center rounded-2xl font-black text-sm sm:text-base bg-card border-2 border-emerald-400/60 hover:border-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.45)] hover:shadow-[0_0_40px_rgba(52,211,153,0.75)] transition-shadow"
                 >
-                  <span className="relative flex items-center gap-2">
-                    <Users size={20} className="text-emerald-400" />
+                  <span className="relative flex flex-wrap items-center justify-center gap-2">
+                    <Users size={18} className="text-emerald-400 shrink-0" />
                     <span className="text-gradient-green">Médicos Prescritores Online Agora</span>
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-500/15 border border-emerald-400/60 text-emerald-300 font-black text-sm animate-pulse">
+                    <span className="inline-flex items-center justify-center h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-emerald-500/15 border border-emerald-400/60 text-emerald-300 font-black text-xs sm:text-sm animate-pulse shrink-0">
                       {onlineDoctors}
                     </span>
-                    <ArrowRight size={18} className="text-emerald-400" />
+                    <ArrowRight size={16} className="text-emerald-400 shrink-0" />
                   </span>
                 </Button>
               </Link>
@@ -604,10 +604,10 @@ const Telemedicina = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 px-5 rounded-2xl font-bold border-primary/40 text-primary hover:bg-primary/10"
+                className="w-full sm:w-auto max-w-full h-12 sm:h-14 px-4 sm:px-5 whitespace-normal text-sm sm:text-base rounded-2xl font-bold border-primary/40 text-primary hover:bg-primary/10"
                 onClick={() => setShowFlowInfo(true)}
               >
-                <HelpCircle size={18} className="mr-2" /> Como funciona o fluxo
+                <HelpCircle size={18} className="mr-1.5 shrink-0" /> Como funciona o fluxo
               </Button>
             </div>
           </motion.div>
@@ -1135,12 +1135,12 @@ const Telemedicina = () => {
             </div>
 
             <div className="text-center pt-2">
-              <Link to="/orientacao-tecnica">
+              <Link to="/orientacao-tecnica" className="inline-block w-full sm:w-auto max-w-full">
                 <Button
                   size="lg"
-                  className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-black rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/30 hover:scale-105 transition-all gap-3"
+                  className="w-full sm:w-auto max-w-full h-auto min-h-[3.25rem] sm:min-h-[4rem] py-3 px-4 sm:px-10 whitespace-normal text-center text-sm sm:text-lg font-black rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/30 hover:scale-105 transition-all gap-2 sm:gap-3"
                 >
-                  <Sparkles size={20} /> Iniciar Orientação Técnica — R$ 30,00 <ArrowRight size={20} />
+                  <Sparkles size={18} className="shrink-0" /> Iniciar Orientação Técnica — R$ 30,00 <ArrowRight size={18} className="shrink-0" />
                 </Button>
               </Link>
               <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1.5">

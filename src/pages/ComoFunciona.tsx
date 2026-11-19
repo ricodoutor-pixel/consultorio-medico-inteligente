@@ -352,12 +352,12 @@ const ComoFunciona = () => {
                   size="lg"
                   onClick={handleDownloadEbook}
                   disabled={downloading}
-                  className="text-lg font-bold bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground"
+                  className="w-full sm:w-auto max-w-full h-auto min-h-[3rem] py-3 px-4 sm:px-8 whitespace-normal text-center text-sm sm:text-lg font-bold bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground"
                 >
                   {downloading ? (
-                    <><Loader2 size={20} className="mr-2 animate-spin" /> Preparando...</>
+                    <><Loader2 size={18} className="mr-1.5 shrink-0 animate-spin" /> Preparando...</>
                   ) : (
-                    <><Download size={20} className="mr-2" /> Baixar E-book Gratuito (PDF)</>
+                    <><Download size={18} className="mr-1.5 shrink-0" /> Baixar E-book Gratuito (PDF)</>
                   )}
                 </Button>
               </CardContent>
@@ -365,13 +365,13 @@ const ComoFunciona = () => {
           </motion.div>
 
           {/* CTAs */}
-          <motion.div className="flex flex-col sm:flex-row gap-4 justify-center mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
+          <motion.div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-10 sm:mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <Button size="lg" className="w-full sm:w-auto max-w-full h-auto min-h-[3rem] py-3 px-4 sm:px-8 whitespace-normal text-center text-sm sm:text-lg font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
               <Link to="/falar-com-especialista">
-                <MessageSquare size={20} className="mr-2" /> Falar com especialista agora
+                <MessageSquare size={18} className="mr-1.5 shrink-0" /> Falar com especialista agora
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg border-border hover:bg-muted font-bold" asChild>
+            <Button size="lg" variant="outline" className="w-full sm:w-auto max-w-full h-auto min-h-[3rem] py-3 px-4 sm:px-8 whitespace-normal text-center text-sm sm:text-lg border-border hover:bg-muted font-bold" asChild>
               <Link to="/cadastro-profissional">
                 <UserPlus size={20} className="mr-2" /> Cadastro como profissional
               </Link>

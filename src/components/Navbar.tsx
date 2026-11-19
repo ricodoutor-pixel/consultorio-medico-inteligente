@@ -233,7 +233,7 @@ export const Navbar = () => {
 
       {/* MOBILE MENU OVERLAY - Embutido e Padronizado */}
       <div 
-        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl 2xl:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[70] bg-background/98 backdrop-blur-xl 2xl:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
           isOpen ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"
         }`}
       >
@@ -272,7 +272,13 @@ export const Navbar = () => {
               <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl mb-3">
                 <AccountMenu /><Button variant="ghost" disabled={signingOut} onClick={() => void logout()} className="text-destructive">Sair da conta</Button>
               </div>
-            ) : (
+            ) : null}
+            {user ? (
+              <Button variant="outline" className="w-full font-black rounded-xl h-12 border-primary/40 text-primary" asChild>
+                <NavLink to="/consultorio" onClick={() => setIsOpen(false)}>CONSULTÓRIO VIRTUAL (MÉDICOS)</NavLink>
+              </Button>
+            ) : null}
+            {!user && (
               <div className="flex gap-2 mb-3">
                 <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
                   <NavLink to="/login" onClick={() => setIsOpen(false)}>

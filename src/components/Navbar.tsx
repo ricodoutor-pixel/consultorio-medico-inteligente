@@ -100,7 +100,7 @@ export const Navbar = () => {
       >
         <div ref={bannerRef}><HolidayPlantaoBanner /></div>
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
-          <div className="flex items-center h-16 md:h-[72px] justify-between">
+          <div className="flex items-center min-h-16 py-1 md:py-0 md:h-[72px] justify-between">
             
               {/* Logo + Seta Consultorio */}
               <div className="flex flex-col md:flex-row md:items-center md:gap-2 justify-center flex-shrink-0 -ml-1 md:-ml-2 lg:-ml-3">
@@ -114,14 +114,14 @@ export const Navbar = () => {
                       {...({ fetchpriority: "high" } as Record<string, string>)}
                       loading="eager"
                       decoding="sync"
-                      className="h-[46px] sm:h-[52px] md:h-[60px] w-auto max-w-[170px] sm:max-w-[200px] md:max-w-[240px] object-contain object-left drop-shadow-[0_0_12px_rgba(34,197,94,0.22)] group-hover:drop-shadow-[0_0_18px_rgba(34,197,94,0.4)] transition-all duration-200"
+                      className={`h-[42px] sm:h-[52px] md:h-[60px] w-auto max-w-[170px] sm:max-w-[200px] md:max-w-[240px] object-contain object-left drop-shadow-[0_0_12px_rgba(34,197,94,0.22)] group-hover:drop-shadow-[0_0_18px_rgba(34,197,94,0.4)] transition-all duration-200`}
                     />
                   </NavLink>
                 </div>
                 {(location.pathname === "/consultorio" || location.pathname === "/dashboard" || location.pathname === "/dashboard-medico") && (
                   <button
                     onClick={() => navigate(location.pathname === "/consultorio" ? "/dashboard" : "/consultorio")}
-                    className="hidden md:flex items-center gap-1 text-[10px] md:text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-1 md:ml-0 mt-0.5 md:mt-0 whitespace-nowrap"
+                    className="flex items-center gap-1 text-[10px] md:text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-1 md:ml-0 mt-0.5 md:mt-0 whitespace-nowrap"
                     title={location.pathname === "/consultorio" ? "Sair da Sala de Espera" : "Ir para Consultório Virtual"}
                   >
                     <ArrowLeft size={11} /> Consultório Virtual

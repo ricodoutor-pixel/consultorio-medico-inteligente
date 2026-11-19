@@ -24,12 +24,12 @@ const DEFAULT_MESSAGES: Record<FrogMood, { message: string; reason: string; icon
   warning: {
     message: "🌿 Senti sua falta! Vamos completar seu cadastro?",
     reason: "Cadastro incompleto ou ausência prolongada",
-    icon: "/frog-warning.png",
+    icon: "/dr-verdinho-doctor.png",
   },
   critical: {
     message: "⚠️ Atenção! Seu tratamento precisa de ação imediata.",
     reason: "Orientação Técnica cancelada ou medicamento acabando",
-    icon: "/frog-critical.png",
+    icon: "/dr-verdinho-doctor.png",
   },
   in_call: {
     message: "🩺 Seu médico está em atendimento — você está sendo cuidado!",

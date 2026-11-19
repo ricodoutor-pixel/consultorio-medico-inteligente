@@ -261,6 +261,19 @@ const Consultorio = () => {
       
       {doctor && (
         <div className="px-4 pb-3 pt-[calc(var(--site-header-height,128px)+12px)] bg-card border-b flex justify-between items-center flex-wrap gap-3">
+          <button
+            onClick={toggleOnlineStatus}
+            disabled={updatingStatus}
+            aria-pressed={isOnline}
+            className={`w-full order-first flex items-center gap-3 px-4 py-3 rounded-2xl border-2 font-black text-lg transition-all ${isOnline ? "bg-primary/15 border-primary text-primary shadow-[0_0_18px_hsl(var(--primary)/0.45)]" : "bg-muted/50 border-border text-muted-foreground"}`}
+          >
+            <img src="/dr-verdinho.png" alt="" className={`w-11 h-11 rounded-full object-cover bg-background ${isOnline ? "" : "grayscale opacity-70"}`} />
+            <span className="flex-1 text-left leading-tight">
+              <span className="block text-xs font-bold opacity-80">{profile?.full_name || doctor.name}</span>
+              {isOnline ? "ON · Atendendo" : "OFF · Toque para ficar ON"}
+            </span>
+            <span className={`w-3.5 h-3.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground/50"}`} />
+          </button>
           <div className="flex flex-wrap items-center gap-2">
             <button 
               onClick={() => window.history.back()}
@@ -356,19 +369,7 @@ const Consultorio = () => {
               )}
             </button>
 
-            <span className="text-sm font-medium whitespace-nowrap">Status do Plantão:</span>
-            <button
-              onClick={toggleOnlineStatus}
-              disabled={updatingStatus}
-              className={`px-4 py-1.5 rounded-full whitespace-nowrap text-sm font-bold flex items-center gap-2 transition-colors shadow-sm ${
-                isOnline 
-                  ? "bg-green-500 text-white hover:bg-green-600" 
-                  : "bg-red-500 text-white hover:bg-red-600"
-              }`}
-            >
-              <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-white animate-pulse" : "bg-white/70"}`} />
-              {isOnline ? "ONLINE (Atendendo)" : "OFFLINE (Ausente)"}
-            </button>
+
           </div>
         </div>
       )}

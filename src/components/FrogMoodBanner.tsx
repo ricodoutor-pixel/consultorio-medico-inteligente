@@ -6,8 +6,8 @@ const DOCTOR_IMG = "/dr-verdinho-doctor.png";
 
 const moodImages: Record<FrogMood, string> = {
   happy: DOCTOR_IMG,
-  warning: "/frog-warning.png",
-  critical: "/frog-critical.png",
+  warning: DOCTOR_IMG,
+  critical: DOCTOR_IMG,
   in_call: "/frog-happy.png", // mesmo asset, recolorido via filtro CSS
 };
 

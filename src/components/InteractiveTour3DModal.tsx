@@ -448,9 +448,9 @@ export const InteractiveTour3DModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-3xl scale-[0.85] origin-center p-0 overflow-hidden border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
+      <DialogContent className="w-[calc(100vw-1rem)] max-w-3xl max-h-[88dvh] overflow-y-auto p-0 border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
         {/* Top Gradient Banner */}
-        <div className="relative p-6 pb-4 border-b border-border/60 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-purple-950/30">
+        <div className="sticky top-0 z-10 p-4 sm:p-6 pb-3 sm:pb-4 border-b border-border/60 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-purple-950/30">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/10">
@@ -530,7 +530,7 @@ export const InteractiveTour3DModal = ({
         </div>
 
         {/* Modal Main Content with 3D Effect */}
-        <div className="p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${currentRole}-${currentStepIndex}`}

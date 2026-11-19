@@ -278,3 +278,4 @@
 - [ ] Publicar frontend e repetir o teste completo com Pix real — depende do Dr. Edilson
 - [x] Aviso único por WhatsApp ao médico quando a consulta é paga (sem dados de saúde)
 - [ ] Triagem de 5 perguntas abrir sozinha depois do pagamento da consulta
+- [x] Termos/tour grande demais no celular

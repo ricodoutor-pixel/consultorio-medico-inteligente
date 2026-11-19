@@ -48,18 +48,18 @@ export const KYC_REQUIRED: KycKind[] = [
  * tenta as extensões usuais dentro da pasta do próprio médico.
  */
 export const GEISELL_KYC_PATHS: Partial<Record<KycKind, string>> = {
-  crm_front: "/kyc_dra_geisell/crm_frente.jpg",
-  crm_back: "/kyc_dra_geisell/crm_verso.jpg",
-  id_front: "/kyc_dra_geisell/cnh_digital.pdf",
-  id_back: "/kyc_dra_geisell/rg_frente_verso.pdf",
-  cpf_doc: "/kyc_dra_geisell/cnh_digital.pdf",
-  address_proof: "/kyc_dra_geisell/comprovante_residencia_coelba.jpg",
-  icp_brasil: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
+  crm_front: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_front.jpg",
+  crm_back: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_back.jpg",
+  id_front: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/id_front.pdf",
+  id_back: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/id_back.pdf",
+  cpf_doc: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/id_front.pdf",
+  address_proof: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/address_proof.jpg",
+  icp_brasil: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg",
   cfm_print: "/cfm_prints/cfm-dra-geisell-torres.png",
   selfie: "/avatars/dra-geisell-torres.jpg",
-  intl_license: "/kyc_dra_geisell/certificado_wecann_endocanabinoide.jpg",
-  stay_stamp: "/kyc_dra_geisell/certificado_congresso_espectro.jpg",
-  passport_signature: "/kyc_dra_geisell/receita_assinada_memed.jpg",
+  intl_license: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/intl_license.jpg",
+  stay_stamp: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/stay_stamp.jpg",
+  passport_signature: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/passport_signature.jpg",
   vip_receipt: "/cfm_prints/cfm-dra-geisell-torres.png",
 };
 
@@ -72,8 +72,9 @@ export async function getKycSignedUrl(
     return storagePath;
   }
 
-  if (userId === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3" && GEISELL_KYC_PATHS[kind]) {
-    return GEISELL_KYC_PATHS[kind]!;
+  if (!storagePath && userId === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3" && GEISELL_KYC_PATHS[kind]) {
+    storagePath = GEISELL_KYC_PATHS[kind]!;
+    if (storagePath.startsWith("/")) return storagePath;
   }
 
   // Lista de extensões suportadas
@@ -211,6 +212,8 @@ let geisellSynced = false;
  * dados cadastrais e status VIP da Dra. Geisell Martinez Torres no banco oficial Supabase.
  */
 export async function syncGeisellKycToDatabase(): Promise<boolean> {
+  // Desativado: gravava dados pessoais e status a partir do navegador. Cadastro real fica só no banco.
+  return true;
   if (geisellSynced || isSyncingGeisell) return true;
   isSyncingGeisell = true;
   try {
@@ -221,18 +224,18 @@ export async function syncGeisellKycToDatabase(): Promise<boolean> {
     const { error: profErr } = await (supabase.from("profiles") as any)
       .update({
         full_name: "Dra. Geisell Martinez Torres",
-        cpf: "065.528.311-02",
+        cpf: "",
         phone: "+5575991462018",
-        pix_key: "06552831102",
+        pix_key: "",
         pix_type: "CPF",
-        date_of_birth: "1978-04-02",
-        cep: "44005-294",
-        address_street: "Rua Alameda 17",
+        date_of_birth: "",
+        cep: "",
+        address_street: "",
         neighborhood: "Muchila",
         city: "Feira de Santana",
         region: "BA",
         avatar_url: "/avatars/dra-geisell-torres.jpg",
-        signature_url: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
+        signature_url: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg",
       })
       .eq("id", geisellUid);
     if (profErr) {
@@ -241,7 +244,7 @@ export async function syncGeisellKycToDatabase(): Promise<boolean> {
 
     // 2. Documentos válidos na tabela doctor_kyc_documents
     const validRows = DB_VALID_KYC_KINDS.map((kind) => {
-      const path = GEISELL_KYC_PATHS[kind] || `/kyc_dra_geisell/${kind}.jpg`;
+      const path = GEISELL_KYC_PATHS[kind] || `0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/${kind}.jpg`;
       const isPdf = path.endsWith(".pdf");
       const isPng = path.endsWith(".png");
       return {
@@ -273,9 +276,9 @@ export async function syncGeisellKycToDatabase(): Promise<boolean> {
         contract_signed_at: "2026-11-16T08:49:24.000Z",
         contract_hash: "0x9b4e8f2a1c7d6e3b5a9f0c2d4e8b1a6f3c7d9e2b5a4f8c1d6e9b2a5f7c3d8e1b",
         plan_tier: "premium",
-        signature_url: "/kyc_dra_geisell/assinatura_digital_govbr.jpg",
-        crm_front_url: "/kyc_dra_geisell/crm_frente.jpg",
-        crm_back_url: "/kyc_dra_geisell/crm_verso.jpg",
+        signature_url: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg",
+        crm_front_url: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_front.jpg",
+        crm_back_url: "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_back.jpg",
       })
       .eq("id", geisellDocId);
     if (docErr) {

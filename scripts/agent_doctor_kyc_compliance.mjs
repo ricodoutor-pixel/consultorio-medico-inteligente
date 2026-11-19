@@ -218,9 +218,9 @@ async function ensureGeisellCompliance(sb) {
     // 1. Profile com CPF de 11 dígitos
     await sb.from('profiles').update({
       full_name: 'Dra. Geisell Martinez Torres',
-      cpf: '065.528.311-02',
+      cpf: '',
       phone: '+5575991462018',
-      pix_key: '06552831102',
+      pix_key: '',
       pix_type: 'CPF',
       date_of_birth: '1978-04-02',
       cep: '44005-294',
@@ -229,20 +229,20 @@ async function ensureGeisellCompliance(sb) {
       city: 'Feira de Santana',
       region: 'BA',
       avatar_url: '/avatars/dra-geisell-torres.jpg',
-      signature_url: '/kyc_dra_geisell/assinatura_digital_govbr.jpg',
+      signature_url: '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg',
     }).eq('id', geisellUid);
 
     // 2. Os 9 kinds válidos
     const validKinds = [
-      ['crm_front', '/kyc_dra_geisell/crm_frente.jpg', 'image/jpeg'],
-      ['crm_back', '/kyc_dra_geisell/crm_verso.jpg', 'image/jpeg'],
-      ['id_front', '/kyc_dra_geisell/cnh_digital.pdf', 'application/pdf'],
-      ['id_back', '/kyc_dra_geisell/rg_frente_verso.pdf', 'application/pdf'],
-      ['cpf_doc', '/kyc_dra_geisell/cnh_digital.pdf', 'application/pdf'],
-      ['address_proof', '/kyc_dra_geisell/comprovante_residencia_coelba.jpg', 'image/jpeg'],
+      ['crm_front', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_front.jpg', 'image/jpeg'],
+      ['crm_back', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_back.jpg', 'image/jpeg'],
+      ['id_front', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/id_front.pdf', 'application/pdf'],
+      ['id_back', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/id_back.pdf', 'application/pdf'],
+      ['cpf_doc', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/id_front.pdf', 'application/pdf'],
+      ['address_proof', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/address_proof.jpg', 'image/jpeg'],
       ['selfie', '/avatars/dra-geisell-torres.jpg', 'image/jpeg'],
       ['cfm_print', '/cfm_prints/cfm-dra-geisell-torres.png', 'image/png'],
-      ['icp_brasil', '/kyc_dra_geisell/assinatura_digital_govbr.jpg', 'image/jpeg'],
+      ['icp_brasil', '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg', 'image/jpeg'],
     ];
 
     for (const [kind, storagePath, mime] of validKinds) {
@@ -271,9 +271,9 @@ async function ensureGeisellCompliance(sb) {
       contract_signed_at: '2026-11-16T08:49:24.000Z',
       contract_hash: '0x9b4e8f2a1c7d6e3b5a9f0c2d4e8b1a6f3c7d9e2b5a4f8c1d6e9b2a5f7c3d8e1b',
       plan_tier: 'premium',
-      signature_url: '/kyc_dra_geisell/assinatura_digital_govbr.jpg',
-      crm_front_url: '/kyc_dra_geisell/crm_frente.jpg',
-      crm_back_url: '/kyc_dra_geisell/crm_verso.jpg',
+      signature_url: '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg',
+      crm_front_url: '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_front.jpg',
+      crm_back_url: '0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/crm_back.jpg',
     }).eq('id', geisellDocId);
   } catch (err) {
     console.warn('[KYC-Agent] Aviso ao sincronizar Dra. Geisell:', err?.message || err);

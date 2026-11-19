@@ -86,21 +86,21 @@ export default function AtualizarDocumentosMedico() {
 
       if (prof) {
         setFullName(prof.full_name || (isGeisell ? "Dra. Geisell Martinez Torres" : ""));
-        setCpf(prof.cpf || (isGeisell ? "065.528.311-02" : ""));
-        setDateOfBirth(prof.date_of_birth || (isGeisell ? "1978-04-02" : ""));
+        setCpf(prof.cpf || (isGeisell ? "" : ""));
+        setDateOfBirth(prof.date_of_birth || (isGeisell ? "" : ""));
         setPhone(prof.phone || (isGeisell ? "+5575991462018" : ""));
-        setPixKey(prof.pix_key || (isGeisell ? "06552831102" : ""));
+        setPixKey(prof.pix_key || (isGeisell ? "" : ""));
         if (prof.signature_url) setSignatureUrl(prof.signature_url);
-        setCep(prof.cep || (isGeisell ? "44005-294" : ""));
+        setCep(prof.cep || (isGeisell ? "" : ""));
         const fullAddr = [prof.address_street, prof.address_number, prof.neighborhood, prof.city, prof.state]
           .filter(Boolean)
           .join(", ");
-        setAddress(fullAddr || (isGeisell ? "Rua Alameda 17, Muchila, Feira de Santana/BA" : ""));
+        setAddress(fullAddr || (isGeisell ? "" : ""));
       }
 
       if (isGeisell) {
         void syncGeisellKycToDatabase();
-        setSignatureUrl((prev) => prev || "/kyc_dra_geisell/assinatura_digital_govbr.jpg");
+        setSignatureUrl((prev) => prev || "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3/icp_brasil.jpg");
         setUploadedDocs([
           "crm_front",
           "crm_back",

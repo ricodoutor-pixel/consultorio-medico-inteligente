@@ -103,7 +103,7 @@ export const Navbar = () => {
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
               {/* Logo + Seta Consultorio */}
-              <div className="flex flex-col justify-center flex-shrink-0 -ml-1 md:-ml-2 lg:-ml-3">
+              <div className="flex flex-col md:flex-row md:items-center md:gap-2 justify-center flex-shrink-0 -ml-1 md:-ml-2 lg:-ml-3">
                 <div className="flex items-center gap-1.5 md:gap-3">
                   <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3 group">
                     <img
@@ -121,7 +121,7 @@ export const Navbar = () => {
                 {(location.pathname === "/consultorio" || location.pathname === "/dashboard" || location.pathname === "/dashboard-medico") && (
                   <button
                     onClick={() => navigate(location.pathname === "/consultorio" ? "/dashboard" : "/consultorio")}
-                    className="hidden md:flex items-center gap-1 text-[10px] md:text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-1 md:ml-2 mt-0.5"
+                    className="hidden md:flex items-center gap-1 text-[10px] md:text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-1 md:ml-0 mt-0.5 md:mt-0 whitespace-nowrap"
                     title={location.pathname === "/consultorio" ? "Sair da Sala de Espera" : "Ir para Consultório Virtual"}
                   >
                     <ArrowLeft size={11} /> Consultório Virtual

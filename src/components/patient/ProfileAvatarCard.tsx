@@ -32,7 +32,8 @@ export const ProfileAvatarCard = ({
   const [currentAvatar, setCurrentAvatar] = useState<string | null>(avatarUrl ?? null);
   const { toast } = useToast();
 
-  const firstName = fullName.split(" ")[0] || "Paciente";
+  const nameParts = fullName.split(" ").filter(Boolean);
+  const firstName = (/^(dra?|dr)\.?$/i.test(nameParts[0] || "") ? nameParts.slice(0, 2).join(" ") : nameParts[0]) || "Paciente";
 
   const handlePick = () => inputRef.current?.click();
 

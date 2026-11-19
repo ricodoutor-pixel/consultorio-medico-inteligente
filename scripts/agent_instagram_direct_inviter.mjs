@@ -1,42 +1,69 @@
 /**
- * 🌿 Planta y Raíz Ltda — Agente Autônomo Instagram Direct Inviter
+ * 🌿 Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14)
  * Script: scripts/agent_instagram_direct_inviter.mjs
- * 
- * Função:
- * 1. Prospecção ativa e envio de convites de Médico Sócio Prescritor via Instagram Direct.
- * 2. Varredura inteligente de hashtags canábicas e integrativas brasileiras.
- * 3. Blindagem anti-bloqueio (jittering de 2 a 5 minutos, limite diário seguro de 25 DMs/dia).
- * 4. Desduplicação persistente em JSON local e sincronização automática com Supabase leads_crm.
- * 5. Sessão persistente de navegador (cookies preservados em scratch/instagram_session).
- * 
+ *
+ * Agente de Prospecção Médica no Instagram Direct — Otimizado para VPS Linux (Hostinger / PM2):
+ * 1. Execução headless nativa (`headless: true`) com detecção automática de Chromium/Chrome do sistema
+ *    e flags de baixo consumo de RAM (`--disable-dev-shm-usage`, `--disable-gpu`, `--no-zygote`).
+ * 2. Autenticação headless para VPS via cookies (`scratch/instagram_cookies.json` ou `IG_SESSIONID` no `.env`),
+ *    além de modo interativo `--headed --export-cookies` para gerar cookies na máquina local e copiar à VPS.
+ * 3. Lock exclusivo de PID (`acquireBrisaWorkerLock`) impedindo duas instâncias simultâneas na mesma conta.
+ * 4. Modo daemon (`--daemon` / `IG_DAEMON=true`) compatível com PM2: respeita janela comercial de Brasília
+ *    (09h–19h), fecha o Chromium entre ciclos (0 MB ocioso) e trata `SIGTERM`/`SIGINT` com encerramento limpo.
+ * 5. Proteção anti-bloqueio e conformidade:
+ *    - Filtro rigoroso de perfil médico (CRM/RQE/especialidade) excluindo psicólogos, nutricionistas,
+ *      optometristas, clínicas, farmácias, growshops e pacientes (nunca chama não médico de "Dr(a).").
+ *    - Mensagens padronizadas (93% via PIX, taxa fixa 7%, Plano Médico VIP opcional R$ 99/mês, sem "sócio"
+ *      nem "participação nos lucros") passando por `sanitizeOutboundAnswer`.
+ *    - Detecção imediata de bloqueio/checkpoint/challenge: interrompe na hora e entra em cooldown de 24h
+ *      (jamais tenta burlar CAPTCHA ou 2FA).
+ *    - `--dry-run` não altera `invitedProfiles` nem consome a cota diária.
+ *
  * Uso:
- *   node scripts/agent_instagram_direct_inviter.mjs
- *   node scripts/agent_instagram_direct_inviter.mjs --dry-run
- *   node scripts/agent_instagram_direct_inviter.mjs --max 15
+ *   # 1. Na máquina local (uma única vez) para logar e exportar cookies para a VPS:
+ *   node scripts/agent_instagram_direct_inviter.mjs --headed --export-cookies
+ *
+ *   # 2. Simulação segura na VPS (sem disparar DMs e sem sujar o estado):
+ *   node scripts/agent_instagram_direct_inviter.mjs --dry-run --max 5
+ *
+ *   # 3. Ciclo único real na VPS:
+ *   node scripts/agent_instagram_direct_inviter.mjs --max 20
+ *
+ *   # 4. Modo daemon 24/7 via PM2 na VPS (usa ecosystem.config.cjs):
+ *   pm2 start ecosystem.config.cjs --only instagram-direct-inviter
  */
 
+import dns from 'node:dns';
+dns.setDefaultResultOrder('ipv4first');
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 import puppeteer from 'puppeteer';
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { acquireBrisaWorkerLock } from './lib/brisa-worker-lock.mjs';
+import { sanitizeOutboundAnswer } from '../supabase/functions/_shared/brisa-response-policy.mjs';
+
+dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SCRATCH_DIR = path.join(__dirname, '../scratch');
+const SESSION_DIR = process.env.IG_SESSION_DIR || path.join(SCRATCH_DIR, 'instagram_session');
+const COOKIES_FILE = process.env.IG_COOKIES_FILE || path.join(SCRATCH_DIR, 'instagram_cookies.json');
+const STATE_FILE = process.env.IG_STATE_FILE || path.join(SCRATCH_DIR, 'instagram_invited_doctors.json');
+const LOG_FILE = process.env.IG_LOG_FILE || path.join(SCRATCH_DIR, 'instagram_inviter.log');
+const LOCK_FILE = process.env.IG_LOCK_FILE || path.join(SCRATCH_DIR, 'instagram_inviter.lock');
 
-// ── CONFIGURAÇÕES ───────────────────────────────────────────────────────────
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://shmbwdjuddvquszwkvuq.supabase.co';
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ';
+const MAX_LOG_BYTES = 5 * 1024 * 1024; // 5 MB (rotação simples na VPS)
+const DEFAULT_DAILY_LIMIT = 25;
+const DEFAULT_MIN_DELAY_SEC = 120; // 2 min
+const DEFAULT_MAX_DELAY_SEC = 300; // 5 min
+const DEFAULT_START_HOUR_BRT = 9;
+const DEFAULT_END_HOUR_BRT = 19;
+const COOLDOWN_ON_RESTRICTION_MS = 24 * 60 * 60 * 1000; // 24h
 
-const SESSION_DIR = path.join(__dirname, '../scratch/instagram_session');
-const STATE_FILE = path.join(__dirname, '../scratch/instagram_invited_doctors.json');
-const LOG_FILE = path.join(__dirname, '../scratch/instagram_inviter.log');
-
-const DEFAULT_DAILY_LIMIT = 25; // Limite seguro para evitar restrições de spam no Instagram
-const MIN_DELAY_SECONDS = 120;  // 2 minutos mínimo entre envios
-const MAX_DELAY_SECONDS = 300;  // 5 minutos máximo entre envios
-
-// Hashtags de busca para médicos e prescritores de cannabis no Brasil
-const HASHTAGS = [
+const DEFAULT_HASHTAGS = [
   'medicinacanabinoide',
   'prescritorcannabis',
   'medicocanabidiol',
@@ -46,312 +73,686 @@ const HASHTAGS = [
   'neurologiaintegrativa',
   'endocanabinologia',
   'medicinadador',
-  'dorcronica'
+  'dorcronica',
 ];
 
-// ── TEMPLATES DE MENSAGEM HUMANIZADOS ───────────────────────────────────────
-const INVITE_TEMPLATES = [
-  `Olá, Dr(a). {name}! Tudo bem com você? Aqui é o Dr. Edilson Bezerra, diretor médico da Planta y Raíz (telemedicina canabinoide).
+// ── TEMPLATES PADRONIZADOS (AUDITORIA 19/11/2026) ───────────────────────────
+// Proibido: "sócio", "participação nos lucros", "taxa zero", "100% de repasse", "pacientes 100% seus".
+export const INVITE_TEMPLATES = [
+  `Olá, {greeting}! Sou da equipe da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14).
 
-Gostaria de convidar o colega para fazer parte do nosso corpo clínico de Médicos Sócios Prescritores.
+Convidamos médicos com CRM ativo para credenciar gratuitamente seu consultório digital na nossa plataforma de telemedicina:
+• Repasse de 93% de cada consulta via PIX (taxa fixa de 7% em todos os planos);
+• Prontuário CFM e prescrição digital assinada via ICP-Brasil / Gov.br (RDC 660 e 327);
+• Plano Médico VIP opcional (R$ 99/mês) com prioridade na fila e ferramentas de IA.
 
-Nossa plataforma foi desenhada por médicos para oferecer:
-• 93% de repasse líquido via PIX instantâneo (taxa fixa de apenas 7%);
-• Prontuário CFM com emissão de receitas ICP-Brasil / Gov.br com QR Code aceito em farmácias e importações ANVISA (RDC 660);
-• Consultório virtual sem mensalidade ou taxa de adesão obrigatória;
-• Pacientes próprios e total autonomia na sua conduta clínica.
-
-👉 Para ativar seu consultório gratuito em 2 minutos:
+Cadastro gratuito em 2 minutos:
 https://www.plantayraiz.com.br/cadastro-profissional
 
-Caso queira tirar qualquer dúvida ou agendar uma rápida conversa direta, fico à disposição por aqui ou no WhatsApp da coordenação: (11) 99136-3154.
+Dúvidas? Nossa equipe atende no WhatsApp (11) 99136-3154.`,
 
-Um abraço cordial,
-Dr. Edilson Bezerra | Planta y Raíz Ltda`,
+  `Olá, {greeting}! Tudo bem? Passando em nome da equipe técnica da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
 
-  `Prezado(a) Dr(a). {name}, espero encontrá-lo(a) bem! Sou o Dr. Edilson Bezerra, diretor técnico da Planta y Raíz.
+Estamos credenciando médicos prescritores com CRM ativo para atender por telemedicina com:
+• Cadastro gratuito e aprovação humana em 24 a 48h úteis;
+• Repasse de 93% via PIX por consulta (taxa fixa de 7%);
+• Consultório virtual com vídeo, prontuário CFM e assinatura digital ICP-Brasil / Gov.br;
+• Plano Médico VIP opcional (R$ 99/mês) com prioridade na fila e Copiloto Clínico.
 
-Acompanho seu trabalho na medicina e gostaria de estender um convite institucional para integrar nossa plataforma de telemedicina canabinoide como Médico Sócio Prescritor.
+Conheça e faça seu cadastro gratuito:
+https://www.plantayraiz.com.br/cadastro-profissional
 
-Nossos diferenciais para o médico:
-• Você retém 93% do valor da consulta (recebimento imediato no PIX);
-• Emissão de prescrições e laudos com assinatura digital válida em todo o Brasil;
-• Triagem prévia de pacientes pela Enfermeira Brisa IA;
-• Consultório digital gratuito e sem fidelidade.
-
-Podemos liberar seu perfil na vitrine médica hoje mesmo:
-👉 https://www.plantayraiz.com.br/cadastro-profissional
-
-Será uma honra ter você conosco! Se preferir, me envie seu WhatsApp que nossa coordenação médica entra em contato direto.`,
+Qualquer dúvida, nossa equipe humana acompanha por aqui ou no WhatsApp (11) 99136-3154.`,
 ];
 
-// ── UTILITÁRIOS ─────────────────────────────────────────────────────────────
+// ── PARSER DE ARGUMENTOS CLI & ENV ──────────────────────────────────────────
+export function parseCliArgs(argv = process.argv.slice(2), env = process.env) {
+  const getFlagValue = (flag) => {
+    const idx = argv.indexOf(flag);
+    if (idx !== -1 && idx + 1 < argv.length && !argv[idx + 1].startsWith('--')) {
+      return argv[idx + 1];
+    }
+    const eq = argv.find((a) => a.startsWith(`${flag}=`));
+    return eq ? eq.slice(flag.length + 1) : undefined;
+  };
+
+  const hasFlag = (flag) => argv.includes(flag);
+
+  const envBool = (key, fallback) => {
+    const raw = env?.[key];
+    if (raw === undefined || raw === '') return fallback;
+    return ['1', 'true', 'yes', 'sim'].includes(String(raw).trim().toLowerCase());
+  };
+
+  const parsePositiveInt = (val, fallback) => {
+    const n = Number.parseInt(String(val ?? ''), 10);
+    return Number.isFinite(n) && n > 0 ? n : fallback;
+  };
+
+  const daemon = hasFlag('--daemon') || (!hasFlag('--once') && envBool('IG_DAEMON', false));
+  const dryRun = hasFlag('--dry-run') || (!hasFlag('--live') && envBool('IG_DRY_RUN', daemon));
+  const headed = hasFlag('--headed') || !envBool('IG_HEADLESS', true);
+  const exportCookiesOnly = hasFlag('--export-cookies');
+  const maxDaily = parsePositiveInt(getFlagValue('--max') ?? env?.IG_DAILY_LIMIT, DEFAULT_DAILY_LIMIT);
+  const minDelaySec = parsePositiveInt(getFlagValue('--min-delay') ?? env?.IG_MIN_DELAY_SEC, DEFAULT_MIN_DELAY_SEC);
+  const maxDelaySec = Math.max(
+    minDelaySec,
+    parsePositiveInt(getFlagValue('--max-delay') ?? env?.IG_MAX_DELAY_SEC, DEFAULT_MAX_DELAY_SEC),
+  );
+  const startHourBrt = parsePositiveInt(getFlagValue('--start-hour') ?? env?.IG_START_HOUR, DEFAULT_START_HOUR_BRT);
+  const endHourBrt = parsePositiveInt(getFlagValue('--end-hour') ?? env?.IG_END_HOUR, DEFAULT_END_HOUR_BRT);
+  const cookiesFile = getFlagValue('--cookies') || env?.IG_COOKIES_FILE || COOKIES_FILE;
+  const rawHashtags = getFlagValue('--hashtags') || env?.IG_HASHTAGS || '';
+  const hashtags = rawHashtags
+    ? rawHashtags.split(',').map((h) => h.replace(/^#/, '').trim()).filter(Boolean)
+    : DEFAULT_HASHTAGS;
+
+  return {
+    dryRun,
+    headless: !headed,
+    daemon,
+    exportCookiesOnly,
+    maxDaily,
+    minDelaySec,
+    maxDelaySec,
+    startHourBrt,
+    endHourBrt,
+    cookiesFile,
+    hashtags,
+  };
+}
+
+// ── DETECÇÃO DE CHROMIUM DO SISTEMA NA VPS LINUX ────────────────────────────
+export function resolveChromiumExecutablePath(env = process.env, existsSync = fs.existsSync) {
+  if (env?.PUPPETEER_EXECUTABLE_PATH && existsSync(env.PUPPETEER_EXECUTABLE_PATH)) {
+    return env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  const candidates = [
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return undefined; // Usa Chromium gerenciado pelo Puppeteer
+}
+
+// ── COOKIES PARA AUTENTICAÇÃO HEADLESS NA VPS ───────────────────────────────
+export function buildCookiesFromEnv(env = process.env) {
+  const sessionid = String(env?.IG_SESSIONID || '').trim();
+  if (!sessionid) return [];
+
+  const base = {
+    domain: '.instagram.com',
+    path: '/',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Lax',
+  };
+
+  const cookies = [{ ...base, name: 'sessionid', value: sessionid }];
+  if (env?.IG_DS_USER_ID) {
+    cookies.push({ ...base, name: 'ds_user_id', value: String(env.IG_DS_USER_ID).trim(), httpOnly: false });
+  }
+  if (env?.IG_CSRFTOKEN) {
+    cookies.push({ ...base, name: 'csrftoken', value: String(env.IG_CSRFTOKEN).trim(), httpOnly: false });
+  }
+  if (env?.IG_MID) {
+    cookies.push({ ...base, name: 'mid', value: String(env.IG_MID).trim(), httpOnly: false });
+  }
+  return cookies;
+}
+
+export function loadCookiesForVps(cookiesFile = COOKIES_FILE, env = process.env) {
+  const envCookies = buildCookiesFromEnv(env);
+  if (envCookies.length > 0) return envCookies;
+
+  if (cookiesFile && fs.existsSync(cookiesFile)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(cookiesFile, 'utf8'));
+      const list = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.cookies) ? parsed.cookies : [];
+      return list
+        .filter((c) => c && c.name && c.value)
+        .map((c) => ({
+          name: String(c.name),
+          value: String(c.value),
+          domain: c.domain || '.instagram.com',
+          path: c.path || '/',
+          httpOnly: Boolean(c.httpOnly),
+          secure: c.secure !== false,
+        }));
+    } catch (err) {
+      log(`⚠️ Falha ao ler arquivo de cookies ${cookiesFile}: ${err.message}`);
+    }
+  }
+  return [];
+}
+
+// ── JANELA COMERCIAL (BRASÍLIA) ─────────────────────────────────────────────
+export function getBrasiliaHour(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    hour12: false,
+  }).formatToParts(now);
+  const hourPart = parts.find((p) => p.type === 'hour')?.value || '0';
+  return Number.parseInt(hourPart, 10) % 24;
+}
+
+export function isWithinBusinessHours(now = new Date(), startHour = DEFAULT_START_HOUR_BRT, endHour = DEFAULT_END_HOUR_BRT) {
+  const h = getBrasiliaHour(now);
+  return h >= startHour && h < endHour;
+}
+
+export function getBrasiliaDateKey(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const y = parts.find((p) => p.type === 'year')?.value;
+  const m = parts.find((p) => p.type === 'month')?.value;
+  const d = parts.find((p) => p.type === 'day')?.value;
+  return `${y}-${m}-${d}`;
+}
+
+// ── FILTRO RIGOROSO DE MÉDICO (EVITA NÃO MÉDICOS E CLÍNICAS) ────────────────
+function normalizeAscii(str = '') {
+  return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+const NON_DOCTOR_EXCLUSION_RE =
+  /\b(psicolog[oa]|psicologia|psicanalis|nutricionist|nutricao|optometr|terapeuta ocupacional|fisioterap|odontolog|dentist|veterinari[oa]|farmacia|drogaria|associacao|growshop|headshop|tabacaria|loja|e-commerce|advogad[oa]|oab|crp|crn|crefito|cro|crmv|crf|enfermeir[oa]|coren|coach|blog|portal|revista|noticias|podcast|paciente)\b/i;
+
+const POSITIVE_DOCTOR_RE =
+  /\b(crm[\s\-/:]*[a-z]{0,2}[\s\-/:]*\d{3,}|rqe[\s\-/:]*\d{2,}|medic[oa]\b|medicina\b|psiquiatra\b|neurologista\b|oncologista\b|reumatologista\b|pediatra\b|ortopedista\b|geriatra\b|endocrinologista\b|anestesiologista\b|clinico geral\b|prescritor\s+de\s+cannabis|medico\s+prescritor)\b/i;
+
+export function isDoctorProfile(bio = '', name = '') {
+  const combined = normalizeAscii(`${bio} ${name}`);
+  if (!combined.trim()) return false;
+  if (NON_DOCTOR_EXCLUSION_RE.test(combined)) return false;
+  return POSITIVE_DOCTOR_RE.test(combined);
+}
+
+export function formatGreetingName(fullName = '', username = '', bio = '') {
+  const rawName = String(fullName || '')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}|•·]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const combined = normalizeAscii(`${bio} ${rawName}`);
+  const hasExplicitDoctorCredential = /\b(crm[\s\-/:]*[a-z]{0,2}[\s\-/:]*\d{3,}|rqe|medic[oa]|psiquiatra|neurologista|oncologista|reumatologista|pediatra)\b/i.test(combined)
+    || /^(dr|dra|doutor|doutora)\.?\s+/i.test(rawName);
+
+  const cleaned = rawName
+    .replace(/^(?:dr\(a\)\.?|dra?\.?|doutora?|m[eé]dic[oa])\s+/i, '')
+    .replace(/\s*[-–—|•].*$/, '')
+    .trim();
+
+  const isClinicOrGeneric = !cleaned
+    || cleaned.length < 2
+    || /instagram/i.test(cleaned)
+    || /\b(clinica|consultorio|instituto|centro|espaco|saude|equipe)\b/i.test(normalizeAscii(cleaned));
+
+  if (isClinicOrGeneric) {
+    return hasExplicitDoctorCredential ? 'colega' : username || 'tudo bem';
+  }
+
+  const firstAndSecond = cleaned.split(/\s+/).slice(0, 2).join(' ');
+  if (hasExplicitDoctorCredential) {
+    const isFemale = /^(dra\.?|doutora)\b/i.test(rawName);
+    return `${isFemale ? 'Dra.' : 'Dr(a).'} ${firstAndSecond}`;
+  }
+  return firstAndSecond;
+}
+
+export function buildInviteMessage({ fullName = '', username = '', bio = '', templateIndex = 0 }) {
+  const greeting = formatGreetingName(fullName, username, bio);
+  const template = INVITE_TEMPLATES[Math.abs(templateIndex) % INVITE_TEMPLATES.length];
+  return sanitizeOutboundAnswer(template.replace('{greeting}', greeting));
+}
+
+// ── DETECÇÃO DE RESTRIÇÃO / BLOQUEIO / CHALLENGE DO INSTAGRAM ───────────────
+export function detectInstagramRestriction({ url = '', bodyText = '' } = {}) {
+  const u = String(url || '').toLowerCase();
+  const text = normalizeAscii(bodyText || '');
+
+  if (u.includes('/challenge/') || u.includes('/accounts/suspended/') || u.includes('/accounts/disabled/')) {
+    return { restricted: true, reason: 'instagram_challenge_or_suspended' };
+  }
+  if (u.includes('/accounts/login')) {
+    return { restricted: true, reason: 'session_expired_login_redirect' };
+  }
+  if (
+    /try again later|tente novamente mais tarde|action blocked|acao bloqueada|restringimos certas atividades|we restrict certain activity|confirm it'?s you|confirme que e voce|conta suspensa|account suspended/.test(text)
+  ) {
+    return { restricted: true, reason: 'instagram_rate_limit_or_checkpoint' };
+  }
+  return { restricted: false, reason: null };
+}
+
+// ── LOG & ESTADO PERSISTENTE ────────────────────────────────────────────────
+function rotateLogIfNeeded() {
+  try {
+    if (fs.existsSync(LOG_FILE) && fs.statSync(LOG_FILE).size > MAX_LOG_BYTES) {
+      fs.renameSync(LOG_FILE, `${LOG_FILE}.old`);
+    }
+  } catch (_) {}
+}
+
 function log(msg) {
   const ts = new Date().toISOString();
   const line = `[${ts}] [IG-INVITER] ${msg}`;
   console.log(line);
   try {
     if (!fs.existsSync(path.dirname(LOG_FILE))) fs.mkdirSync(path.dirname(LOG_FILE), { recursive: true });
+    rotateLogIfNeeded();
     fs.appendFileSync(LOG_FILE, line + '\n', 'utf8');
   } catch (_) {}
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function getRandomDelay(minSec = MIN_DELAY_SECONDS, maxSec = MAX_DELAY_SECONDS) {
+function getRandomDelay(minSec, maxSec) {
   return Math.floor(Math.random() * (maxSec - minSec + 1) + minSec) * 1000;
 }
 
-function loadState() {
-  if (fs.existsSync(STATE_FILE)) {
+export function loadState(filePath = STATE_FILE) {
+  if (fs.existsSync(filePath)) {
     try {
-      return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      return {
+        invitedProfiles: parsed.invitedProfiles || {},
+        dailyCounters: parsed.dailyCounters || {},
+        blockedUntil: parsed.blockedUntil || null,
+        lastRestrictionReason: parsed.lastRestrictionReason || null,
+      };
     } catch (_) {}
   }
   return {
-    invitedProfiles: {}, // username -> { invitedAt, name, status }
-    dailyCounters: {}    // 'YYYY-MM-DD' -> count
+    invitedProfiles: {},
+    dailyCounters: {},
+    blockedUntil: null,
+    lastRestrictionReason: null,
   };
 }
 
-function saveState(state) {
+export function saveState(state, filePath = STATE_FILE) {
   try {
-    if (!fs.existsSync(path.dirname(STATE_FILE))) fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
-  } catch (_) {}
+    if (!fs.existsSync(path.dirname(filePath))) fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    const tmp = `${filePath}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(state, null, 2), 'utf8');
+    fs.renameSync(tmp, filePath);
+  } catch (err) {
+    log(`⚠️ Falha ao salvar estado: ${err.message}`);
+  }
 }
 
-function getTodayKey() {
-  return new Date().toISOString().slice(0, 10);
+export function canSendToday(state, maxDaily, now = new Date()) {
+  if (state.blockedUntil && Date.parse(state.blockedUntil) > now.getTime()) {
+    return false;
+  }
+  const today = getBrasiliaDateKey(now);
+  return (state.dailyCounters[today] || 0) < maxDaily;
 }
 
-function canSendToday(state, maxDaily) {
-  const today = getTodayKey();
-  const currentCount = state.dailyCounters[today] || 0;
-  return currentCount < maxDaily;
-}
-
-function recordInviteSent(state, username, profileData) {
-  const today = getTodayKey();
+export function recordInviteSent(state, username, profileData, { dryRun = false, filePath = STATE_FILE, now = new Date() } = {}) {
+  // Dry-run NUNCA grava em invitedProfiles nem consome a cota diária
+  if (dryRun) return false;
+  const today = getBrasiliaDateKey(now);
   state.dailyCounters[today] = (state.dailyCounters[today] || 0) + 1;
   state.invitedProfiles[username.toLowerCase()] = {
-    invitedAt: new Date().toISOString(),
+    invitedAt: now.toISOString(),
     name: profileData.name || username,
-    bio: profileData.bio || '',
-    status: 'invited'
+    bio: (profileData.bio || '').slice(0, 240),
+    status: 'invited',
   };
-  saveState(state);
+  saveState(state, filePath);
+  return true;
 }
 
-// ── INTEGRAÇÃO CRM SUPABASE ────────────────────────────────────────────────
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// ── SUPABASE CRM (LAZY CLIENT) ──────────────────────────────────────────────
+function getSupabaseClient() {
+  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false } });
+}
 
 async function syncLeadToSupabase(username, profileData) {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
   try {
-    const cleanPhone = profileData.phone || `ig_${username}`;
-    await supabase.from('leads_crm').upsert({
-      name: profileData.name || `Dr(a). ${username}`,
-      phone: cleanPhone,
-      instagram_url: `https://www.instagram.com/${username}/`,
-      specialty: profileData.specialty || 'Medicina Canabinoide / Integrativa',
-      state: profileData.state || 'BR',
-      source: 'instagram_direct',
-      status: 'invited',
-      notes: `Convite enviado via Instagram Direct em ${new Date().toLocaleDateString('pt-BR')}. Bio: ${profileData.bio?.slice(0, 150) || ''}`,
-      last_contact_at: new Date().toISOString()
-    }, { onConflict: 'phone', ignoreDuplicates: false });
-    log(`✅ Lead @${username} registrado no CRM Supabase como 'invited'.`);
+    const cleanPhone = profileData.phone || `ig_${username.toLowerCase()}`;
+    const { error } = await supabase.from('leads_crm').upsert(
+      {
+        name: profileData.name || username,
+        phone: cleanPhone,
+        instagram_url: `https://www.instagram.com/${username}/`,
+        specialty: profileData.specialty || 'Medicina Canabinoide / Integrativa',
+        state: profileData.state || 'BR',
+        source: 'instagram_direct',
+        status: 'invited',
+        notes: `Convite enviado via Instagram Direct em ${new Date().toLocaleDateString('pt-BR')}. Bio: ${(profileData.bio || '').slice(0, 150)}`,
+        last_contact_at: new Date().toISOString(),
+      },
+      { onConflict: 'phone', ignoreDuplicates: false },
+    );
+    if (error) {
+      log(`⚠️ Supabase leads_crm retornou erro para @${username}: ${error.message}`);
+    } else {
+      log(`✅ Lead @${username} sincronizado no CRM Supabase.`);
+    }
   } catch (err) {
-    log(`⚠️ Não foi possível salvar lead no Supabase: ${err.message}`);
+    log(`⚠️ Erro ao sincronizar lead @${username} no Supabase: ${err.message}`);
   }
 }
 
-// ── EXTRAÇÃO E PARSER DE PERFIS ─────────────────────────────────────────────
-function isDoctorProfile(bio, name = '') {
-  const text = `${bio} ${name}`.toLowerCase();
-  const doctorKeywords = [
-    'crm', 'médic', 'medic', 'doutor', 'dr.', 'dra.', 'psiquiatr',
-    'neurolog', 'oncolog', 'cannabis', 'canabinoid', 'integrativ',
-    'dor crônica', 'reumatolog', 'pediatr', 'endocanabinoid'
-  ];
-  return doctorKeywords.some(kw => text.includes(kw));
-}
+// ── DIGITAÇÃO & ENVIO SEGURO NO DIRECT (COMPATÍVEL COM REACT/LEXICAL) ───────
+async function typeAndSendDirectMessage(page, selector, messageText) {
+  await page.waitForSelector(selector, { timeout: 15000 });
+  await page.click(selector);
+  await sleep(600);
 
-function extractName(fullName, username) {
-  if (fullName && fullName.length > 2 && !fullName.includes('Instagram')) {
-    return fullName.replace(/dr\.?|dra\.?|médico|medica/gi, '').trim();
-  }
-  return username;
-}
-
-// ── AGENTE DE ENVIO DIRETO NO INSTAGRAM ─────────────────────────────────────
-export async function runInstagramInviter(options = {}) {
-  const isDryRun = options.dryRun || process.argv.includes('--dry-run');
-  const maxDaily = options.max || DEFAULT_DAILY_LIMIT;
-  const state = loadState();
-
-  log(`🚀 Iniciando Agente Instagram Direct Inviter...`);
-  log(`⚙️ Configuração: Limite Diário = ${maxDaily} DMs | Dry-Run = ${isDryRun ? 'SIM (Apenas simulação)' : 'NÃO (Envio real)'}`);
-
-  const todayKey = getTodayKey();
-  const alreadySentToday = state.dailyCounters[todayKey] || 0;
-  log(`📊 Disparos já realizados hoje (${todayKey}): ${alreadySentToday}/${maxDaily}`);
-
-  if (!canSendToday(state, maxDaily)) {
-    log(`🛑 Limite diário de segurança atingido (${alreadySentToday}/${maxDaily}). Aguardando próximo ciclo.`);
-    return;
+  const lines = messageText.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i]) {
+      await page.keyboard.type(lines[i], { delay: 18 });
+    }
+    if (i < lines.length - 1) {
+      await page.keyboard.down('Shift');
+      await page.keyboard.press('Enter');
+      await page.keyboard.up('Shift');
+    }
   }
 
-  // Inicializa Puppeteer com perfil persistente
-  if (!fs.existsSync(SESSION_DIR)) fs.mkdirSync(SESSION_DIR, { recursive: true });
+  await sleep(1200);
 
-  const browser = await puppeteer.launch({
-    headless: false, // Visível para o usuário caso precise confirmar login/2FA
-    userDataDir: SESSION_DIR,
-    defaultViewport: { width: 1280, height: 800 },
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-notifications',
-      '--disable-blink-features=AutomationControlled'
-    ]
+  // Tenta clicar explicitamente no botão "Enviar"/"Send"; fallback para Enter
+  const clickedSend = await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button, div[role="button"]'));
+    const sendBtn = btns.find((b) => {
+      const t = (b.innerText || '').trim().toLowerCase();
+      return t === 'enviar' || t === 'send';
+    });
+    if (sendBtn) {
+      sendBtn.click();
+      return true;
+    }
+    return false;
   });
 
-  const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36');
+  if (!clickedSend) {
+    await page.keyboard.press('Enter');
+  }
+
+  await sleep(2500);
+}
+
+// ── CICLO ÚNICO DE EXECUÇÃO (ABRE CHROMIUM, EXECUTA, FECHA CHROMIUM) ────────
+let activeBrowser = null;
+let stopRequested = false;
+
+export async function runInstagramInviterCycle(rawOptions = {}) {
+  const cfg = { ...parseCliArgs(), ...rawOptions };
+  const state = loadState();
+  const now = new Date();
+  const todayKey = getBrasiliaDateKey(now);
+
+  if (state.blockedUntil && Date.parse(state.blockedUntil) > now.getTime()) {
+    log(`🛑 Conta em cooldown de segurança até ${state.blockedUntil} (${state.lastRestrictionReason || 'restriction'}). Pulando ciclo.`);
+    return { status: 'cooldown', sent: 0 };
+  }
+
+  const alreadySentToday = state.dailyCounters[todayKey] || 0;
+  log(`🚀 Ciclo Instagram Direct Inviter | headless=${cfg.headless} | dryRun=${cfg.dryRun} | hoje=${alreadySentToday}/${cfg.maxDaily}`);
+
+  if (!cfg.exportCookiesOnly && !canSendToday(state, cfg.maxDaily, now)) {
+    log(`🛑 Limite diário de ${cfg.maxDaily} DMs já atingido (${todayKey}).`);
+    return { status: 'daily_limit', sent: 0 };
+  }
+
+  if (!fs.existsSync(SESSION_DIR)) fs.mkdirSync(SESSION_DIR, { recursive: true });
+
+  const executablePath = resolveChromiumExecutablePath();
+  if (executablePath) {
+    log(`🧭 Usando Chromium do sistema: ${executablePath}`);
+  }
+
+  const launchArgs = [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage', // Crítico em VPS/containers com /dev/shm pequeno
+    '--disable-gpu',
+    '--no-zygote',
+    '--disable-extensions',
+    '--disable-background-networking',
+    '--disable-renderer-backgrounding',
+    '--disable-notifications',
+    '--mute-audio',
+    '--lang=pt-BR',
+    '--window-size=1280,800',
+    '--disable-blink-features=AutomationControlled',
+  ];
+
+  const browser = await puppeteer.launch({
+    headless: cfg.headless,
+    executablePath,
+    userDataDir: SESSION_DIR,
+    defaultViewport: { width: 1280, height: 800 },
+    args: launchArgs,
+  });
+  activeBrowser = browser;
+
+  let sentThisCycle = 0;
 
   try {
-    log(`🌐 Acessando Instagram...`);
-    await page.goto('https://www.instagram.com/', { waitUntil: 'networkidle2', timeout: 45000 });
-    await sleep(3000);
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    );
+    await page.setExtraHTTPHeaders({ 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8' });
 
-    // Checar se está logado
-    const isLoggedIn = await page.evaluate(() => {
-      return Boolean(document.querySelector('svg[aria-label="Direct"], svg[aria-label="Mensagens"], svg[aria-label="Search"], a[href*="/direct/"]'));
+    // Otimização de RAM/banda na VPS: bloqueia vídeos e fontes externas pesadas
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      const resourceType = req.resourceType();
+      if (resourceType === 'media' || resourceType === 'font') {
+        req.abort().catch(() => {});
+      } else {
+        req.continue().catch(() => {});
+      }
     });
 
-    if (!isLoggedIn) {
-      log(`⚠️ Instagram NÃO está logado na sessão persistente.`);
-      log(`👉 Por favor, faça login manualmente na janela do navegador que se abriu.`);
-      log(`⏳ Aguardando até 2 minutos pelo login...`);
-
-      let loggedInAfterWait = false;
-      for (let i = 0; i < 24; i++) {
-        await sleep(5000);
-        loggedInAfterWait = await page.evaluate(() => {
-          return Boolean(document.querySelector('svg[aria-label="Direct"], svg[aria-label="Mensagens"], a[href*="/direct/"]'));
-        });
-        if (loggedInAfterWait) break;
-      }
-
-      if (!loggedInAfterWait) {
-        log(`❌ Tempo limite de login esgotado. Execute novamente após realizar o login.`);
-        await browser.close();
-        return;
-      }
-      log(`✅ Login detectado com sucesso! Sessão salva.`);
-    } else {
-      log(`✅ Sessão do Instagram ativa e autenticada!`);
+    // Injeta cookies da VPS (env IG_SESSIONID ou scratch/instagram_cookies.json) antes de navegar
+    const vpsCookies = loadCookiesForVps(cfg.cookiesFile, process.env);
+    if (vpsCookies.length > 0) {
+      log(`🍪 Carregando ${vpsCookies.length} cookie(s) de sessão para autenticação headless.`);
+      await page.setCookie(...vpsCookies);
     }
 
-    // Coletar perfis candidatos através das hashtags
+    log('🌐 Acessando Instagram...');
+    await page.goto('https://www.instagram.com/', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await sleep(3500);
+
+    const checkLoggedIn = () =>
+      page.evaluate(() =>
+        Boolean(
+          document.querySelector(
+            'svg[aria-label="Direct"], svg[aria-label="Mensagens"], svg[aria-label="Pesquisa"], svg[aria-label="Search"], a[href*="/direct/"]',
+          ),
+        ),
+      );
+
+    let isLoggedIn = await checkLoggedIn();
+
+    if (!isLoggedIn && !cfg.headless) {
+      log('⚠️ Sessão não autenticada. Faça login manualmente na janela aberta (aguardando até 2 minutos)...');
+      for (let i = 0; i < 24 && !stopRequested; i++) {
+        await sleep(5000);
+        isLoggedIn = await checkLoggedIn();
+        if (isLoggedIn) break;
+      }
+    }
+
+    if (!isLoggedIn) {
+      const pageState = await page.evaluate(() => ({
+        url: window.location.href,
+        bodyText: document.body?.innerText?.slice(0, 600) || '',
+      }));
+      const restriction = detectInstagramRestriction(pageState);
+      log(
+        `❌ Sessão do Instagram NÃO autenticada na VPS (${restriction.reason || 'sem_sessao'}). ` +
+          `Exporte os cookies localmente com "--headed --export-cookies" ou configure IG_SESSIONID no .env da VPS.`,
+      );
+      return { status: 'not_authenticated', sent: 0 };
+    }
+
+    // Exporta cookies atualizados para facilitar reuso/backup na VPS
+    const currentCookies = await page.cookies('https://www.instagram.com');
+    if (cfg.exportCookiesOnly) {
+      if (!fs.existsSync(path.dirname(cfg.cookiesFile))) fs.mkdirSync(path.dirname(cfg.cookiesFile), { recursive: true });
+      fs.writeFileSync(cfg.cookiesFile, JSON.stringify(currentCookies, null, 2), { mode: 0o600 });
+      log(`✅ Cookies salvos com permissão 0600 em: ${cfg.cookiesFile}`);
+      log(`👉 Copie para a VPS: scp ${cfg.cookiesFile} root@SEU_IP_VPS:/opt/plantayraiz/scratch/instagram_cookies.json`);
+      return { status: 'cookies_exported', sent: 0 };
+    }
+
+    log('✅ Sessão do Instagram autenticada!');
+
+    // Embaralha hashtags a cada ciclo para diversificar descoberta
+    const shuffledTags = [...cfg.hashtags].sort(() => Math.random() - 0.5).slice(0, 5);
     const candidateProfiles = [];
 
-    for (const hashtag of HASHTAGS) {
-      if (candidateProfiles.length >= 40) break;
-      log(`🔍 Mapeando médicos na hashtag #${hashtag}...`);
+    for (const hashtag of shuffledTags) {
+      if (stopRequested || candidateProfiles.length >= 30) break;
+      log(`🔍 Mapeando perfis na hashtag #${hashtag}...`);
 
       try {
-        await page.goto(`https://www.instagram.com/explore/tags/${hashtag}/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.goto(`https://www.instagram.com/explore/tags/${hashtag}/`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        });
         await sleep(4000);
 
-        // Extrai links de postagens
+        const tagCheck = detectInstagramRestriction(
+          await page.evaluate(() => ({ url: window.location.href, bodyText: document.body?.innerText?.slice(0, 500) || '' })),
+        );
+        if (tagCheck.restricted) {
+          log(`🚨 Restrição detectada pelo Instagram (${tagCheck.reason}). Parando ciclo imediatamente por 24h.`);
+          state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
+          state.lastRestrictionReason = tagCheck.reason;
+          saveState(state);
+          return { status: 'restricted', sent: sentThisCycle };
+        }
+
         const postLinks = await page.evaluate(() => {
-          const links = Array.from(document.querySelectorAll('a[href*="/p/"]')).map(a => a.href);
-          return Array.from(new Set(links)).slice(0, 15);
+          const links = Array.from(document.querySelectorAll('a[href*="/p/"], a[href*="/reel/"]')).map((a) => a.href);
+          return Array.from(new Set(links)).slice(0, 12);
         });
 
-        log(`   📸 Encontrados ${postLinks.length} posts recentes na hashtag #${hashtag}.`);
+        log(`   📸 ${postLinks.length} posts recentes em #${hashtag}.`);
 
         for (const postUrl of postLinks) {
+          if (stopRequested || candidateProfiles.length >= 30) break;
           try {
             await page.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
-            await sleep(2500);
+            await sleep(2200);
 
             const authorInfo = await page.evaluate(() => {
-              const userAnchor = document.querySelector('header a[href^="/"], a[role="link"][href^="/"]');
+              const userAnchor = document.querySelector('article header a[href^="/"], header a[href^="/"]');
               if (!userAnchor) return null;
               const href = userAnchor.getAttribute('href') || '';
-              const username = href.replace(/\//g, '').trim();
-              return username ? { username, profileUrl: `https://www.instagram.com/${username}/` } : null;
+              const username = href.replace(/^\/|\/$/g, '').split('/')[0].trim();
+              return username && !['explore', 'p', 'reel', 'reels', 'accounts'].includes(username.toLowerCase())
+                ? { username, profileUrl: `https://www.instagram.com/${username}/` }
+                : null;
             });
 
-            if (authorInfo && authorInfo.username && !authorInfo.username.includes('explore')) {
+            if (authorInfo?.username) {
               const uLower = authorInfo.username.toLowerCase();
-              if (!state.invitedProfiles[uLower] && !candidateProfiles.some(c => c.username.toLowerCase() === uLower)) {
+              if (!state.invitedProfiles[uLower] && !candidateProfiles.some((c) => c.username.toLowerCase() === uLower)) {
                 candidateProfiles.push(authorInfo);
-                log(`   🎯 Candidato adicionado: @${authorInfo.username}`);
               }
             }
           } catch (_) {}
         }
       } catch (err) {
-        log(`   ⚠️ Erro ao consultar hashtag #${hashtag}: ${err.message}`);
+        log(`   ⚠️ Erro na hashtag #${hashtag}: ${err.message}`);
       }
     }
 
-    log(`📋 Total de médicos candidatos novos para convidar: ${candidateProfiles.length}`);
+    log(`📋 Candidatos novos mapeados neste ciclo: ${candidateProfiles.length}`);
 
-    // Loop de Envio dos Convites
     for (const candidate of candidateProfiles) {
-      if (!canSendToday(state, maxDaily)) {
-        log(`🛑 Limite diário de ${maxDaily} DMs atingido. Encerrando ciclo.`);
+      if (stopRequested) break;
+      if (!canSendToday(state, cfg.maxDaily)) {
+        log(`🛑 Limite diário de ${cfg.maxDaily} DMs atingido.`);
+        break;
+      }
+      if (cfg.dryRun && sentThisCycle >= cfg.maxDaily) {
+        log(`🧪 [DRY-RUN] Limite simulado de ${cfg.maxDaily} perfis atingido.`);
         break;
       }
 
       const username = candidate.username;
-      log(`\n======================================================`);
-      log(`👉 Avaliando perfil: @${username}...`);
+      log(`👉 Avaliando @${username}...`);
 
       try {
-        await page.goto(`https://www.instagram.com/${username}/`, { waitUntil: 'domcontentloaded', timeout: 25000 });
+        await page.goto(`https://www.instagram.com/${username}/`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 25000,
+        });
         await sleep(3000);
 
-        // Extrair Bio e Nome
-        const profileData = await page.evaluate(() => {
-          const nameEl = document.querySelector('header h1, header h2, section h1');
+        const profileSnap = await page.evaluate(() => {
+          const nameEl = document.querySelector('header h1, header h2, header section span[dir="auto"]');
           const bioEl = document.querySelector('header section div:nth-of-type(3), [data-testid="user-bio"]');
           const metaDesc = document.querySelector('meta[name="description"]');
           return {
+            url: window.location.href,
+            bodyText: document.body?.innerText?.slice(0, 500) || '',
             name: nameEl?.innerText?.trim() || '',
-            bio: bioEl?.innerText?.trim() || metaDesc?.getAttribute('content') || ''
+            bio: bioEl?.innerText?.trim() || metaDesc?.getAttribute('content') || '',
           };
         });
 
-        // Validar se é médico / prescritor
-        if (!isDoctorProfile(profileData.bio, profileData.name)) {
-          log(`⏭️ Perfil @${username} não aparenta ser prescritor/médico pela bio. Pulando.`);
+        const restriction = detectInstagramRestriction(profileSnap);
+        if (restriction.restricted) {
+          log(`🚨 Restrição detectada (${restriction.reason}). Entrando em cooldown de 24h.`);
+          state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
+          state.lastRestrictionReason = restriction.reason;
+          saveState(state);
+          break;
+        }
+
+        if (!isDoctorProfile(profileSnap.bio, profileSnap.name)) {
+          log(`⏭️ @${username} descartado (não é médico com credencial confirmada ou pertence a outra profissão/clínica).`);
           continue;
         }
 
-        const displayName = extractName(profileData.name, username);
-        const template = INVITE_TEMPLATES[Math.floor(Math.random() * INVITE_TEMPLATES.length)];
-        const inviteMessage = template.replace('{name}', displayName);
+        const inviteMessage = buildInviteMessage({
+          fullName: profileSnap.name,
+          username,
+          bio: profileSnap.bio,
+          templateIndex: sentThisCycle,
+        });
 
-        log(`👨‍⚕️ Médico confirmado: ${displayName} (@${username})`);
-        log(`📝 Mensagem preparada:\n${inviteMessage.slice(0, 150)}...`);
+        log(`🩺 Médico qualificado: @${username} (${profileSnap.name || 'sem nome'})`);
 
-        if (isDryRun) {
-          log(`🧪 [DRY-RUN] Simulação concluída para @${username}. Mensagem não disparada.`);
-          recordInviteSent(state, username, profileData);
+        if (cfg.dryRun) {
+          sentThisCycle++;
+          log(`🧪 [DRY-RUN #${sentThisCycle}] Simulado para @${username} (estado preservado, nenhuma DM enviada).`);
           continue;
         }
 
-        // Tentar clicar no botão "Enviar mensagem" / Direct
         const clickedMessageBtn = await page.evaluate(() => {
           const buttons = Array.from(document.querySelectorAll('button, div[role="button"]'));
-          const msgBtn = buttons.find(b => {
-            const t = b.innerText.toLowerCase();
+          const msgBtn = buttons.find((b) => {
+            const t = (b.innerText || '').trim().toLowerCase();
             return t === 'mensagem' || t === 'enviar mensagem' || t === 'message';
           });
           if (msgBtn) {
@@ -362,59 +763,117 @@ export async function runInstagramInviter(options = {}) {
         });
 
         if (!clickedMessageBtn) {
-          log(`⚠️ Botão de mensagem não encontrado no perfil @${username} (perfil pode ser fechado ou restringir DMs).`);
+          log(`⚠️ @${username} não exibe botão de Direct (perfil privado/restrito). Pulando.`);
           continue;
         }
 
-        await sleep(4000);
+        await sleep(3500);
 
-        // Digitar e Enviar Mensagem no Direct
-        const messageInputSelector = 'div[role="textbox"][contenteditable="true"], textarea[placeholder*="Mensagem"]';
-        await page.waitForSelector(messageInputSelector, { timeout: 15000 });
+        const dmRestriction = detectInstagramRestriction(
+          await page.evaluate(() => ({ url: window.location.href, bodyText: document.body?.innerText?.slice(0, 500) || '' })),
+        );
+        if (dmRestriction.restricted) {
+          log(`🚨 Restrição ao abrir Direct (${dmRestriction.reason}). Entrando em cooldown de 24h.`);
+          state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
+          state.lastRestrictionReason = dmRestriction.reason;
+          saveState(state);
+          break;
+        }
 
-        await page.click(messageInputSelector);
-        await sleep(1000);
+        const messageInputSelector = 'div[role="textbox"][contenteditable="true"], textarea[placeholder*="Mensagem"], textarea[placeholder*="Message"]';
+        await typeAndSendDirectMessage(page, messageInputSelector, inviteMessage);
 
-        // Digitação humanizada
-        await page.keyboard.sendCharacter('');
-        await page.evaluate((sel, text) => {
-          const el = document.querySelector(sel);
-          if (el) {
-            el.focus();
-            document.execCommand('insertText', false, text);
-          }
-        }, messageInputSelector, inviteMessage);
+        sentThisCycle++;
+        recordInviteSent(state, username, profileSnap, { dryRun: false });
+        await syncLeadToSupabase(username, profileSnap);
+        log(`🎉 DM enviada para @${username} (${sentThisCycle} neste ciclo).`);
 
-        await sleep(2000);
-        await page.keyboard.press('Enter');
-        await sleep(3000);
-
-        log(`🎉 Convite enviado com sucesso para @${username}!`);
-
-        // Registrar no estado local e no Supabase CRM
-        recordInviteSent(state, username, profileData);
-        await syncLeadToSupabase(username, profileData);
-
-        // Jittering de segurança entre mensagens
-        const delayMs = getRandomDelay();
-        log(`⏳ Jittering de segurança anti-bloqueio: aguardando ${(delayMs / 1000).toFixed(0)}s antes do próximo médico...`);
-        await sleep(delayMs);
-
+        if (canSendToday(state, cfg.maxDaily) && !stopRequested) {
+          const delayMs = getRandomDelay(cfg.minDelaySec, cfg.maxDelaySec);
+          log(`⏳ Jittering anti-bloqueio: aguardando ${(delayMs / 1000).toFixed(0)}s...`);
+          await sleep(delayMs);
+        }
       } catch (err) {
-        log(`❌ Falha no fluxo para @${username}: ${err.message}`);
+        log(`❌ Erro ao processar @${username}: ${err.message}`);
       }
     }
 
-    log(`🏁 Ciclo do Agente Instagram Direct concluído.`);
-
+    log(`🏁 Ciclo concluído. Envios${cfg.dryRun ? ' simulados' : ''}: ${sentThisCycle}.`);
+    return { status: 'ok', sent: sentThisCycle };
   } catch (err) {
-    log(`❌ Erro geral no agente: ${err.message}`);
+    log(`❌ Erro geral no ciclo: ${err.message}`);
+    return { status: 'error', sent: sentThisCycle, error: err.message };
   } finally {
-    await browser.close();
+    await browser.close().catch(() => {});
+    activeBrowser = null;
+  }
+}
+
+// ── MODO DAEMON PARA VPS (PM2) ──────────────────────────────────────────────
+export async function runInstagramInviter(rawOptions = {}) {
+  const cfg = { ...parseCliArgs(), ...rawOptions };
+
+  if (!fs.existsSync(SCRATCH_DIR)) fs.mkdirSync(SCRATCH_DIR, { recursive: true });
+  const releaseLock = acquireBrisaWorkerLock(LOCK_FILE);
+  if (!releaseLock) {
+    log('🛑 Outra instância do Instagram Direct Inviter já está em execução. Encerrando duplicata.');
+    return { status: 'locked', sent: 0 };
+  }
+
+  const cleanup = async (signal) => {
+    stopRequested = true;
+    log(`🛑 Sinal ${signal} recebido. Encerrando Chromium e liberando lock...`);
+    if (activeBrowser) {
+      await activeBrowser.close().catch(() => {});
+      activeBrowser = null;
+    }
+    releaseLock();
+    process.exit(0);
+  };
+
+  process.once('SIGTERM', () => cleanup('SIGTERM'));
+  process.once('SIGINT', () => cleanup('SIGINT'));
+  process.once('exit', releaseLock);
+
+  try {
+    if (!cfg.daemon || cfg.exportCookiesOnly) {
+      return await runInstagramInviterCycle(cfg);
+    }
+
+    log(`♻️ Modo DAEMON VPS ativo (janela Brasília ${cfg.startHourBrt}h–${cfg.endHourBrt}h | teto ${cfg.maxDaily}/dia | dryRun=${cfg.dryRun}).`);
+    while (!stopRequested) {
+      const now = new Date();
+      if (!isWithinBusinessHours(now, cfg.startHourBrt, cfg.endHourBrt)) {
+        log(`🌙 Fora da janela comercial (${getBrasiliaHour(now)}h BRT). Aguardando 30 minutos...`);
+        await sleep(30 * 60 * 1000);
+        continue;
+      }
+
+      const result = await runInstagramInviterCycle(cfg);
+      if (stopRequested) break;
+
+      if (result.status === 'not_authenticated') {
+        log('⏸️ Aguardando 60 minutos antes de revalidar cookies/sessão...');
+        await sleep(60 * 60 * 1000);
+      } else if (result.status === 'daily_limit' || result.status === 'cooldown' || result.status === 'restricted') {
+        log('😴 Cota diária/cooldown ativo. Verificando novamente em 60 minutos...');
+        await sleep(60 * 60 * 1000);
+      } else {
+        log('⏱️ Ciclo encerrado com Chromium fechado (RAM liberada). Próximo ciclo em 90 minutos...');
+        await sleep(90 * 60 * 1000);
+      }
+    }
+    return { status: 'stopped', sent: 0 };
+  } finally {
+    releaseLock();
   }
 }
 
 // Execução direta via CLI
-if (process.argv[1] && process.argv[1].endsWith('agent_instagram_direct_inviter.mjs')) {
-  runInstagramInviter();
+const isDirectCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectCli) {
+  runInstagramInviter().catch((err) => {
+    log(`❌ Falha fatal: ${err.message}`);
+    process.exit(1);
+  });
 }

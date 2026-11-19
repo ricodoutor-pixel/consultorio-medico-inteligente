@@ -92,6 +92,26 @@ module.exports = {
       }
     },
     {
+      name: 'instagram-direct-inviter',
+      node_args: '--dns-result-order=ipv4first',
+      script: 'scripts/agent_instagram_direct_inviter.mjs',
+      args: '--daemon',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '900M',
+      restart_delay: 30000,
+      kill_timeout: 15000,
+      env: {
+        NODE_ENV: 'production',
+        IG_HEADLESS: 'true',
+        IG_DAEMON: 'true'
+        // Modo daemon inicia em dry-run por segurança até definir IG_DRY_RUN=false no /opt/plantayraiz/.env
+      }
+    },
+    {
       name: 'apify-lead-sync',
       node_args: '--dns-result-order=ipv4first',
       script: 'scripts/apify_lead_harvester.mjs',
@@ -102,7 +122,6 @@ module.exports = {
       watch: false,
       max_memory_restart: '1G',
       restart_delay: 30000,
-      node_args: '--dns-result-order=ipv4first',
       env: {
         NODE_ENV: 'production'
       }
@@ -135,21 +154,6 @@ module.exports = {
       restart_delay: 10000,
       env: {
         NODE_ENV: 'production'
-      }    },
-    {
-      name: 'meta-organic-growth',
-      node_args: '--dns-result-order=ipv4first',
-      script: 'scripts/agent_meta_organic_growth.mjs',
-      cwd: '/opt/plantayraiz',
-      instances: 1,
-      exec_mode: 'fork',
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
-      restart_delay: 5000,
-      env: {
-        NODE_ENV: 'production',
-        PORT: 3030
       }
     },
     {
@@ -163,7 +167,6 @@ module.exports = {
       watch: false,
       max_memory_restart: '1G',
       restart_delay: 10000,
-      node_args: '--dns-result-order=ipv4first',
       env: {
         NODE_ENV: 'production'
       }

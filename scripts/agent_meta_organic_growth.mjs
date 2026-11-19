@@ -248,7 +248,7 @@ async function handleCommentEvent(entry) {
     return;
   }
 
-  const triggers = ['quero', 'triagem', 'receita', 'vip', 'medico', 'médico', 'farmacia', 'farmácia', 'parceria', 'brisa', 'valor', 'consulta', 'ajuda', 'info'];
+  const triggers = ['convite', 'quero', 'triagem', 'receita', 'vip', 'medico', 'médico', 'farmacia', 'farmácia', 'parceria', 'brisa', 'valor', 'consulta', 'ajuda', 'info'];
   const hasTrigger = triggers.some(t => text.includes(t));
 
   if (!hasTrigger) return;
@@ -262,21 +262,21 @@ async function handleCommentEvent(entry) {
   // 1. Resposta pública imediata
   await replyPublicComment(commentId, username);
 
-  // 2. Classificação de persona e disparo de DM personalizada
-  const isDoctor = text.includes('medico') || text.includes('médico') || text.includes('crm') || text.includes('prescrever') || text.includes('vip');
+  // 2. Classificação de persona e disparo de DM personalizada (não assume "Dr(a)." sem CRM confirmado)
+  const isDoctor = text.includes('medico') || text.includes('médico') || text.includes('crm') || text.includes('prescrever') || text.includes('convite');
   const isPharmacy = text.includes('farmacia') || text.includes('farmácia') || text.includes('parceria') || text.includes('dispensario') || text.includes('produtos');
 
   if (isDoctor) {
     state.metrics.doctorsCaptured++;
-    const doctorMsg = `Olá, Dr(a). ${username}! Seja muito bem-vindo(a) à Planta y Raíz.\n\nTemos um modelo de Consultório Virtual de Telemedicina com 93% de repasse líquido via PIX (taxa fixa de apenas 7%) e opção de Plano Premium por R$ 99/mês com prioridade na fila de pacientes, destaque na vitrine nacional e prontuário CFM integrado.\n\n👉 Conheça e ative seu acesso: https://www.plantayraiz.com.br/cadastro-profissional?utm_source=instagram&utm_medium=comment_auto&utm_campaign=medico_vip\n\nSe preferir falar diretamente com nossa diretoria médica, me envie seu WhatsApp ou CRM por aqui! 🌿`;
+    const doctorMsg = `Olá, ${username}! Seja bem-vindo(a) à Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).\n\nPara profissionais com registro ativo em conselho: cadastro gratuito, repasse de 93% de cada consulta via PIX (taxa fixa de 7%) e Plano Médico VIP opcional por R$ 99/mês com prioridade na fila e ferramentas de IA.\n\n👉 Ative seu cadastro gratuito: https://www.plantayraiz.com.br/cadastro-profissional?utm_source=instagram&utm_medium=comment_auto&utm_campaign=convite_medico\n\nSe preferir falar com nossa equipe humana, envie seu CRM ou WhatsApp por aqui! 🌿`;
     if (userId) await sendDirectMessage(userId, doctorMsg);
   } else if (isPharmacy) {
     state.metrics.pharmaciesCaptured++;
-    const pharmMsg = `Olá, ${username}! Que alegria seu contato institucional com a Planta y Raíz.\n\nConectamos pacientes com prescrições médicas auditadas diretamente a farmácias e importadoras autorizadas pela RDC 660 / RDC 327, sem taxa de adesão de catálogo.\n\n📅 Agende uma reunião de alinhamento de 15 min com nossa diretoria: https://www.plantayraiz.com.br/reuniao-parceiros?utm_source=instagram&utm_medium=comment_auto&utm_campaign=farmacia_parceria\n\nOu me informe seu WhatsApp comercial para entrarmos em contato hoje mesmo! 🌿`;
+    const pharmMsg = `Olá, ${username}! Que alegria seu contato com a Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).\n\nPara farmácias e lojistas parceiros, temos o plano Lojista VIP (R$ 99/mês, taxa padrão de 5% do marketplace — repasse de 95%) e cadastro em:\n👉 https://www.plantayraiz.com.br/cadastro-farmacia?utm_source=instagram&utm_medium=comment_auto&utm_campaign=farmacia_parceria\n\nSe preferir, informe seu WhatsApp comercial por aqui! 🌿`;
     if (userId) await sendDirectMessage(userId, pharmMsg);
   } else {
     state.metrics.patientsCaptured++;
-    const patientMsg = `Olá, ${username}! Seja muito bem-vindo(a) à Planta y Raíz 🌿\n\nPara iniciar sua Orientação Técnica (R$ 30) ou agendar teleconsulta com médicos prescritores certificados, me envie seu WhatsApp com DDD por aqui ou acesse direto:\n\n👉 https://www.plantayraiz.com.br/orientacao-tecnica?utm_source=instagram&utm_medium=comment_auto&utm_campaign=triagem30\n\nNossa equipe acolhe você com todo cuidado e segurança médica! 💚`;
+    const patientMsg = `Olá, ${username}! Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). 🌿\n\nVocê pode começar pela Orientação Técnica educativa (R$ 30 — não é consulta nem prescreve) ou escolher um médico na vitrine:\n👉 https://www.plantayraiz.com.br/orientacao-tecnica?utm_source=instagram&utm_medium=comment_auto&utm_campaign=triagem30\n👉 https://www.plantayraiz.com.br/profissionais\n\nQual faz mais sentido para você hoje?`;
     if (userId) await sendDirectMessage(userId, patientMsg);
   }
 }
@@ -310,26 +310,26 @@ async function handleDirectMessageEvent(entry) {
 
   // Qualificação em 3 etapas
   if (userDialog.step === 1) {
-    if (lower.includes('medico') || lower.includes('médico') || lower.includes('crm') || lower.includes('prescrever') || lower.includes('vip')) {
+    if (lower.includes('medico') || lower.includes('médico') || lower.includes('crm') || lower.includes('prescrever') || lower.includes('convite')) {
       userDialog.data.persona = 'medico';
       userDialog.step = 2;
       state.activeDialogs[senderId] = userDialog;
       saveState();
-      await sendDirectMessage(senderId, `Perfeito, Doutor(a)! A Planta y Raíz conta com mais de 40 médicos homologados e milhares de pacientes buscando atendimento.\n\nQual o seu CRM e estado de atuação? Me informe também seu melhor e-mail para enviarmos seu acesso ao Consultório Virtual Gratuito (93% de repasse via PIX).`);
+      await sendDirectMessage(senderId, `Ótimo! Na Planta y Raiz (Bezerra Med Soluções Integradas Ltda.), profissionais com registro em conselho têm cadastro gratuito e repasse de 93% via PIX (taxa fixa de 7%).\n\nQual o seu conselho/CRM e melhor e-mail para enviarmos o acesso ao cadastro?`);
       return;
     } else if (lower.includes('farmacia') || lower.includes('farmácia') || lower.includes('parceria') || lower.includes('empresa') || lower.includes('fornec')) {
       userDialog.data.persona = 'farmacia';
       userDialog.step = 2;
       state.activeDialogs[senderId] = userDialog;
       saveState();
-      await sendDirectMessage(senderId, `Excelente! A Planta y Raíz integra catálogos de farmácias e importadoras sob a RDC 660 / 327.\n\nQual o nome da sua empresa/farmácia e o WhatsApp da equipe responsável por novos credenciamentos?`);
+      await sendDirectMessage(senderId, `Excelente! Para farmácias e lojistas parceiros, temos o plano Lojista VIP (R$ 99/mês, taxa padrão de 5%).\n\nQual o nome da sua empresa/farmácia e o WhatsApp comercial da equipe responsável?`);
       return;
     } else {
       userDialog.data.persona = 'paciente';
       userDialog.step = 2;
       state.activeDialogs[senderId] = userDialog;
       saveState();
-      await sendDirectMessage(senderId, `Olá! Que alegria receber você aqui 🌿\n\nVocê já faz uso de cannabis medicinal ou gostaria de passar por uma orientação clínica e triagem para saber se o tratamento é indicado para seu caso?`);
+      await sendDirectMessage(senderId, `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). 🌿\n\nO que te trouxe até a Planta y Raiz hoje? Você busca Orientação Técnica educativa (R$ 30) ou consulta direta com um médico da vitrine?`);
       return;
     }
   } else if (userDialog.step === 2) {
@@ -338,16 +338,16 @@ async function handleDirectMessageEvent(entry) {
     saveState();
 
     if (userDialog.data.persona === 'medico') {
-      await sendDirectMessage(senderId, `Excelente! Você pode ativar seu credenciamento e conhecer o Plano VIP por apenas R$ 99/mês direto aqui: https://plantayraiz.com.br/cadastro-profissional?utm_source=instagram&utm_medium=dm_auto&utm_campaign=medico_vip99\n\nPara agendarmos uma apresentação rápida de 15 minutos com nossa coordenação médica, qual seu WhatsApp com DDD?`);
+      await sendDirectMessage(senderId, `Você pode fazer seu cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional?utm_source=instagram&utm_medium=dm_auto&utm_campaign=medico_vip99 e ver os detalhes do Plano Médico VIP (R$ 99/mês) em https://www.plantayraiz.com.br/precos.\n\nSe tiver dúvida sobre repasse ou cadastro, informe seu WhatsApp com DDD para nossa equipe humana.`);
     } else if (userDialog.data.persona === 'farmacia') {
-      await sendDirectMessage(senderId, `Perfeito! Já registramos seu interesse. Você pode escolher o melhor horário para nossa reunião oficial de integração em: https://plantayraiz.com.br/reuniao-parceiros?utm_source=instagram&utm_medium=dm_auto&utm_campaign=farmacia_parceria\n\nNossa diretoria entrará em contato em breve!`);
+      await sendDirectMessage(senderId, `Perfeito! Você pode cadastrar sua farmácia/loja em https://www.plantayraiz.com.br/cadastro-farmacia?utm_source=instagram&utm_medium=dm_auto&utm_campaign=farmacia_parceria e conferir o plano Lojista VIP em https://www.plantayraiz.com.br/precos.`);
     } else {
-      await sendDirectMessage(senderId, `Entendido com muito carinho! A nossa Enfermeira Brisa IA faz o acolhimento inicial e organiza seu prontuário para a consulta com os médicos especialistas.\n\nInicie sua triagem segura agora: https://plantayraiz.com.br/triagem?utm_source=instagram&utm_medium=dm_auto&utm_campaign=triagem30 ou nos envie seu WhatsApp com DDD para auxílio guiado! 🌿`);
+      await sendDirectMessage(senderId, `Você pode iniciar sua Orientação Técnica educativa (R$ 30 — não é consulta nem prescreve) em https://www.plantayraiz.com.br/orientacao-tecnica?utm_source=instagram&utm_medium=dm_auto&utm_campaign=triagem30 ou escolher seu médico na vitrine em https://www.plantayraiz.com.br/profissionais. 🌿`);
     }
     return;
   } else {
     // Etapa 3 concluída ou mensagem contínua
-    await sendDirectMessage(senderId, `Agradecemos sua mensagem! Nossa equipe humana e a Enfª Brisa já receberam seu contato. Se precisar de atendimento emergencial, estamos no WhatsApp oficial: https://wa.me/${BRISA_WHATSAPP_PHONE} 🌿`);
+    await sendDirectMessage(senderId, `Agradecemos sua mensagem! Nossa equipe humana acompanha seu atendimento. Para dúvidas, estamos no WhatsApp oficial: https://wa.me/${BRISA_WHATSAPP_PHONE} (em caso de emergência médica, ligue 192 SAMU). 🌿`);
   }
 }
 
@@ -362,8 +362,8 @@ async function handleStoryMention(entry) {
   state.metrics.storyMentionsAnswered++;
   saveState();
 
-  log(`🌟 Menção em Story detectada de @${username}! Enviando agradecimento e cupom...`);
-  const storyMsg = `Gratidão imensa por marcar a @plantayraiz no seu Story, @${username}! 🌿💚\n\nComo presente especial, você ganhou o cupom *BRISA10* para sua primeira orientação clínica e triagem na plataforma.\n\n👉 Utilize aqui: https://plantayraiz.com.br/triagem?cupom=BRISA10&utm_source=instagram&utm_medium=story_mention&utm_campaign=cupom_brisa10`;
+  log(`🌟 Menção em Story detectada de @${username}! Enviando agradecimento...`);
+  const storyMsg = `Obrigado por marcar a @plantayraiz no seu Story, @${username}! 🌿\n\nVocê pode conhecer nossa Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica?utm_source=instagram&utm_medium=story_mention ou nossa vitrine de médicos em https://www.plantayraiz.com.br/profissionais.`;
 
   if (senderId) {
     await sendDirectMessage(senderId, storyMsg);

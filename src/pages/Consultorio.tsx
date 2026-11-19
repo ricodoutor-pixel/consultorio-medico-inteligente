@@ -260,8 +260,8 @@ const Consultorio = () => {
       <Navbar />
       
       {doctor && (
-        <div className="px-4 py-3 bg-card border-b flex justify-between items-center flex-wrap gap-3">
-          <div className="flex items-center gap-2">
+        <div className="px-4 pb-3 pt-[calc(var(--site-header-height,128px)+12px)] bg-card border-b flex justify-between items-center flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <button 
               onClick={() => window.history.back()}
               className="px-3 py-1.5 rounded-xl bg-muted/60 hover:bg-muted text-foreground font-bold text-xs flex items-center gap-1 transition-colors"
@@ -279,21 +279,21 @@ const Consultorio = () => {
                 navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro-profissional?ref=${refCode}`);
                 toast.success("Link copiado! Envie para seus convidados.");
               }}
-              className="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-colors shadow-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90"
+              className="px-4 py-1.5 rounded-full whitespace-nowrap text-xs font-bold flex items-center gap-2 transition-colors shadow-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90"
             >
               <Gift size={15} /> Link Médico Sócio
             </button>
 
             <button 
               onClick={() => openGlobalTour("medico")}
-              className="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all shadow-sm bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:scale-105"
+              className="px-4 py-1.5 rounded-full whitespace-nowrap text-xs font-bold flex items-center gap-2 transition-all shadow-sm bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:scale-105"
             >
               <Sparkles size={15} /> 🚀 Tour 3D (93% PIX)
             </button>
 
             <button
               onClick={() => setShowProntuarioModal(true)}
-              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 border border-emerald-400/40"
+              className="px-4 py-1.5 rounded-full whitespace-nowrap text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 border border-emerald-400/40"
               title="Importar e Exportar Prontuário / Buscar Paciente por Nome ou CPF"
             >
               <FolderUp size={15} /> 📂 Importar / Exportar Prontuário & CPF
@@ -301,7 +301,7 @@ const Consultorio = () => {
 
             <button
               onClick={() => setShowScheduleModal(true)}
-              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:scale-105 border border-blue-400/40"
+              className="px-4 py-1.5 rounded-full whitespace-nowrap text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:scale-105 border border-blue-400/40"
               title="Escolher Horários de Atendimento para Pacientes Agendados e Consulta por Vídeo"
             >
               <CalendarRange size={15} /> 📅 Escolher Horários & Vídeo
@@ -309,7 +309,7 @@ const Consultorio = () => {
 
             <Link
               to="/atualizar-documentos-medico"
-              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-600/30 to-teal-600/30 text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/60 hover:scale-105"
+              className="px-4 py-1.5 rounded-full whitespace-nowrap text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-600/30 to-teal-600/30 text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/60 hover:scale-105"
               title="Anexar documentos KYC, CRM, comprovação de especialidade e dados de cadastro"
             >
               <FolderUp size={15} /> 📎 Atualizar Cadastro & KYC
@@ -318,24 +318,24 @@ const Consultorio = () => {
             <button
               onClick={() => setShowCashOutModal(true)}
               data-testid="doctor-sacar-button"
-              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-amber-500 to-emerald-600 text-black hover:scale-105 border border-amber-300/60"
+              className="px-4 py-1.5 rounded-full whitespace-nowrap text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-amber-500 to-emerald-600 text-black hover:scale-105 border border-amber-300/60"
               title="Sacar saldo disponível via Pix (com confirmação de chave mascarada)"
             >
               <Wallet size={15} /> 💸 Sacar {walletBalance > 0 ? `(R$ ${walletBalance.toFixed(2).replace(".", ",")})` : ""}
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {nextAppointment ? (
-              <Link to={`/workspace-medico?patient=${nextAppointment.patient_id}&appt=${nextAppointment.id}`} className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
+              <Link to={`/workspace-medico?patient=${nextAppointment.patient_id}&appt=${nextAppointment.id}`} className="px-4 py-1.5 rounded-full whitespace-nowrap text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
                 <Video size={16} /> Iniciar Vídeo
               </Link>
             ) : (
-              <span className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 bg-muted text-muted-foreground">
+              <span className="px-4 py-1.5 rounded-full whitespace-nowrap text-sm font-bold flex items-center gap-2 bg-muted text-muted-foreground">
                 <Video size={16} /> Sem consulta agendada
               </span>
             )}
-            <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
+            <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full whitespace-nowrap text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
               <MessageCircle size={16} /> Telemed WhatsApp
             </Link>
             {/* 🔔 Sino de Notificações do Admin */}
@@ -356,11 +356,11 @@ const Consultorio = () => {
               )}
             </button>
 
-            <span className="text-sm font-medium">Status do Plantão:</span>
+            <span className="text-sm font-medium whitespace-nowrap">Status do Plantão:</span>
             <button
               onClick={toggleOnlineStatus}
               disabled={updatingStatus}
-              className={`px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm ${
+              className={`px-4 py-1.5 rounded-full whitespace-nowrap text-sm font-bold flex items-center gap-2 transition-colors shadow-sm ${
                 isOnline 
                   ? "bg-green-500 text-white hover:bg-green-600" 
                   : "bg-red-500 text-white hover:bg-red-600"
@@ -437,7 +437,7 @@ const Consultorio = () => {
         </div>
       )}
 
-      <div className="flex-1 container mx-auto py-6">
+      <div className={`flex-1 container mx-auto pb-6 ${doctor ? "pt-6" : "pt-[calc(var(--site-header-height,128px)+16px)]"}`}>
         {doctor?.id && (
           <div className="mb-5">
             <ConsultationOfferBanner doctorId={doctor.id} />

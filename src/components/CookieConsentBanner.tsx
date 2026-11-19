@@ -139,27 +139,27 @@ export const CookieConsentBanner = () => {
         exiting ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"
       }`}
     >
-      <div className={`mx-2 sm:mx-6 ${isPlansRoute && isMobile ? "mb-2" : "mb-2 sm:mb-6"}`}>
+      <div className={`mx-2 sm:mx-auto sm:max-w-2xl ${isPlansRoute && isMobile ? "mb-2" : "mb-2 sm:mb-6"}`}>
         <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-emerald-900/95 backdrop-blur-xl">
 
           {/* Decorative leaf pattern — desktop only para manter o banner enxuto no mobile */}
           <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNMzAgNUMxNSAxMCA1IDIwIDUgMzVjMCAxNSAyMCAyMCAyNSAyMFM1NSA1MCA1NSAzNUM1NSAyMCA0NSAxMCAzMCA1eiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC4zIi8+PC9zdmc+')] bg-repeat" />
 
-          <div className={`relative flex flex-row items-center gap-2 sm:gap-5 p-2.5 sm:p-5 ${isPlansRoute && isMobile ? "px-2.5 py-2 pr-2" : ""}`}>
+          <div className={`relative flex flex-row items-center gap-2 sm:gap-5 p-2.5 sm:p-3 ${isPlansRoute && isMobile ? "px-2.5 py-2 pr-2" : ""}`}>
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <Shield size={18} className="text-emerald-300 shrink-0 hidden sm:block" />
               <div className="min-w-0">
                 <p className={`font-display font-bold text-white leading-tight sm:mb-1 truncate sm:whitespace-normal ${isPlansRoute && isMobile ? 'text-[11px]' : 'text-xs sm:text-base'}`}>
                   🍪 Termos, Privacidade & Cookies
                 </p>
-                <p className="hidden sm:block text-emerald-100/80 text-xs sm:text-sm leading-relaxed">
+                <p className="hidden">
                   Ao aceitar, você concorda com os Termos de Uso v2.1, a{" "}
                   <Link to="/privacidade" className="underline underline-offset-2 text-emerald-300 hover:text-white transition-colors">
                     Política de Privacidade
                   </Link>
                   , o tratamento de dados médicos (LGPD Art. 11), o uso da geolocalização para emergências, os dados de saúde e wearables, e os cookies do site — conforme LGPD, RDC 660/2022 (ANVISA) e CFM 2.314/2022.
                 </p>
-                <p className={`sm:hidden text-emerald-100/80 leading-snug ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
+                <p className={`text-emerald-100/80 sm:text-xs leading-snug ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
                   Aceito os Termos, dados médicos, geolocalização e cookies.{" "}
                   <Link to="/privacidade" className="text-emerald-300 underline underline-offset-2">
                     Privacidade
@@ -167,7 +167,7 @@ export const CookieConsentBanner = () => {
                 </p>
 
                 {/* Micro-badges só no desktop */}
-                <div className="hidden sm:flex flex-wrap gap-2 mt-2">
+                <div className="hidden">
                   <span className="inline-flex items-center gap-1 text-[10px] text-emerald-200/70 bg-emerald-950/50 rounded-full px-2 py-0.5">
                     <Cookie size={10} /> Essenciais
                   </span>

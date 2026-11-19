@@ -78,7 +78,7 @@ module.exports = {
     {
       name: 'meta-social-engine',
       node_args: '--dns-result-order=ipv4first',
-      script: 'scripts/agent_meta_social_engine.mjs',
+      script: 'scripts/agent_meta_organic_growth.mjs',
       cwd: '/opt/plantayraiz',
       instances: 1,
       exec_mode: 'fork',

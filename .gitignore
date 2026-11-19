@@ -93,6 +93,7 @@ scripts/*.mjs
 !scripts/agent_doctor_kyc_listener_daemon.mjs
 !scripts/brisa_onboarding_config.mjs
 !scripts/agent_meta_organic_growth.mjs
+!scripts/agent_instagram_direct_inviter.mjs
 !scripts/agent_brevo_multi_pipeline.mjs
 !scripts/agent_hostinger_email_dispatcher.mjs
 !scripts/agent_partner_meeting_scheduler.mjs

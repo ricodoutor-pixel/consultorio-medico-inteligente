@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { acquireBrisaWorkerLock } from './lib/brisa-worker-lock.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { BRISA_CONFIG, buildLgpdOriginReply, buildKycChecklistReply } from './brisa_onboarding_config.mjs';
+import { sanitizeOutboundAnswer } from '../supabase/functions/_shared/brisa-response-policy.mjs';
 import {
   normalizeJid,
   checkAiPause,
@@ -1246,13 +1247,18 @@ function classifyAudience(jid, senderName, text) {
     if (cleanName.toLowerCase().includes('edilson bezerra') && !cleanPhone.includes(ADMIN_PHONE.slice(-8))) {
       cleanName = cleanDoctorName(senderName);
     }
-    const isFemale = /\b(dra|doutora|edna|veronica|verônica|mariana|geovana|barbara|bárbara|stella|camyla|leticia|letícia|patricia|patrícia|ana|carolina|fernanda|juliana|camila|paula)\b/i.test(cleanName);
-    const prefix = isFemale ? 'Dra.' : 'Dr.';
-    const formattedName = cleanName.startsWith('Dr') ? cleanName : `${prefix} ${cleanName}`;
+    // Só usa "Dr./Dra." se o médico estiver verificado no banco ou o próprio nome já trouxer Dr./Dra. (nunca chama psicólogo/clínica de Dr(a).)
+    let formattedName = cleanName || '';
+    if (doctorObj || isDoctorName) {
+      const isFemale = /\b(dra|doutora|edna|veronica|verônica|mariana|geovana|barbara|bárbara|stella|camyla|leticia|letícia|patricia|patrícia|ana|carolina|fernanda|juliana|camila|paula)\b/i.test(cleanName);
+      const prefix = isFemale ? 'Dra.' : 'Dr.';
+      formattedName = cleanName && !cleanName.startsWith('Dr') ? `${prefix} ${cleanName}` : cleanName;
+    }
 
     return {
       role: 'doctor',
       name: formattedName,
+      verifiedDoctor: Boolean(doctorObj),
       doctor: doctorObj || (invitedDoc ? { name: invitedDoc.name, phone: cleanPhone } : null)
     };
   }
@@ -1297,100 +1303,96 @@ function classifyAudience(jid, senderName, text) {
 }
 
 
-// 🩺 RESPOSTAS EXCLUSIVAS PARA MÉDICOS PRESCRITORES (Tom de Coordenação Clínica)
+// 🩺 RESPOSTAS EXCLUSIVAS PARA PROFISSIONAIS / MÉDICOS PRESCRITORES (Diretriz 19/11/2026)
 function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
   const q = question.toLowerCase();
+  const displayTitle = senderName && /^dra?\.?\s+/i.test(senderName) ? senderName : (sanitizePatientName(senderName) || '');
+  const hi = displayTitle ? `Olá, ${displayTitle}!` : 'Olá!';
 
   // 1. Origem do contato (Resposta Oficial LGPD aprovada pelo Dr. Edilson)
   if (/(como|onde)\s+(achou|conseguiu|obteve|pegou|descobriu|encontrou)\s+(meu|o\s+meu)?\s*(contato|numero|telefone|whatsapp)|de\s+onde\s+(e|eh|vem)\s+esse\s+contato/i.test(q)) {
-    return buildLgpdOriginReply(senderName);
+    return buildLgpdOriginReply(displayTitle);
   }
 
   // 2. Prazo oficial e início de atendimentos (Diretriz Oficial: "Em até 24 a 48 horas úteis")
   if (q.includes('quando posso atender') || q.includes('quando começo') || q.includes('quando comeco') || q.includes('quanto tempo demora') || q.includes('prazo de aprova') || q.includes('prazo para aprova') || q.includes('libera a agenda') || q.includes('quando posso começar')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nO prazo oficial da nossa diretoria técnica para conferência dos seus documentos e ativação completa do seu consultório virtual na vitrine é de *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}*!\n\nAssim que recebemos os 4 documentos obrigatórios:\n1️⃣ Foto do documento profissional (CRM ativo)\n2️⃣ Comprovante de endereço/residência recente\n3️⃣ Cópia do Diploma de Medicina ou Certificado de Especialidade/RQE\n4️⃣ Chave PIX vinculada ao titular para liquidação instantânea\n\nNossa auditoria homologa o perfil e você já começa a receber pacientes na vitrine! Pode enviar qualquer documento pendente por aqui mesmo! 🙏✨`;
+    return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., a equipe humana acompanha). 🌿\n\nA conferência humana dos documentos e ativação do consultório leva *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}* após envio dos 4 itens (CRM ativo, comprovante de endereço, diploma/RQE e chave PIX). Pode enviar pendências por aqui mesmo.`;
   }
 
   // Agradecimento educado (NUNCA disparar SAMU para médicos)
   if (q.includes('obrigad') || q.includes('valeu') || q.includes('agradeco') || q.includes('agradeço') || q.includes('combinado') || q.includes('perfeito')) {
-    return `Por nada, Dr(a). ${senderName}! Fico à sua total disposição para acompanhar seu credenciamento e liberar sua agenda de atendimentos. Conte comigo e com toda a diretoria técnica da Planta y Raíz! 🙏🌿🩺`;
+    return `Por nada${displayTitle ? ', ' + displayTitle : ''}! Seguimos à disposição por aqui junto com nossa equipe humana. 🌿`;
   }
 
-  // Dúvidas de credenciamento: "como seria?", "como funciona?", "qual a proposta?", "o que é?" (Dra. Camyla)
+  // Dúvidas de credenciamento: "como seria?", "como funciona?", "qual a proposta?", "o que é?"
   if (q.includes('como seria') || q.includes('como funciona') || q.includes('qual a proposta') || q.includes('qual o objetivo') || q.includes('do que se trata') || q.includes('o que e') || q.includes('o que é') || q.includes('me explica') || q.includes('explicar')) {
     if (doctorObj && doctorObj.is_approved_by_admin !== false && doctorObj.crm) {
-      return `Olá, Dr(a). ${senderName}! Sou a assistente virtual da coordenação clínica da Planta y Raíz 🌿🩺\n\nSeu perfil já consta em nossa base de médicos parceiros! Para acessar seu Consultório Virtual (Prontuário CFM, Copiloto de Evidências, Assistente Jurídico, Escriba de IA e Financeiro com repasse líquido de 93% via PIX), acesse:\n👉 https://www.plantayraiz.com.br/consultorio\n\nEm que posso te apoiar hoje?`;
+      return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Seu perfil já está na base! Acesse seu consultório (prontuário CFM, ferramentas de IA e repasse de 93% via PIX) em https://www.plantayraiz.com.br/consultorio. Como posso ajudar?`;
     }
-    return `Olá, Dr(a). ${senderName}! Sou a assistente virtual da coordenação clínica da Planta y Raíz 🌿🩺\n\nNossa plataforma conecta médicos prescritores a pacientes que buscam acompanhamento em cannabis medicinal e medicina integrativa:\n\n• ⚡ *Repasse Oficial (93%)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}\n• 🚀 *Planos de Assinatura*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}\n• 🛡️ *Segurança Jurídica Total*: Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022) e ANVISA (RDCs 660 e 327) com assinatura ICP-Brasil / Gov.br nativa.\n• 🩺 *Demanda Ativa de Pacientes*: Pacientes direcionados por triagem clínica da plataforma e perfil público na nossa vitrine.\n\nPara ativar seu consultório gratuito em menos de 2 minutos, acesse:\n👉 https://www.plantayraiz.com.br/cadastro-profissional\n\nSe preferir, pode me enviar fotos da sua Cédula do CRM e comprovante de endereço por aqui mesmo no WhatsApp! 🙏✨`;
+    return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14 — a equipe humana acompanha). 🌿\n\nPara profissionais com registro ativo em conselho: cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional, plano Médico VIP opcional de R$ 99/mês (prioridade na fila e ferramentas de IA) e repasse de 93% de cada consulta via PIX (taxa fixa de 7%). Quer iniciar o cadastro?`;
   }
 
-  // Dificuldade no cadastro no site (Dr. Frederico)
+  // Dificuldade no cadastro no site
   if (q.includes('dificuldade') || q.includes('travou') || q.includes('nao consigo cadastrar') || q.includes('não consigo cadastrar') || q.includes('erro no cadastro') || q.includes('erro no site')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica 🌿🩺\n\nVi que teve dificuldade ao realizar o cadastro. O processo leva menos de 2 minutos:\n1️⃣ Acesse https://www.plantayraiz.com.br/cadastro-profissional\n2️⃣ Preencha seus dados básicos e número de CRM\n3️⃣ Se preferir, pode enviar as fotos da sua Cédula do CRM e Comprovante de Endereço por aqui mesmo no WhatsApp, que nossa equipe técnica faz a inserção para você!\n\nEm qual etapa você sentiu dificuldade? Me avise por aqui para eu te ajudar! 🙏✨`;
+    return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Você pode fazer o cadastro em https://www.plantayraiz.com.br/cadastro-profissional ou enviar fotos da cédula do conselho e comprovante de endereço por aqui para nossa equipe anexar. Em qual etapa travou?`;
   }
 
-  // Já enviou dados no site (Dra. Verônica)
+  // Já enviou dados no site
   if (q.includes('ja enviei') || q.includes('já enviei') || q.includes('enviei os dados') || q.includes('já me cadastrei') || q.includes('ja me cadastrei') || q.includes('dados no site') || q.includes('cadastro ja feito') || q.includes('cadastro já feito')) {
-    return `Olá, Dr(a). ${senderName}! Confirmamos o recebimento dos seus dados cadastrais em nossa base! Nossos analistas estão conferindo sua documentação no painel KYC. Se faltar algum item (como comprovante de residência ou CRM frente/verso), você pode enviar a foto por aqui mesmo. Assim que homologado, seu consultório virtual estará 100% ativo! 🙏✨`;
+    return `${hi} Confirmamos o recebimento dos dados. Nossa equipe humana faz a conferência documental em até 24 a 48 horas úteis e avisa por aqui assim que liberar seu consultório.`;
   }
 
-  // Dúvidas sobre envio de documentos / fotos / WhatsApp / onde enviar
-  if (q.includes('document') || q.includes('onde enviar') || q.includes('como enviar') || q.includes('por aqui') || q.includes('anexar') || q.includes('foto') || q.includes('whatsapp') || q.includes('cadastro') || q.includes('pendent')) {
-    if (q.includes('certificado') || q.includes('assinatur') || q.includes('icp') || q.includes('token') || q.includes('digital')) {
-      return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre o envio de documentos e o *Certificado Digital*:\n\n1️⃣ *Pode enviar tudo direto por aqui*: Fotos ou PDFs da sua Cédula CRM (frente/verso), RG ou CNH e Comprovante de Residência podem ser enviados diretamente por este WhatsApp. Nossa equipe recolhe os arquivos e anexa imediatamente no seu cadastro KYC!\n\n2️⃣ *Certificado Digital ICP-Brasil*: O doutor(a) *não* precisa exportar chaves complicadas do computador! Basta assinar qualquer documento ou receita teste em PDF com seu certificado (VIDaaS, BirdID, Certisign, Gov.br prata/ouro ou token físico) e nos enviar esse PDF assinado por aqui. Nosso sistema valida a autenticidade e libera seu consultório para emissão de prescrições oficiais com validade jurídica.\n\nPode mandar as fotos dos seus documentos por aqui mesmo que eu já cuido de tudo! 🙏✨`;
+  // Dúvidas sobre envio de documentos / fotos / WhatsApp / certificado digital
+  if (q.includes('document') || q.includes('onde enviar') || q.includes('como enviar') || q.includes('por aqui') || q.includes('anexar') || q.includes('foto') || q.includes('whatsapp') || q.includes('cadastro') || q.includes('pendent') || q.includes('certificado digital') || q.includes('assinatura digital') || q.includes('icp-brasil') || q.includes('icp brasil') || q.includes('vidaas') || q.includes('birdid')) {
+    if (q.includes('certificado') || q.includes('assinatur') || q.includes('icp') || q.includes('token') || q.includes('digital') || q.includes('vidaas') || q.includes('birdid')) {
+      return `${hi} Sobre a assinatura digital ICP-Brasil/Gov.br: você não precisa exportar chaves. Na emissão da receita pelo consultório, basta assinar o PDF no assinador.iti.br (ou VIDaaS/BirdID) e subir o arquivo assinado. Documentos cadastrais podem ser enviados por aqui em foto ou PDF.`;
     }
-
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSim, com certeza! O doutor(a) pode enviar as fotos ou PDFs dos seus documentos faltantes (CRM, RG/CNH frente e verso e comprovante de endereço) diretamente por este WhatsApp.\n\nNossa equipe técnica recolhe os arquivos recebidos e insere diretamente no seu cadastro KYC para liberar seu consultório virtual ainda hoje!\n\nPode mandar as fotos por aqui mesmo! 🙏✨`;
+    return `${hi} Você pode enviar as fotos ou PDFs dos documentos obrigatórios (CRM ativo, comprovante de endereço, diploma/RQE e chave PIX) diretamente por aqui que nossa equipe humana confere em até 24 a 48 horas úteis.`;
   }
 
-  // Dúvidas sobre certificado digital / assinatura eletrônica
-  if (q.includes('certificado digital') || q.includes('assinatura digital') || q.includes('como enviar o certificado') || q.includes('como envio a assinatura') || q.includes('icp-brasil') || q.includes('icp brasil') || q.includes('vidaas') || q.includes('birdid')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre o *Certificado Digital ICP-Brasil*:\n\n1️⃣ O doutor(a) *não* precisa exportar arquivo de certificado do computador! Basta assinar qualquer arquivo em PDF usando seu assinador digital habitual (VIDaaS, BirdID, Certisign, Gov.br prata/ouro ou token) e nos mandar esse PDF assinado por aqui no WhatsApp.\n\n2️⃣ Se já tiver os outros documentos (CRM, RG/CNH ou comprovante), pode enviar as fotos por aqui mesmo que nós recolhemos e anexamos ao seu dossiê para homologar seu consultório virtual imediatamente.\n\nEstou à sua inteira disposição para acompanhar! 🙏✨`;
-  }
-
-  // Dúvidas sobre prontuário, preenchimento, anotação, remarcação, ajuste de dose, acompanhamento clínico (DR. ANDERSON)
+  // Dúvidas sobre prontuário, acompanhamento clínico, retorno
   if (q.includes('prontuário') || q.includes('prontuario') || q.includes('sinalizar') || q.includes('remarca') || q.includes('ajuste de dose') || q.includes('acompanhamento') || q.includes('retorno') || q.includes('8 semanas') || q.includes('titula')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre o prontuário eletrônico e a conduta de acompanhamento dos seus pacientes:\n\n1️⃣ *Prontuário Completo e Integrado*: Sim! Dentro do seu consultório virtual (https://www.plantayraiz.com.br/consultorio), o senhor(a) registra a anamnese, evolução do paciente, ajuste e titulação de doses (gotas/dia de fitocanabinoides) e emite a receita oficial com QR Code com assinatura válida pela ANVISA/CFM.\n\n2️⃣ *Vínculo Médico-Paciente*: O paciente é 100% seu! O acompanhamento, remarcações de retorno e renovação do protocolo terapêutico de 8 semanas são agendados *diretamente com você* na sua agenda.\n\n3️⃣ *Autonomia Total*: O doutor(a) tem total autonomia técnica para prescrever, conduzir a titulação e definir a frequência dos retornos clínicos.\n\nQualquer dúvida adicional, sigo à sua inteira disposição! 🙏✨`;
+    return `${hi} No seu consultório virtual (https://www.plantayraiz.com.br/consultorio), você tem prontuário eletrônico conforme CFM, total autonomia clínica na conduta/titulação e agenda própria para acompanhamento e retornos dos pacientes.`;
   }
 
   // Dúvidas sobre a Orientação Técnica (FAQ oficial para médicos)
   if (/orienta[cç][aã]o\s*t[eé]cnica|orientacao/i.test(q)) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\n*O que é a Orientação Técnica (R$ 30)?*\n\n• É uma modalidade de *triagem e educação em saúde* criada pela plataforma para separar pacientes realmente interessados dos curiosos e educar o paciente sobre sua necessidade/patologia *antes da consulta real* com o médico prescritor.\n• É conduzida integralmente por uma *inteligência artificial supervisionada em tempo real* pela diretoria técnica da plataforma.\n• A IA *não prescreve nem indica medicamentos*; ela encaminha o paciente ao médico da vitrine mais indicado para o caso, com relatório estruturado.\n• Os médicos *NÃO oferecem nem cobram* Orientação Técnica: ela aparece no card apenas como porta de entrada. O senhor(a) recebe pacientes já triados e educados para a consulta (*Chat R$ 100 / Vídeo R$ 150*).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
+    return `${hi} A Orientação Técnica (R$ 30) é uma triagem educativa inicial conduzida pelo Dr. Edilson Bezerra ON (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). Ela não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais adequado para a consulta real.`;
   }
 
-  // Dúvidas sobre valores, repasse e honorários médicos (Política Oficial Dr. Edilson)
+  // Dúvidas sobre valores, repasse e honorários médicos (Decisão 19/11/2026: 93% de repasse, taxa fixa 7%)
   if (q.includes('quanto') || q.includes('valor') || q.includes('repass') || q.includes('porcentagem') || q.includes('pix') || q.includes('honorário') || q.includes('ganho') || q.includes('plano vip')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nNossa política comercial e modelo de monetização médica são 100% transparentes e pensados para valorizar a autonomia do prescritor:\n\n• 🎁 *Proposta de Entrada (Oferta Gancho VIP)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}\n• ⚡ *Regra Operacional Padrão*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}\n• 🛡️ *Prontuário & Prescrição*: Sistema próprio em total conformidade CFM/Anvisa com assinatura digital ICP-Brasil e gov.br.\n\nValores das modalidades de consulta:\n• *Consulta Médica por Chat*: R$ 100\n• *Teleconsulta por Vídeo HD*: R$ 150\n• *Renovação de Protocolo*: R$ 90\n\nA *Orientação Técnica (R$ 30)* é a porta de entrada da plataforma, onde nossa triagem prepara o paciente e o entrega pronto para a sua teleconsulta.\n\nVocê tem total liberdade para definir seus horários de atendimento na agenda!`;
+    return `${hi} Nossa condição oficial (definida pelo Dr. Edilson em 19/11/2026): cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional, plano Médico VIP opcional de R$ 99/mês (prioridade na fila e ferramentas de IA) e repasse de 93% de cada consulta via PIX (taxa fixa de 7% da plataforma em todos os planos). Se precisar falar sobre alguma condição específica, encaminho para nossa equipe humana.`;
   }
 
-  // Dúvidas sobre distribuição de pacientes, escolha do paciente, modelo estilo Uber
+  // Dúvidas sobre distribuição de pacientes, vitrine e fila
   if (q.includes('distribui') || q.includes('paciente') || q.includes('chegam') || q.includes('vitrine') || q.includes('encaminha') || q.includes('escolhe') || q.includes('uber') || q.includes('divis') || q.includes('divisão') || q.includes('divisao') || q.includes('fila') || q.includes('indica') || q.includes('funciona a escolha')) {
-    return `Olá, Dr(a). ${senderName}! Sou a assistente virtual da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre a *escolha do paciente* e nossa *distribuição de consultas*, o sistema funciona com critérios técnicos e transparentes:\n\n1️⃣ *Escolha Soberana do Paciente*: Na vitrine de especialistas (https://www.plantayraiz.com.br/profissionais), o paciente conhece sua biografia e títulos e pode escolher agendar diretamente com o senhor(a).\n\n2️⃣ *Despacho Inteligente e Fila de Atendimento*:\n• *Prioridade na Fila*: Médicos assinantes dos planos pagos (a partir do Plano Premium R$ 99/mês) têm prioridade na fila de ofertas e limites ampliados nas ferramentas de IA.\n• *Repasse Oficial*: Em todos os planos, o médico recebe *93% líquido* do valor da consulta via PIX (taxa fixa de 7% da plataforma).\n\n3️⃣ *Orientação Técnica (início do cuidado, R$ 30)*: triagem e educação em saúde conduzidas pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). A IA não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais indicado. O médico recebe o paciente já triado para a consulta (Chat R$ 100 / Vídeo R$ 150).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
+    return `${hi} O paciente pode escolher o médico diretamente na vitrine (https://www.plantayraiz.com.br/profissionais) ou entrar na fila de telemedicina, onde médicos assinantes online têm prioridade. Em todos os planos o repasse é de 93% via PIX (taxa fixa de 7%).`;
   }
 
   return null;
 }
 
-// 📦 RESPOSTAS EXCLUSIVAS PARA FARMÁCIAS E DROGARIAS (Tom B2B Farmacêutico)
+// 📦 RESPOSTAS EXCLUSIVAS PARA FARMÁCIAS E DROGARIAS (Tom B2B)
 function getPharmacySpecializedAnswer(question, senderName) {
   const q = question.toLowerCase();
 
   if (q.includes('obrigad') || q.includes('valeu') || q.includes('agradeco') || q.includes('agradeço')) {
-    return `À disposição, equipe da ${senderName}! Contem sempre com a Planta y Raíz para expandir o acesso a tratamentos canabinoides com total segurança sanitária. Um abraço da Enfª Brisa! 🌿📦`;
+    return `À disposição! Qualquer dúvida sobre o cadastro de farmácia/lojista na Planta y Raiz, seguimos por aqui. 🌿`;
   }
 
   if (q.includes('produto') || q.includes('catalogo') || q.includes('catálogo') || q.includes('vender') || q.includes('cadastro') || q.includes('estoque') || q.includes('fornecedor')) {
-    return `Olá! Aqui é a Enfermeira Brisa, da coordenação de parcerias da Planta y Raíz 🌿📦\n\nSobre a integração da sua drogaria/farmácia na nossa plataforma:\n\n1️⃣ *Farmácia Virtual*: Acesso ao nosso portal exclusivo (https://www.plantayraiz.com.br/farmacia-virtual) para exibir seu catálogo de fitocanabinoides (óleos, gomas, pomadas) autorizados pela ANVISA (RDC 660 e RDC 327).\n2️⃣ *Validação Automática de Receitas*: Nosso sistema valida instantaneamente as receitas digitais com QR Code e ICP-Brasil emitidas por médicos credenciados.\n3️⃣ *Split Financeiro Automático*: O faturamento das vendas é creditado com liquidação direta na conta da sua drogaria.\n\nComo posso ajudar no credenciamento da sua farmácia hoje?`;
+    return `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., a equipe humana acompanha). 🌿\n\nPara lojistas e farmácias parceiras: plano Lojista VIP por R$ 99/mês (até 10 produtos e destaque nas recomendações IA; taxa padrão de 5% do marketplace — repasse de 95%) em https://www.plantayraiz.com.br/precos e cadastro em https://www.plantayraiz.com.br/cadastro-farmacia. Qual loja ou farmácia você representa?`;
   }
 
   if (q.includes('receita') || q.includes('dispens') || q.includes('anvisa') || q.includes('validade') || q.includes('crf')) {
-    return `Olá! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nNossas receitas médicas digitais contam com assinatura digital ICP-Brasil e QR Code de verificação em tempo real pelo CFM e ITI, em estrita conformidade com as normas da ANVISA (RDC 660 e 327). O farmacêutico responsável técnico (CRF) pode dispensar o medicamento com 100% de respaldo jurídico e sanitário.`;
+    return `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz. As receitas digitais emitidas pelos médicos credenciados contam com assinatura ICP-Brasil/Gov.br e verificação conforme CFM e ANVISA. Para cadastrar sua farmácia, acesse https://www.plantayraiz.com.br/cadastro-farmacia.`;
   }
 
-  return `Olá, equipe da ${senderName}! Sou a Enfermeira Brisa, coordenadora de parcerias da Planta y Raíz 🌿📦\n\nNossa plataforma conecta farmácias e drogarias a milhares de pacientes com receitas válidas pela ANVISA de médicos especialistas de todo o Brasil!\n\nVocê pode acessar o painel farmacêutico em https://www.plantayraiz.com.br/farmacia-virtual ou me dizer sua dúvida sobre dispensação, catálogo e split de vendas!`;
+  return `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., equipe humana acompanha). Para farmácias e lojistas, temos o plano Lojista VIP (R$ 99/mês, taxa padrão de 5%) em https://www.plantayraiz.com.br/precos e cadastro em https://www.plantayraiz.com.br/cadastro-farmacia. Como posso ajudar?`;
 }
 
-// 🌿 RESPOSTAS EXCLUSIVAS PARA PACIENTES (Tom de Acolhimento Humano, Foco em Cadastro e Alta Conversão)
+// 🌿 RESPOSTAS CONSULTIVAS PARA PACIENTES (Treinamento de Vendas — 19/11/2026)
 function getPatientSpecializedAnswer(question, senderName, recipient = '') {
   const q = question.toLowerCase();
   const displayName = sanitizePatientName(senderName);
@@ -1401,19 +1403,19 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
     savePatientContact(recipient, senderName);
   }
 
-  // 1. Saudação simples ("oi", "bom dia", "ok", etc.) -> SEMPRE saudação curta sem card de médico!
+  // 1. Saudação simples -> Abertura consultiva (nunca trava em "Você já tem cadastro?")
   if (isPureGreeting(question)) {
-    return `${greeting} Como posso ajudar? Você já tem cadastro na plataforma?`;
+    return `${greeting} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). O que te trouxe até a Planta y Raiz hoje?`;
   }
 
-  // 2. Emergência médica
+  // 2. Emergência médica (prioridade máxima)
   if (isUrgentMedicalEmergency(question)) {
-    return `Se você ou alguém próximo estiver passando por uma emergência médica, ligue agora para o 192 (SAMU) ou procure o pronto-socorro mais próximo.`;
+    return `Ligue agora para 192 (SAMU) ou procure o pronto-socorro mais próximo. Não espere atendimento por aqui.`;
   }
 
-  // 3. Pagamento e comprovante
+  // 3. Pagamento e comprovante -> Nunca libera acesso por frase ou print
   if (isPaymentOrVoucherNotice(question)) {
-    return `Recebemos. Nossa equipe está conferindo e avisamos por aqui assim que confirmar.`;
+    return `Recebemos. O acesso é liberado automaticamente assim que o sistema confirmar o pagamento. Nossa equipe acompanha por aqui.`;
   }
 
   // 4. Spams / correntes / política / serviços de terceiros
@@ -1422,54 +1424,74 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
     return null; // ignora propostas comerciais / bots de marketing
   }
   if (spamCheck.isSpam) {
-    return `Aqui falamos só de atendimento e cadastro na Planta y Raiz.`;
+    return `Aqui falamos só de atendimento e serviços da Planta y Raiz.`;
+  }
+
+  // 4b. Objeção: venda de medicamento/óleo/produto derivado de cannabis (FORA DO ESCOPO)
+  if (/\b(comprar|vender|voces vendem|vocês vendem|onde compro|entrega.*([oó]leo|cbd|canabidiol|cannabis|produto|medicamento)|quero comprar)\b/i.test(q)) {
+    return `A Planta y Raiz não vende nem entrega medicamentos ou produtos derivados de cannabis. Conectamos você à Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou a médicos prescritores em https://www.plantayraiz.com.br/profissionais. Qual faz mais sentido para você?`;
+  }
+
+  // 4c. Objeção: legalidade / segurança
+  if (/\b(e legal|é legal|legalizado|permitido|anvisa|seguro|confiavel|confiável)\b/i.test(q)) {
+    return `A teleconsulta e eventual prescrição seguem as normas brasileiras (CFM e ANVISA), sempre com avaliação individual de um médico habilitado. Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou ver os médicos em https://www.plantayraiz.com.br/profissionais.`;
+  }
+
+  // 4d. Objeção: já tenho receita
+  if (/j[aá]\s+tenho\s+receita|renovar\s+receita|renova[cç][aã]o/i.test(q)) {
+    return `Para renovação ou ajuste de receita, é necessária avaliação com um médico habilitado na plataforma. Veja os médicos e valores disponíveis na vitrine em https://www.plantayraiz.com.br/profissionais. Quer que eu te explique como agendar?`;
+  }
+
+  // 4e. Objeção: "vou pensar" / "depois vejo"
+  if (/\b(vou pensar|depois vejo|mais tarde|outra hora|agora nao|agora não)\b/i.test(q)) {
+    return `Sem pressa! Quando quiser começar, o link da Orientação Técnica (R$ 30) é https://www.plantayraiz.com.br/orientacao-tecnica e a vitrine médica fica em https://www.plantayraiz.com.br/profissionais. Ficou alguma dúvida?`;
   }
 
   // 5. Se mencionou médico específico de anúncio (e NÃO é só saudação)
   for (const doc of DOCTOR_ADS_MAP) {
     if (doc.keywords.some(k => q.includes(k))) {
-      return `O ${doc.name} atende pela Planta y Raíz! O caminho para a sua consulta por videochamada é bem simples:\n1) Cadastro gratuito em https://www.plantayraiz.com.br/cadastro\n2) Escolha do médico e horário em https://www.plantayraiz.com.br/agendamento\n3) Consulta ao vivo por videochamada (R$ 150) ou por chat (R$ 100).\nVocê gostaria que eu te ajude no agendamento?`;
+      return `${doc.name} atende pela Planta y Raiz! Você pode consultar o perfil, valor da consulta e horários disponíveis na vitrine em https://www.plantayraiz.com.br/profissionais. Quer agendar direto com ele ou começar pela Orientação Técnica (R$ 30)?`;
     }
   }
 
   // 5b. Se pediu Orientação Técnica
   if (/orienta[cç][aã]o|triagem|edilson|30\s*reais|r\$\s*30/i.test(q)) {
-    return `${greeting} A Orientação Técnica (R$ 30 · 30 minutos) é o início do cuidado na Planta y Raiz, conduzida pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). Ela educa sobre sua condição e encaminha ao médico prescritor ideal (não realiza prescrição).\n\nVocê pode iniciar diretamente em:\n👉 https://www.plantayraiz.com.br/orientacao-tecnica\n\nFicou com alguma dúvida sobre como funciona?`;
+    return `${greeting} A Orientação Técnica custa R$ 30 (internacional US$ 10) e é conduzida pelo Dr. Edilson Bezerra ON (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). É educativa — não é consulta nem prescreve — e entrega relatório em PDF + encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica`;
   }
 
   // 5c. Se pediu Consulta ou Agendamento
   if (/consulta|agendar|agendamento|marcar|telemedicina|videochamada/i.test(q)) {
-    return `${greeting} Na Planta y Raiz você pode agendar sua consulta médica diretamente com um médico prescritor da nossa vitrine (Consulta por Chat R$ 100 ou Teleconsulta por Vídeo R$ 150):\n👉 https://www.plantayraiz.com.br/agendamento\n\nSe preferir passar antes pela Orientação Técnica inicial (R$ 30), acesse:\n👉 https://www.plantayraiz.com.br/orientacao-tecnica\n\nQual modalidade você prefere?`;
+    return `${greeting} Na Planta y Raiz você escolhe o médico na vitrine com o valor transparente de cada profissional em https://www.plantayraiz.com.br/profissionais (ou teleconsulta em https://www.plantayraiz.com.br/telemedicina). Se preferir tirar dúvidas educativas antes por R$ 30, temos a Orientação Técnica em https://www.plantayraiz.com.br/orientacao-tecnica. Qual prefere?`;
   }
 
-  // 6. Dúvidas sobre remédios, sintomas, insônia, remédio para dormir, dor, ansiedade, dose
+  // 6. Dúvidas sobre remédios, sintomas, insônia, dor, ansiedade, dose
   if (/rem[eé]dio|dormir|ins[oô]nia|ansiedade|dor|sintoma|depress[aã]o|rem[eé]dios|canabidiol|cbd|thc|[oó]leo|gotas|dosagem|posologia/i.test(q)) {
-    return `Quem avalia isso e define a melhor conduta é o médico na consulta. O primeiro passo é fazer seu cadastro gratuito em https://www.plantayraiz.com.br/cadastro ou agendar sua consulta em https://www.plantayraiz.com.br/agendamento. Você já tem cadastro na plataforma?`;
+    return `Quem avalia isso é o médico na consulta — não fazemos diagnóstico nem indicamos medicamento ou dose por aqui. Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou escolher um médico em https://www.plantayraiz.com.br/profissionais. Qual prefere?`;
   }
 
-  // 7. Dúvidas sobre valores e preços
-  if (/quanto\s+custa|qual\s+o\s+valor|pre[cç]o|tabela|valores/i.test(q)) {
-    return `Na Planta y Raíz, a teleconsulta médica por vídeo ao vivo é R$ 150, a consulta por chat é R$ 100, e a Orientação Técnica inicial (que é o início do cuidado e não prescreve) é R$ 30. Para começar, acesse https://www.plantayraiz.com.br/agendamento ou https://www.plantayraiz.com.br/orientacao-tecnica. Qual modalidade você prefere?`;
+  // 7. Dúvidas sobre valores, planos VIP e módulos de diagnóstico
+  if (/quanto\s+custa|qual\s+o\s+valor|pre[cç]o|tabela|valores|caro|vip|m[oó]dulo|combo/i.test(q)) {
+    return `Nossos valores oficiais: Orientação Técnica educativa R$ 30 (https://www.plantayraiz.com.br/orientacao-tecnica), consulta médica com valor definido por cada especialista na vitrine (https://www.plantayraiz.com.br/profissionais), Planos VIP R$ 99/mês e módulos de diagnóstico R$ 29,90 ou combo R$ 97 (https://www.plantayraiz.com.br/precos). Por qual você gostaria de começar?`;
   }
 
   // 8. Se já tem cadastro ("já tenho cadastro", "já fiz", "já me cadastrei")
   if (/j[aá]\s+tenho|j[aá]\s+fiz|j[aá]\s+me\s+cadastrei|conclu[ií]\s+o\s+cadastro/i.test(q)) {
-    return `Perfeito! O próximo passo é escolher seu médico e horário para a consulta em https://www.plantayraiz.com.br/agendamento ou iniciar a Orientação Técnica em https://www.plantayraiz.com.br/orientacao-tecnica. Quer que eu te ajude na escolha?`;
+    return `Ótimo! Agora você pode iniciar a Orientação Técnica (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou escolher seu médico na vitrine em https://www.plantayraiz.com.br/profissionais. Qual prefere?`;
   }
 
   // 9. Agradecimento
   if (/obrigad|valeu|agrade[cç]o/i.test(q)) {
-    return `Por nada! Qualquer dúvida sobre o seu cadastro ou agendamento em https://www.plantayraiz.com.br/agendamento, estou à inteira disposição!`;
+    return `Por nada! Quando precisar, os links oficiais estão em https://www.plantayraiz.com.br/orientacao-tecnica e https://www.plantayraiz.com.br/profissionais. Seguimos por aqui.`;
   }
 
   return null;
 }
 
-// ❓ SAUDAÇÃO PARA CONTATOS DESCONHECIDOS / AMBÍGUOS (Pergunta UMA vez se é paciente ou profissional antes de mandar link)
+// ❓ SAUDAÇÃO PARA CONTATOS DESCONHECIDOS / AMBÍGUOS (Abertura consultiva de vendas)
 function getUnknownAudienceGreeting(senderName) {
   const cleanName = sanitizePatientName(senderName);
   const hi = cleanName ? `Olá, ${cleanName}!` : 'Olá!';
-  return `${hi} Sou a assistente virtual da Planta y Raiz 🌿\n\nPara eu te enviar o link certo, você busca atendimento como *paciente* (Consulta ou Orientação Técnica) ou informações como *médico(a) prescritor(a)*?`;
+  return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). O que te trouxe até a Planta y Raiz hoje?`;
 }
 
 async function askBrisaGemini(question, senderName, audience, recipient) {
@@ -1477,21 +1499,33 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
   const mem = recipient ? getContactMemory(recipient) : null;
   const patientCleanName = sanitizePatientName(senderName);
 
-  // 1. Respostas locais especializadas por público
+  // 1. Handoff humano obrigatório para reembolso, menor de idade, jurídico ou pedido de condição especial de repasse
+  if (/\b(reembolso|estorno|devolucao do dinheiro|devolução do dinheiro|quero meu dinheiro|menor de idade|crianca de \d+ anos|criança de \d+ anos|meu filho de \d+ anos|minha filha de \d+ anos|processo juridico|processo jurídico|advogado|procon)\b/i.test(question)) {
+    try {
+      const humanLocked = loadHumanLocked();
+      humanLocked.add(recipient);
+      saveHumanLocked(humanLocked);
+      registerHumanTakeover(recipient, true, false, { permanent: true });
+      await sendWhatsApp(ADMIN_PHONE, `🔔 *[ENCAMINHAMENTO HUMANO — REEMBOLSO/MENOR/JURÍDICO]*\n\n*Contato:* ${senderName || 'Não informado'} (${recipient})\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada até liberação do operador.`);
+    } catch (e) { log(`Aviso handoff obrigatorio: ${e.message}`); }
+    return `Vou passar para nossa equipe humana. Retornamos por aqui.`;
+  }
+
+  // 2. Respostas locais especializadas por público
   let reply = null;
   if (role === 'opt_out') {
-    reply = `Entendido. Já registramos seu pedido e não enviaremos novas mensagens por aqui. Agradecemos a atenção!`;
+    reply = `Entendido, removi seu número e não enviaremos novas mensagens. Obrigada pela atenção.`;
   } else if (role === 'doctor') {
-    // Se médico fizer pergunta jurídica ou de contrato, aciona handoff humano real imediatamente
-    if (/\b(contrato|clausula|cláusula|juridic[oa]|jurídic[oa]|advogad[oa]|imposto|tribut|nota fiscal|cnpj|rpa)\b/i.test(question)) {
+    // Se profissional fizer pergunta jurídica, de contrato ou pedir condição diferente de repasse, aciona handoff humano real imediatamente
+    if (/\b(contrato|clausula|cláusula|juridic[oa]|jurídic[oa]|advogad[oa]|imposto|tribut|nota fiscal|cnpj|rpa|taxa diferente|outro repasse|negociar repasse|desconto na taxa)\b/i.test(question)) {
       try {
         const humanLocked = loadHumanLocked();
         humanLocked.add(recipient);
         saveHumanLocked(humanLocked);
         registerHumanTakeover(recipient, true, false, { permanent: true });
-        await sendWhatsApp(ADMIN_PHONE, `⚖️ *[MÉDICO COM DÚVIDA JURÍDICA / CONTRATO]*\n\n*Médico:* ${senderName}\n*Contato:* ${recipient}\n*Pergunta:* "${question}"\n\n🛑 Automação pausada até liberação do operador.`);
+        await sendWhatsApp(ADMIN_PHONE, `⚖️ *[PROFISSIONAL COM DÚVIDA JURÍDICA / CONTRATO / REPASSE]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Pergunta:* "${question}"\n\n🛑 Automação pausada até liberação do operador.`);
       } catch (e) { log(`Aviso handoff medico: ${e.message}`); }
-      return `Dr(a). ${senderName}, acabei de encaminhar sua dúvida sobre contrato/questão jurídica diretamente para a direção técnica (Dr. Edilson Bezerra) para te responder pessoalmente por aqui em instantes.`;
+      return `Vou passar sua dúvida diretamente para nossa equipe humana e direção técnica. Retornamos por aqui.`;
     }
     reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
   } else if (role === 'pharmacy') {
@@ -1502,7 +1536,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     return getUnknownAudienceGreeting(senderName);
   }
 
-  // 2. Consulta à Edge Function chat-brisa com role explícito e histórico
+  // 3. Consulta à Edge Function chat-brisa com role explícito e histórico
   if (!reply) {
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/chat-brisa`, {
@@ -1536,7 +1570,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
             registerHumanTakeover(recipient, true, false, { permanent: true });
             await sendWhatsApp(ADMIN_PHONE, `🔔 *[Pedido de atendente humano]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${question}"\n\n🛑 Assistente pausada para esta conversa até liberação do operador.`);
           } catch (e) { log(`Aviso handoff: ${e.message}`); }
-          return "";
+          return apiReply || "Vou passar para nossa equipe humana. Retornamos por aqui.";
         }
 
         const degradedPhrases = ['muitos atendimentos', 'não consegui responder', 'problema técnico', 'apenas monitoramento'];
@@ -1545,8 +1579,8 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
         if (apiReply && !isDegraded) {
           reply = apiReply;
         } else if (isDegraded) {
-          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro padrão de cadastro.`);
-          reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse https://www.plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
+          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro consultivo.`);
+          reply = `Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou ver os médicos disponíveis em https://www.plantayraiz.com.br/profissionais. O que faz mais sentido para você?`;
         }
       }
     } catch (e) {
@@ -1554,7 +1588,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     }
   }
 
-  // 3. Fallbacks de segurança se ainda não tiver resposta
+  // 4. Fallbacks de segurança se ainda não tiver resposta
   if (!reply) {
     const locked = loadHumanLocked();
     if (locked.has(recipient) || checkAiPause(recipient).paused || isPauseRequested(question)) {
@@ -1564,11 +1598,11 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     if (role === 'doctor') {
       reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
     } else {
-      reply = `Para que possamos te orientar da melhor forma até a sua consulta por videochamada, você já possui cadastro gratuito em nossa plataforma? Se ainda não tiver, acesse https://www.plantayraiz.com.br/cadastro. Quer que eu te ajude no passo a passo?`;
+      reply = `Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou escolher um médico em https://www.plantayraiz.com.br/profissionais. O que prefere?`;
     }
   }
 
-  return cleanWhatsAppFormatting(reply);
+  return cleanWhatsAppFormatting(sanitizeOutboundAnswer(reply));
 }
 
 async function handleAdminGeminiCommand(prompt) {

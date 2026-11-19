@@ -341,106 +341,38 @@ function loadApifyHarvestedLeads() {
   return leads;
 }
 
-// Template HTML Oficial de E-mail de Convite Médico Sócio
+// Template HTML Oficial de E-mail de Convite Profissional (script desativado)
 function buildCampaignEmailHtml(doctorName) {
   const cleanName = sanitizeDisplayDoctorName(doctorName);
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Convite Especial: Médico Sócio WeCann Planta y Raíz</title>
+  <title>Convite Profissional — Planta y Raiz</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7faf8; margin: 0; padding: 24px; color: #1f2937;">
   <div style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05);">
-    
-    <!-- Cabeçalho Oficial -->
     <div style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
-      <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">WeCann Planta y Raíz 🌿🩺</h1>
-      <p style="margin: 8px 0 0 0; font-size: 15px; font-weight: 500; opacity: 0.95;">Mega Clínica Digital • Telemedicina CFM • Medicina Integrativa</p>
+      <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Planta y Raiz 🌿</h1>
+      <p style="margin: 8px 0 0 0; font-size: 15px; font-weight: 500; opacity: 0.95;">Plataforma de Telemedicina CFM • Medicina Integrativa</p>
     </div>
-
-    <!-- Conteúdo -->
     <div style="padding: 32px 28px; line-height: 1.6; font-size: 15px;">
-      
-      <div style="background-color: #ecfdf5; border-left: 5px solid #10b981; padding: 18px; margin-bottom: 24px; border-radius: 6px;">
-        <h2 style="margin: 0 0 8px 0; font-size: 18px; color: #065f46; font-weight: 700;">
-          🎉 Parabéns, Dr(a). ${cleanName}!
-        </h2>
-        <p style="margin: 0; font-size: 15px; color: #047857; line-height: 1.5;">
-          Você foi escolhido(a) para integrar o quadro exclusivo de <strong>médicos prescritores sócios com direito a participação dos lucros</strong> da <strong>WeCann Planta y Raíz Mega Clínica Digital</strong>!
-        </p>
-      </div>
-
-      <p>
-        Me chamo <strong>Dr. Edilson Bezerra</strong>, sou diretor técnico da Planta y Raíz, e é com imensa satisfação que envio este convite institucional personalizado ao colega.
-      </p>
-
-      <p>
-        Estruturamos a maior plataforma de telemedicina e medicina integrativa canabinoide do país, desenvolvida por médicos e para médicos, com tecnologia de ponta para que você atenda com total comodidade e autonomia clínica.
-      </p>
-
-      <h3 style="color: #064e3b; margin-top: 28px; margin-bottom: 12px; font-size: 17px; font-weight: 700;">
-        🌿 Principais vantagens de ser Médico Sócio na Planta y Raíz:
-      </h3>
-
+      <p>Olá, <strong>${cleanName}</strong>,</p>
+      <p>Convidamos profissionais com registro ativo no CRM para credenciar gratuitamente seu consultório digital na <strong>Planta y Raiz</strong> (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14).</p>
       <ul style="padding-left: 20px; color: #374151; margin-bottom: 24px;">
-        <li style="margin-bottom: 10px;">
-          <strong>Consultório Virtual Completo & Prontuário CFM Integrado:</strong> Anamnese, histórico clínico longitudinal e acompanhamento contínuo dos seus pacientes.
-        </li>
-        <li style="margin-bottom: 10px;">
-          <strong>Emissor de Receitas Digitais com QR Code:</strong> Aceito em 100% das farmácias do Brasil e em processos de autorização de importação da ANVISA (RDC 660 e RDC 327).
-        </li>
-        <li style="margin-bottom: 10px;">
-          <strong>Apoio da Enfermeira Brisa e Copilot de IA:</strong> Seus pacientes chegam educados e pré-triados para a consulta médica, otimizando o seu tempo clínico.
-        </li>
-        <li style="margin-bottom: 10px;">
-          <strong>Pacientes 100% Seus:</strong> Total soberania na conduta, prescrição e retornos agendados diretamente na sua agenda.
-        </li>
-        <li style="margin-bottom: 10px;">
-          <strong>Repasse Financeiro Instantâneo via PIX (93% Líquido):</strong> Retenção fixa de apenas 7% de manutenção da plataforma, sem burocracia após o atendimento.
-        </li>
-        <li style="margin-bottom: 10px;">
-          <strong>Plano Premium Opcional (R$ 99/mês):</strong> Prioridade na fila de pacientes, destaque na vitrine e ferramentas de IA clínica.
-        </li>
+        <li style="margin-bottom: 10px;"><strong>Repasse de 93% via PIX:</strong> taxa fixa de 7% da plataforma em todos os planos.</li>
+        <li style="margin-bottom: 10px;"><strong>Plano Médico VIP opcional (R$ 99/mês):</strong> prioridade na fila de pacientes, destaque na vitrine e ferramentas de IA.</li>
+        <li style="margin-bottom: 10px;"><strong>Consultório CFM e prescrição digital ICP-Brasil / Gov.br.</strong></li>
       </ul>
-
-      <!-- CTA Principal -->
       <div style="text-align: center; margin: 32px 0 20px 0;">
-        <a href="https://www.plantayraiz.com.br/cadastro-profissional?origem=convite_socio" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 15px 36px; font-size: 16px; font-weight: 700; border-radius: 8px; box-shadow: 0 3px 8px rgba(5,150,105,0.35);">
-          Ativar Meu Consultório Virtual Gratuito Agora 🚀
+        <a href="https://www.plantayraiz.com.br/cadastro-profissional" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 15px 36px; font-size: 16px; font-weight: 700; border-radius: 8px;">
+          Ativar Cadastro Profissional Gratuito
         </a>
       </div>
-
-      <p style="font-size: 13px; text-align: center; color: #6b7280; margin-bottom: 24px;">
-        O cadastro leva menos de 2 minutos. Envie seu CRM e documento para ativação imediata.
-      </p>
-
-      <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; font-size: 14px; margin-top: 24px;">
-        <p style="margin: 0 0 6px 0;">
-          🌐 <strong>Conheça nossa Vitrine de Especialistas:</strong><br>
-          <a href="https://www.plantayraiz.com.br/profissionais" style="color: #059669; text-decoration: none; font-weight: 600;">www.plantayraiz.com.br/profissionais</a>
-        </p>
-        <p style="margin: 10px 0 0 0;">
-          💬 <strong>Dúvidas ou auxílio com seu cadastro?</strong><br>
-          Fale diretamente com nossa enfermeira chefe Enfª Brisa no WhatsApp:<br>
-          <a href="https://wa.me/5511991363154" style="color: #059669; text-decoration: none; font-weight: 600;">wa.me/5511991363154</a>
-        </p>
-      </div>
-
-      <p style="margin-top: 32px; font-size: 14px; color: #4b5563;">
-        Com os melhores cumprimentos,<br>
-        <strong>Dr. Edilson Bezerra</strong><br>
-        Diretor Técnico Médico — WeCann Planta y Raíz Ltda<br>
-        <span style="font-size: 12px; color: #9ca3af;">CRM Médico & Equipe de Telemedicina</span>
-      </p>
     </div>
-
-    <!-- Rodapé -->
     <div style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af;">
-      <p style="margin: 0;">Planta y Raíz Ltda • Plataforma de Telemedicina e Saúde Integrativa</p>
-      <p style="margin: 4px 0 0 0;">Este é um convite institucional exclusivo e confidencial para médicos prescritores convidados.</p>
+      <p style="margin: 0;">Bezerra Med Soluções Integradas Ltda. · CNPJ 30.740.319/0001-14 · Planta y Raiz</p>
     </div>
-
   </div>
 </body>
 </html>`;

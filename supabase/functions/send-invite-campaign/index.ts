@@ -3,10 +3,10 @@ import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") || "";
 
-const INVITE_SUBJECT = "Convite Exclusivo: Seja Médico Sócio Prescritor de Cannabis Medicinal na Planta y Raíz Ltda | A Revolução da Medicina Canabinoide";
+const INVITE_SUBJECT = "Convite Profissional: Credencie seu Consultório Digital na Planta y Raiz (93% de Repasse via PIX)";
 
 function buildInviteHTML(doctorName: string): string {
-  const firstName = doctorName.split(" ")[0] || "Doutor(a)";
+  const firstName = doctorName.split(" ")[0] || "Colega";
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -16,74 +16,60 @@ function buildInviteHTML(doctorName: string): string {
     
     <!-- Header Executivo -->
     <div style="background:linear-gradient(135deg,#0f4c35 0%,#10b981 100%);padding:40px 30px;text-align:center;">
-      <h1 style="margin:0;font-size:28px;font-weight:900;color:#ffffff;letter-spacing:2px;text-transform:uppercase;">PLANTA Y RAÍZ LTDA</h1>
-      <p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:3px;font-weight:600;">MEGA CLÍNICA DIGITAL · TELEMEDICINA CANABINOIDE</p>
+      <h1 style="margin:0;font-size:28px;font-weight:900;color:#ffffff;letter-spacing:2px;text-transform:uppercase;">PLANTA Y RAIZ</h1>
+      <p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:3px;font-weight:600;">TELEMEDICINA CFM · MEDICINA INTEGRATIVA</p>
       <div style="width:60px;height:3px;background:rgba(255,255,255,0.4);margin:18px auto 0;border-radius:2px;"></div>
     </div>
 
     <!-- Corpo do E-mail -->
     <div style="padding:35px 30px;line-height:1.7;color:#1e293b;font-size:15px;">
-      <p style="font-size:16px;">Prezado(a) <strong>Dr(a). ${firstName}</strong>,</p>
+      <p style="font-size:16px;">Olá, <strong>${firstName}</strong>,</p>
       
-      <p>A medicina canabinoide no Brasil vive uma expansão sem precedentes, com empresas faturando na casa dos <strong>30 milhões por ano</strong>. No entanto, sabemos que a grande maioria das plataformas tradicionais de telemedicina sufoca a autonomia médica com taxas comissionais abusivas, repasses demorados e ferramentas tecnológicas ultrapassadas.</p>
-      
-      <p>É com grande honra que convidamos você para se tornar <strong style="color:#059669;">Médico Sócio Prescritor</strong> na Planta y Raíz — oficialmente desenvolvida por médicos para ser a melhor, mais rentável e mais completa plataforma de telemedicina canabinoide do planeta.</p>
+      <p>Convidamos médicos com registro ativo no CRM para credenciar gratuitamente seu consultório digital na <strong>Planta y Raiz</strong>, plataforma de telemedicina desenvolvida para apoiar a autonomia clínica com prontuário CFM, emissão de receitas digitais e repasse transparente via PIX.</p>
 
       <!-- Tabela Comparativa -->
-      <h3 style="color:#0f4c35;font-size:17px;margin:25px 0 10px;border-bottom:2px solid #10b981;padding-bottom:8px;">🏆 Planta y Raíz vs. Mercado Tradicional</h3>
+      <h3 style="color:#0f4c35;font-size:17px;margin:25px 0 10px;border-bottom:2px solid #10b981;padding-bottom:8px;">🏆 Planta y Raiz vs. Mercado Tradicional</h3>
       <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
         <thead>
           <tr style="background:#0f4c35;color:#fff;">
             <th style="padding:10px 8px;text-align:left;border:1px solid #1a6b4a;">Diferencial</th>
             <th style="padding:10px 8px;text-align:center;border:1px solid #1a6b4a;">Plataformas Tradicionais</th>
-            <th style="padding:10px 8px;text-align:center;border:1px solid #1a6b4a;background:#059669;">Planta y Raíz</th>
+            <th style="padding:10px 8px;text-align:center;border:1px solid #1a6b4a;background:#059669;">Planta y Raiz</th>
           </tr>
         </thead>
         <tbody>
-          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Taxa da Plataforma</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">20% a 45%</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Apenas 7%</td></tr>
-          <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Repasse Financeiro</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">30 a 60 dias</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">PIX Instantâneo</td></tr>
-          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Preço da Consulta</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Tabela fixa</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Total Liberdade</td></tr>
-          <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Modelo de Parceria</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;">Prestador de serviço</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Sócio Prescritor</td></tr>
-          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Plano de Indicação</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Inexistente</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Rede 3ª Geração</td></tr>
-          <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Suporte Diagnóstico</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;">Prontuários genéricos</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Robô IA Auxiliar</td></tr>
-          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Custo de Adesão</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Mensalidades</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">100% Gratuito</td></tr>
+          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Taxa da Plataforma</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">20% a 45%</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Apenas 7% (93% seu)</td></tr>
+          <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Repasse Financeiro</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">30 a 60 dias</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">PIX</td></tr>
+          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Preço da Consulta</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Tabela fixa</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Autonomia na vitrine</td></tr>
+          <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Plano Médico VIP (Opcional)</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;">Sem prioridade</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">R$ 99/mês (prioridade + IA)</td></tr>
+          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Programa de Indicação</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Inexistente</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Comissão até 3ª Geração</td></tr>
+          <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Custo de Adesão</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Mensalidades obrigatórias</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Cadastro Gratuito</td></tr>
         </tbody>
       </table>
 
-      <h3 style="color:#0f4c35;margin:25px 0 10px;">🚀 O que torna a Planta y Raíz Irresistível?</h3>
+      <h3 style="color:#0f4c35;margin:25px 0 10px;">🚀 Recursos do Consultório Digital</h3>
 
-      <p><strong>💰 Potencial Financeiro de Elite (Ganhe até R$ 45.000/mês)</strong><br>
-      Atenda 10 pacientes/dia a R$ 150 cada com retenção de 93%. PIX em tempo real ao término de cada consulta. Distribuição de lucros por desempenho e Plano de Indicação em 3 Gerações.</p>
+      <p><strong>💰 Repasse Claro (93% via PIX)</strong><br>
+      Taxa fixa de 7% da plataforma em todos os planos. Plano Médico VIP opcional por R$ 99/mês com prioridade na fila de pacientes e ferramentas de IA clínica.</p>
 
-      <p><strong>🧠 Tecnologia de Ponta & Robô IA</strong><br>
-      IA integrada para triagem, prescritor canábico inteligente com calculadora de dosagem CBD/THC, workspace split-pane com vídeo HD + prontuário lado a lado, e perfil de visibilidade global.</p>
-
-      <p><strong>🛡️ Compliance, Segurança e Assistência Jurídica</strong><br>
-      100% conforme CFM, ANVISA e LGPD. Suporte e assistência jurídica especializada em medicina canabinoide.</p>
-
-      <blockquote style="border-left:4px solid #10b981;padding:12px 16px;margin:20px 0;background:#f0fdf4;font-style:italic;color:#065f46;font-size:14px;">
-        "Não seja apenas mais um médico cadastrado em plataformas que valorizam apenas a própria margem. Seja sócio da plataforma que valoriza o seu conhecimento e a sua liberdade."
-      </blockquote>
-
-      <h3 style="color:#0f4c35;margin:25px 0 10px;">🌿 Faça Parte Desta Revolução!</h3>
-      <p>Cadastro <strong>totalmente gratuito</strong> nesta campanha para os primeiros 100 médicos. Leva menos de 2 minutos.</p>
+      <p><strong>🧠 Tecnologia & Compliance CFM / ANVISA</strong><br>
+      Sala de vídeo integrada, prontuário eletrônico conforme CFM, Copiloto Clínico com PubMed, Escriba de rascunho SOAP e emissão de receitas digitais com assinatura ICP-Brasil / Gov.br.</p>
 
       <!-- CTA -->
       <div style="text-align:center;margin:30px 0;">
-        <a href="https://plantayraiz.com.br/cadastro-profissional" style="display:inline-block;background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:16px 40px;font-size:17px;font-weight:800;text-decoration:none;border-radius:8px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(16,185,129,0.4);">
-          👉 CADASTRO GRATUITO AQUI
+        <a href="https://www.plantayraiz.com.br/cadastro-profissional" style="display:inline-block;background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:16px 40px;font-size:17px;font-weight:800;text-decoration:none;border-radius:8px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(16,185,129,0.4);">
+          👉 CADASTRO PROFISSIONAL GRATUITO
         </a>
       </div>
-      <p style="text-align:center;font-size:13px;color:#64748b;">ou entre em contato: <strong>WhatsApp (55) 11 99136-3154</strong></p>
+      <p style="text-align:center;font-size:13px;color:#64748b;">Dúvidas? WhatsApp oficial: <strong>(11) 99136-3154</strong></p>
     </div>
 
     <!-- Rodapé Executivo -->
     <div style="background:#f1f5f9;border-top:1px solid #e2e8f0;padding:25px 30px;">
       <p style="margin:0 0 5px;font-size:14px;color:#334155;">Atenciosamente,</p>
-      <p style="margin:0;font-size:15px;font-weight:700;color:#0f4c35;">Enf. Brisa</p>
-      <p style="margin:2px 0 0;font-size:12px;color:#64748b;">Departamento de Marketing Médico</p>
+      <p style="margin:0;font-size:15px;font-weight:700;color:#0f4c35;">Enf. Brisa (Assistente Virtual) · Equipe Planta y Raiz</p>
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:15px 0;">
-      <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Planta y Raíz Ltda · CNPJ: XX.XXX.XXX/XXXX-XX · A Plataforma nº 1 de Telemedicina Canabinoide</p>
+      <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Bezerra Med Soluções Integradas Ltda. · CNPJ 30.740.319/0001-14 · Planta y Raiz</p>
     </div>
   </div>
 

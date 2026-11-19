@@ -59,14 +59,26 @@ export const BRISA_CONFIG = {
     }
   ],
 
-  // CANAIS E URLS OFICIAIS
+  // IDENTIDADE OFICIAL PADRONIZADA (19/11/2026)
+  EMPRESA: {
+    nomeFantasia: "Planta y Raiz",
+    razaoSocial: "Bezerra Med Soluções Integradas Ltda.",
+    cnpj: "30.740.319/0001-14",
+  },
+
+  // CANAIS E URLS OFICIAIS VERIFICADOS
   URLS: {
     site: "https://www.plantayraiz.com.br",
     cadastroProfissional: "https://www.plantayraiz.com.br/cadastro-profissional",
     profissionais: "https://www.plantayraiz.com.br/profissionais",
     orientacaoTecnica: "https://www.plantayraiz.com.br/orientacao-tecnica",
+    telemedicina: "https://www.plantayraiz.com.br/telemedicina",
     agendamento: "https://www.plantayraiz.com.br/agendamento",
+    precos: "https://www.plantayraiz.com.br/precos",
     cadastroPaciente: "https://www.plantayraiz.com.br/cadastro",
+    cadastroFarmacia: "https://www.plantayraiz.com.br/cadastro-farmacia",
+    indicacoes: "https://www.plantayraiz.com.br/indicacoes",
+    reembolso: "https://www.plantayraiz.com.br/reembolso",
     whatsappOficial: "https://wa.me/5511991363154"
   },
 
@@ -82,16 +94,16 @@ export const BRISA_CONFIG = {
 /**
  * Monta o texto de resposta sobre a origem do contato com saudação contextual
  */
-export function buildLgpdOriginReply(doctorName = '') {
-  const saudacao = doctorName ? `Dr(a). ${doctorName}, ` : '';
-  return `${saudacao}${BRISA_CONFIG.ORIGEM_CONTATO_LGPD}\n\nNosso propósito é apresentar aos médicos prescritores uma plataforma independente, com prontuário CFM nativo, prescrição digital e total liberdade na definição de seus honorários.`;
+export function buildLgpdOriginReply(contactName = '') {
+  const saudacao = contactName ? `${contactName}, ` : '';
+  return `${saudacao}${BRISA_CONFIG.ORIGEM_CONTATO_LGPD}\n\nNosso propósito é apresentar a profissionais com registro ativo em conselho a plataforma Planta y Raiz (${BRISA_CONFIG.EMPRESA.razaoSocial}, CNPJ ${BRISA_CONFIG.EMPRESA.cnpj}), com cadastro gratuito, prontuário CFM e repasse de 93% via PIX.`;
 }
 
 /**
  * Monta o texto de status do checklist de documentos KYC
  */
-export function buildKycChecklistReply(doctorName = '', docsRecebidos = []) {
-  const saudacao = doctorName ? `Olá, Dr(a). ${doctorName}! ` : 'Olá, Dr(a)! ';
+export function buildKycChecklistReply(contactName = '', docsRecebidos = []) {
+  const saudacao = contactName ? `Olá, ${contactName}! ` : 'Olá! ';
   const recebidosSet = new Set(docsRecebidos.map(d => d.toLowerCase()));
 
   const linhas = BRISA_CONFIG.DOCUMENTOS_OBRIGATORIOS.map((doc, idx) => {
@@ -105,34 +117,28 @@ export function buildKycChecklistReply(doctorName = '', docsRecebidos = []) {
 
   let conclusao = '';
   if (todosRecebidos) {
-    conclusao = `\n🎉 *Todos os documentos obrigatórios foram recolhidos com sucesso!*\nNossa diretoria técnica e médica está analisando seu dossiê com o prazo oficial de liberação da sua agenda *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}*. Qualquer novidade você receberá diretamente por aqui! 🙏🌿`;
+    conclusao = `\n🎉 *Todos os documentos obrigatórios foram recebidos!*\nNossa equipe humana está analisando seu cadastro com prazo de *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}*. Avisaremos por aqui assim que concluir.`;
   } else {
-    conclusao = `\nVocê pode enviar os itens pendentes diretamente por aqui pelo WhatsApp (em foto ou PDF). Assim que completarmos a lista, a liberação ocorre *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}*! 🩺✨`;
+    conclusao = `\nVocê pode enviar os itens pendentes por aqui (foto ou PDF). Após o envio completo, a análise humana leva *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}*.`;
   }
 
-  return `${saudacao}Recebemos seus arquivos com total sigilo médico e proteção jurídica.\n\n📋 *Status do seu Credenciamento Médico:*\n${linhas.join('\n')}\n${conclusao}`;
+  return `${saudacao}Recebemos seus arquivos com segurança.\n\n📋 *Status do seu Credenciamento:*\n${linhas.join('\n')}\n${conclusao}`;
 }
 
 /**
- * Mensagem do convite oficial Brevo / Campanha
+ * Mensagem do convite oficial (exclusiva para médicos com CRM confirmado)
  */
-export function buildOfficialInvitationMessage(doctorName = '') {
-  const nomeFormatado = doctorName ? `Dr(a). ${doctorName}` : 'Doutor(a)';
-  return `Olá, ${nomeFormatado}! Tudo bem? 🌿🩺
+export function buildOfficialInvitationMessage(contactName = '') {
+  const saudacao = contactName ? `Olá, ${contactName}!` : 'Olá!';
+  return `${saudacao} Tudo bem? 🌿
 
-Sou a assistente virtual de credenciamento clínico da Planta y Raíz (${BRISA_CONFIG.URLS.site}).
+Sou a Enf. Brisa, assistente virtual da Planta y Raiz (${BRISA_CONFIG.EMPRESA.razaoSocial}, CNPJ ${BRISA_CONFIG.EMPRESA.cnpj} — a equipe humana acompanha).
 
-Gostaria de apresentar o convite oficial do Dr. Edilson Bezerra da Silva para integrar nosso corpo de médicos prescritores parceiros:
+Para profissionais com registro ativo em conselho:
+• *Cadastro gratuito:* ${BRISA_CONFIG.URLS.cadastroProfissional}
+• *Repasse oficial:* ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}
+• *Plano Médico VIP opcional (R$ 99/mês):* ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}
+• *Conformidade CFM / ANVISA:* prontuário eletrônico e prescrição digital ICP-Brasil / Gov.br.
 
-• ⚡ *Repasse Oficial (93%)*: ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}
-• 🚀 *Benefícios do Plano*: ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}
-• 🛡️ *Segurança Jurídica Total*: Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022) e ANVISA (RDCs 660 e 327) com assinatura ICP-Brasil / Gov.br nativa.
-• 🩺 *Demanda Ativa de Pacientes*: Pacientes direcionados por triagem clínica e perfil público na nossa vitrine oficial.
-• 🏪 *Farmácia Digital Integrada*: Facilidade de acesso aos fitocanabinoides prescritos para os seus pacientes.
-
-Gostaria de ativar seu cadastro gratuito e liberar seu consultório digital?
-
-👉 *Link direto para credenciamento*: ${BRISA_CONFIG.URLS.cadastroProfissional}
-
-Se preferir, pode me responder por aqui mesmo no WhatsApp enviando seus documentos que nossa equipe cuida de tudo para você! 🙏✨`;
+Se tiver interesse ou dúvida, responda por aqui que nossa equipe humana acompanha.`;
 }

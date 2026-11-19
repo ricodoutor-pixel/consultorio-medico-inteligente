@@ -67,9 +67,9 @@ const Precos = () => {
       period: "/mês",
       tag: "VENDEDOR",
       icon: Store,
-      description: "Taxa de venda zero e destaque nas recomendações do Verdinho.",
+      description: "Destaque nas recomendações IA e loja verificada no Shopping (taxa padrão de 5%).",
       features: [
-        "Taxa de venda ZERO no Shopping",
+        "Repasse de 95% nas vendas (taxa padrão de 5%)",
         "Destaque nas recomendações IA",
         "Até 10 produtos cadastrados",
         "3 fotos por produto",

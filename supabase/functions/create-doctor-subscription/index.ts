@@ -63,11 +63,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Server-controlled pricing — VIP (basic) has 0% platform fee on consultations
+    // Server-controlled pricing — every doctor plan keeps the standard 7% platform fee (93% doctor payout)
     const plans: Record<string, { title: string; amount: number; feeRate: number }> = {
-      basic:        { title: "Plano Médico VIP — Taxa Zero",  amount: 99,  feeRate: 0 },
-      professional: { title: "Plano Médico Profissional",     amount: 299, feeRate: 0.05 },
-      premium:      { title: "Plano Médico Premium",          amount: 599, feeRate: 0.03 },
+      basic:        { title: "Plano Médico VIP",          amount: 99,  feeRate: 0.07 },
+      professional: { title: "Plano Médico Profissional", amount: 299, feeRate: 0.07 },
+      premium:      { title: "Plano Médico Premium",      amount: 599, feeRate: 0.07 },
     };
 
     const plan = plans[planId];

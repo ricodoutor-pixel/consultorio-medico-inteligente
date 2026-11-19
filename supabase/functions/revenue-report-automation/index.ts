@@ -100,20 +100,24 @@ Deno.serve(async (req) => {
 
         const totalBonus = (bonuses || []).reduce((s, b) => s + b.amount, 0);
 
-        // Send via Evolution API (WhatsApp) if phone available
-        if (profile.phone) {
-          const text = `📊 Relatório ${reportType === "monthly" ? "Mensal" : "Diário"} — ${periodLabel}\n\nDr(a). ${profile.full_name}\n\n👥 Consultas: ${consultations || 0}\n💰 Receita: ${formatBRL(totalRevenue)}\n🏦 Taxa plataforma: ${formatBRL(platformFees)}\n🎁 Bônus NPS: ${formatBRL(totalBonus)}\n⭐ NPS Médio: ${npsAvg}\n\n${Number(npsAvg) >= 8 ? "Excelente trabalho! Continue assim! 🚀" : "Continue melhorando para ganhar mais bônus! 💪"}`;
+        const hasActivity = (consultations || 0) > 0 || totalRevenue > 0 || totalBonus > 0;
+        const phoneDigits = String(profile.phone || "").replace(/\D/g, "");
+        // Never spam doctors with zero-activity daily WhatsApp reports ("Consultas: 0, Receita R$ 0,00")
+        if (profile.phone && hasActivity && phoneDigits !== "557591462018" && phoneDigits !== "7591462018" && phoneDigits !== "5575991462018") {
+          const text = `📊 Relatório ${reportType === "monthly" ? "Mensal" : "Diário"} — ${periodLabel}\n\nDr(a). ${profile.full_name}\n\n👥 Consultas: ${consultations || 0}\n💰 Receita líquida (93%): ${formatBRL(totalRevenue)}\n🏦 Taxa plataforma (7%): ${formatBRL(platformFees)}\n🎁 Bônus: ${formatBRL(totalBonus)}\n⭐ NPS Médio: ${npsAvg}`;
           await sendWhatsApp(profile.phone, text).catch((e) => console.error("Evolution report error:", e));
         }
 
-        // Save internal notification
-        await supabase.from("notifications").insert({
-          user_id: doc.user_id,
-          title: `Relatório ${reportType === "monthly" ? "Mensal" : "Diário"} — ${periodLabel}`,
-          message: `Consultas: ${consultations || 0} | Receita: ${formatBRL(totalRevenue)} | Bônus: ${formatBRL(totalBonus)} | NPS: ${npsAvg}`,
-          type: "financial_report",
-          action_url: "/dashboard-medico",
-        });
+        // Save internal notification only when there is real activity or on monthly closing
+        if (hasActivity || reportType === "monthly") {
+          await supabase.from("notifications").insert({
+            user_id: doc.user_id,
+            title: `Relatório ${reportType === "monthly" ? "Mensal" : "Diário"} — ${periodLabel}`,
+            message: `Consultas: ${consultations || 0} | Receita: ${formatBRL(totalRevenue)} | Bônus: ${formatBRL(totalBonus)} | NPS: ${npsAvg}`,
+            type: "financial_report",
+            action_url: "/dashboard-medico",
+          });
+        }
 
         // Update performance metrics (monthly only)
         if (reportType === "monthly") {

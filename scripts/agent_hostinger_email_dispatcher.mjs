@@ -103,27 +103,27 @@ function saveState() {
 }
 
 function buildDoctorInviteEmail(doctorName) {
-  const cleanName = String(doctorName || 'Doutor(a)').replace(/^(dr|dra|dr\(a\))\.?\s+/i, '').trim();
+  const cleanName = String(doctorName || 'Colega').replace(/^(dr|dra|dr\(a\))\.?\s+/i, '').trim();
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Convite Oficial: Programa Médico Sócio Planta y Raíz</title>
+  <title>Convite Profissional: Credenciamento Médico Planta y Raiz</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b130e; margin: 0; padding: 24px 0; color: #e2e8f0; line-height: 1.6;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #121e16; border-radius: 16px; overflow: hidden; border: 1px solid #1f3a2b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <!-- Topo Dourado / Esmeralda -->
+    <!-- Topo Esmeralda -->
     <tr>
       <td style="background: linear-gradient(135deg, #065f46 0%, #042f2e 100%); padding: 36px 32px; text-align: center; border-bottom: 2px solid #10b981;">
         <span style="background-color: rgba(16,185,129,0.25); color: #6ee7b7; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; padding: 5px 14px; border-radius: 20px; border: 1px solid #10b981;">
-          Convite Exclusivo · Corpo Clínico Oficial
+          Convite Profissional · Corpo Clínico
         </span>
         <h1 style="color: #ffffff; margin: 16px 0 0 0; font-size: 26px; font-weight: 900; letter-spacing: 0.5px;">
-          Planta y Raíz Medicina Canabinoide
+          Planta y Raiz
         </h1>
         <p style="color: #a7f3d0; margin: 6px 0 0 0; font-size: 14px; font-weight: 600;">
-          A Maior Rede de Prescritores e Telemedicina Integrada do Brasil
+          Plataforma de Telemedicina CFM e Medicina Integrativa
         </p>
       </td>
     </tr>
@@ -132,65 +132,64 @@ function buildDoctorInviteEmail(doctorName) {
     <tr>
       <td style="padding: 36px 32px;">
         <p style="font-size: 16px; font-weight: 700; color: #ffffff; margin-top: 0;">
-          Prezado(a) Dr(a). ${cleanName},
+          Olá, ${cleanName},
         </p>
         <p style="font-size: 14.5px; color: #cbd5e1; margin-bottom: 18px;">
-          A medicina canabinoide no Brasil está em franca expansão. No entanto, a maioria das plataformas tradicionais impõe taxas abusivas de até 40% e repasses demorados.
+          Convidamos médicos com registro ativo no CRM para credenciar gratuitamente seu consultório digital na <strong>Planta y Raiz</strong> (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14).
         </p>
         <p style="font-size: 14.5px; color: #cbd5e1; margin-bottom: 22px;">
-          Na <strong>Planta y Raíz</strong>, você é tratado como <strong>Médico Sócio</strong>: criamos um ecossistema com <strong style="color: #10b981;">93% de repasse líquido via Pix</strong>, consultório virtual criptografado em conformidade com o CFM e assinatura digital com padrão ICP-Brasil.
+          Nossa condição oficial oferece <strong style="color: #10b981;">93% de repasse líquido via Pix</strong> em cada consulta (taxa fixa de 7% da plataforma em todos os planos), consultório virtual em conformidade com o CFM e emissão de receitas digitais com padrão ICP-Brasil / Gov.br.
         </p>
 
-        <!-- Destaque: Programa Médico Sócio Meta R$ 15.000/mês -->
+        <!-- Destaque: Programa de Indicações em 3 Gerações -->
         <div style="background-color: #172a1e; border: 2px solid #10b981; border-radius: 12px; padding: 22px; margin: 24px 0;">
           <div style="display: flex; align-items: center; margin-bottom: 12px;">
             <span style="font-size: 18px; margin-right: 8px;">🎯</span>
             <strong style="color: #34d399; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">
-              Plano Meta: R$ 15.000,00 de Salário/Mês Vitalício no Pix
+              Programa de Indicações até a 3ª Geração (Exemplo R$ 15.000/mês)
             </strong>
           </div>
           <p style="margin: 0 0 12px 0; font-size: 13.5px; color: #e2e8f0;">
-            Com a fórmula dos <strong>3 colegas que indicam 3 até a 3ª geração (39 médicos na rede)</strong>, você constrói um faturamento recorrente passivo perpétuo caindo no seu Pix somando 3 pilares:
+            Indicando colegas e pacientes pelo seu link personalizado (3 colegas que indicam 3 até a 3ª geração — 39 médicos na rede), você recebe comissões recorrentes de 25% / 15% / 10%:
           </p>
           <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #94a3b8; line-height: 1.8;">
             <li><strong style="color: #e2e8f0;">R$ 1.560,00/mês</strong> em comissões sobre assinaturas de planos médicos.</li>
             <li><strong style="color: #e2e8f0;">R$ 6.240,00/mês</strong> sobre consultas e teleatendimentos da sua rede.</li>
-            <li><strong style="color: #e2e8f0;">R$ 7.200,00/mês</strong> de compras na Farmácia Canabinoide Integrada da plataforma.</li>
+            <li><strong style="color: #e2e8f0;">R$ 7.200,00/mês</strong> em comissões de compras no marketplace integrado.</li>
           </ul>
           <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #234832; text-align: center;">
-            <span style="font-size: 18px; font-weight: 900; color: #10b981;">
-              Total: R$ 15.000,00 / MÊS VITALÍCIO NO PIX!
+            <span style="font-size: 16px; font-weight: 900; color: #10b981;">
+              Exemplo ilustrativo de rede ativa: R$ 15.000,00/mês via Pix
             </span>
           </div>
         </div>
 
         <!-- Recursos do Consultório -->
         <div style="background-color: #0d1811; border: 1px solid #1f3a2b; border-radius: 10px; padding: 18px; margin-bottom: 26px;">
-          <strong style="color: #a7f3d0; font-size: 14px;">⚡ O que você recebe ao se cadastrar gratuitamente hoje:</strong>
+          <strong style="color: #a7f3d0; font-size: 14px;">⚡ O que você recebe ao se cadastrar gratuitamente:</strong>
           <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 13px; color: #94a3b8; line-height: 1.7;">
-            <li>Consultório com chat em tempo real, sala de vídeo HD e prontuário integrado.</li>
-            <li>Copiloto Clínico com acesso a 40.000 estudos médicos da base PubMed.</li>
-            <li>Escriba inteligente para rascunho de prontuários SOAP.</li>
-            <li>Prescritor com catálogo oficial e emissão de receitas com controle especial.</li>
-            <li>Repasse de 93% via Pix liberado após a avaliação do paciente.</li>
+            <li>Consultório com chat em tempo real, sala de vídeo e prontuário integrado.</li>
+            <li>Plano Médico VIP opcional (R$ 99/mês): prioridade na fila de pacientes, Copiloto Clínico com PubMed, Assistente Jurídico e Escriba SOAP.</li>
+            <li>Emissão de receitas digitais assinadas via assinador.iti.br / ICP-Brasil.</li>
+            <li>Repasse de 93% via Pix (taxa fixa de 7% da plataforma).</li>
           </ul>
         </div>
 
         <!-- Botão CTA Principal -->
         <div style="text-align: center; margin: 32px 0 20px 0;">
-          <a href="https://plantayraiz.com.br/cadastro-profissional?utm_source=hostinger_email&utm_medium=convite_medico&utm_campaign=meta_15k" target="_blank" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #042f2e; text-decoration: none; font-size: 16px; font-weight: 900; padding: 16px 38px; border-radius: 10px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(16,185,129,0.35);">
+          <a href="https://www.plantayraiz.com.br/cadastro-profissional?utm_source=hostinger_email&utm_medium=convite_medico" target="_blank" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #042f2e; text-decoration: none; font-size: 16px; font-weight: 900; padding: 16px 38px; border-radius: 10px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(16,185,129,0.35);">
             Ativar Meu Consultório Gratuito Agora →
           </a>
         </div>
         <p style="font-size: 12px; color: #64748b; text-align: center; margin-top: 10px;">
-          Cadastro gratuito e sem taxa de adesão. Leva menos de 2 minutos.
+          Cadastro gratuito, exclusivo para profissionais com registro ativo em conselho.
         </p>
 
         <!-- Contato & Suporte -->
         <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #1f3a2b; font-size: 12.5px; color: #94a3b8; text-align: center;">
           <p style="margin: 0;">Dúvidas ou atendimento direto com nossa equipe:</p>
           <p style="margin: 4px 0 0 0; font-weight: 700; color: #a7f3d0;">
-            WhatsApp Oficial: (11) 99136-3154 · <a href="https://plantayraiz.com.br" style="color: #10b981; text-decoration: none;">plantayraiz.com.br</a>
+            WhatsApp Oficial: (11) 99136-3154 · <a href="https://www.plantayraiz.com.br" style="color: #10b981; text-decoration: none;">www.plantayraiz.com.br</a>
           </p>
         </div>
       </td>
@@ -199,9 +198,9 @@ function buildDoctorInviteEmail(doctorName) {
     <!-- Rodapé -->
     <tr>
       <td style="background-color: #0b130e; padding: 20px 32px; text-align: center; font-size: 11px; color: #475569; border-top: 1px solid #172a1e;">
-        <p style="margin: 0;">Planta y Raíz Ltda · CNPJ 43.123.456/0001-78 · São Paulo - SP</p>
+        <p style="margin: 0;">Bezerra Med Soluções Integradas Ltda. · CNPJ 30.740.319/0001-14 · Planta y Raiz</p>
         <p style="margin: 4px 0 0 0;">
-          Para não receber mais comunicados desta parceria, <a href="https://plantayraiz.com.br/unsubscribe" style="color: #64748b; text-decoration: underline;">clique aqui para descadastrar</a>.
+          Para não receber mais comunicados, <a href="https://www.plantayraiz.com.br/unsubscribe" style="color: #64748b; text-decoration: underline;">clique aqui para descadastrar</a>.
         </p>
       </td>
     </tr>
@@ -209,29 +208,25 @@ function buildDoctorInviteEmail(doctorName) {
 </body>
 </html>`;
 
-  const text = `Prezado(a) Dr(a). ${cleanName},
+  const text = `Olá, ${cleanName},
 
-Gostaríamos de convidá-lo(a) para fazer parte do corpo clínico oficial da Planta y Raíz, a maior rede de medicina canabinoide e telemedicina do Brasil.
+Convidamos profissionais com registro ativo no CRM para credenciar gratuitamente seu consultório digital na Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14).
 
-VANTAGENS EXCLUSIVAS DO MÉDICO SÓCIO:
-• 93% de Repasse Líquido no Pix por consulta (apenas 7% de taxa da plataforma).
-• Consultório Virtual Completo com Sala de Vídeo HD e Prontuário CFM / ICP-Brasil.
-• Copiloto Clínico de IA conectado a mais de 40.000 artigos científicos do PubMed.
-• Programa Médico Sócio: Meta Oficial de R$ 15.000,00/mês de salário vitalício no Pix com a multiplicação de 3 colegas que indicam 3 até a 3ª geração.
+CONDIÇÕES OFICIAIS:
+• Cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional
+• Repasse de 93% de cada consulta via Pix (taxa fixa de 7% da plataforma em todos os planos).
+• Plano Médico VIP opcional (R$ 99/mês): prioridade na fila de pacientes e ferramentas de IA (Copiloto Clínico, Assistente Jurídico e Escriba).
+• Programa de Indicações até a 3ª geração (25% / 15% / 10%).
 
-Faça seu cadastro gratuito em:
-https://plantayraiz.com.br/cadastro-profissional
-
-Dúvidas? Fale com nossa equipe no WhatsApp: (11) 99136-3154
-Atenciosamente,
-Dr. Edilson Bezerra & Equipe Planta y Raíz`;
+Dúvidas? WhatsApp oficial: (11) 99136-3154
+Equipe Planta y Raiz`;
 
   return { html, text };
 }
 
 async function sendOneDoctorEmail(doc) {
   const email = String(doc.email || '').trim().toLowerCase();
-  const name = doc.name || 'Doutor(a)';
+  const name = doc.name || 'Colega';
 
   // 1. Checa se já foi enviado anteriormente
   if (state.sentEmails[email]) {
@@ -249,7 +244,7 @@ async function sendOneDoctorEmail(doc) {
   }
 
   const { html, text } = buildDoctorInviteEmail(name);
-  const subject = `Dr(a). ${name}, Seja Médico Sócio Prescritor na Planta y Raíz (Meta R$ 15k/mês no Pix)`;
+  const subject = `${name}, Credencie seu Consultório Digital Gratuito na Planta y Raiz (93% via Pix)`;
 
   try {
     const t = getTransporter();

@@ -83,68 +83,51 @@ const PERSONA = BRISA_TRIAGE_PERSONA;
 
 // ── RESPOSTAS INSTANTÂNEAS POR PERFIL (Médico, Paciente, Farmácia) ──────
 const MSGS = {
-  boas_vindas: `Olá! 🌿 Sou a assistente virtual da *Planta y Raíz*.
+  boas_vindas: `Olá! Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda. — a equipe humana acompanha). 🌿
 
-Para eu te enviar o link certo, você busca atendimento como *paciente* ou informações como *médico(a) prescritor(a)*?
+O que te trouxe até a Planta y Raiz hoje?
 
-1️⃣ *Sou Paciente* — Quero agendar Consulta Médica (Chat R$ 100 / Vídeo R$ 150) ou iniciar pela Orientação Técnica (R$ 30).
-2️⃣ *Sou Médico(a) Prescritor(a)* — Quero credenciar meu consultório virtual (repasse líquido de 93% via PIX).
-3️⃣ *Sou Farmácia / Lojista / Associação* — Quero integrar produtos ao canal de dispensação.
+1️⃣ *Orientação Técnica (R$ 30)* ou *Consulta com Médico*
+2️⃣ *Sou Profissional com Registro em Conselho* (cadastro gratuito)
+3️⃣ *Farmácia / Lojista* (Lojista VIP R$ 99/mês)`,
 
-Pode responder com o *número* ou me contar como posso te ajudar! 💚`,
+  paciente: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿
 
-  paciente: `Olá! 🌿💚 Sou a assistente virtual da *Planta y Raíz*.
+Você pode começar agora por dois caminhos:
+• *Orientação Técnica educativa (R$ 30 · 30 min):* conduzida pelo Dr. Edilson Bezerra ON (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). É o início do cuidado — não é consulta e não prescreve; entrega relatório em PDF e encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica
+• *Consulta com Médico Prescritor:* veja os especialistas e valores de cada médico na vitrine: https://www.plantayraiz.com.br/profissionais
 
-Veja os caminhos disponíveis para o seu atendimento:
+Qual faz mais sentido para você hoje?`,
 
-🩺 *Consulta Médica (Chat R$ 100 | Vídeo R$ 150):*
-Atendimento direto com médico prescritor habilitado da nossa vitrine:
-👉 https://www.plantayraiz.com.br/agendamento
+  medico: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda. — a equipe humana acompanha). 🌿
 
-📋 *Orientação Técnica Inicial (R$ 30 · 30 min):*
-Início do cuidado conduzido pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra), para educação em saúde e encaminhamento ao médico ideal (não realiza prescrição):
-👉 https://www.plantayraiz.com.br/orientacao-tecnica
+Para profissionais com registro ativo em conselho:
+• *Cadastro gratuito:* https://www.plantayraiz.com.br/cadastro-profissional
+• *Repasse oficial:* 93% de cada consulta via PIX (taxa fixa de 7% da plataforma em todos os planos).
+• *Plano Médico VIP opcional (R$ 99/mês):* prioridade na fila, destaque na vitrine e ferramentas de IA (https://www.plantayraiz.com.br/precos).
+• *Aprovação humana:* em até 24 a 48h úteis após conferência documental.
 
-📝 *Cadastro Gratuito de Paciente:*
-👉 https://www.plantayraiz.com.br/cadastro
+Se tiver dúvida sobre repasse ou condição diferente, me avise que encaminho para a equipe humana.`,
 
-Você prefere ir direto para a consulta médica ou começar pela Orientação Técnica?`,
+  farmacia_lojista: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda.). 🌿
 
-  medico: `Olá, Doutor(a)! 👨‍⚕️🌿 Sou a assistente virtual de credenciamento da *Planta y Raíz*!
+Para farmácias e lojistas parceiros:
+• *Lojista VIP:* R$ 99/mês (até 10 produtos, destaque nas recomendações IA; taxa padrão de 5% do marketplace — repasse de 95%): https://www.plantayraiz.com.br/precos
+• *Cadastro de Farmácia/Lojista:* https://www.plantayraiz.com.br/cadastro-farmacia
 
-Somos um ecossistema completo para médicos prescritores:
-🩺 *Consultório Virtual Inteligente:* Prontuário eletrônico em conformidade com o CFM (Resolução 2.314/2022), Copiloto de Evidências, Assistente Jurídico e Escriba de IA.
-💰 *Política de Repasse Oficial:* 93% líquido de cada consulta via PIX (taxa fixa de 7% da plataforma em todos os planos).
-📄 *Prescrição Eletrônica RDC 327/660:* Emissão de receitas assinadas via ICP-Brasil / Gov.br.
-⏳ *Homologação em 24 a 48h úteis:* Após conferência dos 4 documentos (CRM, Residência, Diploma/RQE e Chave PIX).
+Qual farmácia ou marca você representa?`,
 
-👉 Faça seu credenciamento gratuito em:
-🔗 https://www.plantayraiz.com.br/cadastro-profissional
-
-Como posso apoiar a sua prática clínica hoje?`,
-
-  farmacia_lojista: `Olá! 🏪🌿 Bem-vindo(a) ao canal corporativo da *Planta y Raíz*!
-
-Conectamos farmácias, fornecedores e associações a médicos prescritores e pacientes:
-📦 *Shopping & Vitrine Oficial:* Seus produtos em destaque na nossa farmácia digital.
-💰 *Split 95/5 no Checkout:* 95% do valor da venda vai para o lojista parceiro (taxa de 5% do marketplace).
-
-👉 Cadastre sua farmácia ou associação na plataforma:
-🔗 https://www.plantayraiz.com.br/cadastro
-
-Qual marca, farmácia ou associação você representa?`,
-
-  cadastrado: `Ótimo! Se você já tem cadastro como paciente, pode escolher seu médico e agendar sua consulta em https://www.plantayraiz.com.br/agendamento ou iniciar a Orientação Técnica (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica 🌿`,
+  cadastrado: `Ótimo! Você pode escolher seu médico na vitrine em https://www.plantayraiz.com.br/profissionais ou iniciar a Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica. Qual prefere? 🌿`,
 
   orientacao_tecnica: ROTEIRO_ORIENTACAO_TECNICA,
 
   cannabis_info: `*Acompanhamento na Planta y Raiz* 🌿
 
-O tratamento é avaliado individualmente pelo médico prescritor em consulta. Veja como iniciar seu atendimento:
+A Planta y Raiz não vende nem entrega medicamentos. O tratamento é avaliado individualmente por um médico habilitado em consulta.
 
 ${ROTEIRO_ORIENTACAO_TECNICA}`,
 
-  generica: `Olá! 🌿 Sou a assistente virtual da *Planta y Raíz*. Para eu te ajudar com o link certo: você busca atendimento como *paciente* (Consulta ou Orientação Técnica) ou informações como *médico(a) prescritor(a)*?`,
+  generica: `Olá! Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿 O que te trouxe até a Planta y Raiz hoje?`,
 };
 
 function norm(t: string) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }

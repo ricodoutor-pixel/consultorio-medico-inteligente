@@ -61,4 +61,23 @@ describe('Brisa response safety rules', () => {
     expect(sanitizeOutboundAnswer('Oi, sou agente humano. Em que podemos ajudar?')).not.toMatch(/sou agente humano/i);
     expect(sanitizeOutboundAnswer('https://plantayraiz.com.br')).toContain('Acesse nossa plataforma oficial em:');
   });
+  it('enforces 19/11 sales audit rules: consultative opener, no cannabis product sale, handoff for refund/minor/legal, and strips forbidden claims', () => {
+    const greeting = quickResponse({ question: 'Oi', senderName: 'Maria' });
+    expect(greeting?.model).toBe('greeting-response');
+    expect(greeting?.answer).toContain('assistente virtual');
+    expect(greeting?.answer).not.toContain('Você já tem cadastro');
+
+    const buyProduct = quickResponse({ question: 'Vocês vendem óleo de CBD?' });
+    expect(buyProduct?.model).toBe('no-medication-sale');
+    expect(buyProduct?.answer).toContain('não vende nem entrega medicamentos');
+    expect(buyProduct?.answer).toContain('orientacao-tecnica');
+
+    expect(quickResponse({ question: 'Quero reembolso do pagamento' })?.handoff).toBe(true);
+    expect(quickResponse({ question: 'Atendimento para meu filho de 8 anos' })?.handoff).toBe(true);
+    expect(quickResponse({ question: 'Vou acionar meu advogado' })?.handoff).toBe(true);
+    expect(quickResponse({ question: 'Olá, sou o assistente virtual de Clínica Modelo' })?.suppressed).toBe(true);
+
+    expect(sanitizeOutboundAnswer('Plano com taxa zero e 100% de repasse para médico sócio com participação nos lucros')).not.toMatch(/taxa zero|100% de repasse|médico sócio|participação nos lucros/i);
+    expect(sanitizeOutboundAnswer('Plano com taxa zero e 100% de repasse')).toContain('93%');
+  });
 });

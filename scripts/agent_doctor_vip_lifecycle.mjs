@@ -120,17 +120,17 @@ export async function processVipDoctorLifecycle(options = { sendWhatsApp: false 
       if (!docState.expirationNotified) {
         const expirationMsg = `Olá, ${doc.name}!
 
-Identificamos que a vigência mensal do seu Plano Médico VIP na Planta y Raíz expirou.
+Identificamos que a vigência mensal do seu Plano Médico VIP na Planta y Raiz expirou.
 
 ⚠️ *Atenda mais, não atrase seu plano!*
 
-Para manter sua taxa de intermediação ZERO (0%), destaque de topo na vitrine médica, fila prioritária e o Copiloto Clínico VIP de Consultas, renove sua assinatura agora:
-👉 https://plantayraiz.com.br/precos
+Para manter sua prioridade no rodízio de pacientes, destaque na vitrine médica e acesso às ferramentas de IA (Copiloto Clínico, Assistente Jurídico e Escriba) — mantendo o repasse de 93% via PIX — renove sua assinatura agora:
+👉 https://www.plantayraiz.com.br/precos
 
 🛡️ *Seus Prontuários e Pacientes Estão Seguros:*
 O histórico de seus pacientes e prontuários permanece 100% íntegro, protegido e disponível em conformidade com as regras do CFM e LGPD.
 
-Equipe Planta y Raíz | Cuidado & Medicina Canabinoide`;
+Equipe Planta y Raiz (Bezerra Med Soluções Integradas Ltda.)`;
 
         if (options.sendWhatsApp) {
           console.log(`  -> Enviando aviso de vencimento para o médico: ${doc.phone}`);

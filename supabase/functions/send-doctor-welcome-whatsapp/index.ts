@@ -118,18 +118,17 @@ Plano: normal (sem VIP grátis). Pendências: assinatura gov.br, contrato, aprov
       // Regra de Vencimento e Renovação
       doctorMsg = `Olá, Dr(a). ${fullName}!
 
-Identificamos que a vigência do seu Plano Médico VIP na Planta y Raíz encerrou sua competência mensal.
+Identificamos que a vigência do seu Plano Médico VIP na Planta y Raiz encerrou sua competência mensal.
 
 ⚠️ *Atenda mais, não atrase seu plano!*
 
-Para manter sua taxa de intermediação ZERO (0%), destaque ouro na vitrine médica, fila prioritária da Enfª Brisa e o Copiloto Clínico VIP de Consultas, renove agora de forma rápida:
+Para manter sua prioridade no rodízio de pacientes, destaque na vitrine médica e acesso às ferramentas de IA (Copiloto Clínico, Assistente Jurídico e Escriba) — mantendo o repasse de 93% de cada consulta via PIX — renove agora:
 👉 ${renewalLink || "https://plantayraiz.com.br/precos"}
 
 🛡️ *Seus Prontuários e Pacientes Estão Seguros:*
-Conforme as normas do CFM e a política de segurança da Planta y Raíz, o histórico de seus pacientes e prontuários permanece 100% íntegro e arquivado de forma confidencial.
+Conforme as normas do CFM e a política de segurança da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.), o histórico de seus pacientes e prontuários permanece 100% íntegro e arquivado de forma confidencial.
 
-Equipe de Gestão Médica | Planta y Raíz
-Telemedicina & Cuidado Canabinoide`;
+Equipe de Gestão Médica | Planta y Raiz`;
 
       adminMsg = `🚨 *AVISO PLANO VENCIDO — PLANTA Y RAÍZ*
 Médico: Dr(a). ${fullName}

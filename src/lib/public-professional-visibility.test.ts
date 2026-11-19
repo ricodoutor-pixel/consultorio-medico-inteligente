@@ -23,4 +23,12 @@ d2("showcase pauses (28/10/2026)", () => {
     e2(vis({ id: "mock-olivia", name: "Dra. Olivia Zimeri" })).toBe(false);
     e2(vis({ name: "Dr. Edilson Bezerra da Silva" })).toBe(false);
   });
+  i2("pauses Dr. Gustavo Nobre Damiani Pereira (CRM 35632/PR) without affecting Dr. Gustavo Simoes", () => {
+    e2(vis({ id: "med-gustavo-nobre" })).toBe(false);
+    e2(vis({ id: "db-real", name: "Dr. Gustavo Nobre Damiani Pereira" })).toBe(false);
+    e2(vis({ crm: "35632/PR (Regular)" })).toBe(false);
+    e2(vis({ crm: "35632", crm_state: "PR" })).toBe(false);
+    e2(vis({ id: "med-gustavo-simoes", name: "Dr. Gustavo Simoes Llivi Ibanez", crm: "7684/RO" })).toBe(true);
+    e2(vis({ crm: "35632/SP" })).toBe(true);
+  });
 });

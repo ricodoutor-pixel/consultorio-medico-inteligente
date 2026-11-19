@@ -8,7 +8,7 @@ import { sendWhatsApp } from "../_shared/evolution.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
 const BRISA_GENERIC_PHONE = "5511991363154";
-const WITHDRAWN = ["leuma leao netta", "ana paula ferreira lima", "edilson bezerra", "edilson bezerra da silva", "olivia zimeri"];
+const WITHDRAWN = ["leuma leao netta", "ana paula ferreira lima", "edilson bezerra", "edilson bezerra da silva", "olivia zimeri", "victor henrique bueno da fonseca", "gustavo nobre damiani pereira"];
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   .replace(/^(?:(?:dra|dr|profa|prof)\.?\s+)+/, "").trim().replace(/\s+/g, " ");
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });

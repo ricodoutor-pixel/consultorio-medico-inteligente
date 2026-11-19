@@ -48,6 +48,7 @@ import {
 } from "@/lib/doctor-schedule";
 import { WaitlistCard } from "@/components/agenda/WaitlistCard";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
+import { isPublicProfessionalVisible } from "@/lib/public-professional-visibility";
 
 const fadeUp = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
@@ -117,17 +118,18 @@ const Agendamento = () => {
   }, []);
 
   useEffect(() => {
+    const visibleProfessionals = professionals.filter(isPublicProfessionalVisible);
     if (proParam) {
-      const found = professionals.find(p => p.id === proParam || p.dbId === proParam || p.crm?.includes(proParam));
+      const found = visibleProfessionals.find(p => p.id === proParam || p.dbId === proParam || p.crm?.includes(proParam));
       if (found) {
         setSelectedDoctor(found);
         setStep(1); // Abre diretamente no Passo 1 (Modalidade)
+        return;
       }
-    } else {
-      // Se não veio ?pro=, seleciona o Dr. Anderson por padrão ou abre a vitrine
-      const defaultDoc = professionals.find(p => p.id === "med-anderson-mikalauskas") || professionals[0];
-      setSelectedDoctor(defaultDoc);
     }
+    // Se não veio ?pro= (ou o profissional foi pausado da vitrine), seleciona o padrão visível
+    const defaultDoc = visibleProfessionals.find(p => p.id === "med-anderson-mikalauskas") || visibleProfessionals[0];
+    if (defaultDoc) setSelectedDoctor(defaultDoc);
   }, [proParam]);
 
   // Modalidades disponíveis para o médico selecionado
@@ -387,6 +389,7 @@ const Agendamento = () => {
   // Médicos disponíveis para troca no Passo de Seleção
   const filteredDoctors = useMemo(() => {
     return professionals.filter(p => {
+      if (!isPublicProfessionalVisible(p)) return false;
       const isHumanDoctor = p.category === "Médicos Prescritores" || p.category === "Dentista Prescritor";
       if (!isHumanDoctor) return false;
       if (!searchDoctorQuery.trim()) return true;

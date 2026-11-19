@@ -265,7 +265,7 @@ export const DOCTOR_SEO_MAP: Record<string, { name: string; crm: string; categor
   "med-grace-conceicao": { name: "Dra. Grace Adriana Lopes Conceição", crm: "CRM 190386/SP • 10372/BA", category: "Médico Prescritor" },
   "med-raissa-chagas": { name: "Dra. Raíssa Ruperto Souza das Chagas", crm: "CRM 26470/DF", category: "Médico Prescritor" },
   "med-diego-cartaxo": { name: "Dr. Diego Cartaxo Jacome", crm: "CRM 14828/PB", category: "Médico Prescritor" },
-  "med-gustavo-nobre": { name: "Dr. Gustavo Nobre Damiani Pereira", crm: "CRM 35632/PR", category: "Médico Prescritor" },
+  // Paused at the doctor's request (2026-11-19): "med-gustavo-nobre": { name: "Dr. Gustavo Nobre Damiani Pereira", crm: "CRM 35632/PR", category: "Médico Prescritor" },
   "med-luiz-medina": { name: "Prof. Dr. Luiz Roberto Medina dos Santos", crm: "CRM 11496/SC", category: "Médico Prescritor" },
   "med-adeonis-oliveira": { name: "Dr. Adeonis Oliveira Lima", crm: "CRM 9060/SE", category: "Médico Prescritor" },
   "med-alexandre-stramandinoli": { name: "Dr. Alexandre Stramandinoli Correa da Silva", crm: "CRM 17266/PB", category: "Médico Prescritor" },

@@ -14,6 +14,8 @@ const WITHDRAWN = [
   "edilson bezerra",
   "edilson bezerra da silva",
   "olivia zimeri",
+  "victor henrique bueno da fonseca",
+  "gustavo nobre damiani pereira",
 ];
 const PANEL_TITLE = "Teste o seu Consultório Virtual";
 const PANEL_MESSAGE = "Novas ferramentas no seu Kit do Assinante. Abra o Consultório e teste.";

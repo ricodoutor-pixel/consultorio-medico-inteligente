@@ -16,6 +16,8 @@ const withdrawals = [
   { id: "mock-olivia", name: "olivia zimeri", number: "", state: "" },
   // Paused at the doctor’s own request (2026-11-16); remove this line to publish the card again.
   { id: "med-victor-fonseca", name: "victor henrique bueno da fonseca", number: "206873", state: "SP" },
+  // Paused at the doctor’s own request (2026-11-19); remove this line to publish the card again.
+  { id: "med-gustavo-nobre", name: "gustavo nobre damiani pereira", number: "35632", state: "PR" },
 ];
 
 export function isPublicProfessionalVisible(identity: PublicIdentity): boolean {

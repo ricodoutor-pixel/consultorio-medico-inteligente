@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
-import { MedicalDashboard } from "@/components/MedicalDashboard";
+import { RealWaitingRoom } from "@/components/doctor/RealWaitingRoom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings";
 import { DoctorTeamDashboard } from "@/components/doctor/DoctorTeamDashboard";
 import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDashboard";
 import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
-import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoEvidencias } from "@/components/doctor/CopilotoEvidencias";
 import { AssistenteJuridico } from "@/components/doctor/AssistenteJuridico";
@@ -68,109 +67,7 @@ const Consultorio = () => {
         .eq('user_id', user.id)
         .maybeSingle()).data;
 
-      const isVictorUser = Boolean(
-        /victor.*fonseca|victor henrique/.test(user.email?.toLowerCase() ?? "") ||
-        /victor.*fonseca|victor henrique/.test(profileData?.full_name?.toLowerCase() ?? "") ||
-        doctorData?.crm === "206873" ||
-        doctorData?.id === "med-victor-fonseca"
-      );
-
-      const isMiltonUser = Boolean(
-        user.email?.toLowerCase().includes("milton") ||
-        profileData?.full_name?.toLowerCase().includes("milton") ||
-        doctorData?.crm === "58169" ||
-        doctorData?.id === "med-milton-urban"
-      );
-
-      const isGeisellUser = Boolean(
-        user.id === "0900d6e3-74f6-48f1-b3af-cf76fee5a6c3" ||
-        /geisell/i.test(user.email?.toLowerCase() ?? "") ||
-        /geisell/i.test(profileData?.full_name?.toLowerCase() ?? "") ||
-        doctorData?.crm === "31192" ||
-        doctorData?.id === "med-geisell-torres"
-      );
-
-      if (isVictorUser) {
-        doctorData = {
-          id: doctorData?.id || "med-victor-fonseca",
-          user_id: user.id,
-          crm: "206873",
-          crm_state: "SP",
-          specialty: "Psiquiatria e Medicina Endocanabinoide (WeCann)",
-          is_online: true,
-          is_available: true,
-          is_verified: true,
-          is_approved_by_admin: true,
-          plan_tier: "vip_prescritor",
-          consultation_price: 150,
-          rating: 5.0,
-          total_consultations: 0,
-          ...(doctorData || {}),
-        } as typeof doctorData;
-        doctorData.is_verified = true;
-        doctorData.is_approved_by_admin = true;
-        doctorData.plan_tier = "vip_prescritor";
-      } else if (isMiltonUser) {
-        doctorData = {
-          id: doctorData?.id || "med-milton-urban",
-          user_id: user.id,
-          crm: "58169",
-          crm_state: "SP",
-          specialty: "Pediatria e Autismo Infantil (TEA) — Cannabis Medicinal",
-          is_online: true,
-          is_available: true,
-          is_verified: true,
-          is_approved_by_admin: true,
-          plan_tier: "vip_prescritor",
-          consultation_price: 150,
-          rating: 5.0,
-          total_consultations: 0,
-          ...(doctorData || {}),
-        } as typeof doctorData;
-        doctorData.is_verified = true;
-        doctorData.is_approved_by_admin = true;
-        doctorData.plan_tier = "vip_prescritor";
-      } else if (isGeisellUser) {
-        doctorData = {
-          id: doctorData?.id || "med-geisell-torres",
-          user_id: user.id,
-          crm: "31192",
-          crm_state: "BA",
-          specialty: "Medicina de Família e Comunidade · Medicina Endocanabinoide (WeCann)",
-          is_online: true,
-          is_available: true,
-          is_verified: true,
-          is_approved_by_admin: true,
-          plan_tier: "vip_prescritor",
-          consultation_price: 150,
-          rating: 5.0,
-          total_consultations: 0,
-          ...(doctorData || {}),
-        } as typeof doctorData;
-        doctorData.is_verified = true;
-        doctorData.is_approved_by_admin = true;
-        doctorData.plan_tier = "vip_prescritor";
-      }
-
-      setProfile(profileData || (isVictorUser ? {
-        id: user.id,
-        full_name: "Dr. Victor Henrique Bueno da Fonseca",
-        email: user.email || "contato@doutorvictorfonseca.com",
-        phone: "5511953045378",
-        avatar_url: "/avatars/dr-victor-fonseca.jpg",
-      } : isMiltonUser ? {
-        id: user.id,
-        full_name: "Dr. Milton Dimas Tadeu Urban",
-        email: user.email || "drmiltonurban@gmail.com",
-        phone: "5519999059665",
-        avatar_url: "/avatars/dr-milton-urban.jpg",
-      } : isGeisellUser ? {
-        id: user.id,
-        full_name: "Dra. Geisell Martinez Torres",
-        email: user.email || "drageisell@gmail.com",
-        phone: "5575991462018",
-        avatar_url: "/avatars/dra-geisell.jpg",
-      } : null));
+      setProfile(profileData || null);
 
       setDoctor(doctorData);
       if (doctorData) {
@@ -373,12 +270,7 @@ const Consultorio = () => {
               <ArrowLeft size={16} /> <span className="hidden sm:inline">Voltar</span>
             </button>
 
-            <button 
-              onClick={() => setActiveTab("paciente-teste")}
-              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-500 to-teal-600 text-black hover:scale-105"
-            >
-              <Sparkles size={16} /> 🎭 Ativar Paciente Teste
-            </button>
+
 
             <button 
               onClick={() => {
@@ -439,9 +331,9 @@ const Consultorio = () => {
                 <Video size={16} /> Iniciar Vídeo
               </Link>
             ) : (
-              <Link to="/workspace-medico?patient=paciente-teste-id&appt=appt-sim-01" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-sm bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:opacity-90">
-                <Video size={16} /> Iniciar Vídeo (Atender Paciente)
-              </Link>
+              <span className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 bg-muted text-muted-foreground">
+                <Video size={16} /> Sem consulta agendada
+              </span>
             )}
             <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
               <MessageCircle size={16} /> Telemed WhatsApp
@@ -538,7 +430,7 @@ const Consultorio = () => {
             <div>
               <h4 className="text-sm font-semibold text-amber-500">Cadastro em Análise</h4>
               <p className="text-sm text-amber-500/80 mt-1">
-                ⚡ Seu cadastro está em análise pela nossa Diretoria Técnica. O prazo de aprovação e publicação do seu Card na plataforma é de até 12 horas. Enquanto isso, aproveite para explorar seu Consultório Virtual e praticar atendimentos com o Paciente Teste IA!
+                ⚡ Seu cadastro está em análise pela nossa Diretoria Técnica. O prazo de aprovação e publicação do seu Card na plataforma é de até 12 horas. Enquanto isso, complete seus documentos e horários.
               </p>
             </div>
           </div>
@@ -578,9 +470,6 @@ const Consultorio = () => {
             <TabsTrigger value="financeiro" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">
               💰 Financeiro
             </TabsTrigger>
-            <TabsTrigger value="paciente-teste" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all bg-emerald-500/10 text-emerald-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
-              🎭 Paciente Teste (Simulação 360°)
-            </TabsTrigger>
             <TabsTrigger value="ranking-plantacoin" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all bg-amber-500/10 text-amber-400 data-[state=active]:bg-amber-500 data-[state=active]:text-black">
               🏆 Ranking & PlantaCoins
             </TabsTrigger>
@@ -591,7 +480,7 @@ const Consultorio = () => {
           </TabsList>
           
           <TabsContent value="atendimentos" className="mt-0 border-0 p-0">
-            <MedicalDashboard />
+            {doctor?.id ? <RealWaitingRoom doctorId={doctor.id} /> : null}
           </TabsContent>
 
           <TabsContent value="prontuarios-pacientes" className="mt-0 border-0 p-0">
@@ -623,10 +512,6 @@ const Consultorio = () => {
 
           <TabsContent value="financeiro" className="mt-0 border-0 p-0">
             {doctor?.id ? <DoctorFinancePanel doctorId={doctor.id} /> : null}
-          </TabsContent>
-
-          <TabsContent value="paciente-teste" className="mt-0 border-0 p-0">
-            <PacienteTesteSimulacao360 />
           </TabsContent>
 
           <TabsContent value="ranking-plantacoin" className="mt-0 border-0 p-0">

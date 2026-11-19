@@ -1,5 +1,10 @@
 # Roadmap
 
+## Definição institucional SaaS — 19/11/2026
+- [x] Integrar definição tecnológica nos Termos, Conformidade, Planos e rodapé, sem mudar aparência, preços ou contratos já assinados
+- [x] Conferir páginas na prévia: definição SaaS presente, acordeão aberto, celular sem transbordamento, sem erros de execução; compilação OK
+- [ ] Completar texto de custos e remuneração — aguarda continuação do texto pelo Dr. Edilson; regras atuais preservadas
+
 ## Conferência solicitada — 18/11/2026
 - [x] Consultar cadastros atuais: 49 registros profissionais, 31 aprovados, 17 pendentes, um rejeitado e seis novos nos últimos sete dias; lista não equivale à vitrine nem só a médicos humanos
 - [x] Executar testes existentes: 277 passaram e um teste externo foi omitido

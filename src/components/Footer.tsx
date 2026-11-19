@@ -22,7 +22,7 @@ export const Footer = () => {
               <span className="font-display font-semibold text-foreground text-sm tracking-tight">Planta y Raiz</span>
             </div>
             <p className="text-muted-foreground text-xs leading-relaxed max-w-[240px]">
-              Inovação e acolhimento em saúde canabinoide.
+              Software em nuvem para médicos, com independência clínica e acolhimento em saúde digital.
             </p>
             <div className="flex items-center gap-3 pt-1 flex-wrap">
               <a href="https://www.instagram.com/plantayraizltda/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="Instagram">
@@ -112,7 +112,7 @@ export const Footer = () => {
             Telemedicina com médicos habilitados. A prescrição depende de avaliação individual.
           </p>
           <p className="text-[11px] text-muted-foreground mt-1.5 max-w-2xl mx-auto leading-relaxed">
-            A Planta y Raíz é exclusivamente uma plataforma de tecnologia e intermediação em saúde digital. A plataforma <strong>NÃO vende produtos, NÃO fabrica e NÃO entrega medicamentos</strong>. Toda prescrição é de responsabilidade médica individual com emissão digital conforme a Resolução CFM nº 2.314/2022 e ANVISA RDC 660/2022.
+            A Planta y Raiz fornece software como serviço (SaaS) para médicos e intermediação em saúde digital; não é uma clínica médica. A plataforma <strong>NÃO vende produtos, NÃO fabrica e NÃO entrega medicamentos</strong>. O médico contrata a ferramenta tecnológica, preserva sua independência clínica e responde individualmente por toda prescrição, observando as normas aplicáveis.
           </p>
         </div>
 
@@ -121,8 +121,8 @@ export const Footer = () => {
           <EdilsonOnNotice />
           <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground/80">
-              <strong className="text-foreground">Transparência Legal — Intermediação Tecnológica:</strong>{" "}
-              A Planta y Raiz atua estritamente como plataforma de tecnologia e intermediação em telemedicina e saúde digital.
+              <strong className="text-foreground">Transparência Legal — SaaS e Intermediação Tecnológica:</strong>{" "}
+              A Planta y Raiz oferece infraestrutura de software em nuvem para prontuário eletrônico, agendamento e consultas por vídeo e chat, além de intermediação em saúde digital.
               A <strong>Bezerra Med Soluções Integradas Ltda.</strong> (CNPJ: 30.740.319/0001-14),
               operando sob o nome fantasia <strong>Planta y Raiz</strong>, não realiza venda direta nem detém posse de medicamentos.
               Toda a responsabilidade técnica pelo ato médico é do profissional prescritor habilitado

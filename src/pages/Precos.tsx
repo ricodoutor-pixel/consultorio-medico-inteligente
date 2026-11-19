@@ -449,7 +449,7 @@ const Precos = () => {
           <div className="grid sm:grid-cols-2 gap-3 text-[11px] text-muted-foreground leading-relaxed">
             <p>
               <strong className="text-foreground">Razão Social:</strong> Planta y Raiz Ltda · <strong>CNAE 6209-1/00</strong> —
-              plataforma digital de intermediação entre pacientes e profissionais de saúde. Não somos uma clínica médica.
+              plataforma tecnológica SaaS (Software as a Service — software como serviço) para médicos e intermediação digital. Não somos uma clínica médica. O médico contrata infraestrutura em nuvem para prontuário, agendamento e consultas por vídeo e chat, preservando sua independência clínica.
             </p>
             <p>
               <strong className="text-foreground">Supervisora Técnica:</strong> Dra. Suelen Naves Rodrigues ·

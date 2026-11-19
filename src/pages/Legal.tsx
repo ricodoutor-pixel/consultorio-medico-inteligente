@@ -41,7 +41,11 @@ const regulations = [
 const termos = [
   {
     title: "1. Natureza da Plataforma",
-    content: "A Planta & Raiz é uma plataforma de intermediação que conecta pacientes a profissionais de saúde habilitados e a estabelecimentos autorizados pela ANVISA para comercialização de produtos à base de cannabis. A plataforma não pratica medicina, não prescreve medicamentos e não se responsabiliza por condutas clínicas individuais dos profissionais cadastrados.",
+    content: "A Planta y Raiz fornece uma plataforma tecnológica SaaS (Software as a Service — software como serviço) para médicos e atua na intermediação digital entre pacientes, profissionais habilitados e estabelecimentos autorizados pela ANVISA. O médico contrata um serviço tecnológico para viabilizar sua prática digital, preservando sua independência clínica. A plataforma não é uma clínica, não pratica medicina e não prescreve medicamentos; o ato médico é de responsabilidade do profissional.",
+  },
+  {
+    title: "Infraestrutura de software em nuvem",
+    content: "O serviço oferece prontuário eletrônico em nuvem, agendamento de teleconsultas, consultas por videochamada e chat e apoio à organização documental do fluxo regulatório da ANVISA (RDC 660/2022), sem aprovação automática. A assinatura segue o fluxo disponível, com certificado ICP-Brasil qualificado quando exigido, inclusive certificados em nuvem como VIDaaS. A menção ao certificado não significa integração automática ativa com seu fornecedor.",
   },
   {
     title: "2. Cadastro e Verificação",

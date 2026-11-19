@@ -2,6 +2,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FileText } from "lucide-react";
 import { motion } from "framer-motion";
+import { SERVICES } from "@/lib/pricing";
+import { Link } from "react-router-dom";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -112,7 +114,10 @@ const TermosDeUso = () => {
 
           {/* 8. Pagamentos */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">⚖️ 8. Pagamentos</h2>
+            <h2 className="text-lg font-display font-black text-foreground">⚖️ 8. Estrutura de Custos, Remuneração e Pagamentos</h2>
+            <p>A contratação do software e os honorários médicos são distintos. As assinaturas remuneram o acesso às ferramentas tecnológicas do plano escolhido, conforme os <Link to="/precos" className="text-primary underline">preços e benefícios vigentes</Link>; não substituem os honorários de cada atendimento.</p>
+            <p>Preços atuais dos serviços: Orientação Técnica R$ {SERVICES.orientacao_tecnica.price}, retorno R$ {SERVICES.retorno_consulta.price}, consulta por chat R$ {SERVICES.consulta_chat.price} e consulta por vídeo R$ {SERVICES.consulta_video.price}. Nas consultas médicas, o repasse é de <strong className="text-foreground">93% ao médico e 7% à plataforma</strong>, em todos os planos. O crédito ao saldo do médico segue a conclusão do atendimento e a avaliação do paciente, independentemente da nota. A assinatura não elimina a taxa de 7%.</p>
+            <p>No Catálogo de Produtos, a comissão da plataforma permanece em 5%. Os preços, repasses e condições operacionais existentes não são alterados por esta definição do serviço SaaS.</p>
             <p>Os pagamentos são processados exclusivamente via <strong className="text-foreground">Mercado Pago</strong>, gateway certificado PCI-DSS Level 1. A Planta y Raiz <strong className="text-foreground">não armazena, processa ou transmite dados de cartão de crédito</strong>.</p>
             <p>Métodos aceitos: cartão de crédito, débito, PIX e boleto (quando disponível).</p>
           </section>

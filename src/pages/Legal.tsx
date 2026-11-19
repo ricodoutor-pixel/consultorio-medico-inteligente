@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Shield, Scale, Lock, Eye, FileText, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { SERVICES } from "@/lib/pricing";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -52,8 +53,8 @@ const termos = [
     content: "Profissionais de saúde são verificados quanto ao registro ativo nos conselhos profissionais (CRM, CRF, CRP, CREFITO). Farmácias e produtores devem apresentar autorização ANVISA vigente. A plataforma reserva-se o direito de suspender ou cancelar cadastros que não atendam aos requisitos de verificação.",
   },
   {
-    title: "3. Pagamentos e Comissões",
-    content: "Todos os pagamentos são processados via PIX através do Mercado Pago. A plataforma opera com um modelo de comissões multinível (50% Nível 1, 5% Nível 2, 2% Nível 3) e uma taxa de administração de 5% sobre vendas de não-assinantes. Saques estão sujeitos a uma taxa de 5%, exceto para o plano Clínica Família. Os repasses são processados automaticamente conforme as regras do plano contratado.",
+    title: "3. Estrutura de Custos e Remuneração",
+    content: `As assinaturas remuneram o acesso ao software conforme o plano vigente e são distintas dos honorários médicos. Os preços atuais são: Orientação Técnica R$ ${SERVICES.orientacao_tecnica.price}, retorno R$ ${SERVICES.retorno_consulta.price}, chat R$ ${SERVICES.consulta_chat.price} e vídeo R$ ${SERVICES.consulta_video.price}. Nas consultas, 93% são destinados ao médico e 7% à plataforma em todos os planos; a assinatura não elimina essa taxa. O crédito ao saldo segue a conclusão do atendimento e a avaliação do paciente, independentemente da nota. No Catálogo de Produtos, a comissão permanece em 5%. Os pagamentos são processados pelo Mercado Pago. A definição SaaS não altera preços, repasses nem condições operacionais existentes.`,
   },
   {
     title: "4. Proteção de Dados",

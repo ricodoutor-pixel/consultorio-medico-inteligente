@@ -4,7 +4,7 @@ import {
   X, Sparkles, ChevronRight, ChevronLeft, CheckCircle2, Stethoscope,
   Users, Store, ShoppingBag, ShieldCheck, DollarSign, FileText, Zap,
   Bot, Video, QrCode, ArrowRight, Play, Eye, RotateCcw, HeartPulse,
-  Award, Clock, Check
+  Award, Clock, Check,
   X as CloseIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

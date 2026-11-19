@@ -5,6 +5,7 @@ import {
   Users, Store, ShoppingBag, ShieldCheck, DollarSign, FileText, Zap,
   Bot, Video, QrCode, ArrowRight, Play, Eye, RotateCcw, HeartPulse,
   Award, Clock, Check
+  X as CloseIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -448,24 +449,27 @@ export const InteractiveTour3DModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-[calc(100vw-1rem)] max-w-3xl max-h-[88dvh] overflow-y-auto p-0 border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-3xl max-h-[78dvh] sm:max-h-[88dvh] overflow-y-auto p-0 [&>button:last-child]:hidden border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
+        <button type="button" onClick={handleClose} aria-label="Fechar tour" className="fixed right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-lg hover:bg-muted">
+          <CloseIcon size={20} />
+        </button>
         {/* Top Gradient Banner */}
-        <div className="sticky top-0 z-10 p-4 pr-16 sm:p-6 sm:pr-14 pb-3 sm:pb-4 border-b border-border/60 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-purple-950/30">
+        <div className="sticky top-0 z-10 p-3 pr-14 sm:p-6 sm:pr-14 pb-3 sm:pb-4 border-b border-border/60 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-purple-950/30">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/10">
+              <div className="hidden sm:flex w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/10">
                 <Sparkles size={22} className="animate-pulse" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg md:text-2xl font-display font-black text-foreground tracking-tight">
+                  <h2 className="text-base md:text-2xl font-display font-black text-foreground tracking-tight">
                     Tour Interativo 360° <span className="text-emerald-400">·</span> Planta y Raíz
                   </h2>
                   <Badge variant="outline" className="hidden sm:inline-flex bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
                     3D STEP-BY-STEP
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="hidden sm:block text-xs text-muted-foreground mt-0.5">
                   Aprenda todo o fluxo passo a passo desde o primeiro contato até o atendimento e recebimento
                 </p>
               </div>
@@ -530,7 +534,7 @@ export const InteractiveTour3DModal = ({
         </div>
 
         {/* Modal Main Content with 3D Effect */}
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className="p-3 sm:p-6 md:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${currentRole}-${currentStepIndex}`}
@@ -556,7 +560,7 @@ export const InteractiveTour3DModal = ({
                     <step.icon size={24} className={step.accentColor} />
                   </div>
                   <div>
-                    <h3 className="text-xl md:text-2xl font-display font-black text-foreground tracking-tight leading-tight">
+                    <h3 className="text-lg md:text-2xl font-display font-black text-foreground tracking-tight leading-tight">
                       {step.title}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
@@ -578,7 +582,7 @@ export const InteractiveTour3DModal = ({
               </div>
 
               {/* Right Column: 3D Simulated Interactive Card Preview (5 cols) */}
-              <div className="lg:col-span-5">
+              <div className="hidden sm:block lg:col-span-5">
                 <motion.div
                   whileHover={{ scale: 1.02, rotateY: -3, rotateX: 3 }}
                   style={{ perspective: 1000 }}

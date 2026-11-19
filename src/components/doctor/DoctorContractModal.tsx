@@ -121,7 +121,7 @@ export const DoctorContractModal = ({
             doctor_cpf: doctorCpf,
             doctor_crm: doctorData.crm,
             doctor_crm_uf: doctorData.crm_state || "SP",
-            contract_version: "v1.0",
+            contract_version: "v1.1",
           },
         });
 
@@ -145,7 +145,7 @@ export const DoctorContractModal = ({
         try {
           const { data: rpcRes, error: rpcErr } = await (supabase.rpc as any)("sign_doctor_contract", {
             p_doctor_id: doctorData.id,
-            p_contract_version: "v1.0",
+            p_contract_version: "v1.1",
             p_sha512_hash: finalHash,
             p_signer_name: doctorName,
             p_signer_cpf: doctorCpf,
@@ -183,7 +183,7 @@ export const DoctorContractModal = ({
               signer_user_agent: userAgent,
               sha512_hash: finalHash,
               pdf_url: finalPdfUrl,
-              contract_version: "v1.0",
+              contract_version: "v1.1",
               ip_capture_failed: !clientIp,
             });
           } catch (dbErr) {
@@ -197,7 +197,7 @@ export const DoctorContractModal = ({
               contract_signed_at: timestamp,
               contract_hash: finalHash,
               contract_ip: clientIp,
-              contract_version: "v1.0",
+              contract_version: "v1.1",
               ip_capture_failed: !clientIp,
             } as any).eq("id", doctorData.id);
           } catch (docUpErr) {
@@ -303,6 +303,12 @@ export const DoctorContractModal = ({
                   </h4>
                   <p>
                     O presente instrumento regulamenta o credenciamento do(a) <strong>MÉDICO(A) CONTRATADO(A)</strong> na plataforma digital da <strong>PLANTA Y RAIZ LTDA (CNPJ 58.283.475/0001-00)</strong>, viabilizando o agendamento de orientações técnicas, consultas de telemedicina, emissão de prescrições canábicas e acompanhamento contínuo de pacientes através de salas de teleatendimento criptografadas de ponta a ponta.
+                  </p>
+                  <p className="mt-2">
+                    A PLANTA Y RAIZ LTDA fornece ao(à) MÉDICO(A) software como serviço (SaaS), isto é, infraestrutura tecnológica em nuvem com prontuário eletrônico, agendamento de teleconsultas, consulta por videochamada e consulta por chat, além de apoio à organização documental do fluxo regulatório. O(A) MÉDICO(A) contrata um serviço tecnológico para viabilizar sua prática digital, preservando integralmente sua independência clínica. A plataforma não é clínica médica e não interfere na conduta clínica.
+                  </p>
+                  <p className="mt-2">
+                    Os valores de eventuais planos de assinatura remuneram o acesso às ferramentas tecnológicas e são distintos dos honorários de cada atendimento. Nas consultas, 93% do valor são repassados ao(à) MÉDICO(A) e 7% remuneram a plataforma, em todos os planos; nas vendas do catálogo de produtos, a comissão da plataforma é de 5%. Preços, repasses e condições vigentes constam em /precos e nos Termos de Uso.
                   </p>
                 </div>
 

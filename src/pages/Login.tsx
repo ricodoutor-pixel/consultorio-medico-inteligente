@@ -112,7 +112,7 @@ export default function Login() {
           if (selectedPortal === "paciente") {
             navigate("/dashboard-paciente");
           } else if (selectedPortal === "medico") {
-            navigate("/workspace-medico");
+            navigate("/consultorio");
           } else if (selectedPortal === "farmacia") {
             navigate("/lojistas");
           } else if (selectedPortal === "admin") {
@@ -146,11 +146,23 @@ export default function Login() {
 
         const isAdmin = !!roleData;
 
+        // Médicos e farmácias não têm perfil de paciente: vão direto ao seu espaço profissional.
+        if (!isAdmin && isDoctor) {
+          toast({ title: `Bem-vindo ao Consultório, Dr(a). ${name}! 🩺` });
+          navigate(safeRedirect || "/consultorio");
+          return;
+        }
+        if (!isAdmin && isVendor) {
+          toast({ title: `Bem-vindo ao Portal da Farmácia! 🏪` });
+          navigate(safeRedirect || "/lojistas");
+          return;
+        }
+
         // Se o usuário selecionou um portal e tem permissão para ele:
         if (selectedPortal === "medico") {
           if (isDoctor) {
             toast({ title: `Bem-vindo ao Consultório, Dr(a). ${name}! 🩺` });
-            navigate(safeRedirect || "/workspace-medico");
+            navigate(safeRedirect || "/consultorio");
           } else {
             toast({
               title: "Acesso Não Permitido",
@@ -172,7 +184,7 @@ export default function Login() {
               description: "Você não possui cadastro de farmácia/lojista. Redirecionando para seu portal...",
               variant: "destructive"
             });
-            navigate(isDoctor ? "/workspace-medico" : "/dashboard-paciente");
+            navigate(isDoctor ? "/consultorio" : "/dashboard-paciente");
           }
           return;
         }
@@ -187,7 +199,7 @@ export default function Login() {
               description: "Esta conta não possui privilégios de administrador.",
               variant: "destructive"
             });
-            navigate(isDoctor ? "/workspace-medico" : isVendor ? "/lojistas" : "/dashboard-paciente");
+            navigate(isDoctor ? "/consultorio" : isVendor ? "/lojistas" : "/dashboard-paciente");
           }
           return;
         }

@@ -368,7 +368,7 @@ const Profissionais = () => {
         .single();
 
       if (profile?.user_type === "doctor") {
-        navigate("/dashboard-medico");
+        navigate("/consultorio");
       } else {
         navigate("/dashboard");
       }

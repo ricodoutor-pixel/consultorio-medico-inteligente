@@ -110,6 +110,18 @@ const DashboardPaciente = () => {
 
     const userId = session.user.id;
 
+    // Médicos e farmácias não têm perfil de paciente (admins com chave mestra continuam vendo).
+    const [docRes, adminRes, typeRes] = await Promise.all([
+      supabase.from("doctors").select("id").eq("user_id", userId).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle(),
+      supabase.from("profiles").select("user_type").eq("id", userId).maybeSingle(),
+    ]);
+    if (!adminRes.data) {
+      const t = (typeRes.data as any)?.user_type;
+      if (docRes.data || t === "doctor") { navigate("/consultorio", { replace: true }); return; }
+      if (t === "vendor" || t === "lojista" || t === "pharmacy" || t === "dispensario") { navigate("/lojistas", { replace: true }); return; }
+    }
+
     const [profileRes, apptsRes, notifRes, prescRes, triageRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).single(),
       supabase.from("appointments").select("*").eq("patient_id", userId).order("scheduled_at", { ascending: false }).limit(20),

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
+import { FrogMoodBanner } from "@/components/FrogMoodBanner";
+import { ProfileAvatarCard } from "@/components/patient/ProfileAvatarCard";
 import { RealWaitingRoom } from "@/components/doctor/RealWaitingRoom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings";
@@ -274,6 +276,17 @@ const Consultorio = () => {
             </span>
             <span className={`w-3.5 h-3.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground/50"}`} />
           </button>
+          <div className="w-full -mx-4 sm:mx-0"><FrogMoodBanner /></div>
+          <div className="w-full">
+            <ProfileAvatarCard
+              userId={profile?.id}
+              fullName={profile?.full_name || doctor.name || "Médico"}
+              phone={profile?.phone}
+              avatarUrl={profile?.avatar_url || doctor.avatar_url}
+              completedCount={0}
+              onUpdated={(url) => setProfile((p: any) => ({ ...p, avatar_url: url }))}
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <button 
               onClick={() => window.history.back()}

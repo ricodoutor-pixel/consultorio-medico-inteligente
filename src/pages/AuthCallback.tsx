@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ROUTE_BY_ROLE: Record<string, string> = {
   paciente: "/dashboard",
-  medico: "/dashboard-medico",
-  profissional: "/dashboard-medico",
-  cuidador: "/dashboard-medico",
+  medico: "/consultorio",
+  profissional: "/consultorio",
+  cuidador: "/consultorio",
   farmacia: "/lojistas",
   lojista: "/lojistas",
   vendor: "/lojistas",

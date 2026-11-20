@@ -1,4 +1,5 @@
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { clientIp, rateLimit } from "../_shared/ai-guard.ts";
 import { GEMINI_PRIMARY_MODEL, callGeminiApiWithFallback } from "../_shared/gemini.ts";
 
 const SYSTEM_PROMPT = `Você é o **Guia Regulatório e Direitos do Paciente** da Planta y Raíz, um assistente especializado em esclarecer dúvidas de pacientes, familiares e prescritores sobre a legislação sanitária brasileira de Cannabis Medicinal e direitos de saúde.
@@ -55,10 +56,25 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  try {
-    const { messages } = await req.json().catch(() => ({ messages: [] }));
+  // Endpoint público (pacientes sem login): limite por IP para evitar abuso de custo da IA.
+  const limited = await rateLimit({
+    bucket: "regulatory-assistant",
+    key: clientIp(req),
+    maxHits: 15,
+    windowSeconds: 60,
+    cors,
+  });
+  if (limited) return limited;
 
-    if (!Array.isArray(messages) || messages.length === 0) {
+  try {
+    const body = await req.json().catch(() => ({ messages: [] }));
+    // Mantém só as últimas 12 mensagens válidas, com tamanho máximo por mensagem.
+    const messages = (Array.isArray(body?.messages) ? body.messages : [])
+      .filter((m: any) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+      .slice(-12)
+      .map((m: any) => ({ role: m.role, content: m.content.slice(0, 2000) }));
+
+    if (messages.length === 0) {
       return new Response(JSON.stringify({ error: "Lista de mensagens vazia ou inválida" }), {
         status: 400,
         headers: { ...cors, "Content-Type": "application/json" },

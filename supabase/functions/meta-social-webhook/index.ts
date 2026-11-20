@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { isValidMetaSignature } from "../_shared/meta-signature.ts";
 import { META_APP_SECRET } from "../_shared/meta-secrets.ts";
+import { handleInstagramDm } from "../_shared/instagram-dm-agent.ts";
 
 const META_VERIFY_TOKEN = Deno.env.get("META_VERIFY_TOKEN") || "planta_meta_webhook_2026";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "https://shmbwdjuddvquszwkvuq.supabase.co";
@@ -54,6 +55,15 @@ serve(async (req: Request) => {
         for (const msg of entry.messaging) {
           const senderId = msg.sender?.id;
           const text = msg.message?.text || "";
+
+          // Agente Brisa responde o Direct do Instagram (Gemini). Roda após o 200 para não estourar o timeout da Meta.
+          if (body.object === "instagram" && !msg.message?.is_echo) {
+            const job = handleInstagramDm(entry.id, msg)
+              .then((r) => console.log("[ig-dm]", r))
+              .catch((e) => console.error("[ig-dm] erro:", e));
+            const rt = (globalThis as any).EdgeRuntime;
+            if (rt?.waitUntil) rt.waitUntil(job); else await job;
+          }
 
           if (text) {
             // Disparar captação de lead via brisa-lead-hunter

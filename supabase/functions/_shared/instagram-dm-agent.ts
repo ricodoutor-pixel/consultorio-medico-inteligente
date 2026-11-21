@@ -134,7 +134,9 @@ export async function handleInstagramDm(ownIgId: string | undefined, ev: IgMessa
   let model = "gemini";
   if (quick) {
     if ((quick as any).suppressed) return "suppressed";
-    answer = quick.answer;
+    answer = (quick as any).optOut
+      ? "Entendido, não enviaremos novas mensagens por aqui. Obrigada pela atenção."
+      : quick.answer;
     model = (quick as any).model || "policy";
     if ((quick as any).handoff || (quick as any).optOut) {
       await sb().from("brisa_unified_contacts").update({

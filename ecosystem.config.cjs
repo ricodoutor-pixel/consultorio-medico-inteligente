@@ -95,7 +95,7 @@ module.exports = {
       name: 'instagram-direct-inviter',
       node_args: '--dns-result-order=ipv4first',
       script: 'scripts/agent_instagram_direct_inviter.mjs',
-      args: '--daemon --live',
+      args: '--daemon',
       cwd: '/opt/plantayraiz',
       instances: 1,
       exec_mode: 'fork',

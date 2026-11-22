@@ -56,12 +56,12 @@ const LOG_FILE = process.env.IG_LOG_FILE || path.join(SCRATCH_DIR, 'instagram_in
 const LOCK_FILE = process.env.IG_LOCK_FILE || path.join(SCRATCH_DIR, 'instagram_inviter.lock');
 
 const MAX_LOG_BYTES = 5 * 1024 * 1024; // 5 MB (rotação simples na VPS)
-const DEFAULT_DAILY_LIMIT = 25;
-const DEFAULT_MIN_DELAY_SEC = 120; // 2 min
-const DEFAULT_MAX_DELAY_SEC = 300; // 5 min
+const DEFAULT_DAILY_LIMIT = 12; // Máximo 12 convites novos por dia (v2)
+const DEFAULT_MIN_DELAY_SEC = 240; // 4 min (v2)
+const DEFAULT_MAX_DELAY_SEC = 540; // 9 min (v2)
 const DEFAULT_START_HOUR_BRT = 9;
 const DEFAULT_END_HOUR_BRT = 19;
-const COOLDOWN_ON_RESTRICTION_MS = 24 * 60 * 60 * 1000; // 24h
+const COOLDOWN_ON_RESTRICTION_MS = 48 * 60 * 60 * 1000; // 48h de cooldown em restrição (v2)
 
 const DEFAULT_HASHTAGS = [
   'medicinacanabinoide',
@@ -76,33 +76,10 @@ const DEFAULT_HASHTAGS = [
   'dorcronica',
 ];
 
-// ── TEMPLATES PADRONIZADOS (AUDITORIA 19/11/2026) ───────────────────────────
-// Proibido: "sócio", "participação nos lucros", "taxa zero", "100% de repasse", "pacientes 100% seus".
+// ── TEMPLATES PADRONIZADOS (PROTOCOLO v2 - ENFª BRISA) ───────────────────────────
+// Proibido: "sócio", "participação nos lucros", "taxa zero", "100% de repasse", superlativos, links no 1º contato.
 export const INVITE_TEMPLATES = [
-  `Olá, {greeting}! Sou da equipe da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14).
-
-Convidamos médicos com CRM ativo para credenciar gratuitamente seu consultório digital na nossa plataforma de telemedicina:
-• Repasse de 93% de cada consulta via PIX (taxa fixa de 7% em todos os planos);
-• Prontuário CFM e prescrição digital assinada via ICP-Brasil / Gov.br (RDC 660 e 327);
-• Plano Médico VIP opcional (R$ 99/mês) com prioridade na fila e ferramentas de IA.
-
-Cadastro gratuito em 2 minutos:
-https://www.plantayraiz.com.br/cadastro-profissional
-
-Dúvidas? Nossa equipe atende no WhatsApp (11) 99136-3154.`,
-
-  `Olá, {greeting}! Tudo bem? Passando em nome da equipe técnica da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
-
-Estamos credenciando médicos prescritores com CRM ativo para atender por telemedicina com:
-• Cadastro gratuito e aprovação humana em 24 a 48h úteis;
-• Repasse de 93% via PIX por consulta (taxa fixa de 7%);
-• Consultório virtual com vídeo, prontuário CFM e assinatura digital ICP-Brasil / Gov.br;
-• Plano Médico VIP opcional (R$ 99/mês) com prioridade na fila e Copiloto Clínico.
-
-Conheça e faça seu cadastro gratuito:
-https://www.plantayraiz.com.br/cadastro-profissional
-
-Qualquer dúvida, nossa equipe humana acompanha por aqui ou no WhatsApp (11) 99136-3154.`,
+  `Olá, {greeting}! Aqui é a Enfª Brisa, assistente virtual de Marketing Médico da Planta y Raiz (a equipe humana acompanha). Acompanhamos seu trabalho em {area} e gostaríamos de convidá-{pronome} a conhecer nossa plataforma de telemedicina: cadastro gratuito para médicos com CRM ativo, {senhorSenhora} define seus honorários, sem exclusividade, e o repasse é de 93% de cada consulta nesta fase de lançamento. Se tiver interesse, envio o link e as condições por escrito, ou marcamos uma conversa com o Dr. Edilson Bezerra, nosso fundador. Se preferir não receber mensagens, é só avisar. Um abraço!`,
 ];
 
 // ── PARSER DE ARGUMENTOS CLI & ENV ──────────────────────────────────────────
@@ -301,18 +278,42 @@ export function formatGreetingName(fullName = '', username = '', bio = '') {
     return hasExplicitDoctorCredential ? 'colega' : username || 'tudo bem';
   }
 
-  const firstAndSecond = cleaned.split(/\s+/).slice(0, 2).join(' ');
+  const firstOnly = cleaned.split(/\s+/)[0] || '';
   if (hasExplicitDoctorCredential) {
-    const isFemale = /^(dra\.?|doutora)\b/i.test(rawName);
-    return `${isFemale ? 'Dra.' : 'Dr(a).'} ${firstAndSecond}`;
+    const isFemale = /^(dra\.?|doutora)\b/i.test(rawName) || /\b(médica|doutora|dra\.)\b/i.test(bio);
+    return `${isFemale ? 'Dra.' : 'Dr.'} ${firstOnly}`;
   }
-  return firstAndSecond;
+  return firstOnly;
+}
+
+export function extractSpecialtyArea(bio = '') {
+  const b = normalizeAscii(bio);
+  if (b.includes('psiquiatr')) return 'psiquiatria e cannabis medicinal';
+  if (b.includes('neurolog')) return 'neurologia e cannabis medicinal';
+  if (b.includes('dor')) return 'medicina da dor e cannabis medicinal';
+  if (b.includes('integrativ')) return 'medicina integrativa e cannabis medicinal';
+  if (b.includes('endocanab')) return 'medicina endocanabinoide';
+  if (b.includes('reumatolog')) return 'reumatologia e cannabis medicinal';
+  if (b.includes('pediatr')) return 'pediatria e cannabis medicinal';
+  if (b.includes('oncolog')) return 'oncologia e cannabis medicinal';
+  return 'medicina canabinoide';
 }
 
 export function buildInviteMessage({ fullName = '', username = '', bio = '', templateIndex = 0 }) {
   const greeting = formatGreetingName(fullName, username, bio);
+  const isFemale = greeting.startsWith('Dra.');
+  const pronome = isFemale ? 'la' : 'lo';
+  const senhorSenhora = isFemale ? 'a senhora' : 'o senhor';
+  const area = extractSpecialtyArea(bio);
+
   const template = INVITE_TEMPLATES[Math.abs(templateIndex) % INVITE_TEMPLATES.length];
-  return sanitizeOutboundAnswer(template.replace('{greeting}', greeting));
+  const msg = template
+    .replace('{greeting}', greeting)
+    .replace('{area}', area)
+    .replace('{pronome}', pronome)
+    .replace('{senhorSenhora}', senhorSenhora);
+
+  return sanitizeOutboundAnswer(msg);
 }
 
 // ── DETECÇÃO DE RESTRIÇÃO / BLOQUEIO / CHALLENGE DO INSTAGRAM ───────────────

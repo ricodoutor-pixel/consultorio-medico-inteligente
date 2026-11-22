@@ -48,7 +48,10 @@ import { sanitizeOutboundAnswer } from '../supabase/functions/_shared/brisa-resp
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCRATCH_DIR = path.join(__dirname, '../scratch');
+const REPO_ROOT = path.join(__dirname, '..');
+const SCRATCH_DIR = path.join(REPO_ROOT, 'scratch');
+const CONVITES_CSV_FILE = process.env.IG_CONVITES_CSV || path.join(REPO_ROOT, 'convites_medicos.csv');
+const EXCLUSAO_CSV_FILE = process.env.IG_EXCLUSAO_CSV || path.join(REPO_ROOT, 'exclusao.csv');
 const SESSION_DIR = process.env.IG_SESSION_DIR || path.join(SCRATCH_DIR, 'instagram_session');
 const COOKIES_FILE = process.env.IG_COOKIES_FILE || path.join(SCRATCH_DIR, 'instagram_cookies.json');
 const STATE_FILE = process.env.IG_STATE_FILE || path.join(SCRATCH_DIR, 'instagram_invited_doctors.json');
@@ -62,6 +65,7 @@ const DEFAULT_MAX_DELAY_SEC = 540; // 9 min (v2)
 const DEFAULT_START_HOUR_BRT = 9;
 const DEFAULT_END_HOUR_BRT = 19;
 const COOLDOWN_ON_RESTRICTION_MS = 48 * 60 * 60 * 1000; // 48h de cooldown em restrição (v2)
+export const REGISTRATION_URL = 'https://www.plantayraiz.com.br/cadastro-profissional';
 
 const DEFAULT_HASHTAGS = [
   'medicinacanabinoide',
@@ -77,9 +81,18 @@ const DEFAULT_HASHTAGS = [
 ];
 
 // ── TEMPLATES PADRONIZADOS (PROTOCOLO v2 - ENFª BRISA) ───────────────────────────
-// Proibido: "sócio", "participação nos lucros", "taxa zero", "100% de repasse", superlativos, links no 1º contato.
+// Proibido: "sócio", "participação nos lucros", "taxa zero", "100% de repasse", superlativos.
 export const INVITE_TEMPLATES = [
   `Olá, {greeting}! Aqui é a Enfª Brisa, assistente virtual de Marketing Médico da Planta y Raiz (a equipe humana acompanha). Acompanhamos seu trabalho em {area} e gostaríamos de convidá-{pronome} a conhecer nossa plataforma de telemedicina: cadastro gratuito para médicos com CRM ativo, {senhorSenhora} define seus honorários, sem exclusividade, e o repasse é de 93% de cada consulta nesta fase de lançamento. Se tiver interesse, envio o link e as condições por escrito, ou marcamos uma conversa com o Dr. Edilson Bezerra, nosso fundador. Se preferir não receber mensagens, é só avisar. Um abraço!`,
+];
+
+export const INVITE_TEMPLATES_WITH_LINK = [
+  `Olá, {greeting}! Aqui é a Enfª Brisa, assistente virtual de Marketing Médico da Planta y Raiz (a equipe humana acompanha). Acompanhamos seu trabalho em {area} e gostaríamos de convidá-{pronome} a conhecer nossa plataforma de telemedicina: cadastro gratuito para médicos com CRM ativo, {senhorSenhora} define seus honorários, sem exclusividade, e o repasse é de 93% de cada consulta (taxa fixa de 7%).
+
+👉 Clique aqui para fazer seu cadastro gratuito:
+${REGISTRATION_URL}
+
+Se preferir conversar antes com o Dr. Edilson Bezerra ou não receber mensagens, é só responder por aqui. Um abraço!`,
 ];
 
 // ── PARSER DE ARGUMENTOS CLI & ENV ──────────────────────────────────────────
@@ -110,6 +123,9 @@ export function parseCliArgs(argv = process.argv.slice(2), env = process.env) {
   const dryRun = hasFlag('--dry-run') || (!hasFlag('--live') && envBool('IG_DRY_RUN', daemon));
   const headed = hasFlag('--headed') || !envBool('IG_HEADLESS', true);
   const exportCookiesOnly = hasFlag('--export-cookies');
+  const followBeforeDm = hasFlag('--follow') || (!hasFlag('--no-follow') && envBool('IG_FOLLOW_BEFORE_DM', false));
+  const includeLink = hasFlag('--with-link') || (!hasFlag('--no-link') && envBool('IG_INCLUDE_LINK', false));
+  const allowSunday = hasFlag('--allow-sunday') || envBool('IG_ALLOW_SUNDAY', false);
   const maxDaily = parsePositiveInt(getFlagValue('--max') ?? env?.IG_DAILY_LIMIT, DEFAULT_DAILY_LIMIT);
   const minDelaySec = parsePositiveInt(getFlagValue('--min-delay') ?? env?.IG_MIN_DELAY_SEC, DEFAULT_MIN_DELAY_SEC);
   const maxDelaySec = Math.max(
@@ -129,6 +145,9 @@ export function parseCliArgs(argv = process.argv.slice(2), env = process.env) {
     headless: !headed,
     daemon,
     exportCookiesOnly,
+    followBeforeDm,
+    includeLink,
+    allowSunday,
     maxDaily,
     minDelaySec,
     maxDelaySec,
@@ -223,6 +242,22 @@ export function isWithinBusinessHours(now = new Date(), startHour = DEFAULT_STAR
   return h >= startHour && h < endHour;
 }
 
+export function isBrasiliaSunday(now = new Date()) {
+  const weekday = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    weekday: 'short',
+  }).format(now);
+  return weekday === 'Sun';
+}
+
+export function isAllowedSendWindow(
+  now = new Date(),
+  { startHourBrt = DEFAULT_START_HOUR_BRT, endHourBrt = DEFAULT_END_HOUR_BRT, allowSunday = false } = {},
+) {
+  if (!allowSunday && isBrasiliaSunday(now)) return false;
+  return isWithinBusinessHours(now, startHourBrt, endHourBrt);
+}
+
 export function getBrasiliaDateKey(now = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Sao_Paulo',
@@ -299,14 +334,15 @@ export function extractSpecialtyArea(bio = '') {
   return 'medicina canabinoide';
 }
 
-export function buildInviteMessage({ fullName = '', username = '', bio = '', templateIndex = 0 }) {
+export function buildInviteMessage({ fullName = '', username = '', bio = '', templateIndex = 0, includeLink = false }) {
   const greeting = formatGreetingName(fullName, username, bio);
   const isFemale = greeting.startsWith('Dra.');
   const pronome = isFemale ? 'la' : 'lo';
   const senhorSenhora = isFemale ? 'a senhora' : 'o senhor';
   const area = extractSpecialtyArea(bio);
 
-  const template = INVITE_TEMPLATES[Math.abs(templateIndex) % INVITE_TEMPLATES.length];
+  const pool = includeLink ? INVITE_TEMPLATES_WITH_LINK : INVITE_TEMPLATES;
+  const template = pool[Math.abs(templateIndex) % pool.length];
   const msg = template
     .replace('{greeting}', greeting)
     .replace('{area}', area)
@@ -413,6 +449,90 @@ export function recordInviteSent(state, username, profileData, { dryRun = false,
   };
   saveState(state, filePath);
   return true;
+}
+
+// ── DEDUPLICAÇÃO E REGISTRO UNIFICADO EM CSV (convites_medicos.csv + exclusao.csv)
+function extractHandlesFromCsv(content = '') {
+  const handles = new Set();
+  const lines = String(content || '').split(/\r?\n/);
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const match = line.match(/@([a-zA-Z0-9._]+)/);
+    if (match?.[1]) handles.add(match[1].toLowerCase());
+  }
+  return handles;
+}
+
+export function loadCsvBlockedProfiles(
+  convitesPath = CONVITES_CSV_FILE,
+  exclusaoPath = EXCLUSAO_CSV_FILE,
+) {
+  const blocked = new Set();
+  for (const filePath of [convitesPath, exclusaoPath]) {
+    try {
+      if (filePath && fs.existsSync(filePath)) {
+        for (const h of extractHandlesFromCsv(fs.readFileSync(filePath, 'utf8'))) {
+          blocked.add(h);
+        }
+      }
+    } catch (_) {}
+  }
+  return blocked;
+}
+
+function escapeCsvCell(value = '') {
+  const clean = String(value ?? '').replace(/[\r\n]+/g, ' ').trim();
+  return clean.includes(',') || clean.includes('"') ? `"${clean.replace(/"/g, '""')}"` : clean;
+}
+
+export function appendInviteToCsv(
+  username,
+  profileData = {},
+  {
+    dryRun = false,
+    hashtag = '',
+    followed = false,
+    status = 'convidado',
+    filePath = CONVITES_CSV_FILE,
+    now = new Date(),
+  } = {},
+) {
+  if (dryRun || !filePath) return false;
+  try {
+    const header = 'data_hora,perfil,nome,conselho_numero,area,termo_de_busca,status,resposta,observacao\n';
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, header, 'utf8');
+    }
+    const dateStr = `${getBrasiliaDateKey(now)} ${new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(now)}`;
+    const crmMatch = String(profileData.bio || '').match(/\bCRM(?:[-/\s]?[A-Z]{2})?[\s:.-]*\d{3,7}/i);
+    const council = crmMatch ? crmMatch[0].trim() : 'CRM';
+    const area = extractSpecialtyArea(profileData.bio || '');
+    const obs = followed ? 'Seguiu + DM automática' : 'DM automática';
+    const row = [
+      dateStr,
+      `@${username}`,
+      profileData.name || username,
+      council,
+      area,
+      hashtag || 'hashtag',
+      status,
+      'sem',
+      obs,
+    ]
+      .map(escapeCsvCell)
+      .join(',');
+    fs.appendFileSync(filePath, `${row}\n`, 'utf8');
+    return true;
+  } catch (err) {
+    log(`⚠️ Falha ao registrar convite em CSV (${filePath}): ${err.message}`);
+    return false;
+  }
 }
 
 // ── SUPABASE CRM (LAZY CLIENT) ──────────────────────────────────────────────
@@ -623,6 +743,12 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
 
     log('✅ Sessão do Instagram autenticada!');
 
+    // Deduplicação unificada com convites_medicos.csv e exclusao.csv
+    const csvBlocked = loadCsvBlockedProfiles();
+    if (csvBlocked.size > 0) {
+      log(`🛡️ ${csvBlocked.size} perfil(is) já registrados em convites_medicos.csv / exclusao.csv serão ignorados.`);
+    }
+
     // Embaralha hashtags a cada ciclo para diversificar descoberta
     const shuffledTags = [...cfg.hashtags].sort(() => Math.random() - 0.5).slice(0, 5);
     const candidateProfiles = [];
@@ -642,7 +768,7 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
           await page.evaluate(() => ({ url: window.location.href, bodyText: document.body?.innerText?.slice(0, 500) || '' })),
         );
         if (tagCheck.restricted) {
-          log(`🚨 Restrição detectada pelo Instagram (${tagCheck.reason}). Parando ciclo imediatamente por 24h.`);
+          log(`🚨 Restrição detectada pelo Instagram (${tagCheck.reason}). Parando ciclo imediatamente por 48h.`);
           state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
           state.lastRestrictionReason = tagCheck.reason;
           saveState(state);
@@ -674,8 +800,12 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
 
             if (authorInfo?.username) {
               const uLower = authorInfo.username.toLowerCase();
-              if (!state.invitedProfiles[uLower] && !candidateProfiles.some((c) => c.username.toLowerCase() === uLower)) {
-                candidateProfiles.push(authorInfo);
+              if (
+                !state.invitedProfiles[uLower] &&
+                !csvBlocked.has(uLower) &&
+                !candidateProfiles.some((c) => c.username.toLowerCase() === uLower)
+              ) {
+                candidateProfiles.push({ ...authorInfo, hashtag });
               }
             }
           } catch (_) {}
@@ -722,7 +852,7 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
 
         const restriction = detectInstagramRestriction(profileSnap);
         if (restriction.restricted) {
-          log(`🚨 Restrição detectada (${restriction.reason}). Entrando em cooldown de 24h.`);
+          log(`🚨 Restrição detectada (${restriction.reason}). Entrando em cooldown de 48h.`);
           state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
           state.lastRestrictionReason = restriction.reason;
           saveState(state);
@@ -739,18 +869,64 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
           username,
           bio: profileSnap.bio,
           templateIndex: sentThisCycle,
+          includeLink: cfg.includeLink,
         });
 
         log(`🩺 Médico qualificado: @${username} (${profileSnap.name || 'sem nome'})`);
 
         if (cfg.dryRun) {
           sentThisCycle++;
-          log(`🧪 [DRY-RUN #${sentThisCycle}] Simulado para @${username} (estado preservado, nenhuma DM enviada).`);
+          log(
+            `🧪 [DRY-RUN #${sentThisCycle}] Simulado para @${username} ` +
+              `(follow=${cfg.followBeforeDm}, withLink=${cfg.includeLink}; estado preservado, nenhuma ação enviada).`,
+          );
           continue;
         }
 
+        // Opcional (--follow / IG_FOLLOW_BEFORE_DM=true): clica em "Seguir" antes de enviar mensagem
+        let followedNow = false;
+        if (cfg.followBeforeDm) {
+          const followResult = await page.evaluate(() => {
+            const headerBtns = Array.from(document.querySelectorAll('header button, header div[role="button"]'));
+            const alreadyBtn = headerBtns.find((b) => {
+              const t = (b.innerText || '').trim().toLowerCase();
+              return t === 'seguindo' || t === 'following' || t === 'solicitado' || t === 'requested';
+            });
+            if (alreadyBtn) return 'already_following';
+
+            const followBtn = headerBtns.find((b) => {
+              const t = (b.innerText || '').trim().toLowerCase();
+              return t === 'seguir' || t === 'follow' || t === 'seguir de volta' || t === 'follow back';
+            });
+            if (followBtn) {
+              followBtn.click();
+              return 'clicked';
+            }
+            return 'not_found';
+          });
+
+          if (followResult === 'clicked') {
+            followedNow = true;
+            log(`➕ Seguindo @${username} antes de enviar DM...`);
+            await sleep(4500 + Math.floor(Math.random() * 2500));
+
+            const followRestriction = detectInstagramRestriction(
+              await page.evaluate(() => ({ url: window.location.href, bodyText: document.body?.innerText?.slice(0, 500) || '' })),
+            );
+            if (followRestriction.restricted) {
+              log(`🚨 Restrição após seguir @${username} (${followRestriction.reason}). Cooldown de 48h.`);
+              state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
+              state.lastRestrictionReason = followRestriction.reason;
+              saveState(state);
+              break;
+            }
+          } else if (followResult === 'already_following') {
+            log(`ℹ️ Já segue @${username}. Prosseguindo para Direct...`);
+          }
+        }
+
         const clickedMessageBtn = await page.evaluate(() => {
-          const buttons = Array.from(document.querySelectorAll('button, div[role="button"]'));
+          const buttons = Array.from(document.querySelectorAll('header button, header div[role="button"], button, div[role="button"]'));
           const msgBtn = buttons.find((b) => {
             const t = (b.innerText || '').trim().toLowerCase();
             return t === 'mensagem' || t === 'enviar mensagem' || t === 'message';
@@ -773,7 +949,7 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
           await page.evaluate(() => ({ url: window.location.href, bodyText: document.body?.innerText?.slice(0, 500) || '' })),
         );
         if (dmRestriction.restricted) {
-          log(`🚨 Restrição ao abrir Direct (${dmRestriction.reason}). Entrando em cooldown de 24h.`);
+          log(`🚨 Restrição ao abrir Direct (${dmRestriction.reason}). Entrando em cooldown de 48h.`);
           state.blockedUntil = new Date(Date.now() + COOLDOWN_ON_RESTRICTION_MS).toISOString();
           state.lastRestrictionReason = dmRestriction.reason;
           saveState(state);
@@ -784,9 +960,16 @@ export async function runInstagramInviterCycle(rawOptions = {}) {
         await typeAndSendDirectMessage(page, messageInputSelector, inviteMessage);
 
         sentThisCycle++;
+        csvBlocked.add(username.toLowerCase());
         recordInviteSent(state, username, profileSnap, { dryRun: false });
+        appendInviteToCsv(username, profileSnap, {
+          dryRun: false,
+          hashtag: candidate.hashtag || '',
+          followed: followedNow,
+          status: 'convidado',
+        });
         await syncLeadToSupabase(username, profileSnap);
-        log(`🎉 DM enviada para @${username} (${sentThisCycle} neste ciclo).`);
+        log(`🎉 DM enviada para @${username} (${sentThisCycle} neste ciclo${followedNow ? ' | seguiu + DM' : ''}).`);
 
         if (canSendToday(state, cfg.maxDaily) && !stopRequested) {
           const delayMs = getRandomDelay(cfg.minDelaySec, cfg.maxDelaySec);
@@ -840,11 +1023,14 @@ export async function runInstagramInviter(rawOptions = {}) {
       return await runInstagramInviterCycle(cfg);
     }
 
-    log(`♻️ Modo DAEMON VPS ativo (janela Brasília ${cfg.startHourBrt}h–${cfg.endHourBrt}h | teto ${cfg.maxDaily}/dia | dryRun=${cfg.dryRun}).`);
+    log(
+      `♻️ Modo DAEMON ativo (janela Brasília ${cfg.allowSunday ? 'Dom–Sáb' : 'Seg–Sáb'} ${cfg.startHourBrt}h–${cfg.endHourBrt}h ` +
+        `| teto ${cfg.maxDaily}/dia | follow=${cfg.followBeforeDm} | withLink=${cfg.includeLink} | dryRun=${cfg.dryRun}).`,
+    );
     while (!stopRequested) {
       const now = new Date();
-      if (!isWithinBusinessHours(now, cfg.startHourBrt, cfg.endHourBrt)) {
-        log(`🌙 Fora da janela comercial (${getBrasiliaHour(now)}h BRT). Aguardando 30 minutos...`);
+      if (!isAllowedSendWindow(now, cfg)) {
+        log(`🌙 Fora da janela permitida (${getBrasiliaHour(now)}h BRT${isBrasiliaSunday(now) ? ' domingo' : ''}). Aguardando 30 minutos...`);
         await sleep(30 * 60 * 1000);
         continue;
       }
@@ -875,13 +1061,16 @@ if (isDirectCli && (process.argv.includes('--help') || process.argv.includes('-h
   console.log(`Uso: node scripts/agent_instagram_direct_inviter.mjs [opções]
   --live              envia DMs reais (padrão em --daemon é dry-run)
   --dry-run           simula sem enviar
-  --once | --daemon   um ciclo ou contínuo
+  --once | --daemon   um ciclo ou contínuo (Seg-Sáb 9h-19h BRT)
   --headed            abre navegador visível
+  --follow            clica em "Seguir" no perfil do médico antes de enviar DM
+  --with-link         inclui chamada "Clique aqui" + URL de cadastro na 1ª DM
+  --allow-sunday      permite envios também aos domingos
   --export-cookies    loga e salva cookies (máquina local)
   --cookies <arq>     arquivo de cookies (padrão scratch/instagram_cookies.json)
-  --max <n>           limite diário (padrão 25)
+  --max <n>           limite diário (padrão 12 — Protocolo v2)
   --min-delay/--max-delay <s>, --start-hour/--end-hour <h>, --hashtags a,b
-Env: IG_SESSIONID, IG_DAILY_LIMIT, IG_DRY_RUN, IG_DAEMON, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY`);
+Env: IG_SESSIONID, IG_DAILY_LIMIT, IG_DRY_RUN, IG_DAEMON, IG_FOLLOW_BEFORE_DM, IG_INCLUDE_LINK, IG_ALLOW_SUNDAY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY`);
   process.exit(0);
 }
 if (isDirectCli) {

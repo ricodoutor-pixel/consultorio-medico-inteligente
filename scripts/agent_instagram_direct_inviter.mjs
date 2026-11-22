@@ -427,22 +427,21 @@ async function syncLeadToSupabase(username, profileData) {
   if (!supabase) return;
   try {
     const cleanPhone = profileData.phone || `ig_${username.toLowerCase()}`;
-    const { error } = await supabase.from('leads_crm').upsert(
-      {
-        name: profileData.name || username,
-        phone: cleanPhone,
+    const { error } = await supabase.from('leads').insert({
+      name: profileData.name || username,
+      whatsapp: cleanPhone,
+      source: 'instagram_direct',
+      status: 'invited',
+      condition_interest: profileData.specialty || 'Medicina Canabinoide / Integrativa',
+      metadata: {
         instagram_url: `https://www.instagram.com/${username}/`,
-        specialty: profileData.specialty || 'Medicina Canabinoide / Integrativa',
         state: profileData.state || 'BR',
-        source: 'instagram_direct',
-        status: 'invited',
-        notes: `Convite enviado via Instagram Direct em ${new Date().toLocaleDateString('pt-BR')}. Bio: ${(profileData.bio || '').slice(0, 150)}`,
-        last_contact_at: new Date().toISOString(),
+        bio: (profileData.bio || '').slice(0, 150),
+        invited_at: new Date().toISOString(),
       },
-      { onConflict: 'phone', ignoreDuplicates: false },
-    );
+    });
     if (error) {
-      log(`⚠️ Supabase leads_crm retornou erro para @${username}: ${error.message}`);
+      log(`⚠️ Supabase leads retornou erro para @${username}: ${error.message}`);
     } else {
       log(`✅ Lead @${username} sincronizado no CRM Supabase.`);
     }
@@ -871,6 +870,19 @@ export async function runInstagramInviter(rawOptions = {}) {
 
 // Execução direta via CLI
 const isDirectCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectCli && (process.argv.includes('--help') || process.argv.includes('-h'))) {
+  console.log(`Uso: node scripts/agent_instagram_direct_inviter.mjs [opções]
+  --live              envia DMs reais (padrão em --daemon é dry-run)
+  --dry-run           simula sem enviar
+  --once | --daemon   um ciclo ou contínuo
+  --headed            abre navegador visível
+  --export-cookies    loga e salva cookies (máquina local)
+  --cookies <arq>     arquivo de cookies (padrão scratch/instagram_cookies.json)
+  --max <n>           limite diário (padrão 25)
+  --min-delay/--max-delay <s>, --start-hour/--end-hour <h>, --hashtags a,b
+Env: IG_SESSIONID, IG_DAILY_LIMIT, IG_DRY_RUN, IG_DAEMON, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY`);
+  process.exit(0);
+}
 if (isDirectCli) {
   runInstagramInviter().catch((err) => {
     log(`❌ Falha fatal: ${err.message}`);

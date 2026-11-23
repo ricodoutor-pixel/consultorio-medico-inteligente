@@ -2233,6 +2233,96 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_scribe_consents: {
+        Row: {
+          accepted: boolean
+          appointment_id: string
+          consent_version: string
+          decided_at: string
+          patient_id: string
+        }
+        Insert: {
+          accepted: boolean
+          appointment_id: string
+          consent_version?: string
+          decided_at?: string
+          patient_id: string
+        }
+        Update: {
+          accepted?: boolean
+          appointment_id?: string
+          consent_version?: string
+          decided_at?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_scribe_consents_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_scribe_consents_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+        ]
+      }
+      consultation_transcripts: {
+        Row: {
+          appointment_id: string
+          attention_points: string
+          consent_decided_at: string | null
+          created_at: string
+          doctor_user_id: string
+          mode: string
+          soap: string
+          transcript: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          attention_points?: string
+          consent_decided_at?: string | null
+          created_at?: string
+          doctor_user_id: string
+          mode: string
+          soap?: string
+          transcript: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          attention_points?: string
+          consent_decided_at?: string | null
+          created_at?: string
+          doctor_user_id?: string
+          mode?: string
+          soap?: string
+          transcript?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_transcripts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_transcripts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+        ]
+      }
       consultation_waitlist: {
         Row: {
           created_at: string
@@ -10783,6 +10873,10 @@ export type Database = {
           url: string
           year: number
         }[]
+      }
+      set_consultation_scribe_consent: {
+        Args: { _accepted: boolean; _appointment_id: string }
+        Returns: string
       }
       settle_doctor_pix_payout: {
         Args: { _reason?: string; _status: string; _withdrawal_id: string }

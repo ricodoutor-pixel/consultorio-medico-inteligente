@@ -343,7 +343,7 @@ A autorização de importação é solicitada pelo paciente no portal gov.br e d
                 <Link to="/manual?tab=paciente"><BookOpen size={14} className="mr-1" /> Passo a Passo</Link>
               </Button>
               <Button size="sm" className="rounded-xl text-xs bg-[#00a884] text-white hover:bg-[#008f6f]" asChild>
-                <Link to="/telemed-whatsapp"><MessageCircle size={14} className="mr-1" /> Telemed WhatsApp</Link>
+                <Link to="/profissionais"><MessageCircle size={14} className="mr-1" /> Consultar um médico</Link>
               </Button>
               <Button size="sm" className="rounded-xl text-xs bg-primary text-primary-foreground" asChild>
                 <Link to="/orientacao-tecnica"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</Link>

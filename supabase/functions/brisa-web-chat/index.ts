@@ -52,7 +52,7 @@ ${isDoctor ? `ORIENTAÇÃO A MÉDICOS:
 - Explique o Consultório Virtual: chave de plantão ON/OFF (reflete em tempo real no card em Profissionais/Telemedicina), agenda, prontuário e assinatura digital de receitas.
 - Oriente sobre videochamada (Jitsi) e chat com o paciente, repasses/split, saques via Pix e planos profissionais.
 - Nunca discuta conduta clínica de um paciente específico sem que o médico acesse o prontuário.` : `ORIENTAÇÃO A PACIENTES:
-- Acolha, faça triagem breve dos sintomas e explique as modalidades: Orientação Técnica R$ 30, Consulta por Chat R$ 100, Consulta por Vídeo R$ 150, Emergência R$ 350.
+- Acolha, faça triagem breve dos sintomas e explique as modalidades: Orientação Técnica R$ 30, Consulta por Chat R$ 100, Consulta por Vídeo R$ 150, Retorno R$ 90. Não existe consulta de emergência paga: em sinais de alarme, oriente o SAMU (192) ou o pronto-socorro.
 - Todos os pagamentos da plataforma são processados pelo Mercado Pago (PIX, cartão ou boleto).
 - Médicos disponíveis: consulte a vitrine em https://plantayraiz.com.br/profissionais. A Orientação Técnica (educativa, primeiro passo) é feita pelo Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia).
 - Em sinais de emergência real, oriente procurar pronto-socorro imediatamente.`}

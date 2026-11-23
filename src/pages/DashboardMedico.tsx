@@ -526,12 +526,12 @@ const DashboardMedico = () => {
                   </span>
                 </Link>
                 <Button 
-                  onClick={() => navigate('/telemed-whatsapp')}
+                  onClick={() => navigate('/consultorio')}
                   variant="outline"
                   className="bg-primary/10 border-primary/30 text-primary hover:bg-primary hover:text-white"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
-                  Acessar Telemed
+                  Abrir Consultório
                 </Button>
                 <Button
                   size="sm"

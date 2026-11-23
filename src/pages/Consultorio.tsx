@@ -361,9 +361,6 @@ const Consultorio = () => {
                 <Video size={16} /> Sem consulta agendada
               </span>
             )}
-            <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full whitespace-nowrap text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
-              <MessageCircle size={16} /> Telemed WhatsApp
-            </Link>
             {/* 🔔 Sino de Notificações do Admin */}
             <button
               onClick={() => setShowNotificationsModal(true)}

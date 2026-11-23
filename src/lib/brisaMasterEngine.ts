@@ -1,5 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent } from "./analytics";
+import { formatBRL, SERVICES } from "./pricing";
+
+// Preços vêm só do catálogo oficial (src/lib/pricing.ts, espelhado no servidor em _shared/payment-catalog.ts).
+const P = {
+  orientacao: SERVICES.orientacao_tecnica.price,
+  chat: SERVICES.consulta_chat.price,
+  video: SERVICES.consulta_video.price,
+  retorno: SERVICES.retorno_consulta.price,
+};
 
 export type ConsultationModality = 'TECHNICAL_ORIENTATION' | 'VIDEO' | 'CHAT' | 'NONE';
 
@@ -16,17 +25,18 @@ Seu papel: Gerente da clínica, especialista em telemedicina, modulação do sis
 Você acolhe o paciente, orienta, auxilia, encaminha e aconselha. Você busca ativamente melhorar a atenção ao usuário.
 
 REGRAS DE NEGÓCIO E VALORES:
-1. Orientação Técnica: R$ 30,00 (é a taxa inicial de triagem que todo paciente faz com você ou com a equipe para direcionar o atendimento).
-2. Consulta por Chat: R$ 150,00.
-3. Consulta por Vídeo (Atendimento Ao Vivo / Agendamento): R$ 250,00.
-4. Consulta de Emergência: R$ 350,00.
-Médicos disponíveis: Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dr. Edilson Bezerra.
+1. Orientação Técnica (Dr. Edilson Bezerra ON): ${formatBRL(P.orientacao)}.
+2. Consulta por Chat: ${formatBRL(P.chat)}.
+3. Consulta por Vídeo: ${formatBRL(P.video)}.
+4. Retorno: ${formatBRL(P.retorno)}.
+Não existe "consulta de emergência": sinais de alarme vão para o SAMU (192) ou o pronto-socorro.
+Nunca cite nomes de médicos disponíveis: o paciente escolhe o médico na lista oficial em /profissionais.
 
 INSTRUÇÕES DE FLUXO:
 - Seja acolhedora no início, pedindo os sintomas de forma breve e sem parecer um robô mecânico.
-- Avalie se não há red flags (emergências extremas que precisam de PS imediato físico).
-- Quando o paciente estiver pronto para ser atendido, apresente as modalidades de atendimento e o médico de preferência.
-- Se o paciente escolher a modalidade, confirme o valor exato (R$ 30 para técnica, R$ 250 para vídeo, etc.) e instrua-o a fazer o pagamento do PIX para liberar o médico.
+- Avalie se não há red flags (emergências que precisam de pronto-socorro presencial imediato) e, se houver, oriente o SAMU (192).
+- Quando o paciente estiver pronto para ser atendido, apresente as modalidades e indique a escolha do médico em /profissionais.
+- O pagamento é feito na página da consulta (Pix ou cartão) e só é confirmado pelo sistema. Nunca peça comprovante nem diga que o pagamento foi confirmado.
 
 TOM DE VOZ:
 Profissional da saúde muito preparada, compassiva, e sempre com o controle da situação. Usa emojis sutis e se adapta ao paciente.
@@ -43,13 +53,11 @@ export function analyzeUserIntent(text: string): {
   const textLower = text.toLowerCase();
   
   if (textLower.includes('orientacao') || textLower.includes('orientação') || textLower.includes('tecnica') || textLower.includes('técnica')) {
-    return { detectedModality: 'TECHNICAL_ORIENTATION', value: 30, tipoAtendimento: "Orientação Técnica" };
+    return { detectedModality: 'TECHNICAL_ORIENTATION', value: P.orientacao, tipoAtendimento: "Orientação Técnica" };
   } else if (textLower.includes('video') || textLower.includes('vídeo') || textLower.includes('vivo') || textLower.includes('agendamento')) {
-    return { detectedModality: 'VIDEO', value: 250, tipoAtendimento: "Atendimento Ao Vivo" };
+    return { detectedModality: 'VIDEO', value: P.video, tipoAtendimento: "Consulta por Vídeo" };
   } else if (textLower.includes('chat')) {
-    return { detectedModality: 'CHAT', value: 150, tipoAtendimento: "Consulta por Chat" };
-  } else if (textLower.includes('emergencia') || textLower.includes('emergência')) {
-    return { detectedModality: 'VIDEO', value: 350, tipoAtendimento: "Emergência" };
+    return { detectedModality: 'CHAT', value: P.chat, tipoAtendimento: "Consulta por Chat" };
   }
 
   return { detectedModality: 'NONE', value: 0, tipoAtendimento: "" };
@@ -85,6 +93,6 @@ export async function invokeBrisaEngine(
   } catch (error) {
     console.error("[Brisa Master Engine] Exception:", error);
     // Fallback gracioso
-    return "Minhas conexões estão oscilando um pouco, mas ouvi o que disse. Vamos dar andamento: prefere atendimento por Orientação Técnica (R$ 30), Chat (R$ 150) ou Vídeo (R$ 250)?";
+    return `Minhas conexões estão oscilando um pouco, mas ouvi o que disse. Vamos dar andamento: prefere Orientação Técnica (${formatBRL(P.orientacao)}), Consulta por Chat (${formatBRL(P.chat)}) ou Consulta por Vídeo (${formatBRL(P.video)})?`;
   }
 }

@@ -86,7 +86,8 @@ export const PLAN_FEATURES: Record<PlanSku, string[]> = {
     "Histórico clínico completo",
   ],
   plano_medico: [
-    "Taxa de intermediação 0% — retenha 100%",
+    "Prioridade no rodízio de pacientes e ferramentas de IA (Copiloto, Jurídico, Escriba)",
+    "Taxa de 7% por consulta: você recebe 93% via Pix",
     "Assinatura digital da plataforma inclusa (para quem não tem Gov.br/ICP)",
     "Consultório virtual com vídeo e chat",
     "Prontuário e prescrição digital",

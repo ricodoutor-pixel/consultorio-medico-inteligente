@@ -230,7 +230,6 @@ const AdminKycAgentes = lazyWithRecovery(() => import("./pages/admin/AdminKycAge
 const AdminMedicosOnline = lazyWithRecovery(() => import("./pages/admin/MedicosOnline"), { sourceRef: "/admin/medicos-online" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
 const MedSocio = lazyWithRecovery(() => import("./pages/MedSocio"), { sourceRef: "/medsocio" });
-const TelemedWhatsApp = lazyWithRecovery(() => import("./pages/TelemedWhatsApp"), { sourceRef: "/telemed-whatsapp" });
 const MonitoramentoSaude = lazyWithRecovery(() => import("./pages/MonitoramentoSaude"), { sourceRef: "/monitoramento-saude" });
 const FeedbackNPS = lazyWithRecovery(() => import("./pages/FeedbackNPS"), { sourceRef: "/feedback" });
 const AdminIaAuditoria = lazyWithRecovery(() => import("./pages/admin/AdminIaAuditoria"), { sourceRef: "/admin/ia-auditoria" });
@@ -578,7 +577,9 @@ const App = () => (
                                 <Route path="/monitoramento" element={<PrivateRoute><MonitoramentoCSI /></PrivateRoute>} />
 <Route path="/monitoramento-saude" element={<MonitoramentoSaude />} />
                 <Route path="/meus-exames" element={<MeusExames />} />
-                <Route path="/telemed-whatsapp" element={<PrivateRoute><TelemedWhatsApp /></PrivateRoute>} />
+                {/* /telemed-whatsapp era uma simulação (pagamento "confirmado" por comprovante, pacientes e receita de exemplo).
+                    Aposentada: links antigos levam à escolha real do médico, com pagamento confirmado só pelo servidor. */}
+                <Route path="/telemed-whatsapp" element={<Navigate to="/profissionais" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

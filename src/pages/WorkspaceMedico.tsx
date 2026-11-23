@@ -15,7 +15,8 @@ import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { JitsiRoom, VideoAccessError } from "@/components/consultation/JitsiRoom";
+import { requestConsultationVideoAccess } from "@/lib/consultation-video";
 import { ConsultationChatPanel } from "@/components/consultation/ConsultationChatPanel";
 import { isConsultationAppointmentId } from "@/lib/consultation-chat";
 import { FreeSignatureModal } from "@/components/prescription/FreeSignatureModal";
@@ -82,6 +83,18 @@ const WorkspaceMedico = () => {
   // Video Room State
   const [roomInfo, setRoomInfo] = useState<{ roomName: string; domain: string; jwt?: string } | null>(null);
   const [roomError, setRoomError] = useState<string | null>(null);
+
+  // Sala da consulta real: mesma sala do paciente, nunca outro servidor em caso de falha.
+  const loadRealVideoRoom = async () => {
+    if (!appointmentId) return;
+    setRoomError(null);
+    setRoomInfo(null);
+    try {
+      setRoomInfo(await requestConsultationVideoAccess((name, options) => supabase.functions.invoke(name, options), appointmentId));
+    } catch (err) {
+      setRoomError(err instanceof Error ? err.message : "Não foi possível abrir o vídeo agora.");
+    }
+  };
 
   useEffect(() => {
     if (!patientId || !appointmentId) {
@@ -173,12 +186,7 @@ const WorkspaceMedico = () => {
       if (type === 'video') {
         if (isRealAppointment) {
           // Mesma sala que o paciente abre (Jitsi próprio com token quando configurado no servidor).
-          const { data: video } = await supabase.functions.invoke("consultation-video-token", { body: { appointmentId } });
-          setRoomInfo(
-            video?.ok
-              ? { roomName: video.roomName, domain: video.domain, jwt: video.jwt ?? undefined }
-              : { roomName: `plantayraiz-consultorio-${appointmentId}`, domain: "meet.jit.si" },
-          );
+          void loadRealVideoRoom();
         } else if (roomRes.data?.ok && roomRes.data?.roomName) {
           setRoomInfo({
             roomName: roomRes.data.roomName,
@@ -198,8 +206,8 @@ const WorkspaceMedico = () => {
       // Erro de rede: não inventa paciente; mantém a sala da consulta real para não interromper o atendimento.
       setPatient((prev: Record<string, unknown> | null) => prev ?? { id: patientId, full_name: "Paciente (dados não carregados)" });
       toast({ title: "Falha ao carregar a consulta", description: "Verifique a conexão e recarregue a página.", variant: "destructive" });
-      if (appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId)) {
-        setRoomInfo({ roomName: `plantayraiz-consultorio-${appointmentId}`, domain: "meet.jit.si" });
+      if (type === "video" && appointmentId && /^[0-9a-f-]{36}$/i.test(appointmentId)) {
+        void loadRealVideoRoom();
       }
     } finally {
       setLoading(false);
@@ -426,9 +434,7 @@ const WorkspaceMedico = () => {
            <div className={type === 'video' ? "flex-1 min-h-0 flex flex-col" : "hidden"}>
            {type === 'video' ? (
              roomError ? (
-               <div className="flex-1 flex items-center justify-center text-red-500 font-bold p-6 text-center">
-                 <p>{roomError}</p>
-               </div>
+               <VideoAccessError message={roomError} onRetry={() => void loadRealVideoRoom()} />
              ) : roomInfo ? (
                <JitsiRoom 
                  roomName={roomInfo.roomName}

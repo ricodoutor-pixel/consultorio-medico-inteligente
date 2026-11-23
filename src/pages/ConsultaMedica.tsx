@@ -28,7 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { StandardPixPaymentCard } from "@/components/payments/StandardPixPaymentCard";
-import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { JitsiRoom, VideoAccessError } from "@/components/consultation/JitsiRoom";
+import { requestConsultationVideoAccess, type ConsultationVideoAccess } from "@/lib/consultation-video";
 import {
   consultationCatalogItem,
   createConsultationCheckout,
@@ -463,28 +464,26 @@ export default function ConsultaMedica() {
   );
 
   // Vídeo: o servidor devolve a sala (Jitsi próprio com token, quando configurado) só a participantes.
-  const [videoAccess, setVideoAccess] = useState<{ domain: string; roomName: string; jwt?: string } | null>(null);
+  // Nunca troca de servidor em caso de falha: mostra "Tentar de novo"/WhatsApp (ver src/lib/consultation-video.ts).
+  const [videoAccess, setVideoAccess] = useState<ConsultationVideoAccess | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [videoRetry, setVideoRetry] = useState(0);
   const roomOpen = !!room;
   useEffect(() => {
     if (!roomOpen || !appt?.id || !(mode === "video" || mode === "premium")) return;
     let cancelled = false;
-    supabase.functions
-      .invoke("consultation-video-token", { body: { appointmentId: appt.id } })
-      .then(({ data }) => {
-        if (cancelled) return;
-        setVideoAccess(
-          data?.ok
-            ? { domain: data.domain, roomName: data.roomName, jwt: data.jwt ?? undefined }
-            : { domain: "meet.jit.si", roomName: consultationRoomName(appt.id) },
-        );
+    setVideoError(null);
+    requestConsultationVideoAccess((name, options) => supabase.functions.invoke(name, options), appt.id)
+      .then((access) => {
+        if (!cancelled) setVideoAccess(access);
       })
-      .catch(() => {
-        if (!cancelled) setVideoAccess({ domain: "meet.jit.si", roomName: consultationRoomName(appt.id) });
+      .catch((err: unknown) => {
+        if (!cancelled) setVideoError(err instanceof Error ? err.message : "Não foi possível abrir o vídeo agora.");
       });
     return () => {
       cancelled = true;
     };
-  }, [roomOpen, appt?.id, mode]);
+  }, [roomOpen, appt?.id, mode, videoRetry]);
   const waitStart = appt ? Number(localStorage.getItem(`pyr_consult_wait_${appt.id}`) || 0) : 0;
   const waitLeft = waitStart ? Math.max(0, WAIT_MINUTES * 60 - Math.floor((now - waitStart) / 1000)) : WAIT_MINUTES * 60;
 
@@ -1050,6 +1049,8 @@ export default function ConsultaMedica() {
                     displayName="Paciente"
                     onClose={() => void endConsultationNow()}
                   />
+                  ) : videoError ? (
+                    <VideoAccessError message={videoError} onRetry={() => setVideoRetry((n) => n + 1)} />
                   ) : (
                     <div className="h-full flex items-center justify-center text-emerald-100 text-sm gap-2">
                       <Loader2 size={16} className="animate-spin" /> Abrindo vídeo seguro...

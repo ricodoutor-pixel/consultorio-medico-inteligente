@@ -259,4 +259,27 @@ export function JitsiRoom({
   );
 }
 
+/** Sala indisponível (token não obtido): oferece nova tentativa e WhatsApp, nunca outro servidor. */
+export function VideoAccessError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full min-h-[260px] gap-4 p-6 text-center bg-zinc-950 rounded-xl">
+      <Radio className="w-8 h-8 text-amber-400" />
+      <p className="text-sm text-zinc-200 max-w-sm">{message}</p>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button onClick={onRetry} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl">
+          <RefreshCw className="w-4 h-4 mr-2" /> Tentar de novo
+        </Button>
+        <a
+          href={WHATSAPP_FALLBACK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 border border-zinc-700 text-zinc-300 hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-semibold"
+        >
+          <MessageCircle className="w-4 h-4" /> Continuar pelo WhatsApp
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default JitsiRoom;

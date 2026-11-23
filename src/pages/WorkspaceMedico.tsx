@@ -510,7 +510,9 @@ const WorkspaceMedico = () => {
                     </Button>
                     </div>
                   </div>
-                  <ScribeRecorder onSoap={(text) => setNotes((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${text}` : text))} />
+                  <ScribeRecorder
+                    appointmentId={isConsultationAppointmentId(appointmentId) ? appointmentId! : undefined}
+                    onSoap={(text) => setNotes((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${text}` : text))} />
                   <Textarea className="min-h-[150px]" placeholder="Paciente relata melhora no quadro álgico após início de CBD 20%..." value={notes} onChange={e => setNotes(e.target.value)} />
                 </div>
                 <div className="space-y-2">

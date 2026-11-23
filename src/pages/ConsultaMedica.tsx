@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { StandardPixPaymentCard } from "@/components/payments/StandardPixPaymentCard";
 import { JitsiRoom, VideoAccessError } from "@/components/consultation/JitsiRoom";
+import { ScribeConsentCard } from "@/components/consultation/ScribeConsentCard";
 import { requestConsultationVideoAccess, type ConsultationVideoAccess } from "@/lib/consultation-video";
 import {
   consultationCatalogItem,
@@ -1058,6 +1059,11 @@ export default function ConsultaMedica() {
                   )}
                 </div>
               )}
+              {(mode === "video" || mode === "premium") && appt?.id && (
+                <div className="px-4 pt-3 bg-white">
+                  <ScribeConsentCard appointmentId={appt.id} />
+                </div>
+              )}
 
               {/* Área de chat e envio de arquivos (mesmo estilo da Orientação Técnica) */}
               <div className="p-4 space-y-2.5 max-h-[38dvh] overflow-y-auto">
@@ -1166,6 +1172,10 @@ export default function ConsultaMedica() {
                     alt={doctor.name}
                     className="w-24 h-24 rounded-full object-cover mx-auto border-2 border-primary"
                   />
+                )}
+
+                {(mode === "video" || mode === "premium") && appt?.id && queueState !== "forwarded_free_ot" && (
+                  <ScribeConsentCard appointmentId={appt.id} />
                 )}
 
                 {queueState === "rescheduled" ? (

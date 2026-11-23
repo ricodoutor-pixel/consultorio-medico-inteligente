@@ -19,15 +19,44 @@ import {
 interface Props {
   /** Recebe o rascunho SOAP (com a linha de consentimento) para acrescentar às notas. */
   onSoap: (text: string) => void;
+  /** Consulta real: usa a autorização dada pelo paciente antes da sala e guarda a transcrição no prontuário. */
+  appointmentId?: string;
 }
+
+type PatientConsent = { consent: "accepted" | "declined" | "pending"; decidedAt: string | null };
 
 /**
  * Escriba de IA: grava o ditado do médico ou a consulta inteira (microfone + áudio da aba da chamada, com
- * consentimento do paciente), transcreve em trechos de 4,5 min e gera o rascunho SOAP. O áudio não é guardado.
+ * autorização do paciente), transcreve em trechos de 4,5 min e gera o rascunho SOAP e os pontos de atenção.
+ * O áudio não é guardado; na consulta real a transcrição fica no prontuário (consultation_transcripts).
  */
-export function ScribeRecorder({ onSoap }: Props) {
+export function ScribeRecorder({ onSoap, appointmentId }: Props) {
   const [mode, setMode] = useState<ScribeMode>("ditado");
   const [consent, setConsent] = useState(false);
+  const [patientConsent, setPatientConsent] = useState<PatientConsent | null>(null);
+  const [attentionPoints, setAttentionPoints] = useState("");
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [savedTranscript, setSavedTranscript] = useState("");
+
+  const loadConsent = useCallback(async () => {
+    if (!appointmentId) return;
+    const { data } = await supabase.functions.invoke("doctor-scribe", { body: { action: "consent", appointmentId } });
+    if (!data || typeof data.consent !== "string") return;
+    setPatientConsent({ consent: data.consent, decidedAt: data.decidedAt ?? null });
+    if (data.consent === "accepted") setMode("consulta");
+    if (data.saved) {
+      setAttentionPoints(data.saved.attention_points || "");
+      setSavedTranscript(data.saved.transcript || "");
+      setSavedAt(data.saved.updated_at || null);
+    }
+  }, [appointmentId]);
+
+  useEffect(() => {
+    void loadConsent();
+  }, [loadConsent]);
+
+  // Na consulta real vale a decisão do paciente; sem consulta vinculada, o médico confirma.
+  const consultaAllowed = appointmentId ? patientConsent?.consent === "accepted" : consent;
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [segments, setSegments] = useState<{ index: number; text: string }[]>([]);
@@ -117,8 +146,8 @@ export function ScribeRecorder({ onSoap }: Props) {
   );
 
   const start = async () => {
-    if (mode === "consulta" && !consent) {
-      toast.error("Confirme que o paciente autorizou a gravação.");
+    if (mode === "consulta" && !consultaAllowed) {
+      toast.error(appointmentId ? "O paciente ainda não autorizou a gravação desta consulta." : "Confirme que o paciente autorizou a gravação.");
       return;
     }
     if (typeof MediaRecorder === "undefined" || !navigator.mediaDevices?.getUserMedia) {
@@ -189,15 +218,25 @@ export function ScribeRecorder({ onSoap }: Props) {
       return;
     }
     setGenerating(true);
-    const { data, error } = await supabase.functions.invoke("doctor-scribe", { body: { action: "soap", transcript: text } });
+    const { data, error } = await supabase.functions.invoke("doctor-scribe", {
+      body: { action: "soap", transcript: text, mode: modeAtStartRef.current, ...(appointmentId ? { appointmentId } : {}) },
+    });
     setGenerating(false);
     if (error || typeof data?.soap !== "string") {
       toast.error(await functionErrorMessage(error, "Não foi possível gerar o SOAP agora."));
       return;
     }
     if (typeof data.remaining === "number") setRemaining(data.remaining);
-    onSoap(`${consentLine(modeAtStartRef.current, new Date())}\n${data.soap}`);
-    toast.success("Rascunho SOAP inserido nas notas. Revise antes de salvar.");
+    if (typeof data.attentionPoints === "string") setAttentionPoints(data.attentionPoints);
+    const consentAt = modeAtStartRef.current === "consulta" && patientConsent?.decidedAt ? new Date(patientConsent.decidedAt) : new Date();
+    onSoap(`${consentLine(modeAtStartRef.current, consentAt)}\n${data.soap}`);
+    if (data.stored) {
+      setSavedAt(new Date().toISOString());
+      setSavedTranscript(text);
+      toast.success("SOAP inserido nas notas e transcrição guardada no prontuário. Revise antes de salvar.");
+    } else {
+      toast.success("Rascunho SOAP inserido nas notas. Revise antes de salvar.");
+    }
   };
 
   return (
@@ -220,7 +259,30 @@ export function ScribeRecorder({ onSoap }: Props) {
         </div>
       )}
 
-      {!recording && mode === "consulta" && (
+      {!recording && mode === "consulta" && appointmentId && (
+        <div data-testid="scribe-patient-consent" className="text-xs rounded-lg border border-border p-2 space-y-1">
+          {patientConsent?.consent === "accepted" ? (
+            <p className="text-emerald-700 font-semibold">
+              ✓ O paciente autorizou a gravação
+              {patientConsent.decidedAt
+                ? ` em ${new Date(patientConsent.decidedAt).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}`
+                : ""}
+              . Clique em "Iniciar gravação" e escolha esta aba com "Compartilhar áudio da aba".
+            </p>
+          ) : patientConsent?.consent === "declined" ? (
+            <p className="text-red-600 font-semibold">O paciente não autorizou a gravação. Use "Ditar resumo" com a sua voz.</p>
+          ) : (
+            <p className="text-amber-700">
+              Aguardando o paciente autorizar a gravação na tela dele.{" "}
+              <button type="button" className="underline font-semibold" onClick={() => void loadConsent()}>
+                Verificar de novo
+              </button>
+            </p>
+          )}
+        </div>
+      )}
+
+      {!recording && mode === "consulta" && !appointmentId && (
         <label className="flex items-start gap-2 text-xs text-foreground">
           <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-0.5" />
           <span>
@@ -258,10 +320,21 @@ export function ScribeRecorder({ onSoap }: Props) {
         )}
       </div>
 
-      {transcript && (
+      {attentionPoints && (
+        <div data-testid="scribe-attention-points" className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-2.5 text-xs space-y-1">
+          <p className="font-bold text-amber-800 dark:text-amber-300">Pontos de atenção para a sua decisão</p>
+          <p className="whitespace-pre-wrap text-foreground/90">{attentionPoints}</p>
+          <p className="text-[10px] text-muted-foreground">Gerado por IA só a partir do que foi falado. Não é diagnóstico; a decisão é sua.</p>
+        </div>
+      )}
+
+      {(transcript || savedTranscript) && (
         <details className="text-xs">
-          <summary className="cursor-pointer text-muted-foreground">Ver transcrição ({transcript.length} caracteres)</summary>
-          <p className="mt-2 whitespace-pre-wrap text-foreground/80 max-h-48 overflow-y-auto">{transcript}</p>
+          <summary className="cursor-pointer text-muted-foreground">
+            Ver transcrição ({(transcript || savedTranscript).length} caracteres)
+            {savedAt ? " · guardada no prontuário" : ""}
+          </summary>
+          <p className="mt-2 whitespace-pre-wrap text-foreground/80 max-h-48 overflow-y-auto">{transcript || savedTranscript}</p>
         </details>
       )}
     </div>

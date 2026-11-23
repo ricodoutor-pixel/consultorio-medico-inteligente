@@ -393,6 +393,13 @@
       "when": 1795097211992,
       "tag": "0055_doctor_heartbeat_server_time",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1795395600000,
+      "tag": "0056_consultation_scribe_consent_transcripts",
+      "breakpoints": true
     }
   ]
 }

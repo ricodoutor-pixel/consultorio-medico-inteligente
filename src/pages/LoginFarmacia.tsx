@@ -10,6 +10,8 @@ import { Store, Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-reac
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { reportAccessError, requestPasswordReset } from "@/lib/auth-access";
+import { PASSWORD_RESET_NOTICE, withAccessTimeout } from "@/lib/auth-access-errors";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -30,14 +32,10 @@ const LoginFarmacia = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await withAccessTimeout(supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password }));
 
       if (error) {
-        if (error.message.includes("Email not confirmed")) {
-          toast({ title: "E-mail não verificado", description: "Verifique seu e-mail antes de fazer login.", variant: "destructive" });
-        } else {
-          toast({ title: "Erro ao entrar", description: "E-mail ou senha incorretos.", variant: "destructive" });
-        }
+        toast({ title: "Erro ao entrar", description: reportAccessError(error, "farmacia"), variant: "destructive" });
         setLoading(false);
         return;
       }
@@ -49,7 +47,7 @@ const LoginFarmacia = () => {
         navigate(redirectTo);
       }
     } catch (err) {
-      toast({ title: "Erro", description: "Falha na conexão. Tente novamente.", variant: "destructive" });
+      toast({ title: "Erro", description: reportAccessError(err, "farmacia"), variant: "destructive" });
     }
     setLoading(false);
   };
@@ -61,16 +59,11 @@ const LoginFarmacia = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "E-mail enviado! 📧", description: "Verifique sua caixa de entrada para redefinir a senha." });
+    try {
+      await requestPasswordReset(email, "farmacia");
+      toast({ title: "Recuperação de senha", description: PASSWORD_RESET_NOTICE });
       setForgotMode(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (

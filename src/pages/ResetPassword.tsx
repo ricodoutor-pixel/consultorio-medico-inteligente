@@ -10,6 +10,8 @@ import { Lock, CheckCircle2, Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { reportAccessError } from "@/lib/auth-access";
+import { withAccessTimeout } from "@/lib/auth-access-errors";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -29,11 +31,12 @@ const ResetPassword = () => {
     if (hash.includes("type=recovery")) {
       setValidSession(true);
     }
-    supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setValidSession(true);
       }
     });
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleReset = async (e: React.FormEvent) => {
@@ -47,15 +50,18 @@ const ResetPassword = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
-      setSuccess(true);
-      toast({ title: "Senha atualizada! ✅" });
-      setTimeout(() => navigate("/login"), 2000);
-    }
+    try {
+      const { error } = await withAccessTimeout(supabase.auth.updateUser({ password }));
+      if (error) {
+        toast({ title: "Erro", description: reportAccessError(error, "paciente", "update_password"), variant: "destructive" });
+      } else {
+        setSuccess(true);
+        toast({ title: "Senha atualizada! ✅" });
+        setTimeout(() => navigate("/login"), 2000);
+      }
+    } catch (error) {
+      toast({ title: "Erro", description: reportAccessError(error, "paciente", "update_password"), variant: "destructive" });
+    } finally { setLoading(false); }
   };
 
   if (!validSession) {

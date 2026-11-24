@@ -1,3 +1,4 @@
+import { reportAccessError } from "@/lib/auth-access";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -176,7 +177,7 @@ const AdminMasterControl = () => {
       });
 
       if (authError) {
-        toast({ title: "Senha incorreta", description: "Re-autenticação falhou.", variant: "destructive" });
+        toast({ title: "Erro ao entrar", description: reportAccessError(authError, "admin"), variant: "destructive" });
         setReAuthLoading(false);
         return;
       }

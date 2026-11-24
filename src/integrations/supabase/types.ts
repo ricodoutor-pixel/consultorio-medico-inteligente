@@ -787,6 +787,33 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_error_logs: {
+        Row: {
+          created_at: string
+          error_code: string
+          http_status: number | null
+          id: string
+          operation: string
+          user_type: string
+        }
+        Insert: {
+          created_at?: string
+          error_code: string
+          http_status?: number | null
+          id?: string
+          operation: string
+          user_type: string
+        }
+        Update: {
+          created_at?: string
+          error_code?: string
+          http_status?: number | null
+          id?: string
+          operation?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
       automation_flows: {
         Row: {
           category: string
@@ -10426,6 +10453,7 @@ export type Database = {
       }
     }
     Functions: {
+      access_health_check: { Args: never; Returns: number }
       admin_doctor_inline_avatar: { Args: { _id: string }; Returns: string }
       admin_doctor_profiles: {
         Args: { _ids: string[] }
@@ -10804,6 +10832,15 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      record_auth_error: {
+        Args: {
+          p_error_code: string
+          p_http_status: number
+          p_operation: string
+          p_user_type: string
+        }
+        Returns: undefined
       }
       refresh_routing_doctor_availability: { Args: never; Returns: number }
       register_new_doctor: {

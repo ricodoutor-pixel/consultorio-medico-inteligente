@@ -379,6 +379,7 @@ const App = () => (
                 <Route path="/login-farmacia" element={<Navigate to="/login?type=farmacia&redirect=/lojistas" replace />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/redefinir-senha" element={<ResetPassword />} />
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
                 <Route path="/telemedicina" element={<Telemedicina />} />
                 <Route path="/rodizio" element={<RodizioMedicos />} />

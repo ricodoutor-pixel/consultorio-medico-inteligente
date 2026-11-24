@@ -11,6 +11,8 @@ import { Shield, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { reportAccessError } from "@/lib/auth-access";
+import { withAccessTimeout } from "@/lib/auth-access-errors";
 import { verifyAndEnsureAdmin } from "@/lib/admin-auth";
 
 const AdminLogin = () => {
@@ -31,31 +33,13 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await withAccessTimeout(supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
-      });
+      }));
 
       if (error || !data.user) {
-        const msg = error?.message || "";
-        const isNetwork =
-          error?.status === 0 ||
-          error?.name === "AuthRetryableFetchError" ||
-          /fetch|network|connection|failed/i.test(msg);
-
-        if (isNetwork) {
-          toast({
-            title: "Banco de dados pausado / inacessível",
-            description: "O projeto Supabase está pausado por inatividade no supabase.com. Acesse o painel e clique em 'Restore project' para reativar o banco.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Acesso negado",
-            description: msg || "Credenciais inválidas. Verifique seu e-mail e senha.",
-            variant: "destructive",
-          });
-        }
+        toast({ title: "Erro ao entrar", description: reportAccessError(error, "admin"), variant: "destructive" });
         setLoading(false);
         return;
       }
@@ -70,8 +54,8 @@ const AdminLogin = () => {
         toast({ title: "Acesso negado", description: "Você não tem permissão de administrador.", variant: "destructive" });
         await supabase.auth.signOut();
       }
-    } catch {
-      toast({ title: "Erro", description: "Erro ao conectar. Tente novamente.", variant: "destructive" });
+    } catch (error) {
+      toast({ title: "Erro ao entrar", description: reportAccessError(error, "admin"), variant: "destructive" });
     }
     setLoading(false);
   };

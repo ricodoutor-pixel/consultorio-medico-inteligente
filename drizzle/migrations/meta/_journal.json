@@ -407,6 +407,13 @@
       "when": 1795404688839,
       "tag": "0057_consultation_scribe_consent_transcripts",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1795498035297,
+      "tag": "0058_auth_access_diagnostics",
+      "breakpoints": true
     }
   ]
 }

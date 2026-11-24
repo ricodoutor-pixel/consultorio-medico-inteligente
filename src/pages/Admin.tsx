@@ -37,6 +37,7 @@ import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
 import { AdminFiscalManagement } from "@/components/admin/AdminFiscalManagement";
 import { PrescriptionsAnvisaPanel } from "@/components/admin/PrescriptionsAnvisaPanel";
 import { LiveCommandCenter } from "@/components/admin/LiveCommandCenter";
+import { AdminAccessSupport } from "@/components/admin/AdminAccessSupport";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -381,6 +382,7 @@ const Admin = () => {
 
           {/* CENTRAL DE COMANDO — todos os parâmetros reais, 15 s + tempo real */}
           <LiveCommandCenter refreshSignal={liveSignal} />
+          <AdminAccessSupport />
 
           {/* MÓDULOS */}
           <div className="mb-8">

@@ -24,4 +24,11 @@ describe("directory badges", () => {
   it("attachments order doctors within each badge category", () => {
     expect(compareDirectoryDoctors({name:"A", directoryBadge:"premium", documentsCount:2}, {name:"B", directoryBadge:"premium", documentsCount:5})).toBeGreaterThan(0);
   });
+  it("uses the server's public badge without inventing expiration dates", () => {
+    expect(directoryBadge({ badge: "premium" }, now)).toBe("premium");
+    expect(directoryBadge({ badge: null }, now)).toBe(null);
+  });
+  it("keeps server ordering without exposing private attachment counts", () => {
+    expect(compareDirectoryDoctors({ name: "A", directoryBadge: null, directoryRank: 3 }, { name: "B", directoryBadge: null, directoryRank: 2 })).toBeGreaterThan(0);
+  });
 });

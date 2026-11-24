@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { invokeLLM } from '@/lib/llm';
 import { sendWhatsAppMessage } from '@/services/whatsapp';
 import { generatePDFWithSignature } from '@/services/pdf-generator';
+import { PUBLIC_DOCTOR_FIELDS } from '@/lib/public-doctor-fields';
 
 // 🟡 INTERFACE: Resposta da Triagem
 interface TriageResponse {
@@ -344,7 +345,7 @@ async function findNextDoctorInQueue(
   try {
     const { data: doctors, error } = await supabase
       .from('doctors_public' as any)
-      .select('*')
+      .select(PUBLIC_DOCTOR_FIELDS)
       .eq('specialty', specialty)
       .eq('is_online', true)
       .lt('current_patient_count', 'max_capacity')
@@ -405,7 +406,7 @@ async function triggerDoctorNotification(
     // Buscar médico escalado
     const { data: doctor } = await supabase
       .from('doctors_public' as any)
-      .select('*')
+      .select(PUBLIC_DOCTOR_FIELDS)
       .eq('specialty', specialty)
       .eq('is_online', true)
       .order('current_patient_count', { ascending: true })

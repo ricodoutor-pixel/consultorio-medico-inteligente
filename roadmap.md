@@ -1,5 +1,16 @@
 # Roadmap
 
+## Selected security findings — 24/11/2026
+- [x] Restrict prescription tools, clinical reports, alerts and ledger writes to authorized patients/doctors
+- [x] Server-only signed file paths, paid appointment creation guards, and atomic administrative withdrawal rejection
+- [x] Server-issued health-card tokens; public doctor badges/ranking separated from private subscription and registration facts
+- [x] Signing-document ownership and verified prescriber email; hide ebook identifiers and contact-sync diagnostic payloads
+- [ ] Run regression/database tests and verify live authorization responses and public listings
+- [ ] Restrict seven public AI assistants — requires owner confirmation because visitors currently use them without login
+- [ ] Rotate exposed messaging credential and deploy corrected scripts on Hostinger — requires secure provider/VPS access
+- [ ] Recover previously created doctor accounts that shared a password — requires owner-approved recovery; no real passwords changed
+- [ ] Review selected public catalog findings and update only selected scan statuses after validation
+
 ## Correção dos acessos — 24/11/2026
 - [x] Serviço oficial respondendo; Anderson aprovado, e-mail confirmado, sem bloqueio de autenticação ou suspensão profissional; nenhuma senha ou aprovação alterada
 - [x] Classificação compartilhada nos quatro portais e login administrativo separado; diagnóstico mínimo persistido e conferido, sem e-mail, senha ou mensagem bruta

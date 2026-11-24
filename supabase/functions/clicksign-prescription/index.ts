@@ -41,12 +41,20 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const { action } = body;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!serviceKey) {
+      return new Response(JSON.stringify({ success: false, error: "Server misconfigured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const adminClient = createClient(supabaseUrl, serviceKey);
+    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: user.id, _role: "admin" });
 
     switch (action) {
       case "upload_and_sign": {
-        const { documentPath, contentBase64, doctorEmail, doctorName, patientName } = body;
+        const { documentPath, contentBase64, patientName } = body;
 
-        if (!documentPath || !contentBase64 || !doctorEmail || !doctorName) {
+        if (!documentPath || !contentBase64) {
           return new Response(
             JSON.stringify({ success: false, error: "Campos obrigatórios: documentPath, contentBase64, doctorEmail, doctorName" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -54,16 +62,8 @@ Deno.serve(async (req) => {
         }
 
         // Authorization: caller MUST be an admin or a registered doctor.
-        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-        if (!serviceKey) {
-          return new Response(JSON.stringify({ success: false, error: "Server misconfigured" }), {
-            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        const adminClient = createClient(supabaseUrl, serviceKey);
-        const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: user.id, _role: "admin" });
         const { data: doctorRow } = await adminClient
-          .from("doctors").select("id").eq("user_id", user.id).maybeSingle();
+          .from("doctors").select("id, user_id, name").eq("user_id", user.id).eq("is_verified", true).maybeSingle();
         if (!isAdmin && !doctorRow) {
           return new Response(JSON.stringify({ success: false, error: "Apenas médicos cadastrados podem enviar receitas para assinatura" }), {
             status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -71,9 +71,11 @@ Deno.serve(async (req) => {
         }
 
         // If a prescriptionId is supplied, caller MUST be the prescribing doctor (or admin).
+        let signingDoctor = doctorRow;
+        let patientId: string | null = null;
         if (body.prescriptionId) {
           const { data: rx } = await adminClient
-            .from("prescriptions").select("id, doctor_id").eq("id", body.prescriptionId).maybeSingle();
+            .from("prescriptions").select("id, doctor_id, patient_id").eq("id", body.prescriptionId).maybeSingle();
           if (!rx) {
             return new Response(JSON.stringify({ success: false, error: "Receita não encontrada" }), {
               status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -84,6 +86,23 @@ Deno.serve(async (req) => {
               status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
           }
+          patientId = rx.patient_id;
+          const { data: prescriber } = await adminClient.from("doctors")
+            .select("id, user_id, name").eq("id", rx.doctor_id).eq("is_verified", true).maybeSingle();
+          signingDoctor = prescriber;
+        }
+        if (!signingDoctor?.user_id) {
+          return new Response(JSON.stringify({ success: false, error: "Médico prescritor não confirmado" }), {
+            status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        const { data: signerAccount, error: signerError } = await adminClient.auth.admin.getUserById(signingDoctor.user_id);
+        const doctorEmail = signerAccount?.user?.email;
+        const doctorName = signingDoctor.name || "Médico prescritor";
+        if (signerError || !doctorEmail || !signerAccount?.user?.email_confirmed_at) {
+          return new Response(JSON.stringify({ success: false, error: "E-mail do prescritor não confirmado" }), {
+            status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
         }
 
         // 1. Upload document
@@ -116,6 +135,17 @@ Deno.serve(async (req) => {
 
         const uploadData = await uploadRes.json();
         const documentKey = uploadData.document.key;
+        const { error: bindingError } = await adminClient.from("clicksign_document_bindings").insert({
+          document_key: documentKey,
+          owner_user_id: signingDoctor.user_id,
+          prescription_id: body.prescriptionId || null,
+          patient_id: patientId,
+        });
+        if (bindingError) {
+          return new Response(JSON.stringify({ success: false, error: "Não foi possível vincular o documento" }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
 
         // 2. Create signer
         const signerRes = await fetch(
@@ -201,11 +231,19 @@ Deno.serve(async (req) => {
 
       case "check_status": {
         const { documentKey } = body;
-        if (!documentKey) {
+        if (typeof documentKey !== "string" || !/^[a-zA-Z0-9_-]{1,100}$/.test(documentKey)) {
           return new Response(
             JSON.stringify({ success: false, error: "documentKey obrigatório" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
+        }
+
+        const { data: binding, error: bindingError } = await adminClient.from("clicksign_document_bindings")
+          .select("owner_user_id, patient_id").eq("document_key", documentKey).maybeSingle();
+        if (bindingError || !binding || (!isAdmin && binding.owner_user_id !== user.id && binding.patient_id !== user.id)) {
+          return new Response(JSON.stringify({ success: false, error: "Acesso negado" }), {
+            status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
         }
 
         const statusRes = await fetch(

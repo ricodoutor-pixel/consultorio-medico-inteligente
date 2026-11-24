@@ -32,5 +32,6 @@ export type Professional = {
   plan_tier?: string;
   directoryBadge?: "premium" | "vip" | null;
   documentsCount?: number;
+  directoryRank?: number;
   specialty?: string;
 };

@@ -1,6 +1,7 @@
 import { LOOPING_BOT_NUMBERS, patientName, quickResponse, repeatedWithinDay, sanitizeOutboundAnswer } from "../_shared/brisa-response-policy.mjs"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getCorsHeaders } from "../_shared/cors.ts"
+import { requireServiceAuth } from "../_shared/service-auth.ts"
 import {
   callGeminiApiWithFallback,
   GEMINI_PRIMARY_MODEL,
@@ -38,6 +39,12 @@ serve(async (req) => {
     rawRole = (body.role || body.context_role || "").toLowerCase();
     senderName = body.confirmedName || body.senderName || "";
     phoneDigits = String(body.phone || "").replace(/\D/g, "");
+    // Phone-based identity lookup is internal messaging functionality, not public lookup.
+    if (phoneDigits && requireServiceAuth(req, corsHeaders) !== null) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const PAUSED_WHATSAPP_CONTACTS = new Set([
       "557591462018",

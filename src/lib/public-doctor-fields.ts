@@ -1,0 +1,2 @@
+// Keep public reads explicit: private registration counts are server-only.
+export const PUBLIC_DOCTOR_FIELDS = "id,user_id,specialty,crm,crm_state,rqe,bio,rating,consultation_price,is_verified,is_online,plan_tier,total_consultations,available_hours,is_available,document_type,country,city,price_video_chat,price_chat_only,price_return,full_name,avatar_url,created_at,last_seen_online";

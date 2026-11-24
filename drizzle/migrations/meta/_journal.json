@@ -421,6 +421,13 @@
       "when": 1795544591482,
       "tag": "0059_security_hardening_payments_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1795544990096,
+      "tag": "0060_selected_security_signing_and_badge_privacy",
+      "breakpoints": true
     }
   ]
 }

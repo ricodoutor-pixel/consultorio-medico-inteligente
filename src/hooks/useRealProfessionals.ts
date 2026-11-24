@@ -11,6 +11,7 @@ import { compareDirectoryDoctors, directoryBadge, type DirectoryFacts } from "@/
 import { ensureDoctorTitle } from "@/lib/doctor-title";
 import { isPublicProfessionalVisible } from "@/lib/public-professional-visibility";
 import { evaluateDoctorPresence } from "@/lib/doctor-presence";
+import { PUBLIC_DOCTOR_FIELDS } from "@/lib/public-doctor-fields";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 const DOCTORS_CACHE_KEY = "__pyr_doctors_cache_v2";
@@ -41,7 +42,6 @@ interface DoctorRow {
   avatar_url?: string | null;
   council_type?: string | null;
   council_number?: string | null;
-  kyc_docs_count?: number | null;
   directoryFacts?: DirectoryFacts;
 }
 
@@ -177,11 +177,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const fetchDoctors = async () => {
       try {
         const [publicRes, activeApptsRes, badgeRes] = await Promise.allSettled([
-          supabase.from("doctors_public" as never).select("*"),
+          supabase.from("doctors_public").select(PUBLIC_DOCTOR_FIELDS),
           // Luz amarela: médicos atendendo agora (função pública 0044; visitantes não leem appointments).
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- função nova ainda fora dos tipos gerados
           (supabase.rpc as any)("doctors_in_consultation"),
-          supabase.rpc("doctor_directory_badge_facts"),
+          supabase.rpc("doctor_directory_public_badges"),
         ]);
         if (!active) return;
 
@@ -261,7 +261,6 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     }
 
     const matchedDbDoctorIds = new Set<string>();
-    const docsCountById = new Map<string, number>();
 
     // 2. Itera sobre os profissionais oficiais configurados (baseProfessionals)
     // Isso garante que TODOS os médicos tratados com jaleco e esteto, além das demais categorias (veterinários, terapeutas, etc.),
@@ -287,7 +286,6 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const registration = isEdilson ? "10963 - Sta Cruz (BO)" : (base.crm || (matchedDb?.crm ? `${matchedDb.crm}${matchedDb.crm_state ? ` - ${matchedDb.crm_state}` : ""}` : ""));
 
       if (!matchedDb) {
-        docsCountById.set(base.id, 0);
         // Vitrine nunca mostra médico como online se não estiver logado com presença ativa no banco
         return {
           ...base,
@@ -303,7 +301,6 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         };
       }
 
-      docsCountById.set(base.id, matchedDb.kyc_docs_count ?? 0);
 
       const priceValue = Number(matchedDb.price_video_chat ?? matchedDb.consultation_price ?? base.priceValue ?? 150) || 150;
       const presence = evaluateDoctorPresence({
@@ -320,7 +317,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       return {
         ...base,
         directoryBadge: directoryBadge(matchedDb.directoryFacts),
-        documentsCount: matchedDb.directoryFacts?.documents_count ?? 0,
+        directoryRank: matchedDb.directoryFacts?.directory_rank,
         dbId: matchedDb.id,
         crm: registration,
         imageUrl: treatedAvatar || base.imageUrl,
@@ -443,12 +440,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         in_consultation: doc.in_consultation,
       });
 
-      docsCountById.set(`db-${doc.id}`, doc.kyc_docs_count ?? 0);
 
       newlyAddedFromDb.push({
         id: `db-${doc.id}`,
         directoryBadge: directoryBadge(doc.directoryFacts),
-        documentsCount: doc.directoryFacts?.documents_count ?? 0,
+        directoryRank: doc.directoryFacts?.directory_rank,
         dbId: doc.id,
         name: fullName,
         category,

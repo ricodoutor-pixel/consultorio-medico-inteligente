@@ -1607,6 +1607,30 @@ export type Database = {
         }
         Relationships: []
       }
+      clicksign_document_bindings: {
+        Row: {
+          created_at: string
+          document_key: string
+          owner_user_id: string
+          patient_id: string | null
+          prescription_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_key: string
+          owner_user_id: string
+          patient_id?: string | null
+          prescription_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_key?: string
+          owner_user_id?: string
+          patient_id?: string | null
+          prescription_id?: string | null
+        }
+        Relationships: []
+      }
       clinic_profiles: {
         Row: {
           active: boolean
@@ -10600,6 +10624,14 @@ export type Database = {
           documents_count: number
           paid_until: string
           registration_complete: boolean
+        }[]
+      }
+      doctor_directory_public_badges: {
+        Args: never
+        Returns: {
+          badge: string
+          directory_rank: number
+          doctor_id: string
         }[]
       }
       doctor_finance_monthly: {

@@ -246,32 +246,16 @@ const AdminMasterControl = () => {
   };
 
   const handleRejectWithdrawal = async (w: WithdrawalRequest) => {
-    const { error } = await supabase
-      .from("affiliate_withdrawals")
-      .update({ status: "rejected", rejected_reason: "Reprovado pelo admin" })
-      .eq("id", w.id);
-
-    if (!error) {
-      // Return balance to wallet
-      const { data: wallet } = await supabase
-        .from("affiliate_wallets")
-        .select("available_balance")
-        .eq("user_id", w.user_id)
-        .single();
-
-      if (wallet) {
-        await supabase
-          .from("affiliate_wallets")
-          .update({
-            available_balance: Number(wallet.available_balance) + w.amount,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_id", w.user_id);
-      }
-
+    const { data, error } = await supabase.rpc("admin_reject_affiliate_withdrawal", {
+      _withdrawal_id: w.id,
+      _reason: "Reprovado pelo admin",
+    });
+    if (!error && data === true) {
       await log("reject_withdrawal", "affiliate_withdrawals", w.id, { status: "pending" }, { status: "rejected" });
       toast({ title: "Saque rejeitado e saldo devolvido", variant: "destructive" });
       fetchData();
+    } else {
+      toast({ title: "Não foi possível rejeitar o saque", description: "Confira se ele ainda está pendente e pertence a outra conta.", variant: "destructive" });
     }
   };
 

@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { hasPaidPatientRelationship } from "../_shared/patient-authorization.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -55,6 +56,12 @@ Deno.serve(async (req: Request) => {
     if (!patientId || !procedureType) {
       return new Response(JSON.stringify({ error: "Dados incompletos" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!isAdmin && (!doctorRow || !await hasPaidPatientRelationship(supabase, doctorRow.id, patientId))) {
+      return new Response(JSON.stringify({ error: "Acesso negado" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 

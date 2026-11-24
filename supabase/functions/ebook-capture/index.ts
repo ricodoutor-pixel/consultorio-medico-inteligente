@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const { data: phoneOk } = await supabase.rpc("check_edge_rate_limit", {
       p_bucket: "ebook_capture_phone", p_key: whatsappRaw, p_max_hits: 1, p_window_seconds: 86400,
     });
-    if (phoneOk === false) return json({ error: "Este WhatsApp já recebeu o ebook nas últimas 24h." }, 429);
+    if (phoneOk === false) return ebookResponse();
 
     // 1) Insert no funil (com upsert manual: se já existe nas últimas 24h, reusa)
     const { data: existing } = await supabase
@@ -53,6 +53,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     let funnelId = existing?.id;
+    if (funnelId) return ebookResponse();
     if (!funnelId) {
       const { data: ins, error: insErr } = await supabase
         .from("ebook_funnel_log")
@@ -113,17 +114,16 @@ Deno.serve(async (req) => {
       console.error("[ebook-capture] WA error:", waErr);
     }
 
-    return json({
-      ok: true,
-      funnel_id: funnelId,
-      pdf_url: EBOOK_PDF_URL,
-      message: "Pronto! Em instantes você recebe o PDF no WhatsApp.",
-    });
+    return ebookResponse();
   } catch (e: any) {
     console.error("[ebook-capture] fatal:", e);
     return json({ error: e?.message || "Erro" }, 500);
   }
 });
+
+function ebookResponse() {
+  return json({ ok: true, pdf_url: EBOOK_PDF_URL, message: "Pronto! Em instantes você recebe o PDF no WhatsApp." });
+}
 
 function json(d: unknown, status = 200) {
   return new Response(JSON.stringify(d), {

@@ -4,22 +4,13 @@ import QRCode from "qrcode";
 import { Eye, EyeOff, Smartphone, Wallet, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartaoVirtualProps {
   numeroCartao: string;       // ex: PYR-12345678
   nomeTitular: string;
   plano: "Verde" | "Raiz" | "Terra";
   validade: string;           // MM/AAAA
-}
-
-/** Token dinâmico que expira a cada 5 minutos (anti-print).
- *  Formato: `<window>.<hash>` — compatível com RPC validate_card_token. */
-function buildDynamicToken(numeroCartao: string) {
-  const window5min = Math.floor(Date.now() / (5 * 60 * 1000));
-  const raw = `${numeroCartao}.${window5min}`;
-  let h = 0;
-  for (let i = 0; i < raw.length; i++) h = (h * 31 + raw.charCodeAt(i)) | 0;
-  return `${window5min}.${(h >>> 0).toString(36)}`;
 }
 
 function maskNumber(num: string) {
@@ -35,7 +26,7 @@ export function CartaoVirtual({ numeroCartao, nomeTitular, plano, validade }: Ca
   const [flipped, setFlipped] = useState(false);
   const [masked, setMasked] = useState(true);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
-  const [token, setToken] = useState(() => buildDynamicToken(numeroCartao));
+  const [token, setToken] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const { toast } = useToast();
 
@@ -48,11 +39,19 @@ export function CartaoVirtual({ numeroCartao, nomeTitular, plano, validade }: Ca
   useEffect(() => {
     let alive = true;
     const regen = async () => {
-      const t = buildDynamicToken(numeroCartao);
-      const url = await QRCode.toDataURL(t, { width: 320, margin: 1, color: { dark: "#04080F", light: "#FFFFFF" } });
-      if (!alive) return;
-      setToken(t);
-      setQrDataUrl(url);
+      try {
+        const { data, error } = await supabase.rpc("issue_card_token");
+        const card = data?.find(row => row.card_number === numeroCartao);
+        if (error || !card?.token) throw new Error("Card unavailable");
+        const url = await QRCode.toDataURL(card.token, { width: 320, margin: 1, color: { dark: "#04080F", light: "#FFFFFF" } });
+        if (!alive) return;
+        setToken(card.token);
+        setQrDataUrl(url);
+      } catch {
+        if (!alive) return;
+        setToken("");
+        setQrDataUrl("");
+      }
     };
     regen();
     const interval = setInterval(regen, 5 * 60 * 1000);

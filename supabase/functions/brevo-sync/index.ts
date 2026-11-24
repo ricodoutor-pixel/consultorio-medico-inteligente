@@ -113,7 +113,7 @@ serve(async (req) => {
       updateEnabled: true, // Atualiza se o contato já existir
     };
 
-    console.log("[brevo-sync] Enviando para Brevo:", payload);
+    console.log("[brevo-sync] Contact sync requested");
 
     // SECURITY + RESILIENCE: AbortSignal prevents hanging if Brevo API is slow
     let brevoResponse: Response;
@@ -129,7 +129,7 @@ serve(async (req) => {
         signal: AbortSignal.timeout(4000), // 4s timeout max — non-blocking
       });
     } catch (fetchErr) {
-      console.error("[brevo-sync] Brevo API timeout ou erro de rede:", fetchErr);
+      console.error("[brevo-sync] Provider request unavailable");
       return new Response(
         JSON.stringify({ success: true, queued: true, warning: "CRM sync queued — Brevo temporariamente indisponível" }),
         { status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -145,7 +145,7 @@ serve(async (req) => {
     }
 
     if (!brevoResponse.ok) {
-      console.error("[brevo-sync] Resposta da API Brevo:", responseData);
+      console.error("[brevo-sync] Provider request rejected", brevoResponse.status);
       // Retorna 202 se for duplicado ou erro tratável para não quebrar a UX do usuário
       return new Response(
         JSON.stringify({ success: true, queued: true, details: responseData }),
@@ -158,7 +158,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("[brevo-sync] Erro interno:", error);
+    console.error("[brevo-sync] Sync failed");
     return new Response(JSON.stringify({ success: true, queued: true, error: error?.message }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

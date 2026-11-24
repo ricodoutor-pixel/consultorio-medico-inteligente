@@ -414,6 +414,13 @@
       "when": 1795498035297,
       "tag": "0058_auth_access_diagnostics",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1795544591482,
+      "tag": "0059_security_hardening_payments_cards",
+      "breakpoints": true
     }
   ]
 }

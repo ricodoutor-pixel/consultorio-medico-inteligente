@@ -4474,6 +4474,24 @@ export type Database = {
         }
         Relationships: []
       }
+      health_card_token_secrets: {
+        Row: {
+          created_at: string
+          secret: string
+          subscription_id: string
+        }
+        Insert: {
+          created_at?: string
+          secret?: string
+          subscription_id: string
+        }
+        Update: {
+          created_at?: string
+          secret?: string
+          subscription_id?: string
+        }
+        Relationships: []
+      }
       health_card_wallet: {
         Row: {
           balance: number
@@ -10478,6 +10496,10 @@ export type Database = {
           region: string
         }[]
       }
+      admin_reject_affiliate_withdrawal: {
+        Args: { _reason?: string; _withdrawal_id: string }
+        Returns: boolean
+      }
       anonymize_old_ot_orders: { Args: never; Returns: undefined }
       auto_release_brisa_orientacao: { Args: never; Returns: Json }
       book_lawyer_slot: { Args: { _slot_id: string }; Returns: string }
@@ -10773,6 +10795,14 @@ export type Database = {
       is_human_takeover_active: {
         Args: { _contact_id: string }
         Returns: boolean
+      }
+      issue_card_token: {
+        Args: never
+        Returns: {
+          card_number: string
+          token: string
+          window_seconds: number
+        }[]
       }
       list_public_vendors: {
         Args: never

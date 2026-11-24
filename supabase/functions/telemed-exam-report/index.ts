@@ -3,6 +3,7 @@ import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 // Cruza todos os exames do paciente (diagnostic_exams) com o banco de patologias
 // e devolve um relatório estruturado gerado pela IA (Gemini via Lovable AI Gateway).
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { hasPaidPatientRelationship } from "../_shared/patient-authorization.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -58,20 +59,14 @@ Deno.serve(async (req: Request) => {
     let targetUserId = requester.id;
     if (patient_id && patient_id !== requester.id) {
       const [{ data: doctor }, { data: isAdmin }] = await Promise.all([
-        admin.from("doctors").select("id").eq("user_id", requester.id).maybeSingle(),
+        admin.from("doctors").select("id").eq("user_id", requester.id).eq("is_verified", true).maybeSingle(),
         admin.rpc("has_role", { _user_id: requester.id, _role: "admin" }),
       ]);
       if (!doctor && !isAdmin) return json({ ok: false, error: "Forbidden" }, 403);
       if (!isAdmin) {
-        // Médico só vê exames de pacientes com quem tem consulta registrada.
-        const { data: link } = await admin
-          .from("appointments")
-          .select("id")
-          .eq("doctor_id", doctor!.id)
-          .eq("patient_id", patient_id)
-          .limit(1)
-          .maybeSingle();
-        if (!link) return json({ ok: false, error: "Forbidden" }, 403);
+        if (!doctor || !await hasPaidPatientRelationship(admin, doctor.id, patient_id)) {
+          return json({ ok: false, error: "Forbidden" }, 403);
+        }
       }
       targetUserId = patient_id;
     }

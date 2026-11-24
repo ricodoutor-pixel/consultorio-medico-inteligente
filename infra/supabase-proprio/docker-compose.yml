@@ -1,0 +1,65 @@
+# Planta y Raiz: our own backend on the VPS (srv1641464), behind the Traefik in ../vps-traefik.
+#
+# A single public address, https://banco.plantayraiz.com.br:
+#   /functions/v1/*  -> "funcoes" (supabase/edge-runtime, all 200+ functions, no plan limit)
+#   everything else  -> "banco-proxy" (Caddy) -> our Supabase project (database, login, files, realtime)
+# So the site, Mercado Pago and Meta use ONE address and the Supabase project can be swapped
+# (second account, paid plan) without touching the site again.
+#
+# Usage on the VPS (see README.md):
+#   cd /opt/planta-y-raiz && git pull
+#   cp infra/supabase-proprio/.env.example infra/supabase-proprio/.env   # fill in
+#   docker compose -f infra/supabase-proprio/docker-compose.yml --env-file infra/supabase-proprio/.env up -d
+
+networks:
+  proxy:
+    external: true
+    name: proxy
+
+services:
+  funcoes:
+    image: supabase/edge-runtime:v1.69.4
+    container_name: pyr_funcoes
+    restart: unless-stopped
+    command: ["start", "--main-service", "/home/deno/main"]
+    env_file: .env
+    volumes:
+      - ./edge/main:/home/deno/main:ro
+      - ../../supabase/functions:/home/deno/functions:ro
+      - ../../supabase/config.toml:/home/deno/config.toml:ro
+      - deno_cache:/root/.cache/deno
+    networks: [proxy]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/_health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pyr-funcoes.rule=Host(`${PUBLIC_HOST}`) && PathPrefix(`/functions/v1`)
+      - traefik.http.routers.pyr-funcoes.priority=100
+      - traefik.http.routers.pyr-funcoes.entrypoints=websecure
+      - traefik.http.routers.pyr-funcoes.tls.certresolver=le
+      - traefik.http.routers.pyr-funcoes.middlewares=pyr-strip-fn
+      - traefik.http.middlewares.pyr-strip-fn.stripprefix.prefixes=/functions/v1
+      - traefik.http.services.pyr-funcoes.loadbalancer.server.port=9000
+
+  banco-proxy:
+    image: caddy:2.8-alpine
+    container_name: pyr_banco_proxy
+    restart: unless-stopped
+    environment:
+      SUPABASE_HOST: ${SUPABASE_PROJECT_REF}.supabase.co
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pyr-banco.rule=Host(`${PUBLIC_HOST}`)
+      - traefik.http.routers.pyr-banco.priority=10
+      - traefik.http.routers.pyr-banco.entrypoints=websecure
+      - traefik.http.routers.pyr-banco.tls.certresolver=le
+      - traefik.http.services.pyr-banco.loadbalancer.server.port=8080
+
+volumes:
+  deno_cache:

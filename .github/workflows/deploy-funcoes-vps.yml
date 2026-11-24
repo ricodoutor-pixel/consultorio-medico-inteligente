@@ -1,0 +1,43 @@
+# Planta y Raiz: publishes the Edge Functions to OUR VPS (infra/supabase-proprio).
+# Manual-only until the cutover off Lovable Cloud; after the cutover, uncomment the `push` trigger.
+#
+# GitHub secrets (Settings -> Secrets -> Actions):
+#   VPS_HOST     -> 2.24.69.154
+#   VPS_USER     -> root (or the deploy user)
+#   VPS_SSH_KEY  -> private key of a key authorized on the VPS
+name: Deploy funcoes -> VPS
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - supabase/functions/**
+  #     - supabase/config.toml
+  #     - infra/supabase-proprio/**
+
+concurrency:
+  group: deploy-funcoes-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Atualizar codigo e reiniciar funcoes na VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/planta-y-raiz
+            git fetch --quiet origin main
+            git reset --hard origin/main
+            cd infra/supabase-proprio
+            docker compose --env-file .env up -d --force-recreate funcoes banco-proxy
+            sleep 8
+            curl -fsS https://banco.plantayraiz.com.br/functions/v1/_health
+            echo "funcoes no ar: ${{ github.sha }}"

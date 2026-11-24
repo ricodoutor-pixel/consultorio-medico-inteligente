@@ -1,0 +1,12 @@
+# Forwards database, login, storage and realtime (websocket) traffic to our Supabase project.
+{
+	auto_https off
+	admin off
+}
+
+:8080 {
+	reverse_proxy https://{$SUPABASE_HOST} {
+		header_up Host {$SUPABASE_HOST}
+		header_up X-Forwarded-Host {host}
+	}
+}

@@ -1,11 +1,17 @@
 # Roadmap
 
 ## Correção dos acessos — 24/11/2026
-- [ ] Conferir disponibilidade atual e situação da conta do médico citado, sem alterar senha ou aprovação
-- [ ] Distinguir credenciais inválidas de indisponibilidade em todos os logins e registrar apenas códigos técnicos
-- [ ] Corrigir recuperação e disponibilizar /redefinir-senha; verificar configuração de e-mail e redirecionamentos
-- [ ] Disponibilizar saúde real e ações administrativas de recuperação, com acesso protegido
-- [ ] Testar respostas reais e falhas simuladas; registrar limites dos testes de e-mail/login e alertas externos
+- [x] Serviço oficial respondendo; Anderson aprovado, e-mail confirmado, sem bloqueio de autenticação ou suspensão profissional; nenhuma senha ou aprovação alterada
+- [x] Classificação compartilhada nos quatro portais e login administrativo separado; diagnóstico mínimo persistido e conferido, sem e-mail, senha ou mensagem bruta
+- [x] /redefinir-senha pública e retorno canônico configurado no código; /reset-password preservada; aviso neutro de recuperação
+- [x] health-check e admin-access-support implantados; painel real conferido com administrador autorizado, lista da vitrine com contas reais, acesso anônimo recusado (401)
+- [x] Reenvio real de recuperação para Anderson aceito pelo serviço pela tela; entrega do e-mail e troca da senha ainda não comprovadas
+- [x] 34 testes automatizados aprovados; 503 simulado nos quatro portais e /admin-login, credencial explicitamente inválida distinta, recuperação indisponível com resposta neutra, compilação OK
+- [ ] Alterar Site URL nas configurações de autenticação — exige ação do proprietário em Mais → Usuários → Configurações de autenticação → Avançado; retornos plantayraiz.com.br/** já autorizados
+- [ ] Configurar e comprovar SMTP Brevo — ferramenta disponível não configura SMTP; aceitação do reset atual não comprova provedor nem recebimento
+- [ ] Implantar alertas de indisponibilidade por e-mail/WhatsApp fora do Cloud — depende de monitor independente com envio configurado; Cloud pausado não consegue notificar a própria queda
+- [ ] Validar login por senha de médico/paciente/admin e conclusão do reset pelo médico — depende dos titulares, sem solicitar ou mudar senhas reais
+- [ ] Publicar alterações das telas no site oficial — não publicado nesta entrega
 
 ## Definição institucional SaaS — 19/11/2026
 - [x] Integrar definição tecnológica nos Termos, Conformidade, Planos e rodapé, sem mudar aparência, preços ou contratos já assinados

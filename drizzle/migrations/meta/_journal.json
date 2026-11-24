@@ -428,6 +428,13 @@
       "when": 1795544990096,
       "tag": "0060_selected_security_signing_and_badge_privacy",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795546446001,
+      "tag": "0061_selected_security_public_doctor_columns",
+      "breakpoints": true
     }
   ]
 }

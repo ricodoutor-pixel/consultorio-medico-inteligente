@@ -348,8 +348,7 @@ async function findNextDoctorInQueue(
       .select(PUBLIC_DOCTOR_FIELDS)
       .eq('specialty', specialty)
       .eq('is_online', true)
-      .lt('current_patient_count', 'max_capacity')
-      .order('current_patient_count', { ascending: true })
+      .order('last_seen_online', { ascending: false })
       .limit(1)
       .single();
 
@@ -409,7 +408,7 @@ async function triggerDoctorNotification(
       .select(PUBLIC_DOCTOR_FIELDS)
       .eq('specialty', specialty)
       .eq('is_online', true)
-      .order('current_patient_count', { ascending: true })
+      .order('last_seen_online', { ascending: false })
       .limit(1)
       .single();
 

@@ -1,5 +1,12 @@
 # Roadmap
 
+## Correção dos acessos — 24/11/2026
+- [ ] Conferir disponibilidade atual e situação da conta do médico citado, sem alterar senha ou aprovação
+- [ ] Distinguir credenciais inválidas de indisponibilidade em todos os logins e registrar apenas códigos técnicos
+- [ ] Corrigir recuperação e disponibilizar /redefinir-senha; verificar configuração de e-mail e redirecionamentos
+- [ ] Disponibilizar saúde real e ações administrativas de recuperação, com acesso protegido
+- [ ] Testar respostas reais e falhas simuladas; registrar limites dos testes de e-mail/login e alertas externos
+
 ## Definição institucional SaaS — 19/11/2026
 - [x] Integrar definição tecnológica nos Termos, Conformidade, Planos e rodapé, sem mudar aparência, preços ou contratos já assinados
 - [x] Conferir páginas na prévia: definição SaaS presente, acordeão aberto, celular sem transbordamento, sem erros de execução; compilação OK

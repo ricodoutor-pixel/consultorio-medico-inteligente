@@ -1042,7 +1042,7 @@ async function ingestIncomingDoc(msg, recipient, senderName) {
         const tempEmail = `medico.whatsapp.${cleanNum}@plantayraiz.com.br`;
         const { data: signUpData } = await supabase.auth.signUp({
           email: tempEmail,
-          password: 'MedicinaCanabica2026!',
+          password: globalThis.crypto.randomUUID() + globalThis.crypto.randomUUID(),
           options: {
             data: {
               full_name: senderName || 'Médico Prescritor (WhatsApp)',

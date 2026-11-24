@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_FILE = path.join(__dirname, 'vip_lifecycle_state.json');
 
 const EVO_URL = (process.env.EVOLUTION_API_URL || process.env.EVOLUTION_URL_VPS || process.env.EVOLUTION_URL || 'https://whatsapp.plantayraiz.com.br').replace(/\/$/, '');
-const EVO_KEY = process.env.EVOLUTION_API_KEY || process.env.EVOLUTION_API_KEY_VPS || '39d3c0208169d52717027e27477cdc9f63d70fda54296c501fbe409c10562a59';
+const EVO_KEY = process.env.EVOLUTION_API_KEY || process.env.EVOLUTION_API_KEY_VPS || '';
 const INSTANCE = process.env.EVOLUTION_INSTANCE || process.env.EVOLUTION_INSTANCE_NAME || 'plantayraiz';
 const ADMIN_PHONE = process.env.ADMIN_WHATSAPP || '5511991363154'; // Dr. Edilson
 

@@ -27,13 +27,15 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!rx) return json({ error: "Receita não encontrada" }, 404);
 
-  let allowed = rx.patient_id === userId;
-  if (!allowed) {
-    const { data: doc } = await svc.from("doctors").select("user_id").eq("id", rx.doctor_id).maybeSingle();
-    allowed = doc?.user_id === userId;
-  }
+  const { data: doc } = await svc.from("doctors").select("user_id").eq("id", rx.doctor_id).maybeSingle();
+  const allowed = rx.patient_id === userId || (!!doc?.user_id && doc.user_id === userId);
   if (!allowed) return json({ error: "Esta receita não pertence a você" }, 403);
   if (rx.status !== "signed" || !rx.signed_pdf_path) return json({ error: "Receita ainda não assinada" }, 409);
+  // O arquivo assinado precisa estar na pasta do médico que emitiu esta receita.
+  const expectedPrefix = doc?.user_id ? `iti-free/${doc.user_id}/` : null;
+  if (!expectedPrefix || !rx.signed_pdf_path.startsWith(expectedPrefix) || rx.signed_pdf_path.includes("..")) {
+    return json({ error: "Arquivo da receita inválido" }, 409);
+  }
 
   const { data, error } = await svc.storage.from("prescriptions").createSignedUrl(rx.signed_pdf_path, 600, {
     download: `${rx.prescription_type === "atestado" ? "atestado" : rx.prescription_type === "solicitacao_exames" ? "exames" : "receita"}-planta-y-raiz-${rx.id.slice(0, 8)}.pdf`,

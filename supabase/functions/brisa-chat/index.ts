@@ -146,6 +146,7 @@ async function executeAgenticTool(toolName: string, args: any, supabase: any, us
       .from("prescriptions")
       .select("id, medication, signature_hash, patient_id")
       .eq("id", prescription_id)
+      .eq("patient_id", userId ?? "00000000-0000-0000-0000-000000000000")
       .maybeSingle();
 
     if (!presc || !presc.signature_hash) {
@@ -163,7 +164,7 @@ async function executeAgenticTool(toolName: string, args: any, supabase: any, us
     };
 
     const selectedProduct = priceMap[product_id] || { name: "Medicamento Canabinoide Certificado", price: 290.00 };
-    const patientUid = userId || presc.patient_id;
+    const patientUid = presc.patient_id;
 
     // Cria registro na tabela agentic_orders
     const { data: order, error: orderErr } = await supabase

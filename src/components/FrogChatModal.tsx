@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { X, Send, Sparkles, Trash2, Minimize2, Calendar, ShoppingBag } from "lucide-react";
@@ -38,10 +39,16 @@ async function streamChat({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       },
       body: JSON.stringify({ messages, leadName, referralPage: currentPage }),
     });
+
+    if (resp.status === 401) {
+      onError("Entre na sua conta para conversar com o Verdinho.");
+      return;
+    }
 
     if (!resp.ok) {
       const data = await resp.json().catch(() => ({ error: "Erro de conexão" }));

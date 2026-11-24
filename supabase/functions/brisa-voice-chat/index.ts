@@ -1,6 +1,7 @@
 // 🎙️ Brisa Voice Chat — Gemini no bastidor (porta-voz oficial Planta y Raiz)
 // Mesma persona do fluxo WhatsApp, com consciência de tempo e leitura de BPM.
 
+import { requireUserAuth } from "../_shared/user-auth.ts";
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { GATEWAY_GEMINI_PRIMARY, GATEWAY_NO_REASONING } from "../_shared/gemini.ts";
@@ -148,6 +149,8 @@ function rateLimit(ip: string): boolean {
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const authDenied = await requireUserAuth(req, corsHeaders);
+  if (authDenied) return authDenied;
 
   const json = (body: unknown, status = 200) => {
     return new Response(JSON.stringify(body), {

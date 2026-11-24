@@ -1,3 +1,4 @@
+import { requireUserAuth } from "../_shared/user-auth.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { clientIp, rateLimit } from "../_shared/ai-guard.ts";
 import { GEMINI_PRIMARY_MODEL, callGeminiApiWithFallback } from "../_shared/gemini.ts";
@@ -48,6 +49,8 @@ const SYSTEM_PROMPT = `Você é o **Guia Regulatório e Direitos do Paciente** d
 Deno.serve(async (req: Request) => {
   const cors = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+  const authDenied = await requireUserAuth(req, cors);
+  if (authDenied) return authDenied;
 
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {

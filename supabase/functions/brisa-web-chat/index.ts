@@ -1,3 +1,4 @@
+import { requireUserAuth } from "../_shared/user-auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -13,6 +14,8 @@ const sanitizePromptInput = (val?: string, max = 80) =>
 serve(async (req: Request) => {
   const cors = getCorsHeaders(req);
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  const authDenied = await requireUserAuth(req, cors);
+  if (authDenied) return authDenied;
 
   // 🔐 Rate limit por IP (endpoint público — protege a chave de IA)
   const limited = await rateLimit({
@@ -150,6 +153,5 @@ COMPLIANCE OBRIGATÓRIO:
     return new Response(JSON.stringify({ 
       text: "Olá! Sou a Enfermeira Brisa da Planta y Raiz. Estou à disposição para orientar sobre exames, cadastro ou agendamento de teleconsultas. Como posso te acolher hoje?" 
     }), { headers: { ...cors, "Content-Type": "application/json" } });
-  }
   }
 });

@@ -40,7 +40,7 @@ const supabase = createClient(SUPA_URL, SUPA_KEY);
 
 const EVO_BASE_URL = process.env.EVOLUTION_API_BASE_URL || 'https://whatsapp.plantayraiz.com.br';
 const EVO_INSTANCE = process.env.EVOLUTION_INSTANCE_NAME || 'plantayraiz';
-const EVO_API_KEY = process.env.EVOLUTION_API_KEY || 'BrisaLiveKey2026PlantaRaiz';
+const EVO_API_KEY = process.env.EVOLUTION_API_KEY || '';
 
 const DR_EDILSON_PHONE = '5511991363154'; // WhatsApp do Fundador
 

@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Mic, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -256,7 +257,8 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         signal: AbortSignal.timeout(2500),
         body: JSON.stringify({

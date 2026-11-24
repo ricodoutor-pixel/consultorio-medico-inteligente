@@ -3,6 +3,7 @@
 // com a Brisa (institucional, sob supervisão técnica da Dra. Suelen Naves Rodrigues (CRM-PR 49354) CRM 49354/PR).
 // Contatos e mensagens ficam salvos em `platform_contacts` / `platform_contact_messages`
 // para o admin acompanhar em /admin/contatos.
+import { requireUserAuth } from "../_shared/user-auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
@@ -75,6 +76,8 @@ async function verifyContactToken(tok: unknown): Promise<string | null> {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const authDenied = await requireUserAuth(req, corsHeaders);
+  if (authDenied) return authDenied;
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "method_not_allowed" }), {
       status: 405,

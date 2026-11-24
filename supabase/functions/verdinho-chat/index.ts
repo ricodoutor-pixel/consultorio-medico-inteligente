@@ -1,3 +1,4 @@
+import { requireUserAuth } from "../_shared/user-auth.ts";
 import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -39,6 +40,8 @@ const SYSTEM_PROMPT = `Você é o **Verdinho** 🐸👑, mascote IA da **Planta 
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const authDenied = await requireUserAuth(req, corsHeaders);
+  if (authDenied) return authDenied;
 
   try {
     // Per-IP rate limiting to protect Gemini API key from abuse

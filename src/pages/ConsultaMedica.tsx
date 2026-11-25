@@ -1,3 +1,4 @@
+import { doctorAreaLabel } from "@/lib/practice-areas";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import type { Json } from "@/integrations/supabase/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -715,7 +716,7 @@ export default function ConsultaMedica() {
             <div className="min-w-0 flex-1">
               <p className="font-black text-foreground truncate">{doctor?.name || "Carregando médico…"}</p>
               <p className="text-xs text-muted-foreground">
-                {[doctor?.crm, doctor?.specialty].filter(Boolean).join(" · ")}
+                {[doctor?.crm, doctorAreaLabel(doctor?.specialty)].filter(Boolean).join(" · ")}
               </p>
               <p className="text-xs font-bold text-primary flex items-center gap-1 mt-1">
                 <ModeIcon size={13} /> {label} · {formatBRL(price)} · até {CONSULT_MINUTES} min

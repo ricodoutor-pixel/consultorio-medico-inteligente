@@ -1,3 +1,4 @@
+import BrisaPhoto from "@/assets/brisa-enfermeira.webp";
 import { readAttribution } from "@/lib/payment-links";
 import { RED_FLAG_OPTIONS, hasEmergency, invalidTriageFields } from "../../supabase/functions/_shared/orientation-triage";
 import { setVisibleInterval } from "@/lib/visible-interval";
@@ -9,7 +10,7 @@ import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { formatPaymentName, normalizeReceiverName } from "../../supabase/functions/_shared/payment-catalog";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { orientationPaymentConfirmed } from "@/lib/payment-confirmation";
-// 🌿 Orientação Técnica — Dr. Edilson Bezerra ON (assistente de IA supervisionado)
+// 🌿 Orientação Técnica — Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -860,7 +861,7 @@ export default function OrientacaoTecnicaAgente() {
           {phase !== "room" && (
             <div className="text-center mb-6">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-black px-4 py-2 rounded-full mb-4">
-                <Stethoscope size={14} /> DR. EDILSON BEZERRA ON · ASSISTENTE DE IA SUPERVISIONADO
+                <Stethoscope size={14} /> ENFª BRISA · ASSISTENTE VIRTUAL SUPERVISIONADA PELO DR. EDILSON BEZERRA
               </div>
               <h1 className="text-3xl md:text-4xl font-display font-black text-foreground">
                 Orientação Técnica · <span className="text-gradient-green">R$ 30</span>
@@ -883,7 +884,7 @@ export default function OrientacaoTecnicaAgente() {
                   Olá{urlNome ? `, ${urlNome}` : ""}! Você veio pela Enfª Brisa 🌿
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  A Orientação Técnica acontece aqui na plataforma, com o Dr. Edilson Bezerra ON.
+                  A Orientação Técnica acontece aqui na plataforma, com a Enfª Brisa.
                 </p>
               </div>
             </div>
@@ -902,16 +903,16 @@ export default function OrientacaoTecnicaAgente() {
                 <CardContent className="p-6 md:p-8 space-y-4">
                   <div className="flex items-center gap-4">
                     <img
-                      src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra ON"
+                      src={BrisaPhoto}
+                      alt="Enfª Brisa"
                       className="w-16 h-16 rounded-2xl object-cover ring-2 ring-primary/40"
                       loading="lazy"
                       decoding="async"
                     />
                     <div className="min-w-0">
-                      <p className="font-display font-black text-lg text-foreground">Dr. Edilson Bezerra ON</p>
+                      <p className="font-display font-black text-lg text-foreground">Enfª Brisa</p>
                       <p className="text-xs text-muted-foreground">
-                        Assistente de IA supervisionado pelo médico Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia)
+                        Assistente virtual supervisionada pelo médico Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia)
                       </p>
                       <p className="text-[11px] text-muted-foreground flex items-start gap-1 mt-1">
                         <MapPin size={12} className="shrink-0 mt-0.5" />
@@ -926,7 +927,7 @@ export default function OrientacaoTecnicaAgente() {
                     </h2>
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li>• Uma <strong className="text-foreground">triagem com educação em saúde</strong> sobre a sua necessidade ou patologia, para você chegar à consulta real bem informado(a).</li>
-                      <li>• Conduzida pelo <strong className="text-foreground">Dr. Edilson Bezerra ON</strong>: um <strong className="text-foreground">assistente de inteligência artificial</strong> com a persona do Dr. Edilson, <strong className="text-foreground">supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir pessoalmente.</li>
+                      <li>• Conduzida pela <strong className="text-foreground">Enfª Brisa</strong>: uma <strong className="text-foreground">assistente virtual</strong>, <strong className="text-foreground">supervisionada em tempo real</strong> pelo Dr. Edilson Bezerra — que acompanha a conversa e pode pausar e intervir pessoalmente.</li>
                       <li>• Orientações apoiadas em <strong className="text-foreground">evidências científicas publicadas</strong>, com hábitos e próximos passos.</li>
                       <li>• Ao final, um <strong className="text-foreground">relatório individual</strong> que só é liberado depois de revisado e aprovado pelo Dr. Edilson.</li>
                       <li>• <strong className="text-foreground">Encaminhamento</strong> ao médico prescritor mais indicado da nossa vitrine para a consulta.</li>
@@ -974,7 +975,7 @@ export default function OrientacaoTecnicaAgente() {
                   <p className="text-xs text-muted-foreground">
                     Como funciona: <strong className="text-foreground">1.</strong> pagamento seguro de R$ 30 pelo Mercado Pago →{" "}
                     <strong className="text-foreground">2.</strong> triagem com a Enfª Brisa (5 perguntas), após confirmação →{" "}
-                    <strong className="text-foreground">3.</strong> sala com o Dr. Edilson Bezerra ON, após concluir a triagem.
+                    <strong className="text-foreground">3.</strong> sala com a Enfª Brisa, após concluir a triagem.
                   </p>
 
                   <Button onClick={() => setPhase("checkout")} className="w-full h-14 rounded-2xl font-black text-base">
@@ -1176,7 +1177,7 @@ export default function OrientacaoTecnicaAgente() {
                     <div className="flex items-end justify-between mb-6">
                       <div>
                         <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">Orientação Técnica</p>
-                        <p className="text-sm text-muted-foreground">30 minutos com o Dr. Edilson Bezerra ON</p>
+                        <p className="text-sm text-muted-foreground">30 minutos com a Enfª Brisa</p>
                       </div>
                       <p className="text-3xl font-display font-black text-gradient-green">R$ 30</p>
                     </div>
@@ -1340,13 +1341,13 @@ export default function OrientacaoTecnicaAgente() {
                 <div className="ot-room-header flex items-center justify-between gap-2 px-3 py-1.5">
                   <div className="flex items-center gap-2 min-w-0">
                     <img
-                      src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra ON"
+                      src={BrisaPhoto}
+                      alt="Enfª Brisa"
                       className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-white/30"
                     />
                     <div className="min-w-0">
-                      <p className="font-bold text-sm truncate">Dr. Edilson Bezerra ON</p>
-                      <p className="text-xs truncate">Assistente de IA supervisionado · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
+                      <p className="font-bold text-sm truncate">Enfª Brisa</p>
+                      <p className="text-xs truncate">Assistente virtual supervisionada pelo Dr. Edilson Bezerra · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -1391,7 +1392,7 @@ export default function OrientacaoTecnicaAgente() {
                   {otState === "active" && secondsLeft <= 300 && secondsLeft > 0 && <div role="status" className="ot-system text-center text-sm p-2 rounded-md">{secondsLeft <= 60 ? "Falta 1 minuto para encerrar." : "Faltam 5 minutos para encerrar."}</div>}
                   <div className="flex justify-center">
                     <span className="text-[11px] bg-[#FFF3C4] text-neutral-700 px-3 py-1.5 rounded-lg shadow-sm text-center max-w-[90%]">
-                      🔒 Conversa educativa com assistente de IA supervisionado pelo Dr. Edilson Bezerra. Não é
+                      🔒 Conversa educativa com assistente virtual supervisionada pelo Dr. Edilson Bezerra. Não é
                       consulta, não prescreve e não emite receita.
                     </span>
                   </div>
@@ -1714,7 +1715,7 @@ export default function OrientacaoTecnicaAgente() {
                           rows={1}
                           disabled={otState !== "active"}
                           placeholder={otState === "paused" ? "Sala pausada pelo Dr. Edilson…" : "Mensagem"}
-                          aria-label="Mensagem para o Dr. Edilson Bezerra ON"
+                          aria-label="Mensagem para a Enfª Brisa"
                           className="ot-input resize-none min-h-[44px] max-h-32 rounded-3xl border-0 px-4 py-3"
                         />
                         <Button
@@ -1730,7 +1731,7 @@ export default function OrientacaoTecnicaAgente() {
                     </>
                   )}
                   <p className="text-[10px] text-neutral-500 mt-1.5 text-center">
-                    Assistente de IA supervisionado · conteúdo educativo · não é consulta, não prescreve e não emite receita.
+                    Assistente virtual supervisionada pelo Dr. Edilson Bezerra · conteúdo educativo · não é consulta, não prescreve e não emite receita.
                   </p>
                 </div>
               </div>

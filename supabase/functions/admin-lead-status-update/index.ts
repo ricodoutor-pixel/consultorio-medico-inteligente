@@ -14,7 +14,7 @@ const TEMPLATES: Partial<Record<Status, (name: string) => string>> = {
   contacted: (name) =>
     `Olá ${name}! 🌱 Aqui é a Enfermeira Brisa da Planta y Raiz. Recebi seus dados e estou entrando em contato para te orientar sobre o protocolo de cannabis medicinal. Pode falar agora?`,
   qualified: (name) =>
-    `${name}, ótima notícia! ✅ Seu perfil foi qualificado pela nossa equipe. Sua Orientação Técnica com o Dr. Edilson Bezerra ON (assistente de IA supervisionado pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia) já pode ser iniciada. Ela é educativa e é o primeiro passo antes da consulta médica. Quer agendar agora por R$ 30?`,
+    `${name}, ótima notícia! ✅ Seu perfil foi qualificado pela nossa equipe. Sua Orientação Técnica com a Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia) já pode ser iniciada. Ela é educativa e é o primeiro passo antes da consulta médica. Quer agendar agora por R$ 30?`,
   converted: (name) =>
     `Parabéns, ${name}! 🎉 Sua orientação técnica foi confirmada. Em até 24h você recebe o PDF assinado digitalmente (ICP-Brasil) por aqui. Qualquer dúvida, é só responder.`,
   lost: (name) =>

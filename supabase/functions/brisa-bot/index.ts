@@ -39,11 +39,11 @@ const SB_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
 import { DOCTOR_NAME, DOCTOR_CRM, DOCTOR_PHONE } from '../_shared/clinic-info.ts';
 
-// ── ROTEIRO COMPLETO DE ORIENTAÇÃO TÉCNICA (DR. EDILSON BEZERRA ON) ──────
+// ── ROTEIRO COMPLETO DE ORIENTAÇÃO TÉCNICA (ENFª BRISA) ──────
 const ROTEIRO_ORIENTACAO_TECNICA = `📲 *COMO FUNCIONA A ORIENTAÇÃO TÉCNICA (R$ 30):*
 
 1️⃣ *Início do Cuidado (Triagem e Educação em Saúde):*
-A Orientação Técnica é o início do seu atendimento na plataforma e é conduzida pelo *${DOCTOR_NAME} ON*, um assistente de inteligência artificial supervisionado pelo ${DOCTOR_NAME} (registro médico boliviano nº 10963, consultório físico no 1º Anillo, Santa Cruz de la Sierra). A Orientação Técnica é apenas o início do cuidado e não realiza prescrição médica:
+A Orientação Técnica é o início do seu atendimento na plataforma e é conduzida pela *Enfª Brisa*, uma assistente virtual supervisionada pelo ${DOCTOR_NAME} (registro médico boliviano nº 10963, consultório físico no 1º Anillo, Santa Cruz de la Sierra). A Orientação Técnica é apenas o início do cuidado e não realiza prescrição médica:
 👉 https://www.plantayraiz.com.br/orientacao-tecnica
 
 2️⃣ *Modalidades na Plataforma:*
@@ -94,7 +94,7 @@ O que te trouxe até a Planta y Raiz hoje?
   paciente: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿
 
 Você pode começar agora por dois caminhos:
-• *Orientação Técnica educativa (R$ 30 · 30 min):* conduzida pelo Dr. Edilson Bezerra ON (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). É o início do cuidado — não é consulta e não prescreve; entrega relatório em PDF e encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica
+• *Orientação Técnica educativa (R$ 30 · 30 min):* conduzida pela Enfª Brisa (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). É o início do cuidado — não é consulta e não prescreve; entrega relatório em PDF e encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica
 • *Consulta com Médico Prescritor:* veja os especialistas e valores de cada médico na vitrine: https://www.plantayraiz.com.br/profissionais
 
 Qual faz mais sentido para você hoje?`,
@@ -344,7 +344,7 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method === 'GET') {
     return new Response(JSON.stringify({
       ok: true, version: '2026.9.09-AGENTES-SEPARADOS-30MIN',
-      agentes: { triagem: 'Enf. Brisa', orientacao_tecnica: 'Dr. Edilson Bezerra On (30 min por pagamento)' },
+      agentes: { triagem: 'Enf. Brisa', orientacao_tecnica: 'Enfª Brisa (30 min por pagamento)' },
       roteiro_ativo: true,
       instant_reply: '✅ ATIVO (com o roteiro completo 5 passos)',
     }, null, 2), { headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -405,7 +405,7 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────
-  // Sessão paga ativa → Dr. Edilson Bezerra On (Orientação Técnica, 30 min).
+  // Sessão paga ativa → Enfª Brisa (Orientação Técnica, 30 min).
   // Sem sessão paga  → Enf. Brisa (triagem curta + link de pagamento).
   const sb = serviceClient();
   const session = sb ? await resolveOtSession(sb, phone, name) : null;
@@ -423,7 +423,7 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   if (sb && session) {
-    // ── AGENTE: Dr. Edilson Bezerra On (pago, com relógio) ──
+    // ── AGENTE: Enfª Brisa (pago, com relógio) ──
     const left = minutesLeft(session);
 
     if (session.opened_now) {

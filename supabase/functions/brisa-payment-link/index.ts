@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
       patient_name: String(name).slice(0, 160),
       patient_whatsapp: String(phone).replace(/\D/g, "").slice(0, 20),
       patient_email: String(email).slice(0, 255),
-      topic: "Orientação Técnica — Dr. Edilson Bezerra ON",
+      topic: "Orientação Técnica — Enfª Brisa",
       amount: 30,
       currency: "BRL",
       platform_fee: 2.10,

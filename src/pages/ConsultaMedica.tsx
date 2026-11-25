@@ -1,3 +1,4 @@
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import type { Json } from "@/integrations/supabase/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -108,6 +109,11 @@ export default function ConsultaMedica() {
   const chosenDoctor = params.get("doctor") || params.get("pro");
   const proParam = params.get("pro") || chosenDoctor;
   const apptId = params.get("appt");
+  const { professionals: directory } = useRealProfessionals();
+  const pickable = directory
+    .filter((p) => !p.councilLabel || p.councilLabel === "CRM")
+    .sort((a, b) => Number(!!b.online) - Number(!!a.online))
+    .slice(0, 12);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -666,8 +672,34 @@ export default function ConsultaMedica() {
           <ArrowLeft size={16} /> Voltar
         </button>
 
+        {!chosenDoctor && !apptId && !appt && (
+          <Card className="border-primary/30">
+            <CardContent className="p-4 space-y-3">
+              <p className="font-black text-foreground">Escolha o médico da sua consulta</p>
+              <p className="text-xs text-muted-foreground">Os médicos online aparecem primeiro.</p>
+              <div className="grid gap-2">
+                {pickable.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => { const next = new URLSearchParams(params); next.set("pro", p.dbId || p.id); setParams(next); }}
+                    className="flex items-center gap-3 rounded-xl border border-border bg-card p-2 text-left hover:border-primary"
+                  >
+                    {p.imageUrl ? <img src={p.imageUrl} alt={p.name} className="w-10 h-10 rounded-xl object-cover" loading="lazy" /> : <Stethoscope className="text-primary" />}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-foreground truncate">{p.name}</span>
+                      <span className="block text-[11px] text-muted-foreground truncate">{p.crm ? `CRM ${p.crm}` : p.category}</span>
+                    </span>
+                    <span className={`text-[10px] font-bold ${p.online ? "text-primary" : "text-muted-foreground"}`}>{p.online ? "Online" : "Offline"}</span>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Médico escolhido */}
-        <Card className="border-primary/30">
+        {(chosenDoctor || apptId || appt) && <Card className="border-primary/30">
           <CardContent className="p-4 flex items-center gap-4">
             {doctor?.photo ? (
               <img
@@ -690,7 +722,7 @@ export default function ConsultaMedica() {
               </p>
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
         {/* Etapas */}
         <ol className="grid grid-cols-5 gap-1 text-[10px] font-bold">

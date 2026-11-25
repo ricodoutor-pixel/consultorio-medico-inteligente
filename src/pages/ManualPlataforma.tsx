@@ -158,7 +158,7 @@ const DOCTOR_STEPS: DoctorStep[] = [
       "Coloque foto, especialidade e uma apresentação curta. É o que o paciente lê antes de escolher você.",
       "Em Consultório → \"Horários & Consulta por Vídeo\", publique sua agenda. O paciente só consegue agendar nos horários que você publicar.",
       "Seus valores são tabelados: consulta por chat R$ 100, consulta por vídeo R$ 150 e retorno R$ 90. Você escolhe apenas o valor da Consulta Premium (vídeo + chat), a partir de R$ 100.",
-      "A Orientação Técnica de R$ 30 é atendida somente pelo Dr. Edilson Bezerra ON. Ela não aparece no seu cartão e você não realiza nem recebe por essa modalidade.",
+      "A Orientação Técnica de R$ 30 é atendida somente pela Enfª Brisa. Ela não aparece no seu cartão e você não realiza nem recebe por essa modalidade.",
     ],
     link: { to: "/consultorio", label: "Abrir Consultório" },
   },
@@ -1147,15 +1147,15 @@ export default function ManualPlataforma() {
               </div>
             </ComicPanel>
 
-            {/* ORIENTAÇÃO TÉCNICA: SÓ O DR. EDILSON BEZERRA ON */}
+            {/* ORIENTAÇÃO TÉCNICA: SÓ O ENFª BRISA */}
             <ComicPanel color="amber">
-              <NarrationBox text="ORIENTAÇÃO TÉCNICA: SÓ O DR. EDILSON BEZERRA ON" color="amber" />
+              <NarrationBox text="ORIENTAÇÃO TÉCNICA: SÓ O ENFª BRISA" color="amber" />
               <p className="text-sm font-black text-amber-200 mb-3">
-                Você não atende, não oferece e não recebe pela Orientação Técnica. Essa modalidade é exclusiva do Dr. Edilson Bezerra ON.
+                Você não atende, não oferece e não recebe pela Orientação Técnica. Essa modalidade é exclusiva da Enfª Brisa.
               </p>
               <ul className="space-y-2 text-sm text-slate-200">
                 <li><strong className="text-white">O que é:</strong> uma conversa educativa de R$ 30 pelo chat. É a porta de entrada da plataforma para quem ainda não pode pagar uma consulta.</li>
-                <li><strong className="text-white">Quem atende:</strong> o Dr. Edilson Bezerra ON, um assistente de inteligência artificial supervisionado pelo Dr. Edilson Bezerra. Nenhum outro médico da vitrine realiza essa modalidade.</li>
+                <li><strong className="text-white">Quem atende:</strong> a Enfª Brisa, uma assistente virtual supervisionada pelo Dr. Edilson Bezerra. Nenhum outro médico da vitrine realiza essa modalidade.</li>
                 <li><strong className="text-white">O que ela não faz:</strong> não é consulta, não dá diagnóstico e não emite receita. É só o início do cuidado.</li>
                 <li><strong className="text-white">Onde aparece:</strong> na página inicial e na página própria da Orientação Técnica. Ela não aparece no seu cartão nem no seu perfil.</li>
                 <li><strong className="text-white">O que chega até você:</strong> o paciente que precisa de consulta é orientado a escolher um médico na vitrine. Aí começa o seu trabalho, com consulta paga.</li>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Copy, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,11 @@ export default function AdminPaymentLinks() {
     try { await navigator.clipboard.writeText(text); toast.success(`${what} copiado`); }
     catch { toast.error("Não foi possível copiar"); }
   };
+  const [stats, setStats] = useState<{ produto: string; campanha: string; pedidos: number; pagos: number }[] | null>(null);
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase.rpc as any)("admin_payment_link_stats", { _days: 30 }).then(({ data, error }: any) => setStats(error ? null : data ?? []));
+  }, []);
   return (
     <main className="min-h-[100dvh] bg-background text-foreground p-4 md:p-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold flex items-center gap-2"><Link2 className="h-6 w-6 text-primary" /> Links de pagamento (WhatsApp)</h1>
@@ -47,6 +53,14 @@ export default function AdminPaymentLinks() {
           );
         })}
       </div>
+      <section className="rounded-xl border border-border bg-card p-4 mt-6">
+        <h2 className="font-semibold mb-2">Pedidos vindos dos links (30 dias)</h2>
+        {stats === null ? <p className="text-sm text-muted-foreground">—</p> : stats.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum pedido pelos links ainda.</p> : (
+          <ul className="text-sm space-y-1">
+            {stats.map((r) => <li key={r.produto + r.campanha}>{r.produto} · {r.campanha}: {r.pedidos} pedidos, {r.pagos} pagos</li>)}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }

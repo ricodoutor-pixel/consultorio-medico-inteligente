@@ -166,8 +166,8 @@ export default function OrientacaoRelatorio() {
               <span className="text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
                 Planta y Raíz · Telemedicina Integrativa
               </span>
-              <h1 className="text-2xl font-black text-slate-900 mt-2">Dr. Edilson Bezerra ON</h1>
-              <p className="text-xs text-slate-600 font-medium">Assistente de IA supervisionado · Orientação educativa, não é consulta médica</p>
+              <h1 className="text-2xl font-black text-slate-900 mt-2">Enfª Brisa</h1>
+              <p className="text-xs text-slate-600 font-medium">Assistente virtual supervisionada pelo Dr. Edilson Bezerra · Orientação educativa, não é consulta médica</p>
               <p className="text-xs text-slate-500">
                 Supervisor: Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia) · atendimento presencial: Edifício Ecodent, 1º Anillo, 13º andar, sala 15 · Santa Cruz de la Sierra
               </p>

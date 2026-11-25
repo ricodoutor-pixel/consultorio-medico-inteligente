@@ -1,3 +1,4 @@
+import BrisaPhoto from "@/assets/brisa-enfermeira.webp";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
@@ -263,7 +264,7 @@ const Index = () => {
                 newTab={false}
                 className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105"
                 source="CTA_Index_Hero"
-                modalMessage="Antes de entrar na sala virtual, deixe seu contato — assim agilizamos sua Orientação Técnica em Nuvem de apenas R$30 com o Dr. Edilson Bezerra ON."
+                modalMessage="Antes de entrar na sala virtual, deixe seu contato — assim agilizamos sua Orientação Técnica em Nuvem de apenas R$30 com a Enfª Brisa."
               >
                 🎯 Iniciar Orientação Técnica (R$ 30) <ArrowRight size={18} className="ml-2" />
               </BrisaCTAGate>
@@ -278,16 +279,16 @@ const Index = () => {
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
-                      src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra ON — assistente de IA supervisionado"
+                      src={BrisaPhoto}
+                      alt="Enfª Brisa — assistente virtual supervisionada pelo Dr. Edilson Bezerra"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
                     />
                   </div>
                   <div>
-                    <p className="font-display font-black text-xl">Dr. Edilson Bezerra ON</p>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">IA supervisionada · Fundador e CEO</p>
+                    <p className="font-display font-black text-xl">Enfª Brisa</p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Assistente virtual · supervisão Dr. Edilson Bezerra</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 pt-2">
@@ -333,10 +334,10 @@ const Index = () => {
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}
-                <span className="text-gradient-green">Dr. Edilson Bezerra ON</span>
+                <span className="text-gradient-green">Enfª Brisa</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Dr. Edilson Bezerra ON</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (fundador da plataforma, medicina integrativa),<strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
+                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Enfª Brisa</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (fundador da plataforma, medicina integrativa),<strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>
@@ -364,7 +365,7 @@ const Index = () => {
                 <div className="text-center">
                   <div className="text-2xl mb-1">⚕️</div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-primary">3. Sala</p>
-                  <p className="text-[10px] text-muted-foreground">com Dr. Edilson Bezerra ON</p>
+                  <p className="text-[10px] text-muted-foreground">com Enfª Brisa</p>
                 </div>
               </div>
               <div className="flex justify-center pt-4">
@@ -376,7 +377,7 @@ const Index = () => {
                     newTab={false}
                     className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
                     source="CTA_DrEdilson_Triagem"
-                    modalMessage="Antes de entrar na sala virtual, deixe seu contato — garantimos sua Orientação Técnica em Nuvem de R$30 com o Dr. Edilson Bezerra ON."
+                    modalMessage="Antes de entrar na sala virtual, deixe seu contato — garantimos sua Orientação Técnica em Nuvem de R$30 com a Enfª Brisa."
                   >
                     💬 Iniciar Orientação Técnica em Nuvem (R$ 30) <ArrowRight size={20} className="ml-2" />
                   </BrisaCTAGate>
@@ -384,7 +385,7 @@ const Index = () => {
               </div>
 
               <p className="text-xs text-muted-foreground italic">
-                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago (pagamento) → Sala com o Dr. Edilson Bezerra ON</strong>. A sala só abre depois que o Mercado Pago confirma o pagamento. Pacientes internacionais: US$10.
+                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago (pagamento) → Sala com a Enfª Brisa</strong>. A sala só abre depois que o Mercado Pago confirma o pagamento. Pacientes internacionais: US$10.
               </p>
             </div>
           </motion.div>

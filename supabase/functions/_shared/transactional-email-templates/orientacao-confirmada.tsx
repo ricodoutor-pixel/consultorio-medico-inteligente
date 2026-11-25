@@ -33,7 +33,7 @@ const OrientacaoConfirmadaEmail = ({ name, whatsappUrl, protocolo }: Props) => (
         <Text style={text}>
           Pagamento recebido com sucesso. Em até <strong>24 horas</strong> a enfermeira
           Brisa entrará em contato pelo WhatsApp para iniciar sua Orientação Técnica com o
-          Dr. Edilson Bezerra ON (assistente de IA supervisionado). A Orientação é educativa e é
+          Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra). A Orientação é educativa e é
           o primeiro passo: o tratamento começa na consulta com médico habilitado.
         </Text>
         {protocolo ? (

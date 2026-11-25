@@ -131,7 +131,7 @@ export interface ServiceMenuItem {
   desc: string;
   /** Emite receita com assinatura digital? */
   prescription: boolean;
-  /** Redireciona para a Orientação Técnica com o Dr. Edilson Bezerra ON. */
+  /** Redireciona para a Orientação Técnica com a Enfª Brisa. */
   redirectToEdilson?: boolean;
   highlight?: boolean;
 }
@@ -193,4 +193,4 @@ export const FIXED_SERVICE_NOTICE =
 
 /** Aviso aos médicos: a Orientação Técnica não faz parte dos serviços deles. */
 export const ORIENTATION_EXCLUSIVE_NOTICE =
-  "A Orientação Técnica (R$ 30) é atendida somente pelo Dr. Edilson Bezerra ON. Os demais médicos não realizam nem recebem por essa modalidade.";
+  "A Orientação Técnica (R$ 30) é atendida somente pela Enfª Brisa. Os demais médicos não realizam nem recebem por essa modalidade.";

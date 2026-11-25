@@ -1,4 +1,4 @@
-// 🌿 Planta y Raíz — Orientação Técnica no site (Dr. Edilson Bezerra On)
+// 🌿 Planta y Raíz — Orientação Técnica no site (Enfª Brisa)
 // Contrato v2: Triagem salva antes da ordem MP -> Liberação SOMENTE via Webhook (status 'ready')
 // -> Paciente clica em Iniciar ('start') -> 30 minutos de Orientação Técnica Educativa estilo WhatsApp.
 // Suporta pausa/intervenção em tempo real pelo Dr. Edilson e geração de relatório revisado.
@@ -330,7 +330,7 @@ Deno.serve(async (req) => {
 
         // Mensagem de boas-vindas do sistema/agente
         const welcomeText =
-          `Olá! Sou o **Dr. Edilson Bezerra ON**, persona de inteligência artificial supervisionada pelo Dr. Edilson Bezerra (CRM Bolívia nº 10963).\n\n` +
+          `Olá! Sou a **Enfª Brisa**, assistente virtual supervisionada pelo Dr. Edilson Bezerra (CRM Bolívia nº 10963).\n\n` +
           `Estou aqui para acolher você, entender em detalhes suas queixas e necessidades, cruzar com nosso acervo de evidências científicas e orientar os melhores caminhos antes de uma consulta formal com um médico prescritor da nossa vitrine.\n\n` +
           `*Lembrando: esta é uma orientação técnica educativa; eu não emito receitas nem prescrevo medicamentos.* Como posso te ajudar hoje?`;
 
@@ -600,7 +600,7 @@ Deno.serve(async (req) => {
       }).format(new Date());
 
       const prompt =
-        `Você é o Dr. Edilson Bezerra ON. Crie um Relatório de Orientação Técnica e Acolhimento Individual para o paciente com base na triagem e conversa abaixo.\n\n` +
+        `Você é a Enfª Brisa. Crie um Relatório de Orientação Técnica e Acolhimento Individual para o paciente com base na triagem e conversa abaixo.\n\n` +
         `IDENTIFICAÇÃO OBRIGATÓRIA (use exatamente estes dados na seção 1):\n` +
         `- Paciente: ${name}\n` +
         `- Código do atendimento: ${attendanceCode}\n` +

@@ -16,10 +16,10 @@ describe("receitas: a plataforma nunca afirma aprovação da ANVISA", () => {
   });
 });
 
-describe("identidade pública: Dr. Edilson Bezerra ON", () => {
+describe("identidade pública: Enfª Brisa", () => {
   it("é IA supervisionada com registro boliviano, nunca CRM brasileiro", () => {
-    expect(EDILSON_ON_SUPERVISION).toContain("Dr. Edilson Bezerra ON");
-    expect(EDILSON_ON_SUPERVISION).toContain("inteligência artificial");
+    expect(EDILSON_ON_SUPERVISION).toContain("Enfª Brisa");
+    expect(EDILSON_ON_SUPERVISION).toContain("assistente virtual supervisionada");
     expect(EDILSON_ON_SUPERVISION).toContain("Bolívia");
     expect(EDILSON_ON_SUPERVISION).not.toMatch(/CRM-(CE|SP)/);
   });

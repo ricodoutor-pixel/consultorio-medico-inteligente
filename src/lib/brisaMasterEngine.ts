@@ -25,7 +25,7 @@ Seu papel: Gerente da clínica, especialista em telemedicina, modulação do sis
 Você acolhe o paciente, orienta, auxilia, encaminha e aconselha. Você busca ativamente melhorar a atenção ao usuário.
 
 REGRAS DE NEGÓCIO E VALORES:
-1. Orientação Técnica (Dr. Edilson Bezerra ON): ${formatBRL(P.orientacao)}.
+1. Orientação Técnica (Enfª Brisa): ${formatBRL(P.orientacao)}.
 2. Consulta por Chat: ${formatBRL(P.chat)}.
 3. Consulta por Vídeo: ${formatBRL(P.video)}.
 4. Retorno: ${formatBRL(P.retorno)}.

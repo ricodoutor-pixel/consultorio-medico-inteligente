@@ -1,3 +1,4 @@
+import { publicPracticeAreas, primaryPracticeArea } from "@/lib/practice-areas";
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
@@ -75,7 +76,7 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
 
 
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
-// Cartões médicos mostram só consultas; a Orientação Técnica (R$ 30) é exclusiva do Dr. Edilson Bezerra ON.
+// Cartões médicos mostram só consultas; a Orientação Técnica (R$ 30) é exclusiva da Enfª Brisa.
 const DOCTOR_CARD_SERVICES = SERVICE_MENU.filter((s) => s.sku !== "orientacao_tecnica");
 const DOCTOR_CARD_FROM_PRICE = SERVICE_MENU.find((s) => s.sku === "consulta_chat")?.price ?? 100;
 
@@ -100,7 +101,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
 
   useEffect(() => {
     if (!pro) return;
-    const doctorSpecialty = (pro.tags && pro.tags[0]) || (pro.category === "Médicos Prescritores" ? "Clínica Geral e Saúde Integrativa" : pro.category);
+    const doctorSpecialty = publicPracticeAreas(pro.tags)[0] || (pro.category === "Médicos Prescritores" ? "Clínica Geral e Saúde Integrativa" : pro.category);
     const crmLabel = pro.crm ? ` (${(pro.councilLabel || "CRM")} ${pro.crm})` : "";
     const pageTitle = `${pro.name} — ${doctorSpecialty} | Consulta online${crmLabel}`;
     document.title = pageTitle;
@@ -251,8 +252,9 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
                  <span className="text-xs text-muted-foreground">• {pro.consults === 0 ? "Novo na plataforma" : `${pro.consults} consultas`}</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
+              <p className="text-xs font-bold text-muted-foreground mb-1">Áreas de atuação</p>
               <div className="flex flex-wrap gap-2 mb-4">
-                {(pro.tags || []).map((t) => (
+                {publicPracticeAreas(pro.tags).map((t) => (
                   <span key={t} className="px-2 py-1 rounded-full text-xs font-bold border border-border bg-card text-muted-foreground">{t}</span>
                 ))}
               </div>
@@ -440,7 +442,7 @@ const Profissionais = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar médico por nome, CRM ou especialidade..."
+                placeholder="Buscar médico por nome, CRM ou área de atuação..."
                 className="w-full pl-12 pr-11 py-3.5 bg-card/80 hover:bg-card focus:bg-card border border-border/80 focus:border-primary rounded-2xl text-sm md:text-base text-foreground placeholder:text-muted-foreground outline-none transition-all shadow-sm focus:ring-2 focus:ring-primary/20"
               />
               {searchQuery && (
@@ -565,7 +567,7 @@ const Profissionais = () => {
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <p className="text-xs text-primary font-bold">
-                                {p.specialty || (p.tags && p.tags[0]) || p.category}
+                                {primaryPracticeArea(p)}
                               </p>
                               <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide ${p.presenceState === 'em_consulta' ? 'text-amber-400' : p.online ? 'text-green-300' : 'text-red-400'}`}>
                                 <span className="relative flex items-center justify-center w-6 h-6">
@@ -600,8 +602,9 @@ const Profissionais = () => {
                       {/* Body */}
                       <div className="px-4 py-3">
                         <p className="text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{p.bio}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground mb-1">Áreas de atuação</p>
                         <div className="flex flex-wrap gap-1 mb-2">
-                          {(p.tags || []).slice(0, 3).map((t) => (
+                          {publicPracticeAreas(p.tags).slice(0, 3).map((t) => (
                             <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border bg-card text-muted-foreground">{t}</span>
                           ))}
                         </div>

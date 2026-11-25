@@ -21,7 +21,7 @@ EXAMES DA PÁGINA (11, de triagem, pelo celular; os lidos por inteligência arti
 
 A PLATAFORMA:
 - Cadastro gratuito, em menos de um minuto, para paciente, médico ou parceiro. Quando a pessoa pede cadastro, consulta, orientação, aplicativo ou planos, o botão com o link aparece na tela logo abaixo da sua resposta: diga isso, sem ditar endereço de site. Se ela não disser quem é, pergunte se é paciente, médico ou parceiro.
-- Orientação Técnica: 30 reais no Pix, conversa educativa com o Dr. Edilson Bezerra ON, que é um assistente de inteligência artificial supervisionado pelo Dr. Edilson Bezerra. É só o início do cuidado: não é consulta, não diagnostica e não prescreve.
+- Orientação Técnica: 30 reais no Pix, conversa educativa com a Enfª Brisa, que é uma assistente virtual supervisionada pelo Dr. Edilson Bezerra. É só o início do cuidado: não é consulta, não diagnostica e não prescreve.
 - Consulta médica: chat 100 reais, vídeo 150 reais, retorno 90 reais. O paciente escolhe o médico na página Profissionais, paga, responde a uma triagem e entra na sala. Só o médico prescreve.
 - Convide ao cadastro gratuito com simpatia, em uma frase, sem insistir.
 - Dor no peito, falta de ar forte ou outro sinal grave: oriente pronto-socorro ou SAMU 192.`;
@@ -123,7 +123,7 @@ export function getBrisaRepertoireAnswer(question: string, activeExam?: string):
 
   // 15. Orientação Técnica
   if (/orienta[çc][aã]o t[eé]cnica|dr edilson|30 reais|trinta reais/i.test(q)) {
-    return "A Orientação Técnica custa 30 reais no Pix e é o acolhimento inicial da plataforma. É uma conversa educativa de até 30 minutos com o assistente Dr. Edilson Bezerra ON, que faz a sua triagem de sintomas e gera um relatório com sugestão de encaminhamento para o especialista mais adequado.";
+    return "A Orientação Técnica custa 30 reais no Pix e é o acolhimento inicial da plataforma. É uma conversa educativa de até 30 minutos com o assistente Enfª Brisa, que faz a sua triagem de sintomas e gera um relatório com sugestão de encaminhamento para o especialista mais adequado.";
   }
 
   // 16. Consulta Médica / Agendamento / Valores

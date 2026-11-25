@@ -689,6 +689,7 @@ export type Database = {
       appointments: {
         Row: {
           amount: number
+          attribution: Json
           cancellation_reason: string | null
           created_at: string
           doctor_id: string
@@ -707,6 +708,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          attribution?: Json
           cancellation_reason?: string | null
           created_at?: string
           doctor_id: string
@@ -725,6 +727,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          attribution?: Json
           cancellation_reason?: string | null
           created_at?: string
           doctor_id?: string
@@ -6097,6 +6100,7 @@ export type Database = {
           ai_analysis: string | null
           amount: number
           amount_brl: number | null
+          attribution: Json
           btc_address: string | null
           btc_amount: number | null
           btc_tx_hash: string | null
@@ -6136,6 +6140,7 @@ export type Database = {
           ai_analysis?: string | null
           amount?: number
           amount_brl?: number | null
+          attribution?: Json
           btc_address?: string | null
           btc_amount?: number | null
           btc_tx_hash?: string | null
@@ -6175,6 +6180,7 @@ export type Database = {
           ai_analysis?: string | null
           amount?: number
           amount_brl?: number | null
+          attribution?: Json
           btc_address?: string | null
           btc_amount?: number | null
           btc_tx_hash?: string | null
@@ -10518,6 +10524,15 @@ export type Database = {
           pix_key: string
           pix_type: string
           region: string
+        }[]
+      }
+      admin_payment_link_stats: {
+        Args: { _days?: number }
+        Returns: {
+          campanha: string
+          pagos: number
+          pedidos: number
+          produto: string
         }[]
       }
       admin_reject_affiliate_withdrawal: {

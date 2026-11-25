@@ -1,3 +1,4 @@
+import BrisaPhoto from "@/assets/brisa-enfermeira.webp";
 import { useState, useEffect, lazy, Suspense } from "react";
 const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import brisaImg from "@/assets/brisa-enfermeira.png";
@@ -796,10 +797,10 @@ const Telemedicina = () => {
                       </Button>
                     </div>
 
-                    {/* Link para Orientação Técnica em Nuvem (Dr. Edilson Bezerra ON - R$ 30) */}
+                    {/* Link para Orientação Técnica em Nuvem (Enfª Brisa - R$ 30) */}
                     <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                       <div className="text-xs text-muted-foreground leading-relaxed">
-                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra ON (consulta PubMed/NCBI em tempo real)?</span>
+                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com a Enfª Brisa (consulta PubMed/NCBI em tempo real)?</span>
                       </div>
                       <Link to="/orientacao-tecnica">
                         <Button variant="outline" size="sm" className="text-xs font-black border-primary text-primary hover:bg-primary/10 gap-1 rounded-xl shrink-0">
@@ -1065,7 +1066,7 @@ const Telemedicina = () => {
         </div>
       </section>
 
-      {/* 🌿 Seção Explicativa Oficial: Orientação Técnica — Dr. Edilson Bezerra ON */}
+      {/* 🌿 Seção Explicativa Oficial: Orientação Técnica — Enfª Brisa */}
       <section
         id="orientacao-tecnica"
         className="scroll-mt-24 md:scroll-mt-28 py-16 bg-gradient-to-br from-primary/10 via-background to-emerald-500/10 border-t border-primary/20"
@@ -1076,8 +1077,8 @@ const Telemedicina = () => {
 
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
               <img
-                src={DrEdilsonPhoto}
-                alt="Dr. Edilson Bezerra ON"
+                src={BrisaPhoto}
+                alt="Enfª Brisa"
                 className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-primary/30 shadow-xl shrink-0"
               />
               <div className="text-center md:text-left space-y-2">
@@ -1094,12 +1095,12 @@ const Telemedicina = () => {
                 </div>
                 <h3 className="text-2xl sm:text-4xl font-display font-black text-foreground">
                   Orientação e Avaliação Técnica com{" "}
-                  <span className="text-gradient-green">Dr. Edilson Bezerra ON</span>
+                  <span className="text-gradient-green">Enfª Brisa</span>
                 </h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
                   Modalidade institucional desenvolvida para <strong>filtrar pacientes reais versus curiosos</strong>,
                   compreender profundamente o histórico de cada caso e educar sobre a terapêutica canabinoide
-                  antes da consulta médica formal. Conduzida pelo <strong>Dr. Edilson Bezerra ON</strong>, um assistente de inteligência artificial, sob <strong>supervisão humana em tempo real</strong> do médico Dr. Edilson Bezerra (registro médico nº 10963, Bolívia; atendimento presencial no Edifício Ecodent, 1º Anillo, 13º andar, sala 15, Santa Cruz de la Sierra).
+                  antes da consulta médica formal. Conduzida pelo <strong>Enfª Brisa</strong>, uma assistente virtual, sob <strong>supervisão humana em tempo real</strong> do médico Dr. Edilson Bezerra (registro médico nº 10963, Bolívia; atendimento presencial no Edifício Ecodent, 1º Anillo, 13º andar, sala 15, Santa Cruz de la Sierra).
                 </p>
               </div>
             </div>

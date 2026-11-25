@@ -33,7 +33,7 @@ interface DoctorServiceMenuProps {
 /**
  * Vitrine padronizada de serviços do profissional.
  * Fluxo dentro da plataforma: Pix → Triagem Brisa → Consulta → Avaliação → Indicação.
- * Orientação Técnica (R$ 30) é sempre direcionada ao Dr. Edilson Bezerra ON.
+ * Orientação Técnica (R$ 30) é sempre direcionada à Enfª Brisa.
  */
 export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }: DoctorServiceMenuProps) {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
     item.sku === "consulta_premium" ? premiumPrice || PREMIUM_SUGGESTED_PRICE : item.price;
 
   const handleSelect = (item: ServiceMenuItem) => {
-    // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
+    // Orientação Técnica é exclusiva da Enfª Brisa (agente em nuvem):
     // leva à página única, que conduz pagamento → triagem → sala.
     // Não exige sessão aqui — a própria página trata login.
     if (item.redirectToEdilson) {
@@ -118,7 +118,7 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice, proId }:
                   {isLoading ? (
                     <><Loader2 size={14} className="mr-1 animate-spin" /> Gerando…</>
                   ) : item.redirectToEdilson ? (
-                    "Iniciar com Dr. Edilson Bezerra ON"
+                    "Iniciar com Enfª Brisa"
                   ) : (
                     "Contratar Agora"
                   )}

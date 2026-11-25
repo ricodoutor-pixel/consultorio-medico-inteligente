@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { acquireBrisaWorkerLock } from './lib/brisa-worker-lock.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { BRISA_CONFIG, buildLgpdOriginReply, buildKycChecklistReply } from './brisa_onboarding_config.mjs';
-import { sanitizeOutboundAnswer } from '../supabase/functions/_shared/brisa-response-policy.mjs';
+import { sanitizeOutboundAnswer, PAYMENT_CLAIM_ANSWER, AUDIO_ANSWER, isMediaOnlyText, introducedWithinDay, patientGreeting } from '../supabase/functions/_shared/brisa-response-policy.mjs';
 import {
   normalizeJid,
   checkAiPause,
@@ -209,6 +209,12 @@ const recentSentHistory = loadRecentSentHistory();
 
 // 🔒 Fila única e trava por conversa (in-flight lock) para evitar 2 ou 3 mensagens no mesmo minuto
 const inFlightChats = new Set();
+
+/** A Brisa já se apresentou a este contato nas últimas 24 h? (histórico local de envios) */
+function introducedRecently(target) {
+  if (!target) return false;
+  return introducedWithinDay(recentSentHistory.get(getCanonicalContactId(target)) || []);
+}
 
 function hasRecentlySent(target, text) {
   if (!text) return false;
@@ -1405,7 +1411,7 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
 
   // 1. Saudação simples -> Abertura consultiva (nunca trava em "Você já tem cadastro?")
   if (isPureGreeting(question)) {
-    return `${greeting} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). O que te trouxe até a Planta y Raiz hoje?`;
+    return patientGreeting(senderName, introducedRecently(recipient));
   }
 
   // 2. Emergência médica (prioridade máxima)
@@ -1415,7 +1421,7 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
 
   // 3. Pagamento e comprovante -> Nunca libera acesso por frase ou print
   if (isPaymentOrVoucherNotice(question)) {
-    return `Recebemos. O acesso é liberado automaticamente assim que o sistema confirmar o pagamento. Nossa equipe acompanha por aqui.`;
+    return PAYMENT_CLAIM_ANSWER;
   }
 
   // 4. Spams / correntes / política / serviços de terceiros
@@ -2169,7 +2175,7 @@ async function loop() {
               const audioMsgs = newInbounds.filter(m => Boolean(m.message?.audioMessage || m.message?.pttMessage));
               if (audioMsgs.length > 0 && !combinedText.trim()) {
                 log(`🎙️ [ÁUDIO RECEBIDO] Áudio recebido de ${senderName} (${canonical}). Enviando aviso oficial.`);
-                const audioReply = "Recebi seu áudio, mas aqui só consigo ler texto. Pode escrever em poucas palavras o que você precisa?";
+                const audioReply = AUDIO_ANSWER;
                 if (!hasRecentlySent(canonical, audioReply)) {
                   await sendWhatsApp(recipient, audioReply);
                   lastRepliedAt.set(canonical, Date.now());
@@ -2196,6 +2202,12 @@ async function loop() {
               const elapsed = Date.now() - lastTime;
               if (elapsed < 60000) {
                 log(`⏳ Contato ${senderName} (${canonical}) recebeu resposta há ${Math.round(elapsed/1000)}s. Aguardando cooldown de 60s para não gerar mensagens duplicadas.`);
+                continue;
+              }
+
+              // Só emoji/figurinha: nada a responder e nunca vira aviso de pagamento
+              if (combinedText.trim().length > 0 && isMediaOnlyText(combinedText)) {
+                log(`🙂 [SÓ EMOJI/FIGURINHA] ${senderName} (${canonical}): sem resposta.`);
                 continue;
               }
 

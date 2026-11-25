@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import fs from 'node:fs';
 import {
+  PATIENT_PAY_LINK,
+  isMediaOnlyText,
+  introducedWithinDay,
   patientName,
   quickResponse,
   repeatedWithinDay,
@@ -55,6 +59,50 @@ describe('Brisa response safety rules', () => {
     expect(LOOPING_BOT_NUMBERS.has('551153045378')).toBe(true);
     expect(LOOPING_BOT_NUMBERS.has('551633572527')).toBe(true);
     expect(LOOPING_BOT_NUMBERS.has('557591462018')).toBe(true);
+  });
+  it('payment claims, emoji and stickers never get "recebemos" nor a payment alert', () => {
+    for (const q of ['paguei', 'fiz o pix', 'segue o comprovante', 'já paguei']) {
+      const r = quickResponse({ question: q });
+      expect(r?.model).toBe('payment-claim');
+      expect(r?.answer).not.toMatch(/recebemos|confirmad[oa] o pagamento|pagamento informado/i);
+      expect(r?.answer).toContain('Mercado Pago');
+      expect(r?.answer).toContain(PATIENT_PAY_LINK);
+    }
+    expect(quickResponse({ question: '👍' })?.suppressed).toBe(true);
+    expect(quickResponse({ question: '🙏🙏 !!' })?.suppressed).toBe(true);
+    expect(quickResponse({ isSticker: true })?.suppressed).toBe(true);
+    expect(isMediaOnlyText('Oi 😊')).toBe(false);
+    expect(fs.readFileSync('scripts/agent_evolution_brisa_live_responder.mjs', 'utf8')).not.toContain('Recebemos. O acesso é liberado');
+  });
+  it('audio gets one fixed answer with the payment link; greeting is not repeated within 24 h', () => {
+    const audio = quickResponse({ isAudio: true });
+    expect(audio?.answer).toContain('Ainda não consigo ouvir áudios, pode me escrever?');
+    expect(audio?.answer).toContain(PATIENT_PAY_LINK);
+    const now = 500000000;
+    expect(introducedWithinDay([{ text: audio?.answer ?? '', sentAt: now - 1000 }], now)).toBe(false);
+    const greet = quickResponse({ question: 'oi', senderName: 'Ana' });
+    expect(greet?.answer).toContain('Sou a Enfª Brisa, assistente virtual');
+    expect(greet?.answer).toContain(PATIENT_PAY_LINK);
+    expect(introducedWithinDay([{ text: greet?.answer ?? '', sentAt: now - 1000 }], now)).toBe(true);
+    expect(introducedWithinDay([{ text: greet?.answer ?? '', sentAt: now - DAY_MS - 1 }], now)).toBe(false);
+    const again = quickResponse({ question: 'oi', senderName: 'Ana', introducedRecently: true });
+    expect(again?.answer).not.toMatch(/Sou a Enf/);
+    expect(again?.answer).toContain(PATIENT_PAY_LINK);
+  });
+  it('unpaid patient contacts get a short answer with the express checkout link and never a doctor persona', () => {
+    for (const q of ['tenho insonia', 'voces vendem oleo de cbd?']) {
+      const r = quickResponse({ question: q });
+      expect(r?.answer).toContain(PATIENT_PAY_LINK);
+      expect(r?.answer.length).toBeLessThan(260);
+    }
+    expect(quickResponse({ question: 'quem e voce' })?.answer).toMatch(/^Sou a Enfª Brisa, assistente virtual/);
+    expect(quickResponse({ question: 'SAIR' })?.optOut).toBe(true);
+  });
+  it('cold "Parabéns, Dr(a)... selecionado(a)" WhatsApp invites only run on a manual admin send', () => {
+    const inviter = fs.readFileSync('scripts/agent_cadence_10min_inviter.mjs', 'utf8');
+    const start = inviter.slice(inviter.indexOf('async function startCadenceInviter'));
+    expect(start.indexOf("process.env.MANUAL_ADMIN_SEND !== '1'")).toBeGreaterThan(-1);
+    expect(start.indexOf("process.env.MANUAL_ADMIN_SEND !== '1'")).toBeLessThan(start.indexOf('sendWhatsAppInvite('));
   });
   it('honors opt-out phrases and sanitizes forbidden human claims or bare links', () => {
     expect(quickResponse({ question: 'Não tenho interesse, pare de enviar' })?.optOut).toBe(true);

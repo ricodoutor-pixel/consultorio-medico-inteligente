@@ -506,6 +506,13 @@ async function sendWhatsAppInvite(doctor, humanLocked, blacklist) {
 
 // Loop Principal de Cadência Estrita (1 envio a cada 10 min)
 async function startCadenceInviter() {
+  // O WhatsApp marcou a conta por spam: o convite "Parabéns, Dr(a)... selecionado(a)" a quem não
+  // iniciou conversa não roda mais sozinho (PM2/cron). Só execução manual do admin:
+  //   MANUAL_ADMIN_SEND=1 node scripts/agent_cadence_10min_inviter.mjs
+  if (process.env.MANUAL_ADMIN_SEND !== '1') {
+    log('🚫 Convite automático desligado (conta marcada por spam). Use MANUAL_ADMIN_SEND=1 para um envio manual do admin.');
+    return;
+  }
   log(`🌟 INICIANDO AGENTE DE CADÊNCIA: 1 CONVITE A CADA 10 MINUTOS`);
   log(`Objetivo: 50 Médicos Ativos na Vitrine | Ordem: VCF do Dr. Edilson -> Apify Harvested Leads`);
 

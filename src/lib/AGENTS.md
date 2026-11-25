@@ -1,2 +1,2 @@
 - Doctor cards and consultation payment headers show "Áreas de atuação" via src/lib/practice-areas.ts, which hides cannabinoid-medicine labels lacking an RQE, since it is not a registered specialty.
-- Payment links store sanitized origin data in the attribution column of orders and appointments; mp-checkout reuses a pending Orientation Pix from the last 20 h so reloads never create duplicate charges.
+- Payment links store sanitized origin data in the attribution column of orders and appointments; mp-checkout and ot-edilson-web reuse an Orientation Pix only via _shared/pix-reuse.ts (MP status pending, under 30 min old, 10+ min before expiry) so patients never see a dead QR.

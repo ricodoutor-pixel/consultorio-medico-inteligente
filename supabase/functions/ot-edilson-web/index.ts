@@ -1,3 +1,4 @@
+import { decidePixReuse } from "../_shared/pix-reuse.ts";
 // 🌿 Planta y Raíz — Orientação Técnica no site (Enfª Brisa)
 // Contrato v2: Triagem salva antes da ordem MP -> Liberação SOMENTE via Webhook (status 'ready')
 // -> Paciente clica em Iniciar ('start') -> 30 minutos de Orientação Técnica Educativa estilo WhatsApp.
@@ -239,15 +240,18 @@ Deno.serve(async (req) => {
                     paymentId: order.mp_payment_id,
                   }));
                 }
-              } else if (p.status === "rejected") {
-                await sb.from("orientacao_tecnica_orders").update({ status: "rejected" }).eq("id", order.id).eq("status", "pending");
-                order.status = p.status;
+              } else if (decidePixReuse(p, order.created_at) === "dead") {
+                // Pix vencido, cancelado, rejeitado ou com mais de 30 min: nunca mostrar de novo.
+                const st = p.status === "rejected" ? "rejected" : "expired";
+                await sb.from("orientacao_tecnica_orders").update({ status: st, updated_at: new Date().toISOString() }).eq("id", order.id).eq("status", "pending");
+                order.status = st;
               }
             }
           } catch (e) { console.error("[ot-reconcile] falha", (e as Error).message); }
         }
       }
       if (order.status === "pending") return json({ state: "awaiting_payment", order });
+      if (order.status === "expired" || order.status === "rejected") return json({ state: "none" });
       if (order.status === "approved") {
         // Auto-cura: triagem já completa e sem emergência, mas a sala não foi criada.
         const tri = (order.triagem || {}) as Record<string, unknown>;

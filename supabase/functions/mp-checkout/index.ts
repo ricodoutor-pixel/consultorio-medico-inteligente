@@ -1,3 +1,4 @@
+import { decidePixReuse, fetchMpPayment, pixExpirationIso, PIX_MAX_REUSE_AGE_MS } from "../_shared/pix-reuse.ts";
 import { safeOrigin, safeReturnUrl } from "../_shared/safe-return.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
@@ -409,6 +410,7 @@ Deno.serve(async (req) => {
         transaction_amount: Number(amount.toFixed(2)),
         description: title,
         payment_method_id: "pix",
+        date_of_expiration: pixExpirationIso(),
         payer: {
           email: payerEmail || (isSellerEmail ? "cliente@plantayraiz.com.br" : (authData.user.email || "contato@plantayraiz.com.br")),
           first_name: pFirst,
@@ -444,13 +446,23 @@ Deno.serve(async (req) => {
     const isOrientacaoOrder = type === "sku" && isOrientacaoSku(sku);
     // Reaproveita o Pix pendente e ainda válido do mesmo paciente, em vez de criar outro.
     if (isOrientacaoOrder && isPixDirect) {
-      const since = new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString();
+      const since = new Date(Date.now() - PIX_MAX_REUSE_AGE_MS).toISOString();
       const { data: pendingOrder } = await supabase.from("orientacao_tecnica_orders")
-        .select("external_reference, mp_payment_id, qr_code, qr_code_base64, ticket_url, amount")
+        .select("id, external_reference, mp_payment_id, qr_code, qr_code_base64, ticket_url, amount, created_at")
         .eq("user_id", userId).eq("status", "pending").eq("amount", amount)
         .not("qr_code", "is", null).gte("created_at", since)
         .order("created_at", { ascending: false }).limit(1).maybeSingle();
-      if (pendingOrder?.qr_code) {
+      let reusable = false;
+      if (pendingOrder?.qr_code && pendingOrder.mp_payment_id) {
+        const mp = await fetchMpPayment(String(pendingOrder.mp_payment_id), MP_ACCESS_TOKEN!).catch(() => null);
+        const decision = decidePixReuse(mp, pendingOrder.created_at);
+        reusable = decision === "reuse";
+        if (decision === "dead") {
+          await supabase.from("orientacao_tecnica_orders").update({ status: "expired", updated_at: new Date().toISOString() })
+            .eq("id", pendingOrder.id).eq("status", "pending");
+        }
+      }
+      if (reusable && pendingOrder?.qr_code) {
         console.info("[mp-checkout] pix_reused", { payment_id: pendingOrder.mp_payment_id });
         return json({
           success: true, reused: true, payment_method: "pix",

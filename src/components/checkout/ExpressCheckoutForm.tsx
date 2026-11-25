@@ -69,7 +69,17 @@ export function ExpressCheckoutForm({ product, priceLabel, onReady, busy, contin
       const { data, error } = await supabase.functions.invoke("checkout-express", {
         body: { ...check.value, attribution },
       });
-      if (error || data?.error) throw new Error(data?.error || "Não foi possível iniciar agora.");
+      if (error) {
+        // Resposta do servidor (dados inválidos, limite de tentativas) vem no corpo do erro.
+        const ctx = (error as { context?: Response }).context;
+        const status = ctx?.status ?? 0;
+        const serverMsg = await ctx?.json?.().then((b: { error?: string; message?: string }) => b?.error || b?.message).catch(() => undefined);
+        if ((status === 400 || status === 429) && serverMsg) throw new Error(serverMsg);
+        // Serviço ainda indisponível: segue pelo caminho antigo (entrar) em vez de travar o paciente.
+        window.location.assign(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+        return;
+      }
+      if (data?.error) throw new Error(data.error);
       if (data?.status === "existing_account") {
         setExisting(true);
         toast({ title: "Você já tem cadastro", description: "Digite sua senha ou receba um link de acesso no seu e-mail." });

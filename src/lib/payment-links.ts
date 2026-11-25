@@ -54,3 +54,15 @@ export function paymentLinkMessage(slug: PaymentLinkSlug, link: string) {
   const price = item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   return `Olá! Aqui é a Enfª Brisa, assistente virtual da Planta y Raiz. Para ${item.name} (${price}), é só clicar e pagar com Pix ou cartão: ${link}. Depois do pagamento confirmado você segue para o atendimento. A indicação de qualquer tratamento depende de avaliação médica individual.`;
 }
+
+const ATTR_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "origem", "indicacao", "pro"];
+/** Origem do link (campanha, indicação, médico) lida da página atual, só com valores seguros. */
+export function readAttribution(search: string): Record<string, string> {
+  const p = new URLSearchParams(search);
+  const out: Record<string, string> = {};
+  for (const k of ATTR_KEYS) {
+    const v = p.get(k);
+    if (v && SAFE.test(v)) out[k] = v;
+  }
+  return out;
+}

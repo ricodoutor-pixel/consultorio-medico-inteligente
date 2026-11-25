@@ -1,3 +1,4 @@
+import { readAttribution } from "@/lib/payment-links";
 import { RED_FLAG_OPTIONS, hasEmergency, invalidTriageFields } from "../../supabase/functions/_shared/orientation-triage";
 import { setVisibleInterval } from "@/lib/visible-interval";
 import { createOtStreamParser } from "../../supabase/functions/_shared/ot-stream";
@@ -564,6 +565,8 @@ export default function OrientacaoTecnicaAgente() {
       const requestedSku = searchParams.get("sku") || "orientacao_tecnica";
       const { data, error } = await supabase.functions.invoke("mp-checkout", { body: {
         sku: requestedSku, payment_method: method,
+        attribution: readAttribution(window.location.search),
+        ...(readAttribution(window.location.search).indicacao ? { refCode: readAttribution(window.location.search).indicacao } : {}),
         returnUrl: `${window.location.origin}/orientacao-tecnica?paid=1`,
       } });
       if (error || data?.error) throw error || new Error(data.error);

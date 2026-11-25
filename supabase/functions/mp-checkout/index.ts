@@ -117,7 +117,15 @@ Deno.serve(async (req) => {
       description: directDesc,
       triage,
       payment_method: requestedPaymentMethod,
+      attribution: rawAttribution,
     } = await req.json();
+    const attribution: Record<string, string> = {};
+    if (rawAttribution && typeof rawAttribution === "object") {
+      for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "origem", "indicacao", "pro"]) {
+        const v = (rawAttribution as Record<string, unknown>)[k];
+        if (typeof v === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(v)) attribution[k] = v;
+      }
+    }
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
     // Programa de indicações (médicos, pacientes e lojistas) — resolvido no servidor.
@@ -434,6 +442,26 @@ Deno.serve(async (req) => {
 
     // Pagamento primeiro: pedido persistido antes da chamada MP; triagem após webhook.
     const isOrientacaoOrder = type === "sku" && isOrientacaoSku(sku);
+    // Reaproveita o Pix pendente e ainda válido do mesmo paciente, em vez de criar outro.
+    if (isOrientacaoOrder && isPixDirect) {
+      const since = new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString();
+      const { data: pendingOrder } = await supabase.from("orientacao_tecnica_orders")
+        .select("external_reference, mp_payment_id, qr_code, qr_code_base64, ticket_url, amount")
+        .eq("user_id", userId).eq("status", "pending").eq("amount", amount)
+        .not("qr_code", "is", null).gte("created_at", since)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (pendingOrder?.qr_code) {
+        console.info("[mp-checkout] pix_reused", { payment_id: pendingOrder.mp_payment_id });
+        return json({
+          success: true, reused: true, payment_method: "pix",
+          payment_id: pendingOrder.mp_payment_id, qr_code: pendingOrder.qr_code,
+          qr_code_base64: pendingOrder.qr_code_base64, ticket_url: pendingOrder.ticket_url,
+          external_reference: pendingOrder.external_reference, amount,
+          description: title, receiver_name: OFFICIAL_RECEIVER_NAME, split: splitDetails,
+        });
+      }
+    }
+
     if (isOrientacaoOrder) {
       const t = tTriage;
       const meta = userMeta;
@@ -463,6 +491,7 @@ Deno.serve(async (req) => {
         currency: "BRL",
         topic: "Orientação Técnica",
         triagem: {},
+        attribution,
         flow_status: "aguardando_pagamento",
         created_at: nowIso,
         updated_at: nowIso,

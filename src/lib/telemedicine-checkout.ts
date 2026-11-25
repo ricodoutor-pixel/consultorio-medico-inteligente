@@ -1,3 +1,4 @@
+import { readAttribution } from "@/lib/payment-links";
 import { supabase } from "@/integrations/supabase/client";
 import { professionals } from "@/data/professionals";
 import { resolveRoutingDoctor } from "@/lib/consultation-routing";
@@ -155,6 +156,7 @@ export async function createConsultationCheckout(
       status: "scheduled",
       payment_status: "pending",
       notes: triageId ? `Triagem: ${triageId}` : "Triagem: pendente (após pagamento)",
+      attribution: typeof window !== "undefined" ? readAttribution(window.location.search) : {},
     }).select("id").single();
     if (error || !data?.id) throw new Error("Não foi possível registrar a consulta.");
     appointmentId = data.id;
@@ -175,6 +177,9 @@ export async function createConsultationCheckout(
       sku,
       triageId,
       payment_method: paymentMethod,
+      ...(typeof window !== "undefined" && readAttribution(window.location.search).indicacao
+        ? { refCode: readAttribution(window.location.search).indicacao }
+        : {}),
       ...(resolvedChosenDoctor ? { doctorId: resolvedChosenDoctor } : {}),
       ...(options?.returnUrl ? { returnUrl: options.returnUrl } : {}),
       ...(options?.requestedAmount !== undefined && options?.requestedAmount !== null

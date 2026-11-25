@@ -1,0 +1,2 @@
+- Doctor cards show "Áreas de atuação" via src/lib/practice-areas.ts, which hides cannabinoid-medicine labels lacking an RQE, since it is not a registered specialty.
+- Payment links store sanitized origin data in the attribution column of orders and appointments; mp-checkout reuses a pending Orientation Pix from the last 20 h so reloads never create duplicate charges.

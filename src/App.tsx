@@ -191,6 +191,8 @@ const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sour
 const BrisaOrientacoes = lazyWithRecovery(() => import("./pages/admin/BrisaOrientacoes"), { sourceRef: "/admin/brisa-orientacoes" });
 const OrientacaoAoVivo = lazyWithRecovery(() => import("./pages/admin/OrientacaoAoVivo"), { sourceRef: "/admin/orientacao-ao-vivo" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
+const PagarRedirect = lazyWithRecovery(() => import("./pages/PagarRedirect"), { sourceRef: "/pagar" });
+const AdminPaymentLinks = lazyWithRecovery(() => import("./pages/AdminPaymentLinks"), { sourceRef: "/admin/links-pagamento" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
 const AdminComprovantesPagamento = lazyWithRecovery(() => import("./pages/admin/AdminComprovantesPagamento"), { sourceRef: "/admin/comprovantes-pagamento" });
 const GrowthDashboard = lazyWithRecovery(() => import("./pages/admin/GrowthDashboard"), { sourceRef: "/admin/growth" });
@@ -413,6 +415,8 @@ const App = () => (
                 <Route path="/admin/brisa-whatsapp-qr" element={<AdminRoute><BrisaWhatsAppQR /></AdminRoute>} />
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
+                <Route path="/pagar/:produto" element={<PagarRedirect />} />
+                <Route path="/admin/links-pagamento" element={<AdminRoute><AdminPaymentLinks /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
                 <Route path="/admin/comprovantes-pagamento" element={<AdminRoute><AdminComprovantesPagamento /></AdminRoute>} />
                 <Route path="/admin/comprovantes" element={<AdminRoute><AdminComprovantesPagamento /></AdminRoute>} />

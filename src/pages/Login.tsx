@@ -20,7 +20,6 @@ import {
   Stethoscope, 
   ShieldAlert, 
   Sparkles,
-  KeyRound,
   CheckCircle2
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -49,7 +48,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
 
-  const isMaster = isMasterAdminEmail(email);
 
   useEffect(() => {
     if (searchParams.get("type")) {
@@ -97,8 +95,8 @@ export default function Login() {
         // ── 1. ACESSO CHAVE MESTRA (contato@plantayraiz.com.br / Admins) ──
         if (isMasterUser) {
           toast({
-            title: `🔑 Chave Mestra Ativada! Bem-vindo, ${name}`,
-            description: `Acesso total concedido ao portal: ${selectedPortal.toUpperCase()}`
+            title: `Bem-vindo, ${name}`,
+            description: `Portal: ${selectedPortal}`
           });
 
           if (safeRedirect) {
@@ -305,16 +303,6 @@ export default function Login() {
                 >
                   <ShieldAlert size={14} /> Admin
                 </button>
-              </div>
-            )}
-
-            {/* Aviso de Chave Mestra quando digitar contato@plantayraiz.com.br */}
-            {isMaster && (
-              <div className="mb-4 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-300 animate-pulse">
-                <span className="flex items-center gap-1.5 font-bold">
-                  <KeyRound size={14} className="text-emerald-400" /> Chave Mestra Ativa
-                </span>
-                <span className="text-[10px] text-muted-foreground">Acesso Universal a Todos os Portais</span>
               </div>
             )}
 

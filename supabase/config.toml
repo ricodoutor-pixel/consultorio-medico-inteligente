@@ -3,6 +3,8 @@ project_id = "shmbwdjuddvquszwkvuq"
 [functions]
   [functions.mp-checkout]
     verify_jwt = true
+  [functions.checkout-express]
+    verify_jwt = false
   [functions.brisa-web-chat]
     verify_jwt = false
   [functions.ai-pharmacokinetic-profile]

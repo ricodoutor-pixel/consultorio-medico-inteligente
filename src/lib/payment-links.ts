@@ -34,10 +34,12 @@ export function resolvePaymentLink(slug: string | undefined, search: string): st
   if (ref && SAFE.test(ref)) out.set("indicacao", ref);
   out.set("origem", "whatsapp_link");
   if (sku === "orientacao_tecnica") {
+    out.set("etapa", "pagamento");
     return `/orientacao-tecnica?${out.toString()}`;
   }
   const pro = input.get("pro");
   if (pro && SAFE.test(pro)) out.set("pro", pro);
+  out.set("etapa", "pagamento");
   return `/consulta/${sku}?${out.toString()}`;
 }
 

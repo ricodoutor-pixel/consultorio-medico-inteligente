@@ -50,6 +50,8 @@ export const CookieConsentBanner = () => {
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
   const isSaudeVerdeRoute = location.pathname.startsWith("/saude-verde") || location.pathname === "/cartao-saude";
+  // Tela de pagamento (link do WhatsApp): o aceite de Termos/Privacidade já está no formulário; nada cobre o botão de pagar.
+  const isPaymentStep = new URLSearchParams(location.search).get("etapa") === "pagamento";
 
   useEffect(() => {
     try {
@@ -129,7 +131,7 @@ export const CookieConsentBanner = () => {
   }, []);
 
 
-  if (!visible) return null;
+  if (!visible || isPaymentStep) return null;
 
   return (
     <div

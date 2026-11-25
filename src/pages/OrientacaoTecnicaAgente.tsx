@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import { ExpressCheckoutForm } from "@/components/checkout/ExpressCheckoutForm";
 import { useToast } from "@/hooks/use-toast";
 import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { EdilsonOnNotice } from "@/components/EdilsonOnNotice";
@@ -329,9 +330,30 @@ export default function OrientacaoTecnicaAgente() {
 
   useEffect(() => {
     if (authed === null) return;
-    if (!authed) { setPhase("intro"); return; }
-    void fetchStatus().catch(() => setPhase("intro"));
-  }, [authed, fetchStatus]);
+    // Link de pagamento (/pagar/orientacao-tecnica) abre direto na tela de pagamento.
+    const firstPhase: Phase = searchParams.get("etapa") === "pagamento" ? "checkout" : "intro";
+    if (!authed) { setPhase(firstPhase); return; }
+    // Conta criada agora no checkout expresso: o próprio formulário segue para o Pix.
+    if (expressStartingRef.current) return;
+    void fetchStatus().catch(() => setPhase(firstPhase));
+  }, [authed, fetchStatus, searchParams]);
+
+  // Conta criada no checkout expresso: com o pagamento confirmado pelo servidor, envia uma vez
+  // o link de acesso (sem senha) ao e-mail, para o paciente voltar depois de outro aparelho.
+  useEffect(() => {
+    if (!orientationPaymentConfirmed(otState)) return;
+    void (async () => {
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!user?.email || user.user_metadata?.origem_cadastro !== "checkout_expresso") return;
+      const key = `pyr_access_link_sent_${user.id}`;
+      try { if (localStorage.getItem(key)) return; localStorage.setItem(key, "1"); } catch { return; }
+      await supabase.auth.signInWithOtp({
+        email: user.email,
+        options: { shouldCreateUser: false, emailRedirectTo: `${window.location.origin}/orientacao-tecnica` },
+      });
+    })();
+  }, [otState]);
 
   useEffect(() => {
     if (phase !== "awaiting" || !authed) return;
@@ -555,10 +577,18 @@ export default function OrientacaoTecnicaAgente() {
     setPhase("triage");
   };
 
+  const expressStartingRef = useRef(false);
+  const payFromExpress = async (method: "pix" | "card") => {
+    expressStartingRef.current = true;
+    try { await generateCheckout(method); } finally { expressStartingRef.current = false; }
+  };
+
   const generateCheckout = async (method: "pix" | "card") => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      navigate(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      // Sem conta: o checkout expresso aparece nesta mesma tela, sem ir para entrar ou cadastrar.
+      setAuthed(false);
+      setPhase("checkout");
       return;
     }
     method === "pix" ? setCreatingPix(true) : setCreatingCheckout(true);
@@ -860,13 +890,13 @@ export default function OrientacaoTecnicaAgente() {
           {/* Cabeçalho */}
           {phase !== "room" && (
             <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-black px-4 py-2 rounded-full mb-4">
+              <div className={`${phase === "checkout" ? "hidden md:inline-flex" : "inline-flex"} items-center gap-2 bg-primary/10 text-primary text-xs font-black px-4 py-2 rounded-full mb-4`}>
                 <Stethoscope size={14} /> ENFª BRISA · ASSISTENTE VIRTUAL SUPERVISIONADA PELO DR. EDILSON BEZERRA
               </div>
               <h1 className="text-3xl md:text-4xl font-display font-black text-foreground">
                 Orientação Técnica · <span className="text-gradient-green">R$ 30</span>
               </h1>
-              <p className="text-muted-foreground mt-3 text-sm md:text-base">
+              <p className={`${phase === "checkout" ? "hidden md:block" : ""} text-muted-foreground mt-3 text-sm md:text-base`}>
                 Triagem e educação sobre a sua necessidade antes da consulta real, com relatório individual
                 revisado pelo Dr. Edilson Bezerra e encaminhamento ao médico prescritor mais indicado.
               </p>
@@ -1182,6 +1212,14 @@ export default function OrientacaoTecnicaAgente() {
                       <p className="text-3xl font-display font-black text-gradient-green">R$ 30</p>
                     </div>
 
+                    {authed === false || expressStartingRef.current ? (
+                      <ExpressCheckoutForm
+                        product="orientacao_tecnica"
+                        priceLabel="R$ 30"
+                        busy={creatingPix || creatingCheckout}
+                        onReady={payFromExpress}
+                      />
+                    ) : (
                     <div className="space-y-3">
                       <Button
                         onClick={startPixCheckout}
@@ -1208,6 +1246,7 @@ export default function OrientacaoTecnicaAgente() {
                         )}
                       </Button>
                     </div>
+                    )}
 
                     <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1 justify-center">
                       <ShieldCheck size={12} className="text-primary" /> Pix ou cartão. A triagem abre após a confirmação do pagamento.

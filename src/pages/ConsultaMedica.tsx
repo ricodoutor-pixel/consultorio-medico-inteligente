@@ -63,6 +63,8 @@ import { ChatAttachmentButton } from "@/components/consultation/ChatAttachmentBu
 import { consultationFileError } from "@/lib/consultation-chat";
 import { professionals } from "@/data/professionals";
 import { formatBRL } from "@/lib/pricing";
+import { ExpressCheckoutForm } from "@/components/checkout/ExpressCheckoutForm";
+import type { ExpressProduct } from "../../supabase/functions/_shared/express-checkout";
 
 const WAIT_MINUTES = 5;
 const TRIAGE_WINDOW_SECONDS = 5 * 60;
@@ -197,13 +199,6 @@ export default function ConsultaMedica() {
     });
   }, []);
 
-  useEffect(() => {
-    if (authChecked && !userId) {
-      const back = `${window.location.pathname}${window.location.search}`;
-      toast.error("Entre na sua conta para contratar a consulta.");
-      navigate(`/login?redirect=${encodeURIComponent(back)}`);
-    }
-  }, [authChecked, userId, navigate]);
 
   const doctorLookupKey = appt?.doctor_id || chosenDoctor || proParam;
 
@@ -654,6 +649,36 @@ export default function ConsultaMedica() {
 
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
   const ModeIcon = mode === "video" ? Video : mode === "retorno" ? Zap : mode === "premium" ? Crown : MessageSquare;
+
+  if (authChecked && !userId) {
+    // Checkout expresso: sem /login nem /cadastro; a conta é criada aqui e a consulta segue.
+    return (
+      <div className="min-h-[100dvh] bg-background pt-[calc(var(--site-header-height,96px)+16px)] pb-[calc(env(safe-area-inset-bottom)+24px)] px-4">
+        <div className="max-w-md mx-auto">
+          <Card className="border-primary/30">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">{label}</p>
+                  {doctor?.name && <p className="text-sm text-muted-foreground">{doctor.name}</p>}
+                </div>
+                <p className="text-2xl font-display font-black text-primary">{formatBRL(price)}</p>
+              </div>
+              <ExpressCheckoutForm
+                product={catalogItem.sku as ExpressProduct}
+                priceLabel={formatBRL(price)}
+                continueLabel="Continuar para o pagamento"
+                onReady={async () => {
+                  const { data } = await supabase.auth.getSession();
+                  setUserId(data.session?.user.id ?? null);
+                }}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (!authChecked || !userId) {
     return (

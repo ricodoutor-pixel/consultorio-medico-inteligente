@@ -157,7 +157,7 @@ Deno.serve(async (req) => {
 
     // 5. Distribuir comissões de afiliados
     const affiliateResults = await distributeAffiliateCommissions(
-      supabase, escrow.patient_id, escrowId, totalAmount
+      supabase, escrow.patient_id, escrowId, totalAmount, escrow.type
     );
 
     // 6. Notificar médico
@@ -231,7 +231,7 @@ Deno.serve(async (req) => {
 });
 
 async function distributeAffiliateCommissions(
-  supabase: any, patientId: string, escrowId: string, totalAmount: number
+  supabase: any, patientId: string, escrowId: string, totalAmount: number, purchaseType: string
 ) {
   const results: any[] = [];
 
@@ -245,7 +245,7 @@ async function distributeAffiliateCommissions(
   if (!referral?.referred_by) return results;
 
   // Só o indicador direto, e nunca paciente (_shared/referral-commission-policy.ts).
-  const referrers = await eligibleReferrers(supabase, [referral.level1_referrer || referral.referred_by]);
+  const referrers = await eligibleReferrers(supabase, [referral.level1_referrer || referral.referred_by], purchaseType);
 
   for (let level = 0; level < referrers.length; level++) {
     const referrerId = referrers[level];

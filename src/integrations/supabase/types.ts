@@ -1610,6 +1610,48 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_consents: {
+        Row: {
+          accepted_privacy: boolean
+          accepted_telemedicine: boolean
+          accepted_terms: boolean
+          attribution: Json
+          created_at: string
+          id: string
+          ip: string | null
+          product: string
+          terms_version: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_privacy: boolean
+          accepted_telemedicine: boolean
+          accepted_terms: boolean
+          attribution?: Json
+          created_at?: string
+          id?: string
+          ip?: string | null
+          product: string
+          terms_version: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_privacy?: boolean
+          accepted_telemedicine?: boolean
+          accepted_terms?: boolean
+          attribution?: Json
+          created_at?: string
+          id?: string
+          ip?: string | null
+          product?: string
+          terms_version?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       clicksign_document_bindings: {
         Row: {
           created_at: string

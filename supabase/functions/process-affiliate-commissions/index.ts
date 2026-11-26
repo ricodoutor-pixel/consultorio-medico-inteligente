@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
-import { eligibleReferrers } from "../_shared/referral-commission-policy.ts";
+import { eligibleReferrers, purchaseMayEarnReferralCommission } from "../_shared/referral-commission-policy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +33,13 @@ Deno.serve(async (req) => {
     if (!buyer_id || !amount) {
       return new Response(JSON.stringify({ error: "buyer_id and amount required" }), {
         status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!purchaseMayEarnReferralCommission(type)) {
+      return new Response(JSON.stringify({ status: "ineligible_purchase", commissions: [], total_distributed: 0 }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -88,7 +95,7 @@ Deno.serve(async (req) => {
     }
 
     // Só quem pode receber: indicador direto e que não seja paciente.
-    const payable = await eligibleReferrers(supabase, upline);
+    const payable = await eligibleReferrers(supabase, upline, type);
     upline.splice(0, upline.length, ...payable);
 
     const netAmount = amount; // Already net after platform fee

@@ -4,6 +4,7 @@ import {
   eligibleReferrers,
   MAX_COMMISSION_LEVELS,
   referrerMayEarn,
+  purchaseMayEarnReferralCommission,
 } from "../../supabase/functions/_shared/referral-commission-policy";
 
 const fakeDb = (userType: string | null) => ({
@@ -13,13 +14,24 @@ const fakeDb = (userType: string | null) => ({
 describe("Comissão por indicação (decisão de 26/11/2026)", () => {
   it("só o indicador direto recebe; 2º e 3º nível não existem", async () => {
     expect(MAX_COMMISSION_LEVELS).toBe(1);
-    expect(await eligibleReferrers(fakeDb("doctor"), ["direto", "nivel2", "nivel3"])).toEqual(["direto"]);
+    expect(await eligibleReferrers(fakeDb("doctor"), ["direto", "nivel2", "nivel3"], "marketplace")).toEqual(["direto"]);
   });
   it("paciente nunca recebe por indicar paciente; conta sem tipo também não", async () => {
     expect(referrerMayEarn("patient")).toBe(false);
-    expect(await eligibleReferrers(fakeDb("patient"), ["paciente-indicador", "x"])).toEqual([]);
-    expect(await eligibleReferrers(fakeDb(null), ["sem-perfil"])).toEqual([]);
-    expect(await eligibleReferrers(fakeDb("doctor"), [])).toEqual([]);
+    expect(await eligibleReferrers(fakeDb("patient"), ["paciente-indicador", "x"], "marketplace")).toEqual([]);
+    expect(await eligibleReferrers(fakeDb(null), ["sem-perfil"], "marketplace")).toEqual([]);
+    expect(await eligibleReferrers(fakeDb("doctor"), [], "marketplace")).toEqual([]);
+  });
+  it("consultations generate zero referral commissions even for doctors", async () => {
+    expect(purchaseMayEarnReferralCommission("consultation")).toBe(false);
+    expect(await eligibleReferrers(fakeDb("doctor"), ["direto"], "consultation")).toEqual([]);
+  });
+  it("only subscriptions and catalog purchases are eligible", async () => {
+    for (const type of ["subscription", "marketplace"]) {
+      expect(await eligibleReferrers(fakeDb("doctor"), ["direto"], type)).toEqual(["direto"]);
+    }
+    expect(purchaseMayEarnReferralCommission(undefined)).toBe(false);
+    expect(purchaseMayEarnReferralCommission("orientation")).toBe(false);
   });
   it("as duas funções que pagam comissão usam a regra única e não têm taxas de 2º/3º nível", () => {
     for (const f of ["supabase/functions/process-affiliate-commissions/index.ts", "supabase/functions/process-payout/index.ts"]) {

@@ -1,5 +1,10 @@
 # Roadmap
 
+## Checkout consent and referral deployment — 26/11/2026
+- [x] Apply corrected consent migration and verify table existence, RLS and server INSERT permission
+- [x] Restrict both referral-payment functions to subscriptions and catalog purchases; consultations earn no referral commission
+- [x] Run commission regressions (8 passing) and publish both functions; no real financial transaction exercised
+
 ## Selected security findings — 24/11/2026
 - [x] Restrict prescription tools, clinical reports, alerts and ledger writes to authorized patients/doctors
 - [x] Server-only signed file paths, paid appointment creation guards, and atomic administrative withdrawal rejection

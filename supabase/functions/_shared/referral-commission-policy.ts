@@ -6,6 +6,11 @@
 
 export const MAX_COMMISSION_LEVELS = 1;
 
+/** Consultations and unknown purchase types never generate referral commissions. */
+export function purchaseMayEarnReferralCommission(purchaseType: string | null | undefined): boolean {
+  return ["subscription", "marketplace"].includes(String(purchaseType ?? "").trim().toLowerCase());
+}
+
 /** Tipos de conta que nunca recebem comissão por indicação. */
 const NEVER_PAID = new Set(["patient", "paciente", ""]);
 
@@ -21,7 +26,9 @@ export async function eligibleReferrers(
   // deno-lint-ignore no-explicit-any
   supabase: any,
   upline: Array<string | null | undefined>,
+  purchaseType: string | null | undefined,
 ): Promise<string[]> {
+  if (!purchaseMayEarnReferralCommission(purchaseType)) return [];
   const direct = upline.find(Boolean) as string | undefined;
   if (!direct) return [];
   const { data } = await supabase.from("profiles").select("user_type").eq("id", direct).maybeSingle();

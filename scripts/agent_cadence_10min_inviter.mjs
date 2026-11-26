@@ -17,6 +17,7 @@
 console.log('🛑 [CADENCE-INVITER] Script desativado permanentemente para proteger o WhatsApp da Planta y Raíz.');
 process.exit(0);
 
+import { T } from '../supabase/functions/_shared/brisa-templates.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -435,23 +436,9 @@ async function sendEmailInvite(doctor) {
 
 // Mensagem Oficial WhatsApp (enxuta, humana e direta para aumentar a taxa de resposta sem parecer spam)
 function buildCampaignWhatsAppMessage(doctorName) {
+  // Texto oficial único (supabase/functions/_shared/brisa-templates.mjs): sem promessa, assinado, com SAIR.
   const cleanName = sanitizeDisplayDoctorName(doctorName);
-  const greeting = cleanName && cleanName.toLowerCase() !== 'doutor(a)'
-    ? `Olá, Dr(a). ${cleanName}! Tudo bem? 🌿`
-    : `Olá, Doutor(a)! Tudo bem? 🌿`;
-
-  return `${greeting}
-
-Vi que você faz parte do nosso grupo médico da *Planta y Raíz* e gostaria de saber se já ativou seu Consultório Digital gratuito na nossa vitrine de prescritores.
-
-• *Repasse líquido de 93% via PIX* após cada teleconsulta (taxa fixa de apenas 7% da plataforma);
-• *Prontuário CFM e prescrição com assinatura ICP-Brasil / Gov.br*;
-• *Encaminhamento de pacientes* que passam pela nossa triagem.
-
-Para ativar seu perfil (leva menos de 2 minutos), acesse:
-👉 https://www.plantayraiz.com.br/cadastro-profissional
-
-Ou, se preferir, pode me enviar seu CRM por aqui mesmo que nossa equipe te ajuda na ativação!`;
+  return T.doctorInvite(cleanName && cleanName.toLowerCase() !== 'doutor(a)' ? cleanName : '');
 }
 
 // Disparo WhatsApp

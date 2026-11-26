@@ -248,3 +248,20 @@ module.exports = {
     }
   ]
 };
+// Desligados em 2026-11-25 por decisão do Dr. Edilson: convite frio a médicos, captação de leads
+// e robôs quebrados (arquivo inexistente ou bloqueio). Não voltam com `pm2 start ecosystem.config.cjs`
+// nem pelo sysadmin-watchdog. Para religar algum, é preciso decisão explícita do dono.
+const DESLIGADOS = [
+  'patient-traffic-booster',      // arquivo não existe
+  'growth-engine',                // motor de captação até 500 médicos (convite frio)
+  'lead-harvesters-master',       // arquivo não existe (captação de leads)
+  'instagram-direct-inviter',     // convite frio por Direct do Instagram
+  'apify-lead-sync',              // captação de leads (chave Apify vencida)
+  'anvisa-rdc660-rpa',            // arquivo não existe
+  'brevo-multi-pipeline',         // Brevo bloqueado (554)
+  'hostinger-email-dispatcher',   // e-mail frio "Médico Sócio"
+  'cannabis-young-doctors-hunter', // e-mail frio a médicos
+  'cadence-10min-inviter',        // WhatsApp frio "Parabéns, Dr(a)..." (não está neste arquivo; nunca religar)
+];
+module.exports.apps = module.exports.apps.filter((app) => !DESLIGADOS.includes(app.name));
+module.exports.DESLIGADOS = DESLIGADOS;

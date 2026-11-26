@@ -10,17 +10,14 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOG_FILE = path.join(__dirname, 'sysadmin_watchdog.log');
 
+// Só os robôs em uso. Convite frio, captação de leads e robôs quebrados foram desligados
+// em 2026-11-25 (ver DESLIGADOS em ecosystem.config.cjs) e o vigia NUNCA os religa.
 const EXPECTED_SERVICES = [
   'brisa-live-responder',
   'doctor-kyc-listener',
-  'patient-traffic-booster',
-  'growth-engine',
-  'lead-harvesters-master',
   'meta-social-engine',
-  'anvisa-rdc660-rpa',
   'partner-meeting-scheduler',
   'organic-analytics-reporter',
-  'cadence-10min-inviter',
   'email-bounce-guardian'
 ];
 

@@ -83,12 +83,15 @@ cp $LOCAIS "$BK/" 2>/dev/null || true
 echo "backup das alterações locais: $BK"
 git status --short | head -20
 git stash push -m "local-$(date +%F-%H%M)" -- $LOCAIS >/dev/null 2>&1 || true
+# A lista de e-mails que voltaram saiu do Git (dado pessoal): guarda antes do pull e devolve depois.
+cp -p scripts/bounced_emails_blacklist.json "$BK/" 2>/dev/null || true
 if ! git pull --ff-only origin main; then
   git stash pop >/dev/null 2>&1 || true
   echo "git pull não avançou (veja o git status acima). Nada foi trocado; robôs de convite continuam desligados."
   pm2 save; pm2 list; exit 2
 fi
 git log --oneline -1
+[ -f scripts/bounced_emails_blacklist.json ] || cp -p "$BK/bounced_emails_blacklist.json" scripts/ 2>/dev/null || true
 if git stash list | grep -q "local-"; then
   if git stash pop >/dev/null 2>&1; then
     echo "alterações locais reaplicadas sobre a versão nova"

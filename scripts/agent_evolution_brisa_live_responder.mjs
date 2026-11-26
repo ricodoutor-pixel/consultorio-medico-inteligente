@@ -664,21 +664,63 @@ function findDoctorByPhone(phone) {
   });
 }
 
-function findInvitedDoctor(phone) {
+/**
+ * Reconhece contato que já está numa lista de médicos (veio do srv2036020, 26/11/2026).
+ * Fontes, todas arquivos locais em scripts/ (fora do Git por conterem telefones):
+ *   1. priority_doctors_phones.json  — lista prioritária do Dr. Edilson (objeto telefone -> {name, salutation})
+ *   2. priority_doctor_queue.json    — mesma lista em fila ({phone, cleanName, salutation})
+ *   3. brevo_whatsapp_invited_doctors.json — convidados via Brevo ({invitedPhones: {telefone: info}}), ignora falhas
+ * Os estados das campanhas de convite frio (priority_campaign_state, medico_socio_campaign_state) NÃO contam:
+ * receber convite frio não prova que a pessoa é médica (clínicas, contabilidades e consultórios também receberam).
+ * Os nomes dessas listas são genéricos ("Doutor(a)"), então só valem se forem nome de verdade.
+ */
+const GENERIC_LIST_NAME = /^(doutor\(a\)|doutora?|dr\(a\)|dra?\.?|colega m[eé]dico|m[eé]dico\(a\)|)$/i;
+function realListName(...names) {
+  for (const n of names) {
+    const v = String(n || '').trim();
+    if (v && !GENERIC_LIST_NAME.test(v) && !/\d/.test(v)) return v;
+  }
+  return '';
+}
+function readLocalJson(file) {
   try {
-    const brevoFile = path.join(__dirname, 'brevo_whatsapp_invited_doctors.json');
-    if (fs.existsSync(brevoFile)) {
-      const data = JSON.parse(fs.readFileSync(brevoFile, 'utf8'));
-      const clean = phone.replace(/\D/g, '');
-      if (!clean || clean.length < 8) return null;
-      const invited = data.invitedPhones || {};
-      for (const [p, info] of Object.entries(invited)) {
-        if (!info.failed && (p.endsWith(clean.slice(-8)) || clean.endsWith(p.slice(-8)))) {
-          return info;
-        }
+    const full = path.join(__dirname, file);
+    return fs.existsSync(full) ? JSON.parse(fs.readFileSync(full, 'utf8')) : null;
+  } catch (e) { return null; }
+}
+function findInvitedDoctor(phone) {
+  const clean = String(phone || '').replace(/\D/g, '');
+  if (!clean || clean.length < 8) return null;
+  const last8 = clean.slice(-8);
+  const same = (p) => {
+    const pClean = String(p || '').replace(/\D/g, '');
+    return pClean.length >= 8 && (pClean.endsWith(last8) || last8.endsWith(pClean.slice(-8)));
+  };
+
+  const phones = readLocalJson('priority_doctors_phones.json');
+  if (phones && typeof phones === 'object' && !Array.isArray(phones)) {
+    for (const [p, info] of Object.entries(phones)) {
+      if (same(info?.phone || p)) {
+        return { name: realListName(info?.name), salutation: info?.salutation || 'Doutor(a)', role: 'doctor', phone: String(info?.phone || p).replace(/\D/g, ''), source: 'priority_doctors_phones' };
       }
     }
-  } catch (e) {}
+  }
+
+  const queue = readLocalJson('priority_doctor_queue.json');
+  if (Array.isArray(queue)) {
+    const item = queue.find((q) => same(q?.phone));
+    if (item) {
+      return { name: realListName(item.cleanName), salutation: item.salutation || 'Doutor(a)', role: 'doctor', phone: String(item.phone).replace(/\D/g, ''), source: 'priority_doctor_queue' };
+    }
+  }
+
+  const brevo = readLocalJson('brevo_whatsapp_invited_doctors.json');
+  const invited = brevo?.invitedPhones || {};
+  for (const [p, info] of Object.entries(invited)) {
+    if (!info?.failed && same(p)) {
+      return { name: realListName(info?.name), role: 'doctor', phone: p, source: 'brevo_invited' };
+    }
+  }
   return null;
 }
 
@@ -1281,7 +1323,8 @@ async function ingestIncomingDoc(msg, recipient, senderName) {
 
 // 🔍 CLASSIFICADOR INTELIGENTE DE PÚBLICO (MÉDICO × FARMÁCIA × PACIENTE COM FOCO TOTAL EM CONVERSÃO)
 function classifyAudience(jid, senderName, text) {
-  const cleanPhone = (jid || '').includes('@lid') ? jid : (jid || '').replace(/\D/g, '');
+  const canonicalContact = getCanonicalContactId(jid);
+  const cleanPhone = (canonicalContact || jid || '').replace(/\D/g, '');
   const normText = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const normName = (senderName || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -1302,6 +1345,16 @@ function classifyAudience(jid, senderName, text) {
       name: senderName || 'Paciente',
       doctor: null
     };
+  }
+
+  // Papel já homologado: se o contato já interagiu como médico, um "Ok" / "Ah tá" não o rebaixa a paciente.
+  const mem = getContactMemory(jid);
+  const memCanonical = canonicalContact && canonicalContact !== jid ? getContactMemory(canonicalContact) : null;
+  const previousRole = mem?.audienceRole || memCanonical?.audienceRole;
+  if (previousRole === 'doctor') {
+    const keptDoctor = mem?.doctorObj || memCanonical?.doctorObj || null;
+    const cleanName = cleanDoctorName(keptDoctor?.name || senderName);
+    return { role: 'doctor', name: cleanName, doctor: keptDoctor || { name: cleanName, phone: cleanPhone } };
   }
 
   // Verificação de Veterinário ou Dentista:
@@ -1372,7 +1425,7 @@ function classifyAudience(jid, senderName, text) {
   const isDoctorKeywords = /(\bcrm\b|sou prescritor|quero prescrever|prontuario|meus pacientes|minha agenda|honorarios|plano vip|plano premium|credenciamento|sou medico|sou medica|sou doutor|sou doutora|minha cedula|documentos medicos|assinatura digital|icp-brasil|vidaas|birdid|posso prescrever|como prescrever|cadastro profissional)/i.test(normText);
 
   if (doctorObj || invitedDoc || isDoctorKeywords) {
-    let cleanName = cleanDoctorName(doctorObj?.name || (invitedDoc ? invitedDoc.name : senderName));
+    let cleanName = cleanDoctorName(doctorObj?.name || invitedDoc?.name || senderName);
     if (cleanName.toLowerCase().includes('edilson bezerra') && !cleanPhone.includes(ADMIN_PHONE.slice(-8))) {
       cleanName = cleanDoctorName(senderName);
     }
@@ -1392,7 +1445,7 @@ function classifyAudience(jid, senderName, text) {
       name: formattedName,
       verifiedDoctor: crmConfirmed,
       isColdContact: Boolean(invitedDoc && !doctorObj),
-      doctor: doctorObj || (invitedDoc ? { name: invitedDoc.name, phone: cleanPhone } : null)
+      doctor: doctorObj || (invitedDoc ? { name: invitedDoc.name || cleanDoctorName(senderName), phone: cleanPhone } : null)
     };
   }
 

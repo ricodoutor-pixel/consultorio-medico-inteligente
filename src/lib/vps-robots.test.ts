@@ -21,3 +21,24 @@ describe("Robôs da VPS srv2036020 (26/11/2026)", () => {
     expect(sh).not.toMatch(/reset --hard/);
   });
 });
+
+describe("Reconhecimento de médicos vindo do srv2036020", () => {
+  const src = fs.readFileSync("scripts/agent_evolution_brisa_live_responder.mjs", "utf8");
+  const fn = src.slice(src.indexOf("function findInvitedDoctor(phone)"), src.indexOf("function findDoctorByName(name)"));
+  it("lê a lista prioritária, a fila e os convidados Brevo, mas não os estados de campanha fria", () => {
+    expect(fn).toContain("priority_doctors_phones.json");
+    expect(fn).toContain("priority_doctor_queue.json");
+    expect(fn).toContain("brevo_whatsapp_invited_doctors.json");
+    expect(fn).not.toMatch(/readLocalJson\('(priority_campaign_state|medico_socio_campaign_state)/);
+  });
+  it("médico já atendido não vira paciente e a classificação usa o telefone canônico", () => {
+    expect(src).toContain("if (previousRole === 'doctor') {");
+    expect(src).toContain("const canonicalContact = getCanonicalContactId(jid);");
+  });
+  it("listas com telefone e e-mails ficam fora do repositório público e a atualização preserva a lista de bounces", () => {
+    const sh = fs.readFileSync("scripts/vps/desligar-convites-e-atualizar.sh", "utf8");
+    expect(sh).toContain('cp -p scripts/bounced_emails_blacklist.json "$BK/"');
+    const ignore = fs.readFileSync(".gitignore", "utf8");
+    expect(ignore).toMatch(/^scripts\/\*\.json$/m);
+  });
+});

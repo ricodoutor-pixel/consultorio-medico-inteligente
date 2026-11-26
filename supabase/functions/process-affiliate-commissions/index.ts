@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { eligibleReferrers } from "../_shared/referral-commission-policy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,13 +8,12 @@ const corsHeaders = {
 };
 
 /**
- * Process Affiliate Commissions (3-Level MLM)
- * Called by mercadopago-webhook after payment confirmation
- * 
- * Rates: Level 1 = 25%, Level 2 = 15%, Level 3 = 10%
+ * Process Affiliate Commissions — só nível 1, nunca para paciente (decisão de 26/11/2026).
+ * Called by mercadopago-webhook after payment confirmation.
+ * Regra em _shared/referral-commission-policy.ts; níveis 2 e 3 foram extintos.
  */
 
-const COMMISSION_RATES = [0.25, 0.15, 0.10]; // Nível 1, 2, 3
+const COMMISSION_RATES = [0.25]; // só o indicador direto
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -86,6 +86,10 @@ Deno.serve(async (req) => {
         }
       }
     }
+
+    // Só quem pode receber: indicador direto e que não seja paciente.
+    const payable = await eligibleReferrers(supabase, upline);
+    upline.splice(0, upline.length, ...payable);
 
     const netAmount = amount; // Already net after platform fee
     const commissions: Array<{ referrer_id: string; level: number; amount: number }> = [];

@@ -1,3 +1,4 @@
+import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -7,27 +8,28 @@ import { useToast } from "@/hooks/use-toast";
 import { Users, TrendingUp, Copy, Network, ShieldCheck, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { AffiliateTree } from "@/components/doctor/AffiliateTree";
 
 export const MedSocio = () => {
   const { toast } = useToast();
-  const [doctor, setDoctor] = useState<any>(null);
+  // Só o código permanente do servidor (ensure_referral_code em referral_links) pode ser compartilhado.
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [codeError, setCodeError] = useState(false);
 
   useEffect(() => {
-    const fetchDoctor = async () => {
+    void (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase.from('doctors').select('*').eq('user_id', user.id).single();
-      setDoctor(data);
-    };
-    fetchDoctor();
+      if (!user) { setCodeError(true); return; }
+      try { setReferralCode(await loadPermanentReferralCode(user.id)); }
+      catch { setCodeError(true); }
+    })();
   }, []);
 
-
-  const referralCode = doctor?.crm ? `DR_${doctor.full_name?.split(' ')[1] || 'MEDICO'}_CRM${doctor.crm}`.toUpperCase() : doctor?.id || "CONVIDADO_" + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const referralLink = `https://plantayraiz.com.br/cadastro-profissional?ref=${referralCode}`;
+  const referralLink = referralCode
+    ? `https://plantayraiz.com.br/cadastro-profissional?ref=${encodeURIComponent(referralCode)}`
+    : "";
 
   const copyLink = () => {
+    if (!referralLink) return;
     navigator.clipboard.writeText(referralLink);
     toast({
       title: "Link Copiado!",
@@ -115,9 +117,9 @@ export const MedSocio = () => {
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
                     <div className="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-3 text-emerald-400 font-mono text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                      {referralLink}
+                      {referralLink || (codeError ? "Não foi possível carregar seu link. Recarregue a página." : "Carregando seu link…")}
                     </div>
-                    <Button onClick={copyLink} className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all shrink-0">
+                    <Button onClick={copyLink} disabled={!referralLink} className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all shrink-0">
                       <Copy className="h-4 w-4 mr-2" /> Copiar
                     </Button>
                   </div>
@@ -146,8 +148,6 @@ export const MedSocio = () => {
               </Card>
             </div>
           </div>
-          
-          <AffiliateTree />
         </motion.div>
       </main>
 

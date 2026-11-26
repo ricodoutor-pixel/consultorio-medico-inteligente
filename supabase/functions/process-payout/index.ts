@@ -5,8 +5,9 @@
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
+import { eligibleReferrers } from "../_shared/referral-commission-policy.ts";
 
-const AFFILIATE_RATES = [0.50, 0.05, 0.02]; // Nível 1: 50%, Nível 2: 5%, Nível 3: 2%
+const AFFILIATE_RATES = [0.50]; // só o indicador direto; níveis 2 e 3 extintos (26/11/2026)
 const WITHDRAWAL_FEE = 0.05; // 5% taxa de manutenção
 
 Deno.serve(async (req) => {
@@ -243,13 +244,10 @@ async function distributeAffiliateCommissions(
 
   if (!referral?.referred_by) return results;
 
-  const referrers = [
-    referral.level1_referrer || referral.referred_by,
-    referral.level2_referrer,
-    referral.level3_referrer,
-  ];
+  // Só o indicador direto, e nunca paciente (_shared/referral-commission-policy.ts).
+  const referrers = await eligibleReferrers(supabase, [referral.level1_referrer || referral.referred_by]);
 
-  for (let level = 0; level < 3; level++) {
+  for (let level = 0; level < referrers.length; level++) {
     const referrerId = referrers[level];
     if (!referrerId) continue;
 

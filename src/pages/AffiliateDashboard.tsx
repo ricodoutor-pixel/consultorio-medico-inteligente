@@ -15,7 +15,6 @@ import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { EarningsNotificationBell } from "@/components/affiliates/EarningsNotificationBell";
-import { AffiliateEarningsSimulator, AffiliateActionPlan } from "@/components/affiliates/AffiliateEarningsSimulator";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
@@ -209,8 +208,7 @@ export default function AffiliateDashboard() {
 
           {/* Simulador de Ganhos + Plano de Ação */}
           <div className="grid lg:grid-cols-2 gap-6 mb-6">
-            <AffiliateEarningsSimulator />
-            <AffiliateActionPlan />
+            <p className="text-sm text-muted-foreground">Só o indicador direto (um nível) pode receber comissão, sobre vendas reais confirmadas. Não há comissão em 2º ou 3º nível, e paciente não recebe por indicar outros pacientes (normas do CFM).</p>
           </div>
 
           {/* Stats Grid */}

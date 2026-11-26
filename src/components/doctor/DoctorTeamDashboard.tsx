@@ -489,13 +489,10 @@ export const DoctorTeamDashboard = ({ doctor, profile }: { doctor: any, profile:
           </CardHeader>
           <CardContent className="space-y-2 text-xs text-muted-foreground leading-relaxed">
             <p>
-              • <strong>Nível 1 (10%):</strong> Indicados diretos que você convidou com seu link.
+              • Comissão só para o indicador direto (um nível), sobre vendas reais confirmadas. Não há 2º nem 3º nível.
             </p>
             <p>
-              • <strong>Nível 2 (5%):</strong> Profissionais e pacientes convidados pelos seus indicados de Nível 1.
-            </p>
-            <p>
-              • <strong>Nível 3 (2,5%):</strong> Rede expandida de terceiro nível.
+              • Nunca há comissão por trazer pacientes: as normas do CFM proíbem pagar por captação de pacientes.
             </p>
             <p className="pt-2 text-[11px] text-foreground font-semibold">
               As comissões são creditadas diretamente na sua carteira digital para saque via PIX instantâneo.

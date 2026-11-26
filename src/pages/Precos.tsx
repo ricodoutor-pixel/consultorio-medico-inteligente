@@ -397,22 +397,16 @@ const Precos = () => {
               Programa de <span className="text-gradient-purple">Afiliados</span>
             </h2>
             <p className="text-muted-foreground mb-8 leading-relaxed font-medium">
-              Ganhe comissão sobre vendas reais — 3 níveis de indicação.
+              Comissão só para o indicador direto (um nível), sobre vendas reais. Paciente não recebe por indicar outros pacientes.
             </p>
-            <div className="grid sm:grid-cols-3 gap-4 mb-8">
-              {[
-                { level: "Nível 1", pct: "25%", desc: "comissão direta" },
-                { level: "Nível 2", pct: "15%", desc: "sub-indicação" },
-                { level: "Nível 3", pct: "10%", desc: "rede expandida" },
-              ].map((l, i) => (
-                <Card key={i} className="border-border">
-                  <CardContent className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground mb-1">{l.level}</p>
-                    <p className="text-2xl font-display font-black text-gradient-purple">{l.pct}</p>
-                    <p className="text-xs text-muted-foreground">{l.desc}</p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="grid sm:grid-cols-1 gap-4 mb-8 max-w-xs mx-auto">
+              <Card className="border-border">
+                <CardContent className="p-4 text-center">
+                  <p className="text-xs text-muted-foreground mb-1">Indicação direta</p>
+                  <p className="text-2xl font-display font-black text-gradient-purple">25%</p>
+                  <p className="text-xs text-muted-foreground">profissionais e lojistas parceiros</p>
+                </CardContent>
+              </Card>
             </div>
             <p className="text-xs text-muted-foreground">Taxa de saque: 5% (isento para Plano Clínica Família)</p>
           </div>

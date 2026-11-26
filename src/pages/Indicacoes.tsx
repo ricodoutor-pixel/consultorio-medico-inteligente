@@ -201,104 +201,16 @@ const Indicacoes = () => {
               Programa de <span className="text-gradient-green">Afiliados</span>
             </h1>
             <p className="text-muted-foreground mb-6 font-medium text-lg">
-              Ganhe até <span className="text-primary font-black text-2xl">50%</span> de comissão em 3 níveis sobre assinaturas mensais dos seus indicados.
+              Comissão só para o indicador direto, sobre vendas reais confirmadas. Paciente não recebe por indicar outros pacientes.
             </p>
 
-            {/* Preview commission table */}
-            <div className="mb-8 text-left">
-              <Card className="border-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Layers size={18} className="text-primary" />
-                    <span className="font-black text-sm text-foreground">Estrutura de Comissões</span>
-                  </div>
-                  <div className="space-y-2">
-                    {commissionLevels.map((c) => (
-                      <div key={c.level} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
-                        <span className="text-sm text-muted-foreground">{c.name}</span>
-                        <Badge className="bg-primary/10 text-primary border-primary/20 font-black">{c.rate}%</Badge>
-                      </div>
-                    ))}
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
-                      <span className="text-sm font-black text-foreground">Total Máximo</span>
-                      <Badge className="bg-primary text-primary-foreground font-black text-base px-3">50%</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
-              <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-14 px-8" onClick={() => navigate("/cadastro")}>
-                Quero Ser Afiliado <ArrowRight size={18} className="ml-2" />
-              </Button>
-              <Button variant="outline" className="font-black rounded-2xl h-14 px-8" onClick={() => navigate("/login")}>
-                Já Tenho Conta
-              </Button>
-            </div>
-
-            {/* Calculadora de Ganhos */}
-            <div className="mb-16 text-left" id="calculadora">
-              <div className="text-center mb-8">
-                <Badge className="bg-primary/20 text-primary border-primary/30 font-bold mb-3">Simulador de Ganhos</Badge>
-                <h2 className="text-2xl md:text-3xl font-display font-black text-foreground">Calcule sua Renda Recorrente</h2>
-                <p className="text-muted-foreground mt-2">Veja quanto você pode ganhar mensalmente indicando o Plano Acesso VIP (R$ 100).</p>
-              </div>
-
-              <Card className="border-border bg-card/50 backdrop-blur">
-                <CardContent className="p-6 md:p-8">
-                  <div className="grid md:grid-cols-2 gap-10 items-center">
-                    <div className="space-y-8">
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <Label className="font-bold">Quantas pessoas você indicaria? (Geração 1)</Label>
-                          <span className="font-black text-primary">{diretos[0]}</span>
-                        </div>
-                        <Slider value={diretos} onValueChange={setDiretos} max={100} min={1} step={1} className="py-2" />
-                        <p className="text-xs text-muted-foreground mt-1">Você ganha 50% de cada um.</p>
-                      </div>
-                      
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <Label className="font-bold">Quantas pessoas cada um indicaria? (Média G2 e G3)</Label>
-                          <span className="font-black text-primary">{indiretosPorPessoa[0]}</span>
-                        </div>
-                        <Slider value={indiretosPorPessoa} onValueChange={setIndiretosPorPessoa} max={20} min={1} step={1} className="py-2" />
-                        <p className="text-xs text-muted-foreground mt-1">Sua rede viraliza até a 3ª geração.</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-                      <h3 className="text-sm font-bold text-muted-foreground mb-4">Projeção Mensal Recorrente</h3>
-                      
-                      <div className="space-y-3 mb-6">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-foreground">Sua indicação (G1)</span>
-                          <span className="font-bold">R$ {earningG1.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-foreground">Rede Indireta (G2)</span>
-                          <span className="font-bold">R$ {earningG2.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-foreground">Profundidade (G3)</span>
-                          <span className="font-bold">R$ {earningG3.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      </div>
-
-                      <div className="border-t border-border pt-4">
-                        <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Total Estimado</p>
-                        <p className="text-4xl font-display font-black text-primary text-gradient-green">
-                          R$ {totalEarning.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </p>
-                        <p className="text-xs font-medium text-muted-foreground mt-1">/mês enquanto os planos estiverem ativos</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-2 text-sm text-muted-foreground">
+                <h3 className="font-display font-black text-foreground">Como funciona a comissão</h3>
+                <p>Só o indicador direto (um nível) pode receber comissão, sobre vendas reais confirmadas. Não há comissão em 2º ou 3º nível.</p>
+                <p>Paciente não recebe por indicar outros pacientes: as normas do CFM proíbem pagar por captação de pacientes.</p>
+              </CardContent>
+            </Card>
 
             {/* Como Funciona & Automação */}
             <div className="mb-16 text-left">
@@ -478,7 +390,7 @@ const Indicacoes = () => {
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-muted-foreground max-w-3xl font-medium mb-6">
-              Ganhe até <span className="text-primary font-black">50% de comissão</span> em 3 níveis sobre o plano mensal dos seus indicados. Pagamento automático via PIX.
+              Comissão só para o indicador direto, sobre vendas reais confirmadas. Paciente não recebe por indicar outros pacientes.
             </motion.p>
 
             {/* Stats */}
@@ -603,20 +515,6 @@ const Indicacoes = () => {
                           </div>
                           <TrendingUp size={24} className="text-primary" />
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div className="p-3 rounded-xl bg-muted/50 text-center">
-                            <p className="text-xs text-muted-foreground">Nível 1</p>
-                            <p className="text-sm font-black text-foreground">R$ 80</p>
-                          </div>
-                          <div className="p-3 rounded-xl bg-muted/50 text-center">
-                            <p className="text-xs text-muted-foreground">Nível 2</p>
-                            <p className="text-sm font-black text-foreground">R$ 52,50</p>
-                          </div>
-                          <div className="p-3 rounded-xl bg-muted/50 text-center">
-                            <p className="text-xs text-muted-foreground">Nível 3</p>
-                            <p className="text-sm font-black text-foreground">R$ 7,50</p>
-                          </div>
-                        </div>
                         <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30">
                           <span className="text-xs text-muted-foreground">Próximo pagamento</span>
                           <div className="flex items-center gap-1">
@@ -709,73 +607,11 @@ const Indicacoes = () => {
             {/* COMISSÕES TAB */}
             <TabsContent value="comissoes">
               <div className="space-y-6">
-                {/* Commission structure */}
-                <Card className="border-border border-primary/20">
-                  <CardContent className="p-6">
-                    <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                      <Percent size={18} className="text-primary" /> Estrutura de Comissões — 3 Níveis
-                    </h3>
-                    <div className="space-y-3 mb-4">
-                      {commissionLevels.map((c) => (
-                        <div key={c.level} className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 border border-border">
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg"
-                            style={{ backgroundColor: c.color + "18", color: c.color }}>
-                            {c.level}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-black text-sm text-foreground">{c.name}</p>
-                            <p className="text-xs text-muted-foreground">{c.desc}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-display font-black" style={{ color: c.color }}>{c.rate}%</p>
-                            <p className="text-[10px] text-muted-foreground">por mês</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Comissão Total Máxima</p>
-                      <p className="text-4xl font-display font-black text-primary">50%</p>
-                      <p className="text-xs text-muted-foreground">do valor do plano mensal, recorrente!</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Earnings per plan */}
                 <Card className="border-border">
-                  <CardContent className="p-6">
-                    <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                      <DollarSign size={18} className="text-primary" /> Ganhos por Plano de Assinatura
-                    </h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-border">
-                            <th className="text-left py-2 text-xs font-bold text-muted-foreground">Plano</th>
-                            <th className="text-center py-2 text-xs font-bold text-muted-foreground">Valor</th>
-                            <th className="text-center py-2 text-xs font-bold text-primary">Nív. 1 (20%)</th>
-                            <th className="text-center py-2 text-xs font-bold text-primary/70">Nív. 2 (15%)</th>
-                            <th className="text-center py-2 text-xs font-bold text-primary/50">Nív. 3 (15%)</th>
-                            <th className="text-center py-2 text-xs font-black text-primary">Total</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {planEarnings.map((p) => (
-                            <tr key={p.plan} className="border-b border-border/50">
-                              <td className="py-3 font-bold text-foreground">{p.plan}</td>
-                              <td className="py-3 text-center text-muted-foreground">R$ {p.price}</td>
-                              <td className="py-3 text-center font-bold text-primary">R$ {p.l1.toFixed(2)}</td>
-                              <td className="py-3 text-center font-bold text-primary/70">R$ {p.l2.toFixed(2)}</td>
-                              <td className="py-3 text-center font-bold text-primary/50">R$ {p.l3.toFixed(2)}</td>
-                              <td className="py-3 text-center font-black text-primary">R$ {p.total.toFixed(2)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-3 text-center">
-                      💡 Valores recorrentes — você ganha todo mês enquanto o indicado mantiver o plano ativo!
-                    </p>
+                  <CardContent className="p-6 space-y-2 text-sm text-muted-foreground">
+                    <h3 className="font-display font-black text-foreground">Como funciona a comissão</h3>
+                    <p>Só o indicador direto (um nível) pode receber comissão, sobre vendas reais confirmadas. Não há comissão em 2º ou 3º nível.</p>
+                    <p>Paciente não recebe por indicar outros pacientes: as normas do CFM proíbem pagar por captação de pacientes.</p>
                   </CardContent>
                 </Card>
 

@@ -167,48 +167,10 @@ export default function AfiliadosGamificado() {
                   </Button>
                 </div>
 
-                <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Users size={18} className="text-primary" /> Sua Rede (3 Gerações)
+                <h3 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Users size={18} className="text-primary" /> Como funciona a comissão
                 </h3>
-                
-                <div className="space-y-4">
-                  <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-foreground">1ª Geração (Diretos)</h4>
-                      <p className="text-sm text-muted-foreground">Pessoas que você convidou diretamente</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="block text-2xl font-black text-primary">50%</span>
-                      <span className="text-xs font-bold text-muted-foreground uppercase">Comissão</span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 rounded-xl border border-border bg-card flex items-center justify-between pl-8 relative">
-                    <div className="absolute left-4 top-0 bottom-0 w-px bg-border"></div>
-                    <div className="absolute left-4 top-1/2 w-4 h-px bg-border"></div>
-                    <div>
-                      <h4 className="font-bold text-foreground">2ª Geração</h4>
-                      <p className="text-sm text-muted-foreground">Convidados dos seus diretos</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="block text-xl font-black text-foreground">5%</span>
-                      <span className="text-xs font-bold text-muted-foreground uppercase">Comissão</span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 rounded-xl border border-border bg-card flex items-center justify-between pl-12 relative">
-                    <div className="absolute left-4 top-0 bottom-0 w-px bg-border"></div>
-                    <div className="absolute left-4 top-1/2 w-8 h-px bg-border"></div>
-                    <div>
-                      <h4 className="font-bold text-foreground">3ª Geração</h4>
-                      <p className="text-sm text-muted-foreground">Rede profunda</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="block text-lg font-black text-muted-foreground">2%</span>
-                      <span className="text-xs font-bold text-muted-foreground uppercase">Comissão</span>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground">Só o indicador direto (um nível) pode receber comissão, sobre vendas reais confirmadas. Não há comissão em 2º ou 3º nível, e paciente não recebe por indicar outros pacientes (normas do CFM).</p>
 
               </CardContent>
             </Card>

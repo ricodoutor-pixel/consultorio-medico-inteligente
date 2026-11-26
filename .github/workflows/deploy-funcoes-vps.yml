@@ -2,7 +2,7 @@
 # Manual-only until the cutover off Lovable Cloud; after the cutover, uncomment the `push` trigger.
 #
 # GitHub secrets (Settings -> Secrets -> Actions):
-#   VPS_HOST     -> 2.24.69.154
+#   VPS_HOST     -> 179.236.244.168 (srv2036020)
 #   VPS_USER     -> root (or the deploy user)
 #   VPS_SSH_KEY  -> private key of a key authorized on the VPS
 name: Deploy funcoes -> VPS

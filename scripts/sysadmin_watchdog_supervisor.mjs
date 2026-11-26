@@ -15,7 +15,6 @@ const LOG_FILE = path.join(__dirname, 'sysadmin_watchdog.log');
 const EXPECTED_SERVICES = [
   'brisa-live-responder',
   'doctor-kyc-listener',
-  'meta-social-engine',
   'partner-meeting-scheduler',
   'organic-analytics-reporter',
   'email-bounce-guardian'

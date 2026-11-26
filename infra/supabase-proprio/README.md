@@ -10,7 +10,7 @@ Decided by the owner on 2026-11-24, after Lovable Cloud took the database offlin
 |---|---|---|
 | Site (React/Vite) | Hostinger, publishes on push to `main` (unchanged) | already paid |
 | Database, login, files, realtime | Our Supabase (free plan; a 2nd account if more space is needed) | 0 |
-| 200+ Edge Functions | VPS `srv1641464`, `supabase/edge-runtime` container (no 100-function cap) | already paid |
+| 200+ Edge Functions | VPS `srv2036020` (179.236.244.168), `supabase/edge-runtime` container (no 100-function cap) | already paid |
 | Single public address | `https://banco.plantayraiz.com.br` (Traefik on the VPS) | 0 |
 | Daily backup | VPS `/opt/backups/pyr` (14 days), never on GitHub | 0 |
 | AI | Our own `GEMINI_API_KEY` (free tier); `_shared/brisa-ai.ts` already falls back to direct Gemini | 0 |

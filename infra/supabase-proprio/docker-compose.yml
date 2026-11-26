@@ -1,4 +1,4 @@
-# Planta y Raiz: our own backend on the VPS (srv1641464), behind the Traefik in ../vps-traefik.
+# Planta y Raiz: our own backend on the VPS (srv2036020, 179.236.244.168), behind the Traefik in ../vps-traefik.
 #
 # A single public address, https://banco.plantayraiz.com.br:
 #   /functions/v1/*  -> "funcoes" (supabase/edge-runtime, all 200+ functions, no plan limit)

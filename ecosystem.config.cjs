@@ -265,6 +265,8 @@ const DESLIGADOS = [
   'brevo-whatsapp-inviter',       // WhatsApp frio via Brevo (nunca religar)
   'whatsapp-bot',                 // WhatsApp frio em loop de 10 min legado (nunca religar)
   'wpp-crm',                      // CRM WhatsApp frio legado (nunca religar)
+  'priority-15min-inviter',       // WhatsApp frio "Parabéns, Dr(a)" a cada 15 min (parado na VPS em 26/11; nunca religar)
+  'meta-social-engine',           // desligado a pedido do dono em 26/11 (o webhook oficial é a função meta-social-webhook)
 ];
 module.exports.apps = module.exports.apps.filter((app) => !DESLIGADOS.includes(app.name));
 module.exports.DESLIGADOS = DESLIGADOS;

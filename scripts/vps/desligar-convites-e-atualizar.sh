@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# VPS srv1641464 — desliga robôs de convite frio / captação / quebrados, atualiza o código e reinicia o robô da Brisa.
+# VPS srv2036020 (179.236.244.168) — desliga robôs de convite frio / captação / quebrados, atualiza o código e reinicia o robô da Brisa.
 # Uso: bash scripts/vps/desligar-convites-e-atualizar.sh   (em /opt/plantayraiz)
 set -uo pipefail
 cd /opt/plantayraiz || { echo "pasta /opt/plantayraiz não existe"; exit 1; }
@@ -9,7 +9,7 @@ pm2 list
 
 DESLIGADOS=(patient-traffic-booster growth-engine lead-harvesters-master instagram-direct-inviter apify-lead-sync
   anvisa-rdc660-rpa brevo-multi-pipeline hostinger-email-dispatcher cannabis-young-doctors-hunter cadence-10min-inviter
-  brevo-whatsapp-inviter whatsapp-bot wpp-crm)
+  brevo-whatsapp-inviter whatsapp-bot wpp-crm priority-15min-inviter meta-social-engine)
 
 # Qualquer outro processo PM2 rodando um script de convite/disparo/loop de 10 min também para.
 EXTRA=$(pm2 jlist 2>/dev/null | node -e '
@@ -68,14 +68,42 @@ PY
   fi
 fi
 
-echo "=== ATUALIZANDO CÓDIGO ==="
-# Sem reset/stash: arquivos locais de estado (lista de opt-out, históricos) ficam intactos.
+echo "=== TIRANDO A CHAVE DO GITHUB DO ENDEREÇO DO REPOSITÓRIO ==="
+# O repositório é público: baixar atualizações não precisa de chave nenhuma.
+git remote set-url origin https://github.com/ricodoutor-pixel/consultorio-medico-inteligente.git
+git config --unset-all credential.helper 2>/dev/null || true
+git remote -v | sed -E 's#://[^@/]+@#://***@#'
+
+echo "=== ATUALIZANDO CÓDIGO (preservando as alterações feitas direto no servidor) ==="
+# Arquivos de estado (lista de opt-out, históricos) não são tocados: só os 2 arquivos alterados à mão.
+LOCAIS="scripts/agent_evolution_brisa_live_responder.mjs scripts/sysadmin_watchdog_supervisor.mjs"
+BK="/root/pyr-backup-$(date +%F-%H%M)"; mkdir -p "$BK"; chmod 700 "$BK"
+git diff -- $LOCAIS > "$BK/alteracoes-locais.patch"
+cp $LOCAIS "$BK/" 2>/dev/null || true
+echo "backup das alterações locais: $BK"
 git status --short | head -20
+git stash push -m "local-$(date +%F-%H%M)" -- $LOCAIS >/dev/null 2>&1 || true
 if ! git pull --ff-only origin main; then
-  echo "git pull não avançou sozinho (alterações locais na VPS). Robôs de convite já estão desligados; código NÃO atualizado."
+  git stash pop >/dev/null 2>&1 || true
+  echo "git pull não avançou (veja o git status acima). Nada foi trocado; robôs de convite continuam desligados."
   pm2 save; pm2 list; exit 2
 fi
 git log --oneline -1
+if git stash list | grep -q "local-"; then
+  if git stash pop >/dev/null 2>&1; then
+    echo "alterações locais reaplicadas sobre a versão nova"
+  else
+    git checkout HEAD -- $LOCAIS; git stash drop >/dev/null 2>&1 || true
+    echo "alterações locais conflitam com a versão nova: ficou a versão do GitHub (backup em $BK)"
+  fi
+fi
+# O vigia nunca pode voltar a religar robô desligado, mesmo com alteração local.
+if node -e 'const d=require("./ecosystem.config.cjs").DESLIGADOS||[];const s=require("fs").readFileSync("scripts/sysadmin_watchdog_supervisor.mjs","utf8");const e=s.slice(s.indexOf("EXPECTED_SERVICES"),s.indexOf("];",s.indexOf("EXPECTED_SERVICES")));process.exit(d.some(n=>e.includes("\x27"+n+"\x27"))?1:0)'; then
+  echo "vigia ok: não religa robô desligado"
+else
+  git checkout HEAD -- scripts/sysadmin_watchdog_supervisor.mjs
+  echo "vigia local religaria robô desligado: voltou a versão do GitHub (backup em $BK)"
+fi
 
 echo "=== REINICIANDO ROBÔS EM USO ==="
 pm2 startOrReload ecosystem.config.cjs --update-env

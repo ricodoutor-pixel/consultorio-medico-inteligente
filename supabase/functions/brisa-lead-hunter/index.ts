@@ -101,7 +101,7 @@ async function syncWithBrevo(lead: {
         CRM: lead.crm || "",
         UF: lead.uf || "SP",
         SMS: sanitizePhone(lead.telefone),
-        ESPECIALIDADE: lead.especialidade || "Medicina Canabinoide",
+        ESPECIALIDADE: lead.especialidade || "Cannabis medicinal",
         ORIGEM: lead.origem || "lead_hunter_engine",
       },
       listIds: [4], // ID da Lista de Médicos Prescritores

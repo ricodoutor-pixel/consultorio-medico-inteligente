@@ -17,11 +17,10 @@ describe("receitas: a plataforma nunca afirma aprovação da ANVISA", () => {
 });
 
 describe("identidade pública: Enfª Brisa", () => {
-  it("é IA supervisionada com registro boliviano, nunca CRM brasileiro", () => {
-    expect(EDILSON_ON_SUPERVISION).toContain("Enfª Brisa");
-    expect(EDILSON_ON_SUPERVISION).toContain("assistente virtual supervisionada");
-    expect(EDILSON_ON_SUPERVISION).toContain("Bolívia");
-    expect(EDILSON_ON_SUPERVISION).not.toMatch(/CRM-(CE|SP)/);
+  it("é assistente virtual com supervisão técnica da Dra. Suelen, sem nome de médico como persona (decisão 25/11/2026)", () => {
+    expect(EDILSON_ON_SUPERVISION).toContain("Enfª Brisa é uma assistente virtual");
+    expect(EDILSON_ON_SUPERVISION).toContain("supervisão técnica da Dra. Suelen Naves Rodrigues (CRM 49354/PR)");
+    expect(EDILSON_ON_SUPERVISION).not.toMatch(/Edilson|10963|CRM-(CE|SP)/);
   });
 
   it("deixa claro que a Orientação é só o início do cuidado", () => {

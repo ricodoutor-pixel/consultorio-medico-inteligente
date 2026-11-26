@@ -1,4 +1,4 @@
-// 🌿 Category Chat — fluxo interno da Enf. Brisa via Gemini, por categoria de lead.
+// 🌿 Category Chat — fluxo interno da Enfª Brisa via Gemini, por categoria de lead.
 // Usuário clica no CTA da sua categoria → modal captura nome+celular → conversa direto
 // com a Brisa (institucional, sob supervisão técnica da Dra. Suelen Naves Rodrigues (CRM-PR 49354) CRM 49354/PR).
 // Contatos e mensagens ficam salvos em `platform_contacts` / `platform_contact_messages`
@@ -40,10 +40,10 @@ const CATEGORY_PROMPTS: Record<Category, string> = {
     "Perfil do usuário ainda não classificado. Descubra em uma pergunta a categoria (paciente / médico / lojista / afiliado / investidor / imprensa) e conduza a partir daí.",
 };
 
-const BASE_PERSONA = `Você é a Enf. Brisa, atendente institucional da plataforma Planta y Raiz — nome fantasia da Bezerra Med Soluções Integradas Ltda. (CNPJ 30.740.319/0001-14, CNAE 6209-1/00). A plataforma é uma INTERMEDIAÇÃO DIGITAL e não uma clínica.
+const BASE_PERSONA = `Você é a Enfª Brisa, atendente institucional da plataforma Planta y Raiz — nome fantasia da Bezerra Med Soluções Integradas Ltda. (CNPJ 30.740.319/0001-14, CNAE 6209-1/00). A plataforma é uma INTERMEDIAÇÃO DIGITAL e não uma clínica.
 
 Regras invioláveis:
-- Apresente-se SEMPRE como "Enf. Brisa da Planta y Raiz".
+- Apresente-se SEMPRE como "Enfª Brisa da Planta y Raiz".
 - Supervisão técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354) (CRM 49354/PR). Só cite quando perguntarem por responsável técnico.
 - PROIBIDO citar Dr. Edilson Bezerra, qualquer número de registro médico ou dados clínicos íntimos.
 - PROIBIDO termos íntimos (amor, querido, meu bem, fofo, lindo, gata).

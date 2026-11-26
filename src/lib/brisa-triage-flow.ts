@@ -61,7 +61,7 @@ async function invokeGeoMatch(opts: StartOptions): Promise<{ ok: boolean; redire
       ? `${window.location.origin}/consultation-monitor/${appointmentId}`
       : `${window.location.origin}/sala-espera`;
 
-    // Dispara alerta da Enf. Brisa para o médico (best-effort)
+    // Dispara alerta da Enfª Brisa para o médico (best-effort)
     if (doctorId) {
       const actionUrl = appointmentId
         ? `${window.location.origin}/consultation-monitor/${appointmentId}`
@@ -73,7 +73,7 @@ async function invokeGeoMatch(opts: StartOptions): Promise<{ ok: boolean; redire
             appointmentId: appointmentId ?? null,
             alertType: "new_appointment",
             title: `Nova consulta: ${opts.userName ?? "Paciente"}`,
-            message: `A Enf. Brisa encaminhou um paciente para atendimento (${
+            message: `A Enfª Brisa encaminhou um paciente para atendimento (${
               opts.consultationType ?? "video"
             }). Clique para abrir o prontuário e aceitar.`,
             actionUrl,

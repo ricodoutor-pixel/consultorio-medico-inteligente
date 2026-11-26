@@ -270,7 +270,7 @@ serve(async (req: Request) => {
       if (!phone) return ok({ ok: false, error: 'Parâmetro ?phone=5511... obrigatório' }, 400);
       const chatId = phone.includes('@') ? phone : `${phone.replace(/\D/g, '')}@c.us`;
       const msg    = url.searchParams.get('msg')
-        || '🌿 *Planta y Raiz* — Sistema Online\n\nEnfermeira Brisa conectada e operando 24h\nhttps://plantayraiz.com.br';
+        || '🌿 *Planta y Raiz* — Sistema Online\n\nEnfª Brisa conectada e operando 24h\nhttps://plantayraiz.com.br';
       const r = await wahaPost('/api/sendText', {
         session: WAHA_SESSION,
         chatId,
@@ -311,7 +311,7 @@ serve(async (req: Request) => {
         const chatId = `${ADMIN_PHONE.replace(/\D/g, '')}@c.us`;
         const tR = await wahaPost('/api/sendText', {
           session: WAHA_SESSION, chatId,
-          text: '🌿 *Planta y Raiz* — Sistema configurado com sucesso\nEnfermeira Brisa online 24h\nhttps://plantayraiz.com.br',
+          text: '🌿 *Planta y Raiz* — Sistema configurado com sucesso\nEnfª Brisa online 24h\nhttps://plantayraiz.com.br',
         });
         results.teste_mensagem = { ok: tR.ok, phone: ADMIN_PHONE, status: tR.status };
       }

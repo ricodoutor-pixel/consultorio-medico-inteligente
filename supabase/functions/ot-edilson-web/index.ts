@@ -334,7 +334,7 @@ Deno.serve(async (req) => {
 
         // Mensagem de boas-vindas do sistema/agente
         const welcomeText =
-          `Olá! Sou a **Enfª Brisa**, assistente virtual supervisionada pelo Dr. Edilson Bezerra (CRM Bolívia nº 10963).\n\n` +
+          `Olá! Sou a **Enfª Brisa**, assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues, CRM 49354/PR.\n\n` +
           `Estou aqui para acolher você, entender em detalhes suas queixas e necessidades, cruzar com nosso acervo de evidências científicas e orientar os melhores caminhos antes de uma consulta formal com um médico prescritor da nossa vitrine.\n\n` +
           `*Lembrando: esta é uma orientação técnica educativa; eu não emito receitas nem prescrevo medicamentos.* Como posso te ajudar hoje?`;
 

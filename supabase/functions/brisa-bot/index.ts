@@ -43,7 +43,7 @@ import { DOCTOR_NAME, DOCTOR_CRM, DOCTOR_PHONE } from '../_shared/clinic-info.ts
 const ROTEIRO_ORIENTACAO_TECNICA = `📲 *COMO FUNCIONA A ORIENTAÇÃO TÉCNICA (R$ 30):*
 
 1️⃣ *Início do Cuidado (Triagem e Educação em Saúde):*
-A Orientação Técnica é o início do seu atendimento na plataforma e é conduzida pela *Enfª Brisa*, uma assistente virtual supervisionada pelo ${DOCTOR_NAME} (registro médico boliviano nº 10963, consultório físico no 1º Anillo, Santa Cruz de la Sierra). A Orientação Técnica é apenas o início do cuidado e não realiza prescrição médica:
+A Orientação Técnica é o início do seu atendimento na plataforma e é conduzida pela *Enfª Brisa*, assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues (CRM 49354/PR). A Orientação Técnica é apenas o início do cuidado e não realiza prescrição médica:
 👉 https://www.plantayraiz.com.br/orientacao-tecnica
 
 2️⃣ *Modalidades na Plataforma:*
@@ -59,7 +59,7 @@ Ao final da Orientação Técnica, você recebe seu Relatório de Encaminhamento
 Como posso te ajudar agora? 🌿💚`;
 
 // ── PERSONAS SEPARADAS (mesmo cérebro Gemini, conteúdos diferentes) ─────
-// Enf. Brisa    → triagem curta + paywall
+// Enfª Brisa    → triagem curta + paywall
 // Dr. Edilson On → orientação técnica paga (30 min por pagamento)
 import {
   BRISA_TRIAGE_PERSONA,
@@ -83,7 +83,7 @@ const PERSONA = BRISA_TRIAGE_PERSONA;
 
 // ── RESPOSTAS INSTANTÂNEAS POR PERFIL (Médico, Paciente, Farmácia) ──────
 const MSGS = {
-  boas_vindas: `Olá! Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda. — a equipe humana acompanha). 🌿
+  boas_vindas: `Olá! Sou a Enfª Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda. — a equipe humana acompanha). 🌿
 
 O que te trouxe até a Planta y Raiz hoje?
 
@@ -91,15 +91,15 @@ O que te trouxe até a Planta y Raiz hoje?
 2️⃣ *Sou Profissional com Registro em Conselho* (cadastro gratuito)
 3️⃣ *Farmácia / Lojista* (Lojista VIP R$ 99/mês)`,
 
-  paciente: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿
+  paciente: `Sou a Enfª Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿
 
 Você pode começar agora por dois caminhos:
-• *Orientação Técnica educativa (R$ 30 · 30 min):* conduzida pela Enfª Brisa (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). É o início do cuidado — não é consulta e não prescreve; entrega relatório em PDF e encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica
+• *Orientação Técnica educativa (R$ 30 · 30 min):* conduzida pela Enfª Brisa, assistente virtual (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)). É o início do cuidado — não é consulta e não prescreve; entrega relatório em PDF e encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica
 • *Consulta com Médico Prescritor:* veja os especialistas e valores de cada médico na vitrine: https://www.plantayraiz.com.br/profissionais
 
 Qual faz mais sentido para você hoje?`,
 
-  medico: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda. — a equipe humana acompanha). 🌿
+  medico: `Sou a Enfª Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda. — a equipe humana acompanha). 🌿
 
 Para profissionais com registro ativo em conselho:
 • *Cadastro gratuito:* https://www.plantayraiz.com.br/cadastro-profissional
@@ -109,7 +109,7 @@ Para profissionais com registro ativo em conselho:
 
 Se tiver dúvida sobre repasse ou condição diferente, me avise que encaminho para a equipe humana.`,
 
-  farmacia_lojista: `Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda.). 🌿
+  farmacia_lojista: `Sou a Enfª Brisa, assistente virtual da *Planta y Raiz* (Bezerra Med Soluções Integradas Ltda.). 🌿
 
 Para farmácias e lojistas parceiros:
 • *Lojista VIP:* R$ 99/mês (até 10 produtos, destaque nas recomendações IA; taxa padrão de 5% do marketplace — repasse de 95%): https://www.plantayraiz.com.br/precos
@@ -127,7 +127,7 @@ A Planta y Raiz não vende nem entrega medicamentos. O tratamento é avaliado in
 
 ${ROTEIRO_ORIENTACAO_TECNICA}`,
 
-  generica: `Olá! Sou a Enf. Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿 O que te trouxe até a Planta y Raiz hoje?`,
+  generica: `Olá! Sou a Enfª Brisa, assistente virtual da *Planta y Raiz* (a equipe humana acompanha). 🌿 O que te trouxe até a Planta y Raiz hoje?`,
 };
 
 function norm(t: string) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
@@ -313,7 +313,7 @@ async function log(phone: string, inText: string, outText: string, via: string) 
       }),
       sb.from('whatsapp_messages').insert([
         { remote_jid: `${phone}@c.us`, message_text: inText,  direction: 'in',  status: 'received', from_me: false },
-        { remote_jid: `${phone}@c.us`, message_text: outText, direction: 'out', status: 'sent',     from_me: true, sender_name: 'Enfermeira Brisa' },
+        { remote_jid: `${phone}@c.us`, message_text: outText, direction: 'out', status: 'sent',     from_me: true, sender_name: 'Enfª Brisa' },
       ]),
     ]);
   } catch {}
@@ -344,7 +344,7 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method === 'GET') {
     return new Response(JSON.stringify({
       ok: true, version: '2026.9.09-AGENTES-SEPARADOS-30MIN',
-      agentes: { triagem: 'Enf. Brisa', orientacao_tecnica: 'Enfª Brisa (30 min por pagamento)' },
+      agentes: { triagem: 'Enfª Brisa', orientacao_tecnica: 'Enfª Brisa (30 min por pagamento)' },
       roteiro_ativo: true,
       instant_reply: '✅ ATIVO (com o roteiro completo 5 passos)',
     }, null, 2), { headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -406,7 +406,7 @@ serve(async (req: Request): Promise<Response> => {
 
   // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────
   // Sessão paga ativa → Enfª Brisa (Orientação Técnica, 30 min).
-  // Sem sessão paga  → Enf. Brisa (triagem curta + link de pagamento).
+  // Sem sessão paga  → Enfª Brisa (triagem curta + link de pagamento).
   const sb = serviceClient();
   const session = sb ? await resolveOtSession(sb, phone, name) : null;
 
@@ -448,7 +448,7 @@ serve(async (req: Request): Promise<Response> => {
     );
   }
 
-  // ── AGENTE: Enf. Brisa (triagem) ───────────────────────────────────────
+  // ── AGENTE: Enfª Brisa (triagem) ───────────────────────────────────────
   const kind = intent(text);
   const useInstant = kind === 'boas_vindas' || kind === 'medico' || kind === 'farmacia_lojista' || (!GEMINI_KEY && !LOVABLE_KEY);
   const instant = useInstant ? instantReply(text, name) : '';

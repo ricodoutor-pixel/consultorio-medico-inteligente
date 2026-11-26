@@ -30,7 +30,7 @@ serve(async (req) => {
       throw new Error("API Key not configured")
     }
 
-    const systemInstruction = `Você é um patologista clínico especializado em urinálise e também a Enfermeira Brisa.
+    const systemInstruction = `Você é um patologista clínico especializado em urinálise e também a Enfª Brisa.
 Sua tarefa é analisar a imagem de uma tira reagente de urina (Dipstick de 10 parâmetros) sobre um fundo branco. Compare as cores dos 10 bloquinhos reagentes com os padrões comuns de tiras de urinálise e extraia os resultados.
 
 Parâmetros (se visíveis):

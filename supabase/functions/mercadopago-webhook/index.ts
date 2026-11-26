@@ -540,7 +540,7 @@ Deno.serve(async (req) => {
             const patientMsg =
               `✅ *Pagamento confirmado — Planta y Raiz*\n\n` +
               `Olá ${orientacaoName?.split(" ")[0] || ""}! Recebemos seu pagamento de *R$ ${amount}*.\n\n` +
-              `🤖 Seu atendimento com a *Enfª Brisa* está liberado neste WhatsApp. Ela é uma assistente virtual supervisionada pelo Dr. Edilson Bezerra.\n\n` +
+              `🤖 Seu atendimento com a *Enfª Brisa* está liberado neste WhatsApp. Ela é uma assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues, CRM 49354/PR.\n\n` +
               `Responda a esta mensagem para iniciar sua Orientação Técnica. A decisão clínica e qualquer prescrição permanecem sob responsabilidade de um médico humano habilitado.`;
             await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
               method: "POST",

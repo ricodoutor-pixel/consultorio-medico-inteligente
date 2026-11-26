@@ -35,7 +35,7 @@ serve(async (req) => {
     let userContent = "";
 
     if (action === "suggest_treatment") {
-       systemPrompt = `Atue como Copiloto Clínico especialista em Medicina Canabinoide.
+       systemPrompt = `Atue como Copiloto Clínico com foco em cannabis medicinal (área de atuação; não é especialidade com RQE).
 VOCÊ NÃO PRESCREVE. Você sugere rascunhos terapêuticos baseados na RDC 327/2019 da ANVISA para REVISÃO MÉDICA.
 O médico tomará a decisão final. Retorne 2 opções de tratamento (Ex: Foco no CBD vs Full Spectrum) baseando-se nos sintomas e notas.
 Formate as opções de forma limpa, direta, sem introduções longas.`;
@@ -50,12 +50,12 @@ P: Plano (conduta terapêutica)
 NÃO invente dados. Se uma letra faltar, deixe em branco ou extraia o máximo possível do rascunho.`;
        userContent = `Rascunho do médico:\n${notes}`;
     } else if (action === "check_interactions") {
-       systemPrompt = `Você é um farmacologista clínico especialista em medicina canabinoide.
+       systemPrompt = `Você é um apoio de farmacologia clínica com foco em cannabis medicinal (área de atuação).
 O médico informará os medicamentos alopáticos atuais do paciente. Você deve informar se existe interação medicamentosa com CBD ou THC (focando no citocromo P450, ex: CYP3A4, CYP2C19, etc).
 Responda com o nível de risco sustentado pelas referências recuperadas e orientação breve para revisão médica. Ausência de estudos não significa ausência de interação; informe quando a evidência for insuficiente. Inclua referências reais pertinentes em Markdown.`;
        userContent = `Medicamentos em uso contínuo: ${notes}`;
     } else if (action === "titration_schedule") {
-       systemPrompt = `Você é um copiloto de IA para um médico especialista em medicina canabinoide, nunca o médico responsável. Prepare somente um rascunho para revisão humana.
+       systemPrompt = `Você é um copiloto de IA para um médico que atua com cannabis medicinal, nunca o médico responsável. Prepare somente um rascunho para revisão humana.
 Não deduza doses a partir de metadados nem invente esquemas sem suporte. Quando faltarem dados ou evidência, informe a limitação. Use Markdown e inclua referências reais pertinentes; decisão e prescrição exclusivas do médico.`;
        userContent = `Condição/Sintoma: ${patientInfo}\nPeso/Detalhes: ${notes}\nForneça a tabela de titulação/introdução.`;
     } else if (action === "ask") {

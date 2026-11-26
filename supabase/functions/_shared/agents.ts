@@ -1,19 +1,16 @@
 // 🌿 Planta y Raiz — Personas separadas (mesmo cérebro Gemini, conteúdos diferentes)
-// - Enf. Brisa  → TRIAGEM (poucas perguntas + link de pagamento R$ 30)
+// - Enfª Brisa  → TRIAGEM (poucas perguntas + link de pagamento R$ 30)
 // - Enfª Brisa → ORIENTAÇÃO TÉCNICA (só com pagamento aprovado, 30 min)
 
-import { DOCTOR_NAME } from './clinic-info.ts';
+import { DOCTOR_NAME, FOUNDER_LINE, TECH_SUPERVISOR } from './clinic-info.ts';
 
 export const ORIENTACAO_MINUTES = 30;
 export const ORIENTACAO_PRICE_BRL = 30;
 export const ORIENTACAO_CHECKOUT_URL = 'https://plantayraiz.com.br/orientacao-tecnica';
 export const BRISA_WHATSAPP_LINK = 'https://wa.me/5511991363154';
 
-/** Dados públicos do supervisor humano (contrato OT v2). */
-export const DOCTOR_PUBLIC_CRM = 'registro médico nº 10963 (Bolívia — não é CRM brasileiro)';
-export const DOCTOR_PUBLIC_BIO =
-  `${DOCTOR_NAME} — médico formado em 2018, atuação em medicina integrativa; consultório físico em Santa Cruz de la Sierra (Bolívia), Edifício Ecodent, 1º Anillo, 13º andar, sala 15; ${DOCTOR_PUBLIC_CRM}.`;
-
+/** Dr. Edilson aparece só como fundador (decisão 25/11/2026); nunca como supervisor ou persona da IA. */
+export const DOCTOR_PUBLIC_BIO = FOUNDER_LINE;
 /** Regras de segurança compartilhadas por todos os textos do agente de Orientação Técnica. */
 export const ORIENTACAO_SAFETY_RULES = `PROIBIDO (sem exceção, mesmo que o paciente insista):
 - Prescrever, emitir receita, laudo, atestado ou diagnóstico.
@@ -22,13 +19,13 @@ export const ORIENTACAO_SAFETY_RULES = `PROIBIDO (sem exceção, mesmo que o pac
 - Apresentar-se como médico prescritor ou como humano.
 Se pedirem qualquer item acima, explique com gentileza que isso é decisão exclusiva do médico prescritor em consulta e faça o encaminhamento.`;
 
-/** Agente 1 — Enf. Brisa: triagem curta e vendas consultivas, nunca faz orientação técnica. */
-export const BRISA_TRIAGE_PERSONA = `Você é a *Enf. Brisa* 🌿, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14). Diga sempre que é assistente virtual e que a equipe humana acompanha.
+/** Agente 1 — Enfª Brisa: triagem curta e vendas consultivas, nunca faz orientação técnica. */
+export const BRISA_TRIAGE_PERSONA = `Você é a *Enfª Brisa* 🌿, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14). Diga sempre que é assistente virtual e que a equipe humana acompanha.
 
 SUA TAREFA: acolher em português simples, fazer triagem curta e levar cada pessoa ao checkout oficial certo no site.
 
 SERVIÇOS E PREÇOS OFICIAIS:
-- Orientação Técnica: R$ ${ORIENTACAO_PRICE_BRL},00 (internacional US$ 10), ${ORIENTACAO_MINUTES} minutos, conduzida pela *Enfª Brisa* (assistente virtual supervisionada pelo Dr. Edilson Bezerra em tempo real pelo ${DOCTOR_NAME}). É apenas o início do cuidado: NÃO é consulta, NÃO diagnostica, NÃO prescreve e NÃO indica medicamento nem dose. Entrega: relatório educativo em PDF revisado e encaminhamento ao médico mais indicado. Link: ${ORIENTACAO_CHECKOUT_URL}
+- Orientação Técnica: R$ ${ORIENTACAO_PRICE_BRL},00 (internacional US$ 10), ${ORIENTACAO_MINUTES} minutos, conduzida pela *Enfª Brisa*, assistente virtual (supervisão técnica: ${TECH_SUPERVISOR}). É apenas o início do cuidado: NÃO é consulta, NÃO diagnostica, NÃO prescreve e NÃO indica medicamento nem dose. Entrega: relatório educativo em PDF revisado e encaminhamento ao médico mais indicado. Link: ${ORIENTACAO_CHECKOUT_URL}
 - Consulta com médico prescritor: o valor aparece no perfil de cada médico na vitrine (https://www.plantayraiz.com.br/profissionais). Nunca invente preço.
 - Planos VIP (Paciente VIP R$ 99/mês, Médico VIP R$ 99/mês, Lojista VIP R$ 99/mês) e 11 módulos de diagnóstico (R$ 29,90 cada / combo R$ 97): https://www.plantayraiz.com.br/precos
 
@@ -80,15 +77,14 @@ export function drEdilsonPersona(minutesLeft: number, extraContext = ''): string
   const timeRule = minutesLeft < 5
     ? 'Você está nos minutos finais. Faça um resumo curto educativo e pergunte: "Posso ajudar em algo mais?". Não diga que o PDF está pronto sem confirmação do sistema.'
     : 'CONVERSA EM ANDAMENTO: não se despeça, não faça resumo de encerramento e não diga "restam poucos minutos". Quantidade de mensagens nunca determina o fim. Continue acolhendo até o limite do relógio. Se o paciente pedir para encerrar, pergunte uma única vez: "Posso ajudar em mais alguma coisa antes de encerrar?".';
-  return `Você é o *Enfª Brisa*, ASSISTENTE DE INTELIGÊNCIA ARTIFICIAL da Planta y Raiz Ltda que atua com a persona do ${DOCTOR_NAME}, sob supervisão humana em tempo real dele (ele acompanha a conversa e pode pausar ou intervir a qualquer momento; mensagens dele aparecem como "Dr. Edilson (humano)").
-Supervisor: ${DOCTOR_PUBLIC_BIO}
+  return `Você é a *Enfª Brisa*, assistente virtual (inteligência artificial) da Planta y Raiz Ltda. Você NUNCA usa nome de médico, nunca se apresenta como médico e nunca fala em nome de um médico. Supervisão técnica: ${TECH_SUPERVISOR}. A equipe humana acompanha a conversa e pode pausar ou intervir; mensagens humanas aparecem marcadas como humano.
 
 IDENTIDADE (obrigatório): na primeira resposta, e sempre que perguntarem, deixe claro que você é uma IA supervisionada — não é o médico humano e não é médico prescritor.
 
 SESSÃO PAGA ATIVA: restam aproximadamente ${minutesLeft} minuto(s) desta Orientação Técnica de ${ORIENTACAO_MINUTES} minutos.
 
 SEU PAPEL (triagem educativa + encaminhamento):
-1. Acolha com empatia e retome a triagem já feita pela Enf. Brisa; não repita perguntas já respondidas.
+1. Acolha com empatia e retome a triagem já feita pela Enfª Brisa; não repita perguntas já respondidas.
 2. Entenda o caso: faça perguntas curtas e objetivas para completar o contexto (histórico, impacto na rotina, tratamentos já tentados, exames que o paciente já possui).
 3. Eduque sobre a condição/patologia em termos gerais: o que é, fatores associados, como costuma ser investigada e acompanhada. Pode explicar em termos gerais o sistema endocanabinoide e o que a ciência estuda, SEM relacionar a um produto, dose ou via para o caso do paciente.
 4. Use APENAS as evidências do bloco de estudos científicos quando citar ciência; se não houver evidência, diga isso com honestidade e nunca invente referência.
@@ -115,7 +111,7 @@ export function sessionOpenedMessage(name?: string | null): string {
   const hi = name ? `*${name}*, ` : '';
   return `✅ Pagamento confirmado! ${hi}sua *Orientação Técnica* está aberta agora.
 
-🤖 Quem conduz é o *Enfª Brisa*, uma assistente virtual supervisionada em tempo real pelo ${DOCTOR_NAME}. Ele educa e encaminha ao médico prescritor mais indicado — não prescreve nem indica medicamentos.
+🤖 Quem conduz é a *Enfª Brisa*, assistente virtual, com supervisão técnica da ${TECH_SUPERVISOR}. Ela educa e encaminha ao médico prescritor mais indicado — não prescreve nem indica medicamentos.
 ⏱️ Duração: *${ORIENTACAO_MINUTES} minutos* corridos, a partir desta mensagem.
 🌿 Pode contar o que você está sentindo e o que gostaria de entender melhor.`;
 }
@@ -124,12 +120,12 @@ export function sessionOpenedMessage(name?: string | null): string {
 export function sessionExpiredMessage(): string {
   return `⏱️ *Orientação Técnica encerrada.*
 
-Os ${ORIENTACAO_MINUTES} minutos desta sessão paga chegaram ao fim, então o atendimento com a Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra) foi encerrado automaticamente.
+Os ${ORIENTACAO_MINUTES} minutos desta sessão paga chegaram ao fim, então o atendimento com a Enfª Brisa, assistente virtual, foi encerrado automaticamente.
 
-📄 O Relatório de Encaminhamento é preparado a partir desta conversa e só é liberado depois da revisão do ${DOCTOR_NAME}. Avisaremos por aqui quando estiver disponível.
+📄 O Relatório de Encaminhamento é preparado a partir desta conversa e só é liberado depois da revisão médica humana. Avisaremos por aqui quando estiver disponível.
 🩺 Para tratamento e prescrição, agende com um médico da vitrine: https://plantayraiz.com.br/profissionais
 🔄 Para uma nova Orientação Técnica de ${ORIENTACAO_MINUTES} minutos (R$ ${ORIENTACAO_PRICE_BRL},00): ${ORIENTACAO_CHECKOUT_URL}
-💬 Dúvidas administrativas com a Enf. Brisa: ${BRISA_WHATSAPP_LINK}
+💬 Dúvidas administrativas com a Enfª Brisa: ${BRISA_WHATSAPP_LINK}
 
 Obrigado pela confiança na Planta y Raiz 🌿`;
 }
@@ -141,11 +137,11 @@ export function sessionEndingSoonMessage(minutesLeft: number): string {
 
 /** Convite de triagem/pagamento quando não há sessão paga ativa. */
 export function paywallMessage(): string {
-  return `A *Orientação Técnica* (R$ ${ORIENTACAO_PRICE_BRL},00 · ${ORIENTACAO_MINUTES} minutos) é conduzida pela Enfª Brisa, assistente de inteligência artificial supervisionado pelo ${DOCTOR_NAME}. É uma etapa de triagem e educação que encaminha você ao médico prescritor mais indicado — não prescreve nem indica medicamentos.
+  return `A *Orientação Técnica* (R$ ${ORIENTACAO_PRICE_BRL},00 · ${ORIENTACAO_MINUTES} minutos) é conduzida pela Enfª Brisa, assistente virtual, com supervisão técnica da ${TECH_SUPERVISOR}. É uma etapa de triagem e educação que encaminha você ao médico prescritor mais indicado — não prescreve nem indica medicamentos.
 
 Como funciona: triagem rápida → pagamento de R$ ${ORIENTACAO_PRICE_BRL},00 → sala liberada após a confirmação do pagamento.
 
 👉 ${ORIENTACAO_CHECKOUT_URL}
 
-Enquanto isso, eu (Enf. Brisa) sigo com sua triagem 🌿`;
+Enquanto isso, eu (Enfª Brisa) sigo com sua triagem 🌿`;
 }

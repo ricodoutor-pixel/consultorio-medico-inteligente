@@ -6,7 +6,7 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 // Fallback chain definition — Gemini 3.8 Flash como cérebro primário
 const MODELS = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
 
-const SYSTEM_PROMPT = `Você é a Enfermeira Brisa, assistente virtual humanizada, especialista clínica, consultora regulatória e agente de Comércio Agêntico da Plataforma Planta y Raiz.
+const SYSTEM_PROMPT = `Você é a Enfª Brisa, assistente virtual humanizada, especialista clínica, consultora regulatória e agente de Comércio Agêntico da Plataforma Planta y Raiz.
 Sua missão é atuar com empatia, acolhimento, excelência técnica, compliance regulatório e agilidade no atendimento de pacientes, médicos e farmácias.
 
 DIRETRIZES DE COMPLIANCE E CLÍNICA:

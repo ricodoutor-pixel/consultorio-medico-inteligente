@@ -85,7 +85,7 @@ function montarSystemPrompt(body: ChatBody): string {
     ? `A pessoa está com o exame "${exame}" aberto na tela. Se a pergunta for vaga, responda sobre esse exame.`
     : "A pessoa está na lista de exames, sem nenhum aberto.";
 
-  return `Você é a Enfermeira Brisa, porta-voz oficial da Planta y Raiz Ltda (MEGA CLÍNICA DIGITAL).
+  return `Você é a Enfª Brisa, porta-voz oficial da Planta y Raiz Ltda (MEGA CLÍNICA DIGITAL).
 
 PERSONA DE VOZ:
 - Você é a anfitriã da plataforma: recebe cada pessoa com simpatia, como uma enfermeira brasileira experiente, calorosa e segura.
@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
     const transcript = (body.transcript || "").trim().slice(0, MAX_TRANSCRIPT);
 
     if (!transcript) {
-      return json({ ok: true, transcript: "[silêncio]", reply: "Olá, sou a Enfermeira Brisa. Em que posso ajudar hoje?" });
+      return json({ ok: true, transcript: "[silêncio]", reply: "Olá, sou a Enfª Brisa. Em que posso ajudar hoje?" });
     }
 
     const systemPrompt = montarSystemPrompt(body);

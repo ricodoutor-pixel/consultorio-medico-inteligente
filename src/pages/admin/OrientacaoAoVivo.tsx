@@ -179,7 +179,7 @@ export default function OrientacaoAoVivo() {
             </h1>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Supervisão clínica em tempo real das sessões da persona Enfª Brisa (CRM 10963 - Sta Cruz/BO).
+            Acompanhamento em tempo real das sessões da Enfª Brisa, assistente virtual (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)).
           </p>
         </div>
         <div className="flex items-center gap-2">

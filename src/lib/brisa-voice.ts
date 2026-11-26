@@ -1,7 +1,7 @@
 /**
  * 🎙️ Brisa Voice Engine — Síntese Vocal Estritamente Feminina
  *
- * Garante que a voz da Enfermeira Brisa seja 100% feminina em todas as plataformas
+ * Garante que a voz da Enfª Brisa seja 100% feminina em todas as plataformas
  * (Windows, Android, iOS, macOS, Edge, Chrome, Safari, Firefox).
  *
  * Elimina sumariamente vozes masculinas (Microsoft Daniel, Antonio, etc.) e aplica

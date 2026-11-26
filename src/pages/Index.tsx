@@ -280,7 +280,7 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={BrisaPhoto}
-                      alt="Enfª Brisa — assistente virtual supervisionada pelo Dr. Edilson Bezerra"
+                      alt="Enfª Brisa — assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues, CRM 49354/PR"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -337,7 +337,7 @@ const Index = () => {
                 <span className="text-gradient-green">Enfª Brisa</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Enfª Brisa</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (fundador da plataforma, medicina integrativa),<strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
+                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é a <strong>Enfª Brisa, assistente virtual</strong>, com <strong>supervisão técnica da Dra. Suelen Naves Rodrigues (CRM 49354/PR)</strong>. A equipe humana acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>

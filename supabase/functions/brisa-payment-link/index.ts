@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
       const guestPref = {
         items: [{
           title: "Orientação Técnica — Planta y Raiz",
-          description: "Orientação Técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório em PDF e encaminhamento clínico pela Planta y Raíz Ltda.",
+          description: "Orientação Técnica em Cannabis Medicinal com acompanhamento da Enfª Brisa, relatório em PDF e encaminhamento clínico pela Planta y Raíz Ltda.",
           quantity: 1,
           unit_price: 30.0,
           currency_id: "BRL",
@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
       const preference: any = {
         items: [{
           title: "Orientação Técnica — Planta y Raiz",
-          description: "Orientação Técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório em PDF e encaminhamento clínico pela Planta y Raíz Ltda.",
+          description: "Orientação Técnica em Cannabis Medicinal com acompanhamento da Enfª Brisa, relatório em PDF e encaminhamento clínico pela Planta y Raíz Ltda.",
           quantity: 1,
           unit_price: 30.0,
           currency_id: "BRL",

@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
       `Recebi sua solicitação do *Guia Completo de Cannabis Medicinal 2026*. ` +
       `Segue o PDF para download imediato:\n\n` +
       `📘 ${EBOOK_PDF_URL}\n\n` +
-      `✨ Bônus: você desbloqueou *acesso prioritário* à Orientação Técnica com a Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra; educativa, primeiro passo antes da consulta). ` +
+      `✨ Bônus: você desbloqueou *acesso prioritário* à Orientação Técnica com a Enfª Brisa (assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues, CRM 49354/PR; educativa, primeiro passo antes da consulta). ` +
       `Em 24h eu te envio um cupom especial. 💚\n\n` +
       `Qualquer dúvida sobre dosagem, receita ANVISA ou indicação, é só responder aqui.`;
 

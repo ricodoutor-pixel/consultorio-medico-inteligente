@@ -78,7 +78,7 @@ const EVERGREEN_CONTENT = [
   "💊 Formas farmacêuticas: Óleo sublingual, cápsulas, tópicos, vaporizadores. Qual indicar?",
   "🎯 Foco em resultados: Nosso sistema de follow-up automático garante adesão do paciente.",
   "🏆 Parabéns aos Top 10 do mês! Ranking atualizado em tempo real na plataforma.",
-  "📞 Suporte 24/7: Enfermeira Brisa disponível via WhatsApp para qualquer dúvida.",
+  "📞 Suporte 24/7: Enfª Brisa disponível via WhatsApp para qualquer dúvida.",
   "🌿 Cannabis e Oncologia: Evidências crescentes para manejo de náusea, dor e apetite.",
   "💡 Dica fiscal: Consultas por telemedicina têm o mesmo respaldo legal que presenciais.",
   "📊 Seu relatório semanal está disponível! Acesse o dashboard para ver seu desempenho.",

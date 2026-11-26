@@ -6,27 +6,27 @@ export const AUTO_POST_TOPICS = [
   "Telemedicina canabinoide 100% legalizada pela ANVISA — atendimento em vídeo de qualquer lugar do Brasil",
   "Importação ANVISA RDC 660/2022 com frete grátis e rastreamento — a Planta y Raiz cuida de tudo",
   "Marketplace de Cannabis Medicinal: produtos selecionados, com receita digital integrada",
-  "Orientação Técnica em vídeo por apenas R$ 30 (PIX) — acolhimento humanizado da Enfermeira Brisa 24h",
+  "Orientação Técnica em vídeo por apenas R$ 30 (PIX) — acolhimento humanizado da Enfª Brisa 24h",
   "Plano de assinatura Club Planta y Raiz: tratamento contínuo, descontos e acompanhamento clínico",
   "Para médicos: cadastre-se grátis, receba pacientes prontos, prescreva digitalmente com selo gov.br",
   "Para lojistas e parceiros: vitrine integrada, comissão automática, split Mercado Pago instantâneo",
   "Programa de afiliados em 3 gerações (25% / 15% / 10%) — ganhe indicando saúde",
   "Sistema endocanabinoide e bem-estar: ciência, evidência e acompanhamento personalizado",
   "Receita digital com assinatura ICP-Brasil e QR Code verificável — segurança total",
-  "Atendimento humanizado: a Enfermeira Brisa acolhe você por WhatsApp em minutos",
+  "Atendimento humanizado: a Enfª Brisa acolhe você por WhatsApp em minutos",
   "Saúde acessível: PIX, cartão e cripto — o Brasil inteiro tratando com Cannabis Medicinal",
   "Programa de fidelidade Planta-Coins: cada interação vira benefício real",
   "Plataforma omnichannel: WhatsApp, Instagram, Messenger, web — onde você estiver, a gente atende",
 ];
 
-export const AUTO_POST_SYSTEM_PROMPT = `Você é a Enfermeira Brisa, voz oficial da Planta y Raiz — a maior plataforma digital de Cannabis Medicinal do Brasil.
+export const AUTO_POST_SYSTEM_PROMPT = `Você é a Enfª Brisa, voz oficial da Planta y Raiz — a maior plataforma digital de Cannabis Medicinal do Brasil.
 
 REGRAS RÍGIDAS DE CONTEÚDO:
 - NUNCA mencione nomes de médicos, "Dr." ou "Dra." específicos, números de CRM, nem destaque profissional individual.
 - Foque SEMPRE nas vantagens da plataforma para todos: pacientes, médicos cadastrados, lojistas, afiliados, parceiros e usuários em geral.
-- Destaque: tecnologia, ANVISA RDC 660/2022, atendimento 24h da Enf. Brisa, marketplace, programa de afiliados, frete grátis, PIX, segurança ICP-Brasil.
+- Destaque: tecnologia, ANVISA RDC 660/2022, atendimento 24h da Enfª Brisa, marketplace, programa de afiliados, frete grátis, PIX, segurança ICP-Brasil.
 - Tom: acolhedor, científico, profissional, inclusivo.
-- Sempre encerrar com o link plantayraiz.com.br e WhatsApp da Enf. Brisa (11) 99136-3154.
+- Sempre encerrar com o link plantayraiz.com.br e WhatsApp da Enfª Brisa (11) 99136-3154.
 - Hashtags relevantes ao tema (8-12 para Instagram, 3-5 para Facebook).
 - Emojis sutis (🌿 💚 🤍 ✨).
 - Nunca prometa cura. Nunca cite paciente real. LGPD sempre.`;

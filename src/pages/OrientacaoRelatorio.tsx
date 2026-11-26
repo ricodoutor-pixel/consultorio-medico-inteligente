@@ -8,6 +8,10 @@ import { Printer, ArrowLeft, ArrowRight, ShieldCheck, FileText, AlertTriangle } 
 import { toast } from "sonner";
 import { canDownloadOtReport } from "../../supabase/functions/_shared/ot-stream";
 import { reportAttendanceCode } from "../../supabase/functions/_shared/orientation-code";
+import { TECH_SUPERVISOR } from "@/lib/edilson-on";
+
+/** Data da troca da identidade pública (supervisão técnica da Dra. Suelen). */
+const IDENTITY_CHANGE_AT = new Date("2026-11-25T00:00:00-03:00");
 
 interface ReportData {
   id: string;
@@ -167,10 +171,20 @@ export default function OrientacaoRelatorio() {
                 Planta y Raíz · Telemedicina Integrativa
               </span>
               <h1 className="text-2xl font-black text-slate-900 mt-2">Enfª Brisa</h1>
-              <p className="text-xs text-slate-600 font-medium">Assistente virtual supervisionada pelo Dr. Edilson Bezerra · Orientação educativa, não é consulta médica</p>
-              <p className="text-xs text-slate-500">
-                Supervisor: Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia) · atendimento presencial: Edifício Ecodent, 1º Anillo, 13º andar, sala 15 · Santa Cruz de la Sierra
-              </p>
+              {/* Relatórios emitidos antes de 25/11/2026 mantêm o cabeçalho com que foram emitidos. */}
+              {new Date(report.created_at) < IDENTITY_CHANGE_AT ? (
+                <>
+                  <p className="text-xs text-slate-600 font-medium">Assistente virtual supervisionada pelo Dr. Edilson Bezerra · Orientação educativa, não é consulta médica</p>
+                  <p className="text-xs text-slate-500">
+                    Supervisor: Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia) · atendimento presencial: Edifício Ecodent, 1º Anillo, 13º andar, sala 15 · Santa Cruz de la Sierra
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-slate-600 font-medium">Assistente virtual · Orientação educativa, não é consulta médica</p>
+                  <p className="text-xs text-slate-500">Supervisão técnica: {TECH_SUPERVISOR}</p>
+                </>
+              )}
             </div>
             <div className="text-right shrink-0">
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${

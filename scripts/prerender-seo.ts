@@ -236,7 +236,7 @@ const DOCTOR_PAGES: DoctorSEOItem[] = [
   { id: "med-luiz-medina", name: "Prof. Dr. Luiz Roberto Medina dos Santos", crm: "CRM 11496/SC", category: "Médico Prescritor", specialty: "Cirurgia de Cabeça e Pescoço e SBEC", bio: "Doutorado pela FMUSP, membro da SBEC e referência nacional." },
   { id: "med-adeonis-oliveira", name: "Dr. Adeonis Oliveira Lima", crm: "CRM 9060/SE", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Médico prescritor de cannabis medicinal." },
   { id: "med-alexandre-stramandinoli", name: "Dr. Alexandre Stramandinoli Correa da Silva", crm: "CRM 17266/PB", category: "Médico Prescritor", specialty: "Cirurgia e Medicina Canabinoide", bio: "Atuação médica com condutas baseadas em evidências científicas." },
-  { id: "med-0", name: "Dr. Edilson Bezerra", crm: "CRM 10963 - Sta Cruz (BO)", category: "Médico Prescritor", specialty: "Farmacologia e Cannabis Medicinal", bio: "Fundador e diretor técnico com foco na democratização do acesso a canabinoides." },
+  { id: "med-0", name: "Dr. Edilson Bezerra", crm: "Registro médico 10963 (Bolívia)", category: "Fundador", specialty: "Medicina integrativa", bio: "Médico com mais de 10 anos de experiência em medicina integrativa, CEO e fundador da Planta y Raiz." },
   { id: "med-guilherme-campos", name: "Dr. Guilherme Campos Silva", crm: "CRM 49694/PR", category: "Médico Prescritor", specialty: "Medicina Física e Reabilitação", bio: "RQE em Fisiatria, reabilitação neuromotora e manejo da dor crônica." },
   { id: "med-gustavo-simoes", name: "Dr. Gustavo Simoes Llivi Ibanez", crm: "CRM 7684/RO", category: "Médico Prescritor", specialty: "Medicina Canabinoide", bio: "Médico prescritor dedicado à clínica médica e dor." },
   { id: "med-jose-roberto", name: "Dr. José Roberto Silva Coutinho", crm: "CRM 5266864-8/RJ", category: "Médico Prescritor", specialty: "Cardiologia e Medicina Canabinoide", bio: "Especialista em Cardiologia e modulação do sistema cardiovascular e dor." },
@@ -328,7 +328,7 @@ const STATIC_PAGES: StaticPage[] = [
     description: "Telemedicina especializada em Cannabis Medicinal 100% online. Consulta com Dra. Suelen Naves Rodrigues (CRM-PR 49354) por videochamada criptografada, prescrição digital e suporte ANVISA.",
     h1: "Telemedicina de Cannabis Medicinal — 100% Online",
     intro: [
-      "Atendimento por videochamada segura (Jitsi WebRTC) com Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva — CRM-SP 10963.",
+      "Atendimento por videochamada segura (Jitsi WebRTC) com médicos habilitados; supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR).",
       "Prescrição digital com assinatura ICP-Brasil e selo gov.br, válida em farmácias e para importação ANVISA.",
       "Disponível em todo o Brasil — São Paulo, Rio de Janeiro, Brasília, Belo Horizonte, Salvador, Curitiba, Porto Alegre, Recife, Fortaleza e demais capitais.",
     ],
@@ -336,7 +336,7 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/profissionais",
     title: "Médicos Prescritores de Cannabis Medicinal | Planta y Raiz",
-    description: "Conheça os médicos prescritores da Planta y Raiz — especialistas em Cannabis Medicinal regulamentados pela ANVISA e CFM. Dra. Suelen Naves Rodrigues (CRM-PR 49354) CRM 10963 e equipe.",
+    description: "Conheça os médicos prescritores da Planta y Raiz — especialistas em Cannabis Medicinal regulamentados pela ANVISA e CFM. Supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR).",
     h1: "Médicos Prescritores de Cannabis Medicinal",
     intro: [
       "Equipe médica especializada em Cannabis Medicinal, treinada na RDC 660/2022 e RDC 327/2019 da ANVISA.",

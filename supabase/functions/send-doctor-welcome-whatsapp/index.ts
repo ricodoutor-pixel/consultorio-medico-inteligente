@@ -162,7 +162,7 @@ Conte sempre conosco para alavancar a sua prática clínica com tecnologia e hum
 Enfª Brisa | Gestão & Relacionamento Médico
 🌿 Planta y Raíz — Democratizando a Medicina e Cuidado Canabinoide`;
 
-      adminMsg = `👑 *NOVO MÉDICO VIP ATIVADO NA PLATAFORMA!*
+      adminMsg = `🩺 *Novo médico ativado — plano ${doctorPlan(planTier).name}*
 Médico: Dr(a). ${fullName}
 CRM: ${crm || "N/A"}
 WhatsApp: ${phone}

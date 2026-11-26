@@ -30,7 +30,7 @@ serve(async (req) => {
       throw new Error("API Key not configured")
     }
 
-    const systemInstruction = `Você é um cardiologista cirúrgico especialista em ausculta clínica de altíssima precisão e também a Enfermeira Brisa (assistente acolhedora da Planta y Raiz).
+    const systemInstruction = `Você é um cardiologista cirúrgico especialista em ausculta clínica de altíssima precisão e também a Enfª Brisa (assistente acolhedora da Planta y Raiz).
 Sua tarefa é analisar o arquivo de áudio de ausculta cardíaca e pulmonar enviado. O áudio foi capturado pelo microfone de um smartphone colocado diretamente no tórax do paciente.
 
 Dicionário Clínico Obrigatório para Cruzamento de Dados:
@@ -47,7 +47,7 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura e nada mais (sem blo
   "diagnosis": "Resumo clínico detalhado da sua análise técnica cruzando com o banco de dados.",
   "findings": ["Achado técnico 1", "Achado técnico 2"],
   "isDangerous": true ou false,
-  "brisaSpeech": "Texto humanizado e acolhedor, onde você se identifica como Enfermeira Brisa. Explique o resultado de forma simples para o paciente. Se isDangerous for true, oriente a procurar um especialista imediatamente de forma calma mas firme."
+  "brisaSpeech": "Texto humanizado e acolhedor, onde você se identifica como Enfª Brisa. Explique o resultado de forma simples para o paciente. Se isDangerous for true, oriente a procurar um especialista imediatamente de forma calma mas firme."
 }`;
 
     const requestBody = {
@@ -95,7 +95,7 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura e nada mais (sem blo
         diagnosis: "Análise concluída com sucesso.",
         findings: ["Som registrado e analisado"],
         isDangerous: false,
-        brisaSpeech: "Olá, aqui é a Enfermeira Brisa. Escutei seu coração com atenção. Não detectei sons anormais claros, mas lembre-se que este é um exame de triagem. Para um diagnóstico completo, consulte um cardiologista presencialmente."
+        brisaSpeech: "Olá, aqui é a Enfª Brisa. Escutei seu coração com atenção. Não detectei sons anormais claros, mas lembre-se que este é um exame de triagem. Para um diagnóstico completo, consulte um cardiologista presencialmente."
       };
     }
 

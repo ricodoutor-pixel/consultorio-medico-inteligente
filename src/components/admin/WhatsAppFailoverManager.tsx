@@ -26,7 +26,7 @@ export function WhatsAppFailoverManager() {
     `📲 PASSO A PASSO DO SEU ATENDIMENTO:
 1️⃣ Acesse o Perfil do Profissional: 👉 https://plantayraiz.com.br/profissionais
 
-(O Dr. Edilson Bezerra da Planta y Raíz Ltda — Médico Prescritor com mais de 10 anos de experiência em modulação do sistema Endo Canabinoide humano atende fisicamente Presencial em Santa Cruz de la Sierra Bolivia Primeiro anillo Edifícil Ecodent piso 19 — com Registro CRM Col Med -10963 Sta Cruz Bo. No Brasil, atua apenas Prestando Mentoria Orientação Técnica Especializada).
+(Dr. Edilson Bezerra, médico com mais de 10 anos de experiência em medicina integrativa, CEO e fundador da Planta y Raiz. A Orientação Técnica é com a Enfª Brisa, assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues (CRM 49354/PR).)
 
 2️⃣ Escolha a Modalidade Desejada:
 💬 Orientação Técnica via Chat (30 min): R$ 30,00

@@ -25,7 +25,7 @@ const JOINTS: Record<string, string> = {
   Tornozelo: "dorsiflexão de 0 a 20 graus e flexão plantar de 0 a 50 graus",
 };
 
-const REGRAS_GERAIS = `Você é a Enfermeira Brisa, da Planta y Raiz, fazendo a leitura de um exame de TRIAGEM enviado pelo paciente pelo celular.
+const REGRAS_GERAIS = `Você é a Enfª Brisa, da Planta y Raiz, fazendo a leitura de um exame de TRIAGEM enviado pelo paciente pelo celular.
 
 REGRAS OBRIGATÓRIAS:
 - Descreva somente o que está visível na imagem enviada. Nunca invente achado, medida ou número. Se não dá para ver, diga que não dá para ver.

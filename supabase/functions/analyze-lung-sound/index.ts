@@ -30,7 +30,7 @@ serve(async (req) => {
       throw new Error("API Key not configured")
     }
 
-    const systemInstruction = `Você é um pneumologista clínico especialista em ausculta pulmonar de altíssima precisão e também a Enfermeira Brisa (assistente acolhedora da Planta y Raiz).
+    const systemInstruction = `Você é um pneumologista clínico especialista em ausculta pulmonar de altíssima precisão e também a Enfª Brisa (assistente acolhedora da Planta y Raiz).
 Sua tarefa é analisar o arquivo de áudio de ausculta pulmonar enviado. O áudio foi capturado pelo microfone de um smartphone colocado diretamente no tórax do paciente (face posterior ou anterior). O paciente pode estar respirando profundamente ou repetindo "trinta e três".
 
 Dicionário Clínico Obrigatório para Cruzamento de Dados:
@@ -46,7 +46,7 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura e nada mais (sem blo
   "diagnosis": "Resumo clínico detalhado da sua análise técnica cruzando com o banco de dados.",
   "findings": ["Achado técnico 1", "Achado técnico 2"],
   "isDangerous": true ou false,
-  "brisaSpeech": "Texto humanizado e acolhedor, onde você se identifica como Enfermeira Brisa. Explique o resultado de forma simples para o paciente. Se isDangerous for true, oriente a procurar um pneumologista ou PS imediatamente de forma calma mas firme."
+  "brisaSpeech": "Texto humanizado e acolhedor, onde você se identifica como Enfª Brisa. Explique o resultado de forma simples para o paciente. Se isDangerous for true, oriente a procurar um pneumologista ou PS imediatamente de forma calma mas firme."
 }`;
 
     const requestBody = {
@@ -94,7 +94,7 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura e nada mais (sem blo
         diagnosis: "Análise concluída com sucesso.",
         findings: ["Som registrado e analisado"],
         isDangerous: false,
-        brisaSpeech: "Olá, aqui é a Enfermeira Brisa. Escutei seus pulmões com atenção. Não detectei sons anormais claros, mas lembre-se que este é um exame de triagem. Para um diagnóstico completo, consulte um pneumologista presencialmente."
+        brisaSpeech: "Olá, aqui é a Enfª Brisa. Escutei seus pulmões com atenção. Não detectei sons anormais claros, mas lembre-se que este é um exame de triagem. Para um diagnóstico completo, consulte um pneumologista presencialmente."
       };
     }
 

@@ -92,7 +92,7 @@ export interface PatientRecord {
   referred_by_name?: string;
   friends_referred_count: number;
   
-  // Enfermeira Brisa
+  // Enfª Brisa
   brisa_interactions_count: number;
   brisa_last_contact?: string;
   brisa_triage_completed: boolean;
@@ -144,7 +144,7 @@ export const TEST_PATIENT_DATA: PatientRecord = {
   referred_by_name: "Dra. Suelen Naves Rodrigues",
   friends_referred_count: 2,
   
-  // Enf. Brisa
+  // Enfª Brisa
   brisa_interactions_count: 7,
   brisa_last_contact: "Hoje, 14:15",
   brisa_triage_completed: true,

@@ -57,7 +57,7 @@ serve(async (req) => {
 
             <h3 style="color: #059669;">O Fluxo de Atendimento na Plataforma</h3>
             <ul style="padding-left: 20px;">
-              <li><strong>Recepção Acolhedora:</strong> O paciente inicia o contato diretamente pelo WhatsApp com a Enfermeira Brisa, sendo recebido de forma humanizada e ágil.</li>
+              <li><strong>Recepção Acolhedora:</strong> O paciente inicia o contato diretamente pelo WhatsApp com a Enfª Brisa, sendo recebido de forma humanizada e ágil.</li>
               <li><strong>Triagem Automatizada:</strong> Coletamos o histórico de saúde preliminar, queixas principais e exames prévios para que você receba o caso clínico já organizado antes da teleconsulta.</li>
               <li><strong>Pagamento Seguro:</strong> O processamento financeiro é transparente e pré-pago, garantindo a liquidação do valor antes do agendamento final.</li>
               <li><strong>Atendimento Clínico Completo:</strong> A teleconsulta ocorre em ambiente criptografado de alta estabilidade, integrado diretamente ao prontuário eletrônico e às ferramentas de emissão de receituários digitais.</li>

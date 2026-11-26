@@ -57,7 +57,7 @@ ${isDoctor ? `ORIENTAÇÃO A MÉDICOS:
 - Nunca discuta conduta clínica de um paciente específico sem que o médico acesse o prontuário.` : `ORIENTAÇÃO A PACIENTES:
 - Acolha, faça triagem breve dos sintomas e explique as modalidades: Orientação Técnica R$ 30, Consulta por Chat R$ 100, Consulta por Vídeo R$ 150, Retorno R$ 90. Não existe consulta de emergência paga: em sinais de alarme, oriente o SAMU (192) ou o pronto-socorro.
 - Todos os pagamentos da plataforma são processados pelo Mercado Pago (PIX, cartão ou boleto).
-- Médicos disponíveis: consulte a vitrine em https://plantayraiz.com.br/profissionais. A Orientação Técnica (educativa, primeiro passo) é feita pela Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra, registro médico nº 10963 – Bolívia).
+- Médicos disponíveis: consulte a vitrine em https://plantayraiz.com.br/profissionais. A Orientação Técnica (educativa, primeiro passo) é feita pela Enfª Brisa (assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues, CRM 49354/PR).
 - Em sinais de emergência real, oriente procurar pronto-socorro imediatamente.`}
 
 COMPLIANCE OBRIGATÓRIO:
@@ -142,7 +142,7 @@ COMPLIANCE OBRIGATÓRIO:
       } else if (/orienta[çc][ãa]o/i.test(lastUserMsg)) {
         reply = "A Orientação Técnica custa R$ 30 e é o início do cuidado, com triagem e educação em saúde conduzida pela Enfª Brisa em plantayraiz.com.br/orientacao-tecnica.";
       } else {
-        reply = "Olá! Sou a Enfermeira Brisa da Planta y Raiz. Posso te orientar sobre o cadastro gratuito, nossos 11 exames de triagem pelo celular, a Orientação Técnica a R$ 30 ou o agendamento de consultas médicas. Como posso te ajudar hoje?";
+        reply = "Olá! Sou a Enfª Brisa da Planta y Raiz. Posso te orientar sobre o cadastro gratuito, nossos 11 exames de triagem pelo celular, a Orientação Técnica a R$ 30 ou o agendamento de consultas médicas. Como posso te ajudar hoje?";
       }
     }
 
@@ -151,7 +151,7 @@ COMPLIANCE OBRIGATÓRIO:
   } catch (error: any) {
     console.error("Erro na função brisa-web-chat:", error);
     return new Response(JSON.stringify({ 
-      text: "Olá! Sou a Enfermeira Brisa da Planta y Raiz. Estou à disposição para orientar sobre exames, cadastro ou agendamento de teleconsultas. Como posso te acolher hoje?" 
+      text: "Olá! Sou a Enfª Brisa da Planta y Raiz. Estou à disposição para orientar sobre exames, cadastro ou agendamento de teleconsultas. Como posso te acolher hoje?" 
     }), { headers: { ...cors, "Content-Type": "application/json" } });
   }
 });

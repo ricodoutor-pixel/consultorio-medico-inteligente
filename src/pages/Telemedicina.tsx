@@ -1087,7 +1087,7 @@ const Telemedicina = () => {
                     Triagem Clínica & Educação em Saúde
                   </Badge>
                   <Badge variant="outline" className="border-primary/40 text-primary font-bold text-xs">
-                    ⚕️ Supervisão: registro médico nº 10963 (Bolívia)
+                    ⚕️ Supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)
                   </Badge>
                   <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 font-bold text-xs">
                     📚 Evidências Publicadas (PubMed)
@@ -1100,7 +1100,7 @@ const Telemedicina = () => {
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
                   Modalidade institucional desenvolvida para <strong>filtrar pacientes reais versus curiosos</strong>,
                   compreender profundamente o histórico de cada caso e educar sobre a terapêutica canabinoide
-                  antes da consulta médica formal. Conduzida pelo <strong>Enfª Brisa</strong>, uma assistente virtual, sob <strong>supervisão humana em tempo real</strong> do médico Dr. Edilson Bezerra (registro médico nº 10963, Bolívia; atendimento presencial no Edifício Ecodent, 1º Anillo, 13º andar, sala 15, Santa Cruz de la Sierra).
+                  antes da consulta médica formal. Conduzida pela <strong>Enfª Brisa</strong>, assistente virtual, com <strong>supervisão técnica da Dra. Suelen Naves Rodrigues (CRM 49354/PR)</strong>.
                 </p>
               </div>
             </div>

@@ -816,7 +816,7 @@ async function upsertLeadToSupabase(remoteJid, senderName, role = 'unknown', sta
   } catch (e) {}
 }
 
-async function logMessageToSupabase(remoteJid, messageText, direction = 'out', senderName = 'Enfermeira Brisa') {
+async function logMessageToSupabase(remoteJid, messageText, direction = 'out', senderName = 'Enfª Brisa') {
   try {
     const adminSupa = await getAdminSupabase();
     if (!adminSupa) return;
@@ -1322,7 +1322,7 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
 
   // 2. Prazo oficial e início de atendimentos (Diretriz Oficial: "Em até 24 a 48 horas úteis")
   if (q.includes('quando posso atender') || q.includes('quando começo') || q.includes('quando comeco') || q.includes('quanto tempo demora') || q.includes('prazo de aprova') || q.includes('prazo para aprova') || q.includes('libera a agenda') || q.includes('quando posso começar')) {
-    return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., a equipe humana acompanha). 🌿\n\nA conferência humana dos documentos e ativação do consultório leva *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}* após envio dos 4 itens (CRM ativo, comprovante de endereço, diploma/RQE e chave PIX). Pode enviar pendências por aqui mesmo.`;
+    return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., a equipe humana acompanha). 🌿\n\nA conferência humana dos documentos e ativação do consultório leva *${BRISA_CONFIG.PRAZO_APROVACAO.textoOficial}* após envio dos 4 itens (CRM ativo, comprovante de endereço, diploma/RQE e chave PIX). Pode enviar pendências por aqui mesmo.`;
   }
 
   // Agradecimento educado (NUNCA disparar SAMU para médicos)
@@ -1333,14 +1333,14 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
   // Dúvidas de credenciamento: "como seria?", "como funciona?", "qual a proposta?", "o que é?"
   if (q.includes('como seria') || q.includes('como funciona') || q.includes('qual a proposta') || q.includes('qual o objetivo') || q.includes('do que se trata') || q.includes('o que e') || q.includes('o que é') || q.includes('me explica') || q.includes('explicar')) {
     if (doctorObj && doctorObj.is_approved_by_admin !== false && doctorObj.crm) {
-      return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Seu perfil já está na base! Acesse seu consultório (prontuário CFM, ferramentas de IA e repasse de 93% via PIX) em https://www.plantayraiz.com.br/consultorio. Como posso ajudar?`;
+      return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Seu perfil já está na base! Acesse seu consultório (prontuário CFM, ferramentas de IA e repasse de 93% via PIX) em https://www.plantayraiz.com.br/consultorio. Como posso ajudar?`;
     }
-    return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14 — a equipe humana acompanha). 🌿\n\nPara profissionais com registro ativo em conselho: cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional, plano Médico VIP opcional de R$ 99/mês (prioridade na fila e ferramentas de IA) e repasse de 93% de cada consulta via PIX (taxa fixa de 7%). Quer iniciar o cadastro?`;
+    return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14 — a equipe humana acompanha). 🌿\n\nPara profissionais com registro ativo em conselho: cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional, plano Médico VIP opcional de R$ 99/mês (prioridade na fila e ferramentas de IA) e repasse de 93% de cada consulta via PIX (taxa fixa de 7%). Quer iniciar o cadastro?`;
   }
 
   // Dificuldade no cadastro no site
   if (q.includes('dificuldade') || q.includes('travou') || q.includes('nao consigo cadastrar') || q.includes('não consigo cadastrar') || q.includes('erro no cadastro') || q.includes('erro no site')) {
-    return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Você pode fazer o cadastro em https://www.plantayraiz.com.br/cadastro-profissional ou enviar fotos da cédula do conselho e comprovante de endereço por aqui para nossa equipe anexar. Em qual etapa travou?`;
+    return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Você pode fazer o cadastro em https://www.plantayraiz.com.br/cadastro-profissional ou enviar fotos da cédula do conselho e comprovante de endereço por aqui para nossa equipe anexar. Em qual etapa travou?`;
   }
 
   // Já enviou dados no site
@@ -1363,7 +1363,7 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
 
   // Dúvidas sobre a Orientação Técnica (FAQ oficial para médicos)
   if (/orienta[cç][aã]o\s*t[eé]cnica|orientacao/i.test(q)) {
-    return `${hi} A Orientação Técnica (R$ 30) é uma triagem educativa inicial conduzida pelo Dr. Edilson Bezerra ON (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). Ela não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais adequado para a consulta real.`;
+    return `${hi} A Orientação Técnica (R$ 30) é uma triagem educativa inicial com a Enfª Brisa, assistente virtual (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)). Ela não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais adequado para a consulta real.`;
   }
 
   // Dúvidas sobre valores, repasse e honorários médicos (Decisão 19/11/2026: 93% de repasse, taxa fixa 7%)
@@ -1388,14 +1388,14 @@ function getPharmacySpecializedAnswer(question, senderName) {
   }
 
   if (q.includes('produto') || q.includes('catalogo') || q.includes('catálogo') || q.includes('vender') || q.includes('cadastro') || q.includes('estoque') || q.includes('fornecedor')) {
-    return `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., a equipe humana acompanha). 🌿\n\nPara lojistas e farmácias parceiras: plano Lojista VIP por R$ 99/mês (até 10 produtos e destaque nas recomendações IA; taxa padrão de 5% do marketplace — repasse de 95%) em https://www.plantayraiz.com.br/precos e cadastro em https://www.plantayraiz.com.br/cadastro-farmacia. Qual loja ou farmácia você representa?`;
+    return `Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., a equipe humana acompanha). 🌿\n\nPara lojistas e farmácias parceiras: plano Lojista VIP por R$ 99/mês (até 10 produtos e destaque nas recomendações IA; taxa padrão de 5% do marketplace — repasse de 95%) em https://www.plantayraiz.com.br/precos e cadastro em https://www.plantayraiz.com.br/cadastro-farmacia. Qual loja ou farmácia você representa?`;
   }
 
   if (q.includes('receita') || q.includes('dispens') || q.includes('anvisa') || q.includes('validade') || q.includes('crf')) {
-    return `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz. As receitas digitais emitidas pelos médicos credenciados contam com assinatura ICP-Brasil/Gov.br e verificação conforme CFM e ANVISA. Para cadastrar sua farmácia, acesse https://www.plantayraiz.com.br/cadastro-farmacia.`;
+    return `Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz. As receitas digitais emitidas pelos médicos credenciados contam com assinatura ICP-Brasil/Gov.br e verificação conforme CFM e ANVISA. Para cadastrar sua farmácia, acesse https://www.plantayraiz.com.br/cadastro-farmacia.`;
   }
 
-  return `Olá! Sou a Enf. Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., equipe humana acompanha). Para farmácias e lojistas, temos o plano Lojista VIP (R$ 99/mês, taxa padrão de 5%) em https://www.plantayraiz.com.br/precos e cadastro em https://www.plantayraiz.com.br/cadastro-farmacia. Como posso ajudar?`;
+  return `Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., equipe humana acompanha). Para farmácias e lojistas, temos o plano Lojista VIP (R$ 99/mês, taxa padrão de 5%) em https://www.plantayraiz.com.br/precos e cadastro em https://www.plantayraiz.com.br/cadastro-farmacia. Como posso ajudar?`;
 }
 
 // 🌿 RESPOSTAS CONSULTIVAS PARA PACIENTES (Treinamento de Vendas — 19/11/2026)
@@ -1462,7 +1462,7 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
 
   // 5b. Se pediu Orientação Técnica
   if (/orienta[cç][aã]o|triagem|edilson|30\s*reais|r\$\s*30/i.test(q)) {
-    return `${greeting} A Orientação Técnica custa R$ 30 (internacional US$ 10) e é conduzida pelo Dr. Edilson Bezerra ON (IA supervisionada pelo Dr. Edilson Bezerra, registro médico boliviano 10963, 1º Anillo, Santa Cruz de la Sierra). É educativa — não é consulta nem prescreve — e entrega relatório em PDF + encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica`;
+    return `${greeting} A Orientação Técnica custa R$ 30 (internacional US$ 10) e é feita com a Enfª Brisa, assistente virtual (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)). É educativa — não é consulta nem prescreve — e entrega relatório em PDF + encaminhamento ao médico ideal: https://www.plantayraiz.com.br/orientacao-tecnica`;
   }
 
   // 5c. Se pediu Consulta ou Agendamento
@@ -1497,7 +1497,7 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
 function getUnknownAudienceGreeting(senderName) {
   const cleanName = sanitizePatientName(senderName);
   const hi = cleanName ? `Olá, ${cleanName}!` : 'Olá!';
-  return `${hi} Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). O que te trouxe até a Planta y Raiz hoje?`;
+  return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). O que te trouxe até a Planta y Raiz hoje?`;
 }
 
 async function askBrisaGemini(question, senderName, audience, recipient) {
@@ -1586,7 +1586,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
           reply = apiReply;
         } else if (isDegraded) {
           log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro consultivo.`);
-          reply = `Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou ver os médicos disponíveis em https://www.plantayraiz.com.br/profissionais. O que faz mais sentido para você?`;
+          reply = `Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou ver os médicos disponíveis em https://www.plantayraiz.com.br/profissionais. O que faz mais sentido para você?`;
         }
       }
     } catch (e) {
@@ -1604,7 +1604,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     if (role === 'doctor') {
       reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
     } else {
-      reply = `Sou a Enf. Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou escolher um médico em https://www.plantayraiz.com.br/profissionais. O que prefere?`;
+      reply = `Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou escolher um médico em https://www.plantayraiz.com.br/profissionais. O que prefere?`;
     }
   }
 

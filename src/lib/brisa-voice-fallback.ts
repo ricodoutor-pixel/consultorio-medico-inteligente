@@ -21,7 +21,7 @@ EXAMES DA PÁGINA (11, de triagem, pelo celular; os lidos por inteligência arti
 
 A PLATAFORMA:
 - Cadastro gratuito, em menos de um minuto, para paciente, médico ou parceiro. Quando a pessoa pede cadastro, consulta, orientação, aplicativo ou planos, o botão com o link aparece na tela logo abaixo da sua resposta: diga isso, sem ditar endereço de site. Se ela não disser quem é, pergunte se é paciente, médico ou parceiro.
-- Orientação Técnica: 30 reais no Pix, conversa educativa com a Enfª Brisa, que é uma assistente virtual supervisionada pelo Dr. Edilson Bezerra. É só o início do cuidado: não é consulta, não diagnostica e não prescreve.
+- Orientação Técnica: 30 reais no Pix, conversa educativa com a Enfª Brisa, que é uma assistente virtual, com supervisão técnica da Dra. Suelen Naves Rodrigues, CRM 49354/PR. É só o início do cuidado: não é consulta, não diagnostica e não prescreve.
 - Consulta médica: chat 100 reais, vídeo 150 reais, retorno 90 reais. O paciente escolhe o médico na página Profissionais, paga, responde a uma triagem e entra na sala. Só o médico prescreve.
 - Convide ao cadastro gratuito com simpatia, em uma frase, sem insistir.
 - Dor no peito, falta de ar forte ou outro sinal grave: oriente pronto-socorro ou SAMU 192.`;
@@ -151,14 +151,14 @@ export function getBrisaRepertoireAnswer(question: string, activeExam?: string):
     return "Para dores crônicas ou crises articulares, evite forçar a região dolorida, faça repouso e aplique compressas mornas. Uma teleconsulta com nossos médicos especialistas em controle da dor pode indicar a melhor abordagem terapêutica para o seu caso.";
   }
 
-  // 21. Quem é a Enfermeira Brisa
+  // 21. Quem é a Enfª Brisa
   if (/quem [eé] voc[eê]|brisa|voc[eê] [eé] m[eé]dica|rob[oô]/i.test(q)) {
-    return "Eu sou a Enfermeira Brisa, porta-voz e assistente virtual de saúde da Planta y Raiz. Estou aqui para te acolher, explicar como fazer os exames de triagem, tirar dúvidas sobre a plataforma e te ajudar a encontrar o melhor caminho para o seu cuidado médico.";
+    return "Eu sou a Enfª Brisa, porta-voz e assistente virtual de saúde da Planta y Raiz. Estou aqui para te acolher, explicar como fazer os exames de triagem, tirar dúvidas sobre a plataforma e te ajudar a encontrar o melhor caminho para o seu cuidado médico.";
   }
 
   // 22. Saudações
   if (/^(oi|ol[aá]|bom dia|boa tarde|boa noite|ol[aá] brisa|oi brisa|tudo bem)\b/i.test(q)) {
-    return "Olá! Seja muito bem-vindo à Central de Monitoramento de Saúde da Planta y Raiz. Eu sou a Enfermeira Brisa e estou aqui para te acompanhar. Em que posso te orientar hoje?";
+    return "Olá! Seja muito bem-vindo à Central de Monitoramento de Saúde da Planta y Raiz. Eu sou a Enfª Brisa e estou aqui para te acompanhar. Em que posso te orientar hoje?";
   }
 
   // 23. Agradecimentos

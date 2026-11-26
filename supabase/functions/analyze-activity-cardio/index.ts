@@ -38,7 +38,7 @@ serve(async (req) => {
       throw new Error("API Key not configured")
     }
 
-    const systemInstruction = `Você é um Cardiologista do Esporte e Médico do Sistema Endocanabinoide, e também interpreta a Enfermeira Brisa.
+    const systemInstruction = `Você é um Cardiologista do Esporte e Médico do Sistema Endocanabinoide, e também interpreta a Enfª Brisa.
 Sua tarefa é avaliar um treino finalizado pelo paciente e gerar um laudo de impacto cardiovascular e de liberação de endocanabinoides endógenos (Anandamida), conhecida por gerar o "Barato do Corredor" (Runner's High) e possuir papel anti-inflamatório.
 
 DADOS RECEBIDOS:
@@ -56,7 +56,7 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura:
   "diagnosis": "Laudo de Índice de Estresse & Benefício Vascular detalhando como o esforço afetou o miocárdio e a saúde endotelial. Mencione também a sinergia com o Sistema Endocanabinoide (liberação de Anandamida pela atividade física).",
   "findings": ["Achado 1: Gasto calórico excelente.", "Achado 2: Velocidade adequada."],
   "isDangerous": false (coloque true APENAS se houver valores extremos irreais, ex: velocidade > 40km/h na caminhada, que indique erro de GPS ou risco extremo),
-  "brisaSpeech": "Texto motivacional, carinhoso e focado em recuperação, hidratação e sinais do corpo, lido pela Enfermeira Brisa."
+  "brisaSpeech": "Texto motivacional, carinhoso e focado em recuperação, hidratação e sinais do corpo, lido pela Enfª Brisa."
 }`;
 
     const requestBody = {

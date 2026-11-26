@@ -1,4 +1,4 @@
-// 📸 Agente de Directs do Instagram — Enf. Brisa (cérebro Gemini via brisa-ai.ts)
+// 📸 Agente de Directs do Instagram — Enfª Brisa (cérebro Gemini via brisa-ai.ts)
 // Reaproveita: persona/CTA, política de segurança (emergência, humano, opt-out, reembolso),
 // memória omnichannel e dedup atômico. Só texto sai daqui; nada clínico é inventado.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -16,7 +16,7 @@ const INSTAGRAM_ADDENDUM = `
 📸 CANAL: DIRECT DO INSTAGRAM (@plantayraizltda)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Texto puro: SEM markdown (nada de ** ou #), no máximo 4 linhas curtas e 1 emoji.
-• Seja transparente: você é a Enf. Brisa, assistente virtual; a equipe humana acompanha. Nunca diga que é pessoa real.
+• Seja transparente: você é a Enfª Brisa, assistente virtual; a equipe humana acompanha. Nunca diga que é pessoa real.
 • Nunca diagnostique, indique medicamento, dose ou produto. Oriente a Orientação Técnica (R$ 30) ou consulta com médico em ${"https://www.plantayraiz.com.br/profissionais"}.
 • Nunca invente preços, horários, vagas ou promessas de cura. Se não souber, diga que a equipe confirma.
 • Sempre feche com UM próximo passo claro (link ou pergunta simples).`;

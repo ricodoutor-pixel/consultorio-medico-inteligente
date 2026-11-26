@@ -100,8 +100,6 @@ Deno.serve(async (req) => {
       visits = new Set((ev || []).map((e: any) => e.session_id).filter(Boolean)).size;
     } catch (_) { /* ignore */ }
 
-    // 4) Status do fluxo (heurística simples)
-    const statusFluxo = "rodando bem em todos os parâmetros ✅";
 
     // Monta o relatório
     const breakdown = Object.entries(byType)
@@ -109,7 +107,7 @@ Deno.serve(async (req) => {
       .join("\n") || "   • (nenhum cadastro hoje)";
 
     const text =
-`🌿 *Parabéns, Doutor!* — Resumo do dia
+`🌿 *Resumo do dia*
 
 📋 *Novos cadastros hoje:* ${totalSignups}
 ${breakdown}
@@ -117,9 +115,7 @@ ${breakdown}
 🩺 *Orientações Técnicas auditadas:* ${orientacoes}
 👀 *Visitas (sessões únicas):* ${visits}
 
-📊 Fluxo: ${statusFluxo}
-
-— Enf. Brisa · Planta y Raiz · 19h BRT`;
+— Enfª Brisa, assistente virtual · Planta y Raiz · 19h BRT`;
 
     const sent = await sendWhatsApp(text);
 

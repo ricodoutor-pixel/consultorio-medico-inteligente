@@ -109,7 +109,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
         const patientMsg =
           `🌍 *Payment Confirmed — Planta y Raiz*\n\n` +
           `Hello ${orientacaoName?.split(" ")[0] || ""}! We received your payment of *USD ${amount.toFixed(2)}*.\n\n` +
-          `🤖 *Enfª Brisa* (a virtual nursing assistant supervised by Dr. Edilson Bezerra, medical registration no. 10963 – Bolivia) will contact you shortly right here on WhatsApp for your *Technical Guidance*. It is educational and only the first step: it is not a medical consultation and does not diagnose or prescribe.\n\n` +
+          `🤖 *Enfª Brisa* (a virtual assistant with technical supervision by Dra. Suelen Naves Rodrigues, CRM 49354/PR) will contact you shortly right here on WhatsApp for your *Technical Guidance*. It is educational and only the first step: it is not a medical consultation and does not diagnose or prescribe.\n\n` +
           `Any questions, just talk to me, Nurse Brisa.`;
         await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
           method: "POST",

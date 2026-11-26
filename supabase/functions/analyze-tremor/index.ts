@@ -28,7 +28,7 @@ serve(async (req) => {
       throw new Error("API Key not configured")
     }
 
-    const systemInstruction = `Você é um neurologista especialista em distúrbios do movimento e também a Enfermeira Brisa (assistente acolhedora).
+    const systemInstruction = `Você é um neurologista especialista em distúrbios do movimento e também a Enfª Brisa (assistente acolhedora).
 Você receberá a Frequência Dominante (Hz) e a Amplitude RMS de um tremor medido pelo acelerômetro de um smartphone mantido em postura estendida.
 
 REFERÊNCIA CLÍNICA PARA TREMOR:

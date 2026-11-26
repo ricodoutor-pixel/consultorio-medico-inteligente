@@ -1,6 +1,6 @@
 // supabase/functions/lead-invite-orientacao/index.ts
 // Disparado quando um novo lead é capturado em qualquer modal de retenção da plataforma.
-// Envia WhatsApp (via Evolution API — Enf. Brisa) com convite imediato para Orientação Técnica R$30.
+// Envia WhatsApp (via Evolution API — Enfª Brisa) com convite imediato para Orientação Técnica R$30.
 // Marca o lead com tag "Convite_R30_Enviado" para evitar duplicação.
 //
 // verify_jwt = false (chamado tanto por sessão anônima quanto por usuários logados).
@@ -22,21 +22,21 @@ function inviteMessage(nome: string, categoria: string | null) {
   const first = (nome || "").trim().split(/\s+/)[0] || "tudo bem";
   if (categoria === "medico") {
     return (
-      `Olá Dr(a). ${first}! 🌿\n\nAqui é a Enf. Brisa da Planta y Raiz.\n` +
+      `Olá Dr(a). ${first}! 🌿\n\nAqui é a Enfª Brisa da Planta y Raiz.\n` +
       `Vi que demonstrou interesse na nossa rede médica. Vamos conversar sobre o credenciamento?\n` +
       `👉 ${SITE_BASE}/cadastro-profissional`
     );
   }
   if (categoria === "lojista") {
     return (
-      `Olá ${first}! 🌿\n\nAqui é a Enf. Brisa da Planta y Raiz.\n` +
+      `Olá ${first}! 🌿\n\nAqui é a Enfª Brisa da Planta y Raiz.\n` +
       `Vi que demonstrou interesse em vender no nosso Shopping. Vamos conversar sobre parceria?\n` +
       `👉 ${SITE_BASE}/shopping`
     );
   }
   // default: paciente / ebook
   return (
-    `Olá ${first}! 🌿💚\n\nAqui é a Enf. Brisa da Planta y Raiz.\n\n` +
+    `Olá ${first}! 🌿💚\n\nAqui é a Enfª Brisa da Planta y Raiz.\n\n` +
     `🎯 *Garanta agora sua Orientação Técnica em Cannabis Medicinal com a Planta y Raíz Ltda por apenas R$30* — relatório em PDF com assinatura digital ICP-Brasil e selo gov.br.\n\n` +
     `Acesse rapidinho aqui: ${WA_LINK}\n\n` +
     `Qualquer dúvida, é só responder esta mensagem. Estou aqui para te ajudar! 🐸`

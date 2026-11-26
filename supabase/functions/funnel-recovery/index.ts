@@ -230,7 +230,7 @@ Deno.serve(async (req) => {
           if (sub?.data?.id) {
             await sendContent(sub.data.id, [{
               type: "text",
-              text: `No momento não temos médicos disponíveis para sua especialidade. 😔\n\nVamos notificá-lo assim que um especialista estiver online!\n\n📞 Enquanto isso, fale com a Enfermeira Brisa: wa.me/5511991363154`
+              text: `No momento não temos médicos disponíveis para sua especialidade. 😔\n\nVamos notificá-lo assim que um especialista estiver online!\n\n📞 Enquanto isso, fale com a Enfª Brisa: wa.me/5511991363154`
             }]);
           }
           return new Response(JSON.stringify({ success: false, message: "Sem médicos disponíveis" }), {

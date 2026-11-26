@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
             ``,
             `Acesse sua receita completa: https://plantayraiz.com.br/prontuario`,
             ``,
-            `🐸 _Enfermeira Brisa — Planta y Raiz_`,
+            `🐸 _Enfª Brisa — Planta y Raiz_`,
           ].filter(Boolean).join("\n");
 
           try {

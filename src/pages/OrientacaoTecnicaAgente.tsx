@@ -10,7 +10,7 @@ import { loadPermanentReferralCode } from "@/lib/referral-code";
 import { formatPaymentName, normalizeReceiverName } from "../../supabase/functions/_shared/payment-catalog";
 import { PaymentConfirmedNotice } from "@/components/payments/PaymentConfirmedNotice";
 import { orientationPaymentConfirmed } from "@/lib/payment-confirmation";
-// 🌿 Orientação Técnica — Enfª Brisa (assistente virtual supervisionada pelo Dr. Edilson Bezerra)
+// 🌿 Orientação Técnica com a Enfª Brisa, assistente virtual (supervisão técnica: Dra. Suelen Naves Rodrigues)
 // Pagamento R$30 → confirmação do webhook → triagem persistida → sala protegida.
 // Nunca liberamos a sala por botão "Já paguei" nem por retorno do checkout.
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -891,14 +891,14 @@ export default function OrientacaoTecnicaAgente() {
           {phase !== "room" && (
             <div className="text-center mb-6">
               <div className={`${phase === "checkout" ? "hidden md:inline-flex" : "inline-flex"} items-center gap-2 bg-primary/10 text-primary text-xs font-black px-4 py-2 rounded-full mb-4`}>
-                <Stethoscope size={14} /> ENFª BRISA · ASSISTENTE VIRTUAL SUPERVISIONADA PELO DR. EDILSON BEZERRA
+                <Stethoscope size={14} /> ENFª BRISA · ASSISTENTE VIRTUAL · SUPERVISÃO TÉCNICA: DRA. SUELEN NAVES RODRIGUES (CRM 49354/PR)
               </div>
               <h1 className="text-3xl md:text-4xl font-display font-black text-foreground">
                 Orientação Técnica · <span className="text-gradient-green">R$ 30</span>
               </h1>
               <p className={`${phase === "checkout" ? "hidden md:block" : ""} text-muted-foreground mt-3 text-sm md:text-base`}>
                 Triagem e educação sobre a sua necessidade antes da consulta real, com relatório individual
-                revisado pelo Dr. Edilson Bezerra e encaminhamento ao médico prescritor mais indicado.
+                com revisão médica humana e encaminhamento ao médico prescritor mais indicado.
               </p>
             </div>
           )}
@@ -942,7 +942,7 @@ export default function OrientacaoTecnicaAgente() {
                     <div className="min-w-0">
                       <p className="font-display font-black text-lg text-foreground">Enfª Brisa</p>
                       <p className="text-xs text-muted-foreground">
-                        Assistente virtual supervisionada pelo médico Dr. Edilson Bezerra · registro médico nº 10963 (Bolívia)
+                        Assistente virtual · supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)
                       </p>
                       <p className="text-[11px] text-muted-foreground flex items-start gap-1 mt-1">
                         <MapPin size={12} className="shrink-0 mt-0.5" />
@@ -959,7 +959,7 @@ export default function OrientacaoTecnicaAgente() {
                       <li>• Uma <strong className="text-foreground">triagem com educação em saúde</strong> sobre a sua necessidade ou patologia, para você chegar à consulta real bem informado(a).</li>
                       <li>• Conduzida pela <strong className="text-foreground">Enfª Brisa</strong>: uma <strong className="text-foreground">assistente virtual</strong>, <strong className="text-foreground">supervisionada em tempo real</strong> pelo Dr. Edilson Bezerra — que acompanha a conversa e pode pausar e intervir pessoalmente.</li>
                       <li>• Orientações apoiadas em <strong className="text-foreground">evidências científicas publicadas</strong>, com hábitos e próximos passos.</li>
-                      <li>• Ao final, um <strong className="text-foreground">relatório individual</strong> que só é liberado depois de revisado e aprovado pelo Dr. Edilson.</li>
+                      <li>• Ao final, um <strong className="text-foreground">relatório individual</strong> que só é liberado depois de revisado e aprovado por médico da equipe.</li>
                       <li>• <strong className="text-foreground">Encaminhamento</strong> ao médico prescritor mais indicado da nossa vitrine para a consulta.</li>
                     </ul>
                   </div>
@@ -997,7 +997,7 @@ export default function OrientacaoTecnicaAgente() {
                       <FileText size={18} className="text-primary shrink-0 mt-0.5" />
                       <div>
                         <p className="text-xs font-bold text-foreground">Relatório em PDF</p>
-                        <p className="text-[11px] text-muted-foreground">Revisado pelo Dr. Edilson</p>
+                        <p className="text-[11px] text-muted-foreground">Com revisão médica</p>
                       </div>
                     </div>
                   </div>
@@ -1386,7 +1386,7 @@ export default function OrientacaoTecnicaAgente() {
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">Enfª Brisa</p>
-                      <p className="text-xs truncate">Assistente virtual supervisionada pelo Dr. Edilson Bezerra · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
+                      <p className="text-xs truncate">Assistente virtual · {streaming ? "digitando…" : otState === "active" ? "online" : otState === "expired" || otState === "completed" ? "encerrado" : otState}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -1431,7 +1431,7 @@ export default function OrientacaoTecnicaAgente() {
                   {otState === "active" && secondsLeft <= 300 && secondsLeft > 0 && <div role="status" className="ot-system text-center text-sm p-2 rounded-md">{secondsLeft <= 60 ? "Falta 1 minuto para encerrar." : "Faltam 5 minutos para encerrar."}</div>}
                   <div className="flex justify-center">
                     <span className="text-[11px] bg-[#FFF3C4] text-neutral-700 px-3 py-1.5 rounded-lg shadow-sm text-center max-w-[90%]">
-                      🔒 Conversa educativa com assistente virtual supervisionada pelo Dr. Edilson Bezerra. Não é
+                      🔒 Conversa educativa com assistente virtual (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)). Não é
                       consulta, não prescreve e não emite receita.
                     </span>
                   </div>
@@ -1770,7 +1770,7 @@ export default function OrientacaoTecnicaAgente() {
                     </>
                   )}
                   <p className="text-[10px] text-neutral-500 mt-1.5 text-center">
-                    Assistente virtual supervisionada pelo Dr. Edilson Bezerra · conteúdo educativo · não é consulta, não prescreve e não emite receita.
+                    Assistente virtual · supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR) · conteúdo educativo · não é consulta, não prescreve e não emite receita.
                   </p>
                 </div>
               </div>

@@ -102,7 +102,7 @@ export const DOCTOR_FORMAL_PROPOSAL_HTML = (doctorName = 'Doutor(a)') => {
 
       <h3 style="color: #34d399; font-size: 16px; margin-top: 24px;">🚀 Infraestrutura Exclusiva do Seu Consultório Virtual:</h3>
       <ul style="padding-left: 20px; color: #cbd5e1; font-size: 14px;">
-        <li style="margin-bottom: 8px;"><strong>Acolhimento Inteligente:</strong> A Enfermeira Brisa IA realiza a pré-triagem do paciente, organizando queixas, sintomas e exames antes da consulta.</li>
+        <li style="margin-bottom: 8px;"><strong>Acolhimento Inteligente:</strong> A Enfª Brisa IA realiza a pré-triagem do paciente, organizando queixas, sintomas e exames antes da consulta.</li>
         <li style="margin-bottom: 8px;"><strong>Teleconsulta HD Criptografada:</strong> Sala WebRTC com prontuário eletrônico CFM integrado em tela única.</li>
         <li style="margin-bottom: 8px;"><strong>Assistência Farmacêutica Garantida:</strong> Nossa Farmácia Oficial e Dispensário ANVISA cuidam do suporte e entrega dos fitocanabinoides ao paciente, assegurando adesão terapêutica contínua.</li>
         <li style="margin-bottom: 8px;"><strong>Blindagem Jurídica:</strong> Total conformidade com as Resoluções CFM 2.314/2022, ANVISA RDC 660/2022 e LGPD.</li>
@@ -138,7 +138,7 @@ export const DOCTOR_FORMAL_PROPOSAL_HTML = (doctorName = 'Doutor(a)') => {
 export const DOCTOR_FORMAL_PROPOSAL_TEXT = (doctorName = 'Doutor(a)') => {
   return `Olá Dr(a). ${doctorName}! 🌿
 
-Sou a Enfermeira Brisa, consultora clínica da Planta y Raíz (Mega Clínica Digital de Telemedicina Canabinoide).
+Sou a Enfª Brisa, consultora clínica da Planta y Raíz (Mega Clínica Digital de Telemedicina Canabinoide).
 
 Gostaríamos de apresentar as vantagens exclusivas de atuar como Médico(a) Sócio(a) Prescritor(a) em nossa plataforma:
 

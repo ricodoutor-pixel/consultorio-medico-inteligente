@@ -1,5 +1,6 @@
-// 🌿 Planta y Raiz — Disparador Autônomo Baileys (QR Code Oficial Windows Chrome)
-// Pacing: 30 segundos por médico | ACK em tempo real via WebSocket
+// 🛑 DESATIVADO PERMANENTEMENTE: disparos frios em massa via Baileys estão proibidos (decisão Dr. Edilson).
+console.log('🛑 [DISPATCH-BAILEYS] Script desativado permanentemente.');
+process.exit(0);
 
 require('dotenv').config();
 const {

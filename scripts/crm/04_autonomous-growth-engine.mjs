@@ -15,18 +15,24 @@
  *   23:59h → Relatório diário + checar meta 500
  */
 
+// 🛑 DESATIVADO PERMANENTEMENTE: Motor autônomo de captação/disparo frio 24/7 foi desligado (decisão Dr. Edilson).
+console.log('🛑 [GROWTH-ENGINE] Script desativado permanentemente.');
+process.exit(0);
+
 import { createClient } from '@supabase/supabase-js';
 import { execFile, spawn } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { T } from '../../supabase/functions/_shared/brisa-templates.mjs';
+import { isBusinessHoursBRT } from '../../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ── CONFIG ────────────────────────────────────────────────
-const SUPABASE_URL = 'https://shmbwdjuddvquszwkvuq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://shmbwdjuddvquszwkvuq.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || '';
 const TARGET_DOCTORS = 500;
 const LOG_FILE = path.join(__dirname, '../../scratch/growth-engine.log');
 
@@ -57,7 +63,6 @@ function msUntilHour(hour) {
 // ── VERIFICAÇÃO DA META ───────────────────────────────────
 
 async function checkGoalReached() {
-  // Checar médicos aprovados na plataforma principal
   const { count: approvedDoctors } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
@@ -102,7 +107,7 @@ async function runScript(scriptName, label) {
   });
 }
 
-// ── IMPORTAR 438 MÉDICOS DA CAMPANHA EXISTENTE ───────────
+// ── IMPORTAR MÉDICOS DA CAMPANHA EXISTENTE ───────────
 
 async function importCampaignData() {
   const campaignPath = path.join(__dirname, '../../scratch/campaign_data.json');
@@ -122,8 +127,6 @@ async function importCampaignData() {
   const phones = data.phones || [];
   let imported = 0;
 
-  log(`📥 Importando ${phones.length} médicos da campanha anterior...`);
-
   for (const phone of phones) {
     const clean = phone.replace(/\D/g, '');
     const status = sentSet.has(clean) ? 'invited' : 'scraped';
@@ -142,10 +145,13 @@ async function importCampaignData() {
   log(`✅ ${imported} contatos importados para o CRM!`);
 }
 
-// ── DISPARO DIRETO VIA URL (Sem Puppeteer para lista inicial) ─
+// ── DISPARO DIRETO (BLOQUEADO FORA DE HORÁRIO COMERCIAL) ─
 
 async function runDirectDispatch() {
-  // Buscar leads com status scraped que têm telefone
+  if (!isBusinessHoursBRT()) {
+    log('⏰ Fora do horário comercial (Seg–Sáb, 09h–19h BRT). Disparo bloqueado.');
+    return;
+  }
   const { data: leads } = await supabase
     .from('leads_crm')
     .select('id, phone, name')
@@ -159,9 +165,7 @@ async function runDirectDispatch() {
     return;
   }
 
-  const message = encodeURIComponent(
-    `Assunto: *Convite Exclusivo: Seja Médico Sócio Prescritor na Planta y Raíz* 🌿\n\nPrezado(a) Doutor(a),\n\nConvidamos você para se tornar *Médico Sócio Prescritor na Planta y Raíz* — com apenas 7% de taxa e repasse PIX instantâneo!\n\n🌿 Cadastro GRATUITO: https://plantayraiz.com.br\n\n*Diretoria Médica — Planta y Raíz Ltda* 💚`
-  );
+  const message = encodeURIComponent(T.doctorInvite(''));
 
   log(`📤 Disparando para ${leads.length} leads via URL nativa...`);
 

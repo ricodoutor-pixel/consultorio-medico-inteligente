@@ -91,6 +91,11 @@ const AGENT_TEXT_FILES = [
   "supabase/functions/brisa-daily-summary/index.ts",
   "supabase/functions/send-doctor-welcome-whatsapp/index.ts",
   "supabase/functions/send-invite-campaign/index.ts",
+  "supabase/functions/admin-send-invites/index.ts",
+  "supabase/functions/funnel-recovery/index.ts",
+  "supabase/functions/growth-engine/index.ts",
+  "supabase/functions/lead-invite-orientacao/index.ts",
+  "supabase/functions/retention-engine/index.ts",
   "supabase/functions/mercadopago-webhook/index.ts",
   "supabase/functions/payments-webhook/index.ts",
   "supabase/functions/admin-lead-status-update/index.ts",
@@ -99,6 +104,9 @@ const AGENT_TEXT_FILES = [
   "scripts/agent_evolution_brisa_live_responder.mjs",
   "scripts/agent_cadence_10min_inviter.mjs",
   "scripts/agent_hostinger_email_dispatcher.mjs",
+  "scripts/whatsapp-bot.cjs",
+  "scripts/crm/03_whatsapp-crm-engine.mjs",
+  "scripts/crm/04_autonomous-growth-engine.mjs",
   "src/lib/edilson-on.ts",
   "src/lib/brisaMasterEngine.ts",
   "src/lib/brisa-voice-fallback.ts",
@@ -112,8 +120,8 @@ const AGENT_TEXT_FILES = [
 ];
 const isCommentOrProhibition = (line: string) =>
   /^\s*(\/\/|\*|\/\*|\{\/\*)/.test(line) ||
-  /(proibid|nunca|n[ãa]o (diga|use|fale|cite)|^\s*- dizer|dizer ")/i.test(line) ||
-  /FORBIDDEN_PHRASES|\.includes\(/.test(line);
+  /(proibid|nunca|n[ãa]o (diga|use|fale|cite|existe)|^\s*- dizer|dizer ")/i.test(line) ||
+  /FORBIDDEN_PHRASES|\.includes\(|\.replace\(/.test(line);
 
 describe("Nenhum texto ativo do agente contém frase proibida", () => {
   for (const file of AGENT_TEXT_FILES) {
@@ -134,11 +142,21 @@ describe("Nenhum texto ativo do agente contém frase proibida", () => {
   it("robôs de convite frio e captação ficam fora do PM2 e o vigia não os religa", async () => {
     const eco = await import("../../ecosystem.config.cjs");
     const names: string[] = (eco.default ?? eco).apps.map((a: { name: string }) => a.name);
-    for (const off of ["growth-engine", "lead-harvesters-master", "instagram-direct-inviter", "hostinger-email-dispatcher", "cannabis-young-doctors-hunter", "cadence-10min-inviter"]) {
+    for (const off of [
+      "growth-engine",
+      "lead-harvesters-master",
+      "instagram-direct-inviter",
+      "hostinger-email-dispatcher",
+      "cannabis-young-doctors-hunter",
+      "cadence-10min-inviter",
+      "brevo-whatsapp-inviter",
+      "whatsapp-bot",
+      "wpp-crm",
+    ]) {
       expect(names).not.toContain(off);
     }
     const watchdog = fs.readFileSync("scripts/sysadmin_watchdog_supervisor.mjs", "utf8");
     const expected = watchdog.slice(watchdog.indexOf("EXPECTED_SERVICES"), watchdog.indexOf("];", watchdog.indexOf("EXPECTED_SERVICES")));
-    expect(expected).not.toMatch(/cadence|growth-engine|lead-harvesters|patient-traffic|anvisa-rdc660/);
+    expect(expected).not.toMatch(/cadence|growth-engine|lead-harvesters|patient-traffic|anvisa-rdc660|whatsapp-bot|wpp-crm|brevo-whatsapp/);
   });
 });

@@ -10,6 +10,10 @@
  * Execução 100% autônoma, sem necessidade de supervisão manual.
  */
 
+// 🛑 DESATIVADO PERMANENTEMENTE: Captação e disparos frios para médicos estão desligados (decisão Dr. Edilson).
+console.log('🛑 [CANNABIS-YOUNG-DOCTORS-HUNTER] Script desativado permanentemente.');
+process.exit(0);
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

@@ -6,6 +6,8 @@
 // Regras de texto: verdade (nada que o sistema não confirmou), frases curtas, um próximo passo por mensagem,
 // sem diagnóstico/prescrição/produto/dose, sem promessa de resultado ou de renda.
 
+import { formatDoctorAddressing } from './whatsapp-outreach-guard.mjs';
+
 export const SITE = 'https://www.plantayraiz.com.br';
 export const PATIENT_PAY_LINK = `${SITE}/pagar/orientacao-tecnica?utm_source=whatsapp`;
 export const DOCTOR_SIGNUP_LINK = `${SITE}/cadastro-profissional`;
@@ -31,6 +33,8 @@ export const T = {
   doctorGreeting: (name = '') =>
     `Olá${name ? ', ' + name : ''}! Sou a ${BRISA_IDENTITY} da Planta y Raiz (a equipe humana acompanha). Como posso ajudar no seu cadastro profissional?`,
   doctorGreetingAgain: 'Como posso ajudar no seu cadastro profissional?',
+  coldContactGreeting:
+    `Olá! Sou a ${BRISA_IDENTITY} da Planta y Raiz. Como posso ajudar? Se não desejar mais mensagens, responda SAIR.`,
   paymentClaim:
     'O pagamento é confirmado automaticamente pelo Mercado Pago, não por mensagem ou comprovante. ' +
     `Assim que ele aprovar, o acesso abre sozinho na mesma tela. Se ainda não pagou, o link é: ${PATIENT_PAY_LINK}`,
@@ -39,6 +43,7 @@ export const T = {
     'Para ativar seu consultório: foto do CRM ativo, comprovante de endereço, diploma ou RQE (se tiver) e sua chave Pix. ' +
     `Pode enviar por aqui mesmo ou pelo cadastro: ${DOCTOR_SIGNUP_LINK}`,
   audio: `Ainda não consigo ouvir áudios, pode me escrever? Se quiser começar pela Orientação Técnica (${OT_PRICE_LABEL}): ${PATIENT_PAY_LINK}`,
+  audioNeutral: 'Ainda não consigo ouvir áudios, pode me escrever?',
   call: 'Por aqui não atendemos ligações. Pode escrever sua dúvida?',
   emergency: 'Ligue agora para 192 (SAMU) ou procure o pronto-socorro mais próximo. Não espere atendimento por aqui.',
   handoff: 'Vou passar para nossa equipe humana. Retornamos por aqui.',
@@ -53,21 +58,45 @@ export const T = {
   professionalCost:
     'O cadastro profissional é gratuito. A plataforma fica com 7% de cada consulta paga (você recebe 93% via Pix) e o plano Médico VIP (R$ 99/mês) é opcional. ' +
     `Hoje a vitrine atende médicos com CRM ativo; o cadastro é em ${DOCTOR_SIGNUP_LINK}.`,
-  /** Convite a médico: SÓ envio manual do admin, para médico com CRM verificado que já falou conosco. */
-  doctorInvite: (name = '') =>
-    `Olá${name ? ', Dr(a). ' + name : ', Dr(a).'}! Aqui é a ${BRISA_IDENTITY}, do marketing médico da Planta y Raiz. ` +
-    `Temos consultório virtual com vídeo, prontuário e receita digital; repasse de 93% de cada consulta (taxa de 7%). Cadastro gratuito: ${DOCTOR_SIGNUP_LINK}\n` +
-    'Se não quiser mais mensagens, responda SAIR.\n— Enfª Brisa, marketing médico',
+  /**
+   * Convite a médico: SÓ envio manual do admin, em horário comercial (Seg-Sáb 9h-19h BRT),
+   * para médico com CRM confirmado. Jamais prefixa "Dr(a)." sem CRM confirmado e bloqueia PJ/empresas.
+   */
+  doctorInvite: (name = '', options = {}) => {
+    const addressing = formatDoctorAddressing({
+      name,
+      crm: options?.crm || '',
+      crmState: options?.crmState || options?.crm_state || '',
+      councilType: options?.councilType || options?.council_type || '',
+      crmConfirmed: Boolean(options?.crmConfirmed),
+      email: options?.email || '',
+      specialty: options?.specialty || '',
+      company: options?.company || '',
+    });
+    if (!addressing.allowed) return '';
+    const greeting = addressing.salutation ? `Olá, ${addressing.salutation}!` : 'Olá!';
+    return (
+      `${greeting} Aqui é a ${BRISA_IDENTITY}, do marketing médico da Planta y Raiz. ` +
+      `Temos consultório virtual com vídeo, prontuário e receita digital; repasse de 93% de cada consulta (taxa de 7%). Cadastro gratuito: ${DOCTOR_SIGNUP_LINK}\n` +
+      'Se não quiser mais mensagens, responda SAIR.\n— Enfª Brisa, marketing médico'
+    );
+  },
 };
 
 /** Frases que nenhum texto do agente pode conter (verificado por teste automático). */
 export const FORBIDDEN_PHRASES = [
   /recebemos sua mensagem sobre o pagamento/i,
+  /pagamento informado/i,
   /recebemos\.? o acesso é liberado/i,
   /Edilson Bezerra ON/i,
   /você foi selecionad[oa]/i,
+  /você foi escolhid[oa]/i,
   /selecionado\(a\)/i,
+  /m[eé]dic[oa](?:\(a\)|s)?\s+prescritor(?:es|as|\(a\))?\s+s[oó]ci[oa](?:\(a\)|s)?/i,
+  /s[oó]ci[oa](?:\(a\))?\s+prescritor/i,
   /participação nos lucros|distribuição de lucros/i,
+  /taxa\s+zero/i,
+  /100%\s+de\s+repasse|repasse\s+(?:l[ií]quido\s+)?de\s+100%/i,
   /medicina canabin[oó]ide/i,
   /rodando bem em todos os par[aâ]metros/i,
   /R\$ ?(15|45)\.000/i,

@@ -6,11 +6,15 @@
  * Funcionalidades:
  * 1. Disparo nativo via Hostinger SMTP oficial (contato@plantayraiz.com.br / smtp.hostinger.com:465 SSL).
  * 2. Alternativa 100% autônoma e resiliente à API do Brevo (que pode ter limites ou bloqueios de conta).
- * 3. Apresenta o Programa Médico Sócio (sem promessa de renda; decisão de 25/11/2026). Robô desligado do PM2.
+ * 3. Convites a médicos verificados (sem promessa de renda, sem "sócio", sem taxa zero; decisão de 25/11/2026). Robô desligado do PM2.
  * 4. Verificação estrita anti-bounce e filtro de entregabilidade (email_validator.mjs).
  * 5. Cadência segura de entrega: 60 a 90 segundos entre envios para manter score máximo e reputação intacta.
  * 6. Sincronização em tempo real de disparos no Lovable Cloud Supabase (email_send_log e leads_contatos).
  */
+
+// 🛑 DESATIVADO PERMANENTEMENTE: Disparos frios de e-mail para médicos estão desligados (decisão Dr. Edilson).
+console.log('🛑 [HOSTINGER-EMAIL-DISPATCHER] Script desativado permanentemente.');
+process.exit(0);
 
 import dns from 'node:dns';
 dns.setDefaultResultOrder('ipv4first');
@@ -258,7 +262,7 @@ async function sendOneDoctorEmail(doc) {
     // Sincroniza em segundo plano no Supabase CRM
     await logEmailSendInSupabase({
       email,
-      templateName: 'hostinger_medico_socio_15k',
+      templateName: 'hostinger_convite_profissional',
       status: 'sent',
       messageId: info.messageId,
       metadata: { doctor_name: name, subject, provider: 'Hostinger SMTP' }

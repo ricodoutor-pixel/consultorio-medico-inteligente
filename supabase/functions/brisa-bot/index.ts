@@ -8,7 +8,16 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { claimBrisaInbound } from '../_shared/brisa-inbound-claim.ts';
-import { LOOPING_BOT_NUMBERS, patientName, quickResponse, sanitizeOutboundAnswer } from '../_shared/brisa-response-policy.mjs';
+import {
+  isAutoReplyOrCommercialBot,
+  isBusinessOrNonDoctorSender,
+  LOOPING_BOT_NUMBERS,
+  patientName,
+  quickResponse,
+  sanitizeOutboundAnswer,
+} from '../_shared/brisa-response-policy.mjs';
+import { hasPendingPaymentForPhone } from '../_shared/pending-payment-context.ts';
+import { T } from '../_shared/brisa-templates.mjs';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -372,13 +381,12 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({ ok: true, ignored: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
-  // Bloqueio imediato dos números em laço e respostas automáticas de consultórios
+  // Bloqueio imediato dos números em laço, URAs, bots comerciais e respostas automáticas (silêncio total)
   if ((phone && LOOPING_BOT_NUMBERS.has(phone)) || LOOPING_BOT_NUMBERS.has(chatId.replace(/@.*/, ''))) {
     return new Response(JSON.stringify({ ok: true, ignored: 'looping_bot_blacklisted' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
-  const quick = quickResponse({ question: text, senderName: name || '' });
-  if (quick?.suppressed) {
-    return new Response(JSON.stringify({ ok: true, ignored: quick.model }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  if (isAutoReplyOrCommercialBot(text, { senderName: name || '', senderJid: chatId })) {
+    return new Response(JSON.stringify({ ok: true, ignored: 'auto-reply-suppressed' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
   const claim = SB_URL && SB_KEY
@@ -391,23 +399,75 @@ serve(async (req: Request): Promise<Response> => {
     });
   }
 
-  // ── PAUSA HUMANA ───────────────────────────────────────────────────────
-  const sbPause = serviceClient();
-  if (sbPause && await humanPauseActive(sbPause, phone)) {
+  // ── PAUSA HUMANA & CONTEXTO DO CONTATO ─────────────────────────────────
+  const sb = serviceClient();
+  if (sb && await humanPauseActive(sb, phone)) {
     await log(phone, text, '(silêncio: atendimento humano)', 'human_paused');
     return new Response(JSON.stringify({ ok: true, ignored: 'human_paused' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
-  if (sbPause && quick?.handoff) {
-    await setHumanPause(sbPause, phone, name || '', text);
+
+  // Verifica se o contato já recebeu convite frio (para jamais oferecer Orientação Técnica de paciente)
+  let isColdContact = false;
+  if (sb && phone) {
+    try {
+      const { data: recentOut } = await sb
+        .from('whatsapp_messages')
+        .select('message_text')
+        .in('remote_jid', [`${phone}@c.us`, `${phone}@s.whatsapp.net`])
+        .eq('from_me', true)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      isColdContact = (recentOut || []).some((m: { message_text?: string }) =>
+        /marketing médico|cadastro-profissional|consultório virtual com vídeo|convite/i.test(String(m.message_text || '')),
+      );
+    } catch {
+      isColdContact = false;
+    }
+  }
+
+  // Verifica cobrança/pedido pendente REAL do próprio contato antes de classificar qualquer aviso de pagamento
+  const pendingCheck = sb && phone
+    ? await hasPendingPaymentForPhone(sb, phone)
+    : { hasPendingPayment: false, source: null };
+
+  const quick = quickResponse({
+    question: text,
+    senderName: name || '',
+    senderJid: chatId,
+    role: isColdContact ? 'unknown' : 'patient',
+    hasPendingPaymentContext: pendingCheck.hasPendingPayment,
+    isColdContact,
+  });
+
+  if (quick?.suppressed) {
+    return new Response(JSON.stringify({ ok: true, ignored: quick.model }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+  if (sb && quick?.optOut) {
+    await setHumanPause(sb, phone, name || '', 'opt_out_requested');
+    const sentOpt = await sendMsg(chatId, phone, quick.answer);
+    await log(phone, text, quick.answer, 'opt_out');
+    return new Response(JSON.stringify({ ok: true, sent: sentOpt, agent: 'opt_out' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+  if (sb && quick?.handoff) {
+    await setHumanPause(sb, phone, name || '', text);
     const sentH = await sendMsg(chatId, phone, quick.answer);
     await log(phone, text, quick.answer, 'human_handoff');
     return new Response(JSON.stringify({ ok: true, sent: sentH, agent: 'human_handoff' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+  if (quick?.model === 'safety-emergency' || quick?.model === 'payment-claim') {
+    const sentQ = await sendMsg(chatId, phone, quick.answer);
+    await log(phone, text, quick.answer, quick.model);
+    return new Response(JSON.stringify({ ok: true, sent: sentQ, agent: quick.model }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+
+  // Empresas/PJ/clínicas/não-médicos sem sessão paga: silêncio total (nunca oferecer Orientação Técnica)
+  if (isBusinessOrNonDoctorSender(name || '')) {
+    return new Response(JSON.stringify({ ok: true, ignored: 'business-contact-suppressed' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
   // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────
   // Sessão paga ativa → Enfª Brisa (Orientação Técnica, 30 min).
   // Sem sessão paga  → Enfª Brisa (triagem curta + link de pagamento).
-  const sb = serviceClient();
   const session = sb ? await resolveOtSession(sb, phone, name) : null;
 
   // Tempo esgotado → desliga o atendimento e avisa o paciente.
@@ -444,6 +504,27 @@ serve(async (req: Request): Promise<Response> => {
     await touchOtSession(sb, session.session_id);
     return new Response(
       JSON.stringify({ ok: true, sent: sentOt, agent: 'dr_edilson_on', minutes_left: left, phone }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  // Respostas determinísticas da política compartilhada para contatos sem sessão paga
+  if (quick?.answer) {
+    const sentQ = await sendMsg(chatId, phone, quick.answer);
+    await log(phone, text, quick.answer, quick.model || 'quick_response');
+    return new Response(
+      JSON.stringify({ ok: true, sent: sentQ, agent: quick.model || 'quick_response', phone, chatId }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  // Contatos frios nunca recebem oferta de Orientação Técnica (R$ 30) de paciente
+  if (isColdContact) {
+    const neutral = T.coldContactGreeting;
+    const sentNeutral = await sendMsg(chatId, phone, neutral);
+    await log(phone, text, neutral, 'cold_contact_neutral');
+    return new Response(
+      JSON.stringify({ ok: true, sent: sentNeutral, agent: 'cold_contact_neutral', phone, chatId }),
       { headers: { ...cors, 'Content-Type': 'application/json' } },
     );
   }

@@ -183,6 +183,18 @@ async function handleIncomingMessage(msg, chat) {
   const lower = bodyText.toLowerCase();
   const hasMedia = Boolean(msg.hasMedia || msg.type === 'image' || msg.type === 'document' || msg.type === 'ptt' || msg.type === 'audio');
 
+  const { isAutoReplyOrCommercialBot, isBusinessOrNonDoctorSender } = await import(
+    '../supabase/functions/_shared/brisa-response-policy.mjs'
+  );
+  if (isAutoReplyOrCommercialBot(bodyText, { senderName: contactName, senderJid: chatId })) {
+    console.log(`[WAHA] 🔇 Silenciado (auto-reply/URA/bot comercial): ${chatId}`);
+    return;
+  }
+  if (isBusinessOrNonDoctorSender(contactName)) {
+    console.log(`[WAHA] 🔇 Silenciado (empresa/PJ/não-médico): ${contactName}`);
+    return;
+  }
+
   // Rate limit por chat: evitar responder mais de uma vez a cada 10 segundos
   const lastReply = lastRepliedChatTimes.get(chatId) || 0;
   if (Date.now() - lastReply < 10000) {
@@ -198,30 +210,30 @@ async function handleIncomingMessage(msg, chat) {
 
   // 1. SOLICITAÇÃO DE ATENDIMENTO HUMANO
   if (/humano|atendente|pessoa|falar com algu[eé]m|suporte humano|atendimento presencial/i.test(lower)) {
-    replyText = `Com certeza! Já avisei nossa equipe de plantão aqui na central da Planta y Raiz. Em instantes um de nossos consultores humanos dará continuidade ao seu atendimento por aqui com todo o cuidado! 🌿`;
+    replyText = `Vou passar para nossa equipe humana. Retornamos por aqui.`;
     category = 'Lead Solicitou Atendente Humano';
   }
   // 2. ENVIO DE DOCUMENTOS / COMPLIANCE MÉDICO (KYC)
-  else if (hasMedia || /segue (meu )?(crm|diploma|comprovante|documento|rg|cnh|cpf)|minha chave pix|chave pix|comprovante de resid[eê]ncia/i.test(lower)) {
-    const isDoc = contactName.toLowerCase().includes('dr') || /crm|m[eé]dic/i.test(lower);
+  else if (hasMedia || /segue (meu )?(crm|diploma|comprovante de resid[eê]ncia|documento|rg|cnh|cpf)|minha chave pix|chave pix/i.test(lower)) {
+    const isDoc = /\bcrm\b|m[eé]dic/i.test(lower);
     if (isDoc) {
-      replyText = `Olá, Doutor(a)! Documentos recebidos com sucesso. 🌿 Nossa equipe de compliance e auditoria médica já está validando para homologação do seu consultório virtual. Qualquer dúvida, estou por aqui!`;
+      replyText = `Obrigada! Nossa equipe confere os documentos e responde por aqui.`;
       category = 'Médico Cadastrado - Envio de Documentos';
       listIds = [BREVO_LIST_WHATSAPP_INBOUND, BREVO_LIST_MEDICOS_CADASTRADOS];
     } else {
-      replyText = `Recebido com sucesso! 🌿 Muito obrigada pelo envio dos dados. Nossa equipe já está processando tudo com prioridade e em instantes te retornamos.`;
+      replyText = `Obrigada! Nossa equipe confere os documentos e responde por aqui.`;
       category = 'Lead WhatsApp - Envio de Documentos';
     }
   }
-  // 3. FLUXO DE MÉDICOS PRESCritORES / CREDENCIAMENTO
-  else if (contactName.toLowerCase().includes('dr') || /\b(sou m[eé]dico|sou prescritor|me credenciar|cadastrar como m[eé]dico|consult[oó]rio virtual|prescrever cannabis|receita digital)\b/i.test(lower)) {
-    replyText = `Olá, Doutor(a)! Seja muito bem-vindo(a) à Planta y Raiz. 🌿 Oferecemos consultório virtual completo, emissão de receitas com certificado ICP-Brasil e repasse de 100% dos honorários médicos via PIX. Para ativar seu perfil, basta acessar: https://www.plantayraiz.com.br/medicos/ativar`;
+  // 3. FLUXO DE MÉDICOS PRESCRITORES / CREDENCIAMENTO (nunca prefixa Dr(a). sem CRM confirmado; repasse oficial 93% / taxa 7%)
+  else if (/\b(sou m[eé]dico|sou prescritor|me credenciar|cadastrar como m[eé]dico|consult[oó]rio virtual|prescrever cannabis|receita digital)\b/i.test(lower)) {
+    replyText = `Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz. 🌿 Oferecemos consultório virtual com prontuário, receita digital ICP-Brasil e repasse de 93% de cada consulta via PIX (taxa fixa de 7%). Cadastro gratuito: https://www.plantayraiz.com.br/cadastro-profissional`;
     category = 'Médico Prescritor - Credenciamento';
     listIds = [BREVO_LIST_WHATSAPP_INBOUND, BREVO_LIST_MEDICOS_PROSPECTS];
   }
   // 4. FLUXO DE FARMÁCIAS / DROGARIAS / B2B
   else if (/\b(farm[aá]cia|drogaria|distribuidora|dispensa[cç][aã]o|lojista|comprar no atacado|sa[uú]de verde)\b/i.test(lower)) {
-    replyText = `Olá! Seja bem-vindo(a) à Planta y Raiz. 🌿 Temos um programa exclusivo de dispensação e distribuição para farmácias sob a RDC 327 da Anvisa. Conheça nosso portal institucional e credencie seu estabelecimento em: https://www.plantayraiz.com.br/saude-verde`;
+    replyText = `Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz. 🌿 Para farmácias e lojistas, confira o cadastro em: https://www.plantayraiz.com.br/cadastro-farmacia`;
     category = 'Farmácia / Drogaria B2B';
     listIds = [BREVO_LIST_WHATSAPP_INBOUND, BREVO_LIST_FARMACIAS];
   }

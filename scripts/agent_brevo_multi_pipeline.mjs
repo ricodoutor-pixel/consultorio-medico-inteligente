@@ -5,16 +5,16 @@
  * Plataforma Planta y Raíz Ltda (plantayraiz.com.br)
  * 
  * Funcionalidades:
- * 1. Régua de 3 E-mails Institucionais para Médicos Prescritores (Cadência de 48h):
- *    - E-mail 1 (Oportunidade): Consultório Virtual Taxa Zero no 1º mês + Prontuário CFM / ICP-Brasil.
- *    - E-mail 2 (Evidências): Biblioteca Científica com 40.000 estudos para embasamento de laudos.
- *    - E-mail 3 (Oferta VIP R$ 99): Destaque no Topo Ouro da Vitrine + Pacientes Triados pela Enfª Brisa.
- * 2. Esteira B2B de Parceria para Farmácias e Importadoras (RDC 660 / RDC 327):
- *    - Conexão direta com pacientes prescritos e integração de catálogo sem taxa de adesão.
- * 3. Gateway Duplo Híbrido:
- *    - Brevo API REST (Quota de até 300 e-mails/dia rastreados) com failover transparente para Hostinger SMTP.
- * 4. Persistência de Régua em JSON com controle rigoroso de cadência temporal e proteção anti-spam.
+ * 1. Régua de 3 E-mails Institucionais para Médicos Prescritores (DESLIGADO):
+ *    - E-mail 1: Consultório Virtual com repasse de 93% (taxa fixa de 7%) + Prontuário CFM / ICP-Brasil.
+ *    - E-mail 2: Biblioteca Científica para embasamento de laudos.
+ *    - E-mail 3: Plano Médico VIP R$ 99/mês opcional.
+ * 2. Esteira B2B de Parceria para Farmácias e Importadoras (RDC 660 / RDC 327).
  */
+
+// 🛑 DESATIVADO PERMANENTEMENTE: Disparos frios via Brevo estão desligados (decisão Dr. Edilson).
+console.log('🛑 [BREVO-MULTI-PIPELINE] Script desativado permanentemente.');
+process.exit(0);
 
 import dns from 'node:dns';
 dns.setDefaultResultOrder('ipv4first');

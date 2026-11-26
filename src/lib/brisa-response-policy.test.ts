@@ -60,9 +60,13 @@ describe('Brisa response safety rules', () => {
     expect(LOOPING_BOT_NUMBERS.has('551633572527')).toBe(true);
     expect(LOOPING_BOT_NUMBERS.has('557591462018')).toBe(true);
   });
-  it('payment claims, emoji and stickers never get "recebemos" nor a payment alert', () => {
+  it('payment claims require real pending payment context and never get "recebemos" nor a payment alert', () => {
     for (const q of ['paguei', 'fiz o pix', 'segue o comprovante', 'já paguei']) {
-      const r = quickResponse({ question: q });
+      // Sem cobrança/pedido pendente real do próprio contato -> nunca classifica como payment-claim
+      expect(quickResponse({ question: q })?.model).not.toBe('payment-claim');
+
+      // Com cobrança/pedido pendente real confirmado pelo servidor -> explica confirmação automática via Mercado Pago
+      const r = quickResponse({ question: q, hasPendingPaymentContext: true });
       expect(r?.model).toBe('payment-claim');
       expect(r?.answer).not.toMatch(/recebemos|confirmad[oa] o pagamento|pagamento informado/i);
       expect(r?.answer).toContain('Mercado Pago');

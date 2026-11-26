@@ -259,9 +259,12 @@ const DESLIGADOS = [
   'apify-lead-sync',              // captação de leads (chave Apify vencida)
   'anvisa-rdc660-rpa',            // arquivo não existe
   'brevo-multi-pipeline',         // Brevo bloqueado (554)
-  'hostinger-email-dispatcher',   // e-mail frio "Médico Sócio"
+  'hostinger-email-dispatcher',   // e-mail frio a médicos
   'cannabis-young-doctors-hunter', // e-mail frio a médicos
-  'cadence-10min-inviter',        // WhatsApp frio "Parabéns, Dr(a)..." (não está neste arquivo; nunca religar)
+  'cadence-10min-inviter',        // WhatsApp frio em loop de 10 min (nunca religar)
+  'brevo-whatsapp-inviter',       // WhatsApp frio via Brevo (nunca religar)
+  'whatsapp-bot',                 // WhatsApp frio em loop de 10 min legado (nunca religar)
+  'wpp-crm',                      // CRM WhatsApp frio legado (nunca religar)
 ];
 module.exports.apps = module.exports.apps.filter((app) => !DESLIGADOS.includes(app.name));
 module.exports.DESLIGADOS = DESLIGADOS;

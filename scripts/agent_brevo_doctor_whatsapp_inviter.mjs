@@ -54,16 +54,15 @@ function loadBlacklist() {
   return new Set();
 }
 
-// 🕒 JANELA DE ENVIO: Todos os dias das 08:00 às 23:00 (Horário de Brasília) ou override via FORCE_OUTREACH_ACTIVE
-function isWithinBusinessHours() {
-  if (process.env.FORCE_OUTREACH_ACTIVE === 'true') return true;
-  const now = new Date();
-  const spDateStr = now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' });
-  const spDate = new Date(spDateStr);
-  const hour = spDate.getHours();
+// 🕒 JANELA DE ENVIO ESTRITA: Segunda a Sábado, 09:00 às 19:00 (Horário de Brasília — sem override)
+import {
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+  hasConfirmedCrm,
+} from '../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 
-  if (hour < 8 || hour >= 23) return false;
-  return true;
+function isWithinBusinessHours() {
+  return isBusinessHoursBRT();
 }
 
 async function checkInstanceStatus() {
@@ -79,7 +78,7 @@ async function checkInstanceStatus() {
   }
 }
 
-// ⏱️ INTERVALO DE 15 MINUTOS POR MENSAGEM (conforme solicitado pelo Dr. Edilson)
+// ⏱️ INTERVALO DE 15 MINUTOS POR MENSAGEM (script desativado)
 function getRandomCadenceMs() {
   return 15 * 60 * 1000;
 }
@@ -148,20 +147,19 @@ function normalizeValidBrazilianMobile(raw) {
 
 const PREPOSITIONS = new Set(['da', 'de', 'do', 'dos', 'das', 'e', 'del', 'd', 'von', 'van']);
 
-// Limpa nome removendo títulos duplicados ("Dr(a). Dr(a).") e tratando preposições sem cortar sobrenome ("André da Silveira")
+// Limpa nome removendo títulos duplicados sem jamais prefixar Dr(a).
 function cleanDoctorName(name) {
-  if (!name) return 'Doutor(a)';
+  if (!name) return '';
   let n = String(name).trim();
+  if (isCompanyOrNonDoctorContact({ name: n }).blocked) return '';
 
-  // Remove títulos duplicados repetidamente no início
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|médico|médica)\s*/gi, '');
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|médico|médica)\s*/gi, '');
   n = n.replace(/[–—\-_/\\|]/g, ' ').trim();
 
   const rawWords = n.split(/\s+/).filter(Boolean);
-  if (rawWords.length === 0) return 'Doutor(a)';
+  if (rawWords.length === 0) return '';
 
-  // Constrói nome respeitando preposições
   const words = [rawWords[0]];
   let i = 1;
   while (i < rawWords.length) {
@@ -187,41 +185,33 @@ function cleanDoctorName(name) {
   }).join(' ');
 }
 
-// Filtro estrito de público NÃO médico para convites de prescritor
-function isExcludedAudience(name = '', email = '', specialty = '') {
-  const combined = `${name} ${email} ${specialty}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-  // 1. Veterinários (M.V., CRMV, pet, cão, animal, etc.)
-  if (/(veterin|crmv|\bvet\b|animal|petshop|\bpet\b)/i.test(combined)) {
-    return { excluded: true, reason: 'veterinario' };
+// Filtro estrito de PJ/empresas/não-médicos usando política compartilhada
+function isExcludedAudience(name = '', email = '', specialty = '', crm = '', councilType = '') {
+  const check = isCompanyOrNonDoctorContact({ name, email, specialty, crm, councilType });
+  if (check.blocked) {
+    return { excluded: true, reason: check.reason };
   }
-  // 2. Dentistas (CRO, odonto, ortodontista, etc.)
-  if (/(odont|dentist|\bcro\b|ortodont|implantodont)/i.test(combined)) {
-    return { excluded: true, reason: 'dentista' };
+  if (!hasConfirmedCrm(crm, '', councilType)) {
+    return { excluded: true, reason: 'unconfirmed_crm' };
   }
-  // 3. Psicólogos (CRP, psicologo, etc.)
-  if (/(psicolog|psicoterap|\bcrp\b)/i.test(combined)) {
-    return { excluded: true, reason: 'psicologo' };
-  }
-  // 4. Empresas / Clínicas / Consultórios / Nomes genéricos
-  if (/\b(mais proximo|consultorio|clinica|clinicar|polimeg|cnh|detran|hospital|instituto|centro|laboratorio|diagnostico|servicos medicos|saude integrad|espaco|ltda|eireli|me|epp|s\/s|s\.a\.|associacao|contabilidade|assessoria)\b/i.test(combined)) {
-    return { excluded: true, reason: 'empresa' };
-  }
-
   return { excluded: false };
 }
 
-function buildInvitationMessage(doctorName) {
+function buildInvitationMessage(doctorName, options = {}) {
   const cleanName = sanitizeDoctorName(doctorName);
-  return buildOfficialInvitationMessage(cleanName);
+  if (!cleanName) return '';
+  return buildOfficialInvitationMessage(cleanName, options);
 }
 
-async function sendWhatsApp(recipient, text) {
+async function sendWhatsApp(recipient, text, contact = {}) {
+  if (!isWithinBusinessHours()) {
+    return { dryRun: true, status: 'blocked', reason: 'OUTSIDE_BUSINESS_HOURS_BRT' };
+  }
   const norm = normalizeJid(recipient);
   const cleanNumber = norm.phone || recipient.replace(/\D/g, '');
 
-  // 🛡️ GUARDA DE PRÉ-ENVIO (Fase 2 - S2, S3 e DRY-RUN)
-  const guard = preSendGuard(norm.normalizedJid, text);
+  // 🛡️ GUARDA DE PRÉ-ENVIO (horário BRT, PJ, CRM, opt-out, textos proibidos)
+  const guard = preSendGuard(norm.normalizedJid, text, { isOutreach: true, contact });
   if (!guard.canSend) {
     log(`🛡️ ${guard.log}`);
     return { dryRun: true, status: 'blocked', reason: guard.reason };

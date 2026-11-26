@@ -1,5 +1,17 @@
-import { LOOPING_BOT_NUMBERS, patientName, quickResponse, repeatedWithinDay, sanitizeOutboundAnswer } from "../_shared/brisa-response-policy.mjs"
+import {
+  isAutoReplyOrCommercialBot,
+  isBusinessOrNonDoctorSender,
+  LOOPING_BOT_NUMBERS,
+  patientName,
+  quickResponse,
+  repeatedWithinDay,
+  sanitizeOutboundAnswer,
+} from "../_shared/brisa-response-policy.mjs"
+import { T } from "../_shared/brisa-templates.mjs"
+import { hasConfirmedCrm } from "../_shared/whatsapp-outreach-guard.mjs"
+import { hasPendingPaymentForPhone } from "../_shared/pending-payment-context.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { getCorsHeaders } from "../_shared/cors.ts"
 import { requireServiceAuth } from "../_shared/service-auth.ts"
 import {
@@ -23,6 +35,14 @@ function getGoldenDoctorScript(_senderName?: string): string {
   return `Sou a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.). Para médicos com registro em conselho: cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional, plano Médico VIP R$ 99/mês e repasse de 93% de cada consulta (taxa de 7%). Como posso ajudar?`;
 }
 
+function detectColdContactFromHistory(history: Array<{ role?: string; text?: string }> = []): boolean {
+  return history.some((h) => {
+    if (h?.role !== 'brisa' && h?.role !== 'assistant') return false;
+    const t = String(h?.text || '').toLowerCase();
+    return /marketing médico|cadastro-profissional|convite|consultório virtual com vídeo/i.test(t);
+  });
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') {
@@ -30,15 +50,21 @@ serve(async (req) => {
   }
 
   let rawRole = "unknown";
-  let senderName = "Usuário";
+  let senderName = "";
   let phoneDigits = "";
+  let suppressOnError = false;
+  let isColdContact = false;
 
   try {
     const body = await req.json().catch(() => ({}));
     const question = String(body.question || "").trim();
-    rawRole = (body.role || body.context_role || "").toLowerCase();
-    senderName = body.confirmedName || body.senderName || "";
+    rawRole = String(body.role || body.context_role || "").toLowerCase();
+    senderName = String(body.confirmedName || body.senderName || "").trim();
     phoneDigits = String(body.phone || "").replace(/\D/g, "");
+    const senderJid = String(body.senderJid || (phoneDigits ? `${phoneDigits}@s.whatsapp.net` : ""));
+    const history = Array.isArray(body.history) ? body.history : [];
+    isColdContact = Boolean(body.isColdContact) || detectColdContactFromHistory(history);
+
     // Phone-based identity lookup is internal messaging functionality, not public lookup.
     if (phoneDigits && requireServiceAuth(req, corsHeaders) !== null) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -58,12 +84,24 @@ serve(async (req) => {
     const normQ = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const normSender = String(senderName || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+    // 🛑 Bloqueio imediato de bots/URAs/auto-respostas comerciais (silêncio total)
+    if (
+      (phoneDigits && LOOPING_BOT_NUMBERS.has(phoneDigits)) ||
+      isAutoReplyOrCommercialBot(question, { senderName, senderJid })
+    ) {
+      suppressOnError = true;
+      return new Response(JSON.stringify({ answer: "", suppressed: true, reason: "auto-reply-suppressed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // 🛑 Se a conversa no WhatsApp está pausada pelo Dr. Edilson ou pelo contato, suprime imediatamente
     if (
       (phoneDigits && PAUSED_WHATSAPP_CONTACTS.has(phoneDigits)) ||
       (phoneDigits && (normSender.includes("geisell") || /^dra\s+g\b/.test(normSender))) ||
       /\b(vou pausar|pausar a automacao|pausar esta conversa|pausar conversa|pausa a automacao|pausar ia)\b/.test(normQ)
     ) {
+      suppressOnError = true;
       return new Response(JSON.stringify({ answer: "", suppressed: true, reason: "human_paused_conversation" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -104,6 +142,7 @@ serve(async (req) => {
               /\b(vou pausar|pausar a automacao|pausar esta conversa|pausar conversa|pausa a automacao|preciso falar com humano|falar com humano|atendente humano)\b/.test(mText) ||
               (m.key?.fromMe && (m.source === "android" || m.source === "ios"))
             ) {
+              suppressOnError = true;
               return new Response(JSON.stringify({ answer: "", suppressed: true, reason: "human_paused_conversation" }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
               });
@@ -115,39 +154,50 @@ serve(async (req) => {
       }
     }
 
-    // 🧑‍⚕️ Verificação oficial: se o telefone pertence a um médico cadastrado, NUNCA tratar como paciente
+    // 🧑‍⚕️ Verificação oficial: médico cadastrado + CRM confirmado; checagem de cobrança pendente do próprio contato
     let verifiedDoctor = false;
-    if (phoneDigits.length >= 8) {
+    let hasPendingPaymentContext = false;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+    if (phoneDigits.length >= 8 && supabaseUrl && supabaseKey) {
       try {
-        const url = Deno.env.get("SUPABASE_URL");
-        const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-        if (!url || !key) throw new Error("Missing service configuration");
-        const h = { apikey: key, Authorization: `Bearer ${key}` };
+        const h = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` };
         const last8 = phoneDigits.slice(-8);
-        const pr = await fetch(`${url}/rest/v1/profiles?select=id,full_name,phone&phone=ilike.*${last8}*&limit=5`, { headers: h });
+        const pr = await fetch(`${supabaseUrl}/rest/v1/profiles?select=id,full_name,phone&phone=ilike.*${last8}*&limit=5`, { headers: h });
         const profs = pr.ok ? await pr.json() : [];
-        const ids = (profs || []).map((p: any) => p.id).filter(Boolean);
+        const ids = (profs || []).map((p: { id?: string }) => p.id).filter(Boolean);
         if (ids.length) {
-          const dr = await fetch(`${url}/rest/v1/doctors?select=user_id&user_id=in.(${ids.join(",")})&limit=1`, { headers: h });
+          const dr = await fetch(
+            `${supabaseUrl}/rest/v1/doctors?select=user_id,crm,crm_state,council_type&user_id=in.(${ids.join(",")})&limit=1`,
+            { headers: h },
+          );
           const docs = dr.ok ? await dr.json() : [];
           if (docs?.length) {
-            verifiedDoctor = true;
+            const doc = docs[0];
             rawRole = "doctor";
-            const p = profs.find((x: any) => x.id === docs[0].user_id);
-            if (p?.full_name) senderName = String(p.full_name).replace(/^(dr\.?|dra\.?)\s+/i, "");
+            verifiedDoctor = hasConfirmedCrm(doc.crm, doc.crm_state, doc.council_type);
+            const p = profs.find((x: { id?: string; full_name?: string }) => x.id === doc.user_id);
+            if (p?.full_name) senderName = String(p.full_name).replace(/^(dr\.?|dra\.?|dr\(a\)\.?)\s+/i, "");
           }
         }
       } catch (e) {
         console.warn("[chat-brisa] verificação de médico falhou:", e);
       }
+
+      if (supabase && phoneDigits.length >= 10) {
+        const pendingCheck = await hasPendingPaymentForPhone(supabase, phoneDigits);
+        hasPendingPaymentContext = pendingCheck.hasPendingPayment;
+      }
+    }
+
+    // 🛑 Empresas/PJ/clínicas/não-médicos que não são médicos cadastrados: silêncio total (exceto opt-out no quickResponse)
+    if (rawRole !== "doctor" && isBusinessOrNonDoctorSender(senderName)) {
+      suppressOnError = true;
     }
 
     const sentHistory = Array.isArray(body.sentHistory24h) ? body.sentHistory24h : [];
-    if (phoneDigits && LOOPING_BOT_NUMBERS.has(phoneDigits)) {
-      return new Response(JSON.stringify({ answer: '', suppressed: true, reason: 'looping_bot_blacklisted' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
     const respond = (data: Record<string, unknown>) => {
       const sanitized = typeof data.answer === 'string' ? sanitizeOutboundAnswer(data.answer) : '';
       const duplicate = Boolean(sanitized) && repeatedWithinDay(sanitized, sentHistory);
@@ -155,8 +205,26 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     };
-    const quick = quickResponse({ question, senderName, role: rawRole, isAudio: Boolean(body.isAudio), isCall: Boolean(body.isCall) });
-    if (quick) return respond({ ...quick, role: rawRole || 'patient', verifiedDoctor });
+
+    const effectiveRole = rawRole || (isColdContact ? 'unknown' : 'patient');
+    const quick = quickResponse({
+      question,
+      senderName,
+      senderJid,
+      role: effectiveRole,
+      isAudio: Boolean(body.isAudio),
+      isCall: Boolean(body.isCall),
+      isSticker: Boolean(body.isSticker),
+      introducedRecently: Boolean(body.introducedRecently),
+      hasPendingPaymentContext,
+      isColdContact,
+    });
+    if (quick) return respond({ ...quick, role: effectiveRole, verifiedDoctor });
+
+    // Se for empresa/PJ e passou pelo quickResponse (não era opt-out), manter silêncio total
+    if (suppressOnError) {
+      return respond({ answer: "", suppressed: true, reason: "business-contact-suppressed", role: effectiveRole, verifiedDoctor });
+    }
 
     // 🎯 PROMPT DO SISTEMA (Auditoria e Treinamento de Vendas — 19/11/2026)
     let systemInstruction = "";
@@ -165,8 +233,8 @@ serve(async (req) => {
       // 🩺 PROFISSIONAIS DE SAÚDE / MÉDICOS PRESCRITORES
       const cleanName = sanitizePatientName(senderName);
       const addressingRule = verifiedDoctor
-        ? `Você está falando com um médico verificado (${cleanName ? `Dr(a). ${cleanName}` : 'colega'}).`
-        : `NUNCA chame de "Dr(a)." quem não for médico verificado. Use apenas o nome da pessoa (${cleanName || 'sem título'}).`;
+        ? `Você está falando com um médico com CRM confirmado (${cleanName ? `Dr(a). ${cleanName}` : 'colega'}).`
+        : `NUNCA chame de "Dr(a)." quem não tiver CRM confirmado. Use apenas o nome da pessoa (${cleanName || 'sem título'}).`;
 
       systemInstruction = `Você é a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14). Fale em português simples, frases curtas (máximo 3 a 4 linhas), tom acolhedor e profissional, sem jargão e no máximo 1 emoji. Diga que é assistente virtual e que a equipe humana acompanha.
 ${addressingRule}
@@ -178,9 +246,18 @@ INFORMAÇÕES OFICIAIS PARA PROFISSIONAIS COM REGISTRO EM CONSELHO:
 
 NUNCA FAÇA:
 - Dizer "sócio", "participação nos lucros", "pacientes 100% seus", "taxa zero" ou "100% de repasse".
-- Chamar de "Dr(a)." quem não for médico confirmado.
+- Chamar de "Dr(a)." quem não tiver CRM confirmado.
 - Tratar profissional como paciente ou enviar link sozinho sem frase explicativa.
+- Classificar mensagem como pagamento sem cobrança pendente confirmada.
 - Se o profissional pedir condição comercial diferente, tiver dúvida sobre repasse/contrato ou questão jurídica, encaminhe para a equipe humana ("Vou passar para nossa equipe humana. Retornamos por aqui.").`;
+    } else if (isColdContact) {
+      // 🛑 CONTATO FRIO: nunca oferecer Orientação Técnica de paciente nem chamar de Dr(a). sem CRM confirmado
+      systemInstruction = `Você é a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.). Responda em português simples, no máximo 2 a 3 linhas.
+REGRAS ESTRITAS PARA CONTATO FRIO:
+- NUNCA ofereça Orientação Técnica (R$ 30) nem envie link de checkout de paciente.
+- NUNCA chame de "Dr(a)." sem CRM confirmado.
+- NUNCA diga "sócio", "participação nos lucros", "taxa zero", "100% de repasse" ou "Recebemos sua mensagem sobre o pagamento".
+- Se a pessoa pedir para parar ou não tiver interesse, oriente responder SAIR e encerre educadamente.`;
     } else {
       // 🌿 VENDAS CONSULTIVAS PARA PACIENTES E INTERESSADOS (19/11/2026)
       const patientCleanName = sanitizePatientName(senderName);
@@ -219,7 +296,7 @@ NUNCA FAÇA:
 - Prometer cura, resultado, receita ou desconto não cadastrado; falar de dose, posologia ou medicamento; fazer diagnóstico.
 - Vender ou indicar produto/medicamento de cannabis.
 - Dizer "sócio", "participação nos lucros", "taxa zero", "100% de repasse" ou "pacientes 100% seus".
-- Chamar de "Dr(a)." quem não for médico. Use o nome da pessoa (${patientCleanName || 'sem título'}).
+- Chamar de "Dr(a)." quem não for médico confirmado. Use o nome da pessoa (${patientCleanName || 'sem título'}).
 - Responder a outros robôs ("mensagem automática", "assistente virtual de..."): fique em silêncio.
 - Repetir frases já enviadas nas últimas 24h ou fazer textões longos.
 
@@ -227,9 +304,8 @@ ENCAMINHE PARA HUMANO (responda "Vou passar para nossa equipe humana. Retornamos
 - Reclamação, pedido de reembolso, caso clínico complexo, menor de idade, urgência (oriente SAMU 192 imediatamente antes de tudo), pedido jurídico ou qualquer dúvida sobre repasse a médico.`;
     }
 
-    const history = Array.isArray(body.history) ? body.history : [];
     const historyContext = history.length > 0
-      ? `\nHISTÓRICO RECENTE DA CONVERSA:\n` + history.map((h: any) => `${h.role === 'brisa' ? 'Assistente' : senderName}: ${h.text}`).join('\n') + `\n\nLEMBRETE: Não repita frases já ditas no histórico. Avance para o próximo passo.\n`
+      ? `\nHISTÓRICO RECENTE DA CONVERSA:\n` + history.map((h: { role?: string; text?: string }) => `${h.role === 'brisa' ? 'Assistente' : senderName}: ${h.text}`).join('\n') + `\n\nLEMBRETE: Não repita frases já ditas no histórico. Avance para o próximo passo.\n`
       : "";
 
     const requestBody = {
@@ -247,7 +323,7 @@ ENCAMINHE PARA HUMANO (responda "Vou passar para nossa equipe humana. Retornamos
       try {
         const gwMessages = [
           { role: "system", content: systemInstruction },
-          ...history.slice(-8).map((h: any) => ({
+          ...history.slice(-8).map((h: { role?: string; text?: string }) => ({
             role: h.role === 'brisa' ? 'assistant' : 'user',
             content: h.text || ''
           })),
@@ -283,9 +359,11 @@ ENCAMINHE PARA HUMANO (responda "Vou passar para nossa equipe humana. Retornamos
       usedModel = res.usedModel;
     }
 
-    // 3. Fallback de Ouro: focado em responder a pergunta ou conduzir ao cadastro
+    // 3. Fallback de Ouro: nunca oferece Orientação Técnica para empresas ou contatos frios
     if (!answer) {
-      if (/rem[eé]dio|dormir|ins[oô]nia|ansiedade|dor|sintoma/i.test(normQ)) {
+      if (isColdContact && rawRole !== 'doctor') {
+        answer = T.coldContactGreeting;
+      } else if (/rem[eé]dio|dormir|ins[oô]nia|ansiedade|dor|sintoma/i.test(normQ)) {
         answer = "Quem avalia isso e define a melhor conduta é o médico na consulta. O primeiro passo é o cadastro gratuito em plantayraiz.com.br/cadastro. Você já tem cadastro na plataforma?";
       } else {
         answer = rawRole === 'doctor'
@@ -295,13 +373,21 @@ ENCAMINHE PARA HUMANO (responda "Vou passar para nossa equipe humana. Retornamos
       usedModel = "golden-script-fallback";
     }
 
-    return respond({ answer, model: usedModel, role: rawRole || 'unknown', verifiedDoctor });
+    return respond({ answer, model: usedModel, role: effectiveRole, verifiedDoctor });
 
   } catch (error) {
     console.error("Error in chat-brisa:", error);
-    const fallbackAnswer = rawRole === 'doctor' 
-      ? getGoldenDoctorScript(senderName) 
-      : getGoldenPatientScript(senderName, phoneDigits);
+    if (suppressOnError || isBusinessOrNonDoctorSender(senderName)) {
+      return new Response(
+        JSON.stringify({ answer: "", suppressed: true, degraded: true }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const fallbackAnswer = rawRole === 'doctor'
+      ? getGoldenDoctorScript(senderName)
+      : isColdContact
+        ? T.coldContactGreeting
+        : getGoldenPatientScript(senderName, phoneDigits);
 
     return new Response(
       JSON.stringify({

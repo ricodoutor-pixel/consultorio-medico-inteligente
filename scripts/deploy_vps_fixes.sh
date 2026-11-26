@@ -28,28 +28,32 @@ export NODE_OPTIONS="--dns-result-order=ipv4first"
 echo "⚙️ 3. Aplicando nova configuração do PM2..."
 pm2 startOrReload ecosystem.config.cjs --update-env
 
-# Garante que os agentes bloqueados pelo Brevo ou Apify e os disparadores frios fiquem desligados e excluídos do PM2
+# Garante que os agentes bloqueados pelo Brevo ou Apify e TODOS os disparadores frios fiquem desligados e excluídos do PM2
 echo "🛑 4. Desligando e excluindo agentes frios e bloqueados..."
-pm2 stop cadence-10min-inviter 2>/dev/null || true
-pm2 delete cadence-10min-inviter 2>/dev/null || true
-pm2 stop brevo-whatsapp-inviter 2>/dev/null || true
-pm2 delete brevo-whatsapp-inviter 2>/dev/null || true
-pm2 stop brevo-multi-pipeline 2>/dev/null || true
-pm2 delete brevo-multi-pipeline 2>/dev/null || true
-pm2 stop apify-lead-sync 2>/dev/null || true
-pm2 delete apify-lead-sync 2>/dev/null || true
+for app in cadence-10min-inviter brevo-whatsapp-inviter whatsapp-bot wpp-crm growth-engine brevo-multi-pipeline apify-lead-sync hostinger-email-dispatcher cannabis-young-doctors-hunter instagram-direct-inviter; do
+  pm2 stop "$app" 2>/dev/null || true
+  pm2 delete "$app" 2>/dev/null || true
+done
 
-# 5. Desativa o fluxo n8n legado (LdAWxfIxg0s67H32) que disparava "🔔 PAGAMENTO INFORMADO" falso quando médicos enviavam documentos KYC
-echo "🛡️ 5. Desativando fluxo legado do n8n (LdAWxfIxg0s67H32) que gerava avisos duplicados de pagamento..."
+# 5. Desativa o fluxo n8n legado (LdAWxfIxg0s67H32) e qualquer clone com alerta falso de pagamento ou convite frio proibido
+echo "🛡️ 5. Desativando fluxos legados do n8n (alerta falso de pagamento e convites frios proibidos)..."
 if [ -f "/var/lib/docker/volumes/n8n-a3wy_n8n_data/_data/database.sqlite" ]; then
   python3 -c "
 import sqlite3
 conn = sqlite3.connect('/var/lib/docker/volumes/n8n-a3wy_n8n_data/_data/database.sqlite')
 c = conn.cursor()
-c.execute(\"UPDATE workflow_entity SET active = 0 WHERE id = 'LdAWxfIxg0s67H32'\")
+c.execute('''
+  UPDATE workflow_entity SET active = 0
+  WHERE id = 'LdAWxfIxg0s67H32'
+     OR lower(coalesce(nodes, '')) LIKE '%recebemos sua mensagem sobre o pagamento%'
+     OR lower(coalesce(nodes, '')) LIKE '%pagamento informado%'
+     OR lower(coalesce(nodes, '')) LIKE '%prescritores s%'
+     OR lower(coalesce(nodes, '')) LIKE '%você foi selecionado%'
+     OR lower(coalesce(nodes, '')) LIKE '%voce foi selecionado%'
+''')
+print('Workflows n8n desativados:', c.rowcount)
 conn.commit()
 conn.close()
-print('Workflow n8n LdAWxfIxg0s67H32 desativado no SQLite.')
 " || true
   docker restart $(docker ps -q --filter "name=n8n") 2>/dev/null || true
 fi

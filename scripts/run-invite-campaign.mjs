@@ -1,3 +1,7 @@
+// 🛑 DESATIVADO PERMANENTEMENTE: disparos frios em massa no WhatsApp estão proibidos (decisão Dr. Edilson).
+console.log('🛑 [RUN-INVITE-CAMPAIGN] Script desativado permanentemente.');
+process.exit(0);
+
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 

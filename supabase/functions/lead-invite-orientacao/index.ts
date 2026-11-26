@@ -6,6 +6,11 @@
 // verify_jwt = false (chamado tanto por sessão anônima quanto por usuários logados).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { OT_DESCRIPTION, PATIENT_PAY_LINK } from "../_shared/brisa-templates.mjs";
+import {
+  formatDoctorAddressing,
+  isCompanyOrNonDoctorContact,
+} from "../_shared/whatsapp-outreach-guard.mjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,33 +18,38 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const SITE_BASE = "https://plantayraiz.com.br";
-const WA_LINK = `https://wa.me/5511991363154?text=${encodeURIComponent(
-  "Olá Enfª Brisa, quero garantir minha Orientação Técnica de R$30 com a Planta y Raíz Ltda!"
-)}`;
+const SITE_BASE = "https://www.plantayraiz.com.br";
 
-function inviteMessage(nome: string, categoria: string | null) {
-  const first = (nome || "").trim().split(/\s+/)[0] || "tudo bem";
+function inviteMessage(nome: string, categoria: string | null, crm = "", crmState = "") {
+  const addressing = formatDoctorAddressing({ name: nome, crm, crmState });
+  if (!addressing.allowed) return "";
+  const first = (addressing.cleanName || "").split(/\s+/)[0] || "";
+
   if (categoria === "medico") {
+    const salutation = addressing.salutation || first;
+    const greeting = salutation ? `Olá, ${salutation}!` : "Olá!";
     return (
-      `Olá Dr(a). ${first}! 🌿\n\nAqui é a Enfª Brisa da Planta y Raiz.\n` +
-      `Vi que demonstrou interesse na nossa rede médica. Vamos conversar sobre o credenciamento?\n` +
-      `👉 ${SITE_BASE}/cadastro-profissional`
+      `${greeting} 🌿\n\nAqui é a Enfª Brisa, assistente virtual da Planta y Raiz.\n` +
+      `Cadastro gratuito para médicos com CRM ativo (repasse de 93% via PIX, taxa fixa de 7%):\n` +
+      `👉 ${SITE_BASE}/cadastro-profissional\n` +
+      `Se não quiser mais mensagens, responda SAIR.`
     );
   }
   if (categoria === "lojista") {
+    const greeting = first ? `Olá, ${first}!` : "Olá!";
     return (
-      `Olá ${first}! 🌿\n\nAqui é a Enfª Brisa da Planta y Raiz.\n` +
+      `${greeting} 🌿\n\nAqui é a Enfª Brisa, assistente virtual da Planta y Raiz.\n` +
       `Vi que demonstrou interesse em vender no nosso Shopping. Vamos conversar sobre parceria?\n` +
-      `👉 ${SITE_BASE}/shopping`
+      `👉 ${SITE_BASE}/shopping\n` +
+      `Se não quiser mais mensagens, responda SAIR.`
     );
   }
-  // default: paciente / ebook
+  const greeting = first ? `Olá, ${first}!` : "Olá!";
   return (
-    `Olá ${first}! 🌿💚\n\nAqui é a Enfª Brisa da Planta y Raiz.\n\n` +
-    `🎯 *Garanta agora sua Orientação Técnica em Cannabis Medicinal com a Planta y Raíz Ltda por apenas R$30* — relatório em PDF com assinatura digital ICP-Brasil e selo gov.br.\n\n` +
-    `Acesse rapidinho aqui: ${WA_LINK}\n\n` +
-    `Qualquer dúvida, é só responder esta mensagem. Estou aqui para te ajudar! 🐸`
+    `${greeting} 🌿\n\nAqui é a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha).\n\n` +
+    `${OT_DESCRIPTION}\n\n` +
+    `Para começar: ${PATIENT_PAY_LINK}\n\n` +
+    `Se não quiser mais mensagens, responda SAIR.`
   );
 }
 
@@ -64,7 +74,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { nome, telefone, email, categoria, origem } = await req.json();
+    const { nome, telefone, email, categoria, origem, crm, crm_state } = await req.json();
     const phoneDigitsRaw = String(telefone || "").replace(/\D/g, "");
     // Strict BR E.164: 10–13 digits, must start with 55 or be a 10–11 digit local number
     const isValidBR =
@@ -73,6 +83,13 @@ Deno.serve(async (req) => {
     if (!nome || String(nome).trim().length < 2 || !isValidBR) {
       return new Response(JSON.stringify({ error: "invalid_payload" }), {
         status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Bloqueia PJ/empresas/clínicas/não-médicos antes de qualquer disparo (exceto lojista explícito)
+    if (categoria !== "lojista" && isCompanyOrNonDoctorContact({ name: nome, email }).blocked) {
+      return new Response(JSON.stringify({ ok: true, skipped: "blocked_pj_or_non_doctor" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -117,7 +134,6 @@ Deno.serve(async (req) => {
 
     const phoneDigits = phoneDigitsRaw;
 
-
     // Anti-duplicação: se já existe tag de convite enviado, não dispara de novo.
     const { data: existing } = await supabase
       .from("leads_contatos")
@@ -151,7 +167,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    const msg = inviteMessage(nome, categoria ?? null);
+    const msg = inviteMessage(nome, categoria ?? null, String(crm || ""), String(crm_state || ""));
+    if (!msg) {
+      return new Response(JSON.stringify({ ok: true, skipped: "blocked_pj_or_non_doctor" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const wa = await sendWhatsApp(phoneDigits, msg);
 
     // Marca o lead como já contatado pelo convite (idempotência).

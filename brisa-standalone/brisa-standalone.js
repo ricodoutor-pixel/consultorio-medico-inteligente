@@ -14,23 +14,32 @@ const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://tkxxoghzhvhjztdoomgss.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const genAI = GEMINI_KEY ? new GoogleGenerativeAI(GEMINI_KEY) : null;
 const supabase = (SUPABASE_URL && SUPABASE_KEY) ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-const BRISA_PERSONA = `Você é a Enfermeira Brisa, assistente virtual da clínica Planta y Raíz.
-Seu tom é extremamente acolhedor, profissional e claro.
-Você orienta pacientes sobre Telemedicina Canábica, agendamentos e diagnósticos.
-Sempre envie o link oficial da clínica: https://plantayraiz.com.br quando apropriado.`;
+let sharedPolicyPromise = null;
+function getSharedPolicy() {
+  if (!sharedPolicyPromise) {
+    sharedPolicyPromise = import(path.resolve(__dirname, '../supabase/functions/_shared/brisa-response-policy.mjs'));
+  }
+  return sharedPolicyPromise;
+}
+
+const BRISA_PERSONA = `Você é a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
+Seu tom é acolhedor, profissional e claro (máximo 3 linhas).
+Você orienta pacientes sobre a Orientação Técnica educativa (R$ 30) e consultas na vitrine de médicos.
+NUNCA dê diagnóstico, NUNCA prescreva, NUNCA diga "sócio", "participação nos lucros", "taxa zero", "100% de repasse" ou "Recebemos sua mensagem sobre o pagamento".
+Link oficial: https://www.plantayraiz.com.br`;
 
 async function getBrisaReply(userMessage) {
   if (!genAI) {
-    return "Olá! Sou a Enfª Brisa da Planta y Raíz. No momento estou sem acesso à minha IA, mas você pode agendar direto em: https://plantayraiz.com.br";
+    return "Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz. Você pode iniciar seu atendimento em: https://www.plantayraiz.com.br";
   }
 
-  const modelsToTry = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash"];
+  const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
 
   for (const modelName of modelsToTry) {
     try {
@@ -45,7 +54,7 @@ async function getBrisaReply(userMessage) {
     }
   }
 
-  return "Olá! Sou a Enfª Brisa da Planta y Raíz. Como posso te ajudar hoje? Acesse: https://plantayraiz.com.br";
+  return "Olá! Sou a Enfª Brisa, assistente virtual da Planta y Raiz. Como posso te ajudar hoje? Acesse: https://www.plantayraiz.com.br";
 }
 
 async function startBrisaBot() {
@@ -53,6 +62,7 @@ async function startBrisaBot() {
   console.log("🌿 INICIANDO ENFERMEIRA BRISA — VERSÃO STANDALONE");
   console.log("=================================================\n");
 
+  const policy = await getSharedPolicy();
   const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, 'auth_info_brisa'));
   const { version } = await fetchLatestBaileysVersion();
 
@@ -93,14 +103,36 @@ async function startBrisaBot() {
     for (const msg of messages) {
       if (!msg.message || msg.key.fromMe) continue;
 
-      const from = msg.key.remoteJid;
+      const from = msg.key.remoteJid || '';
+      if (!from || from.endsWith('@g.us') || from.includes('status@') || from.includes('@newsletter')) continue;
+
+      const senderName = msg.pushName || '';
       const text = msg.message.conversation || msg.message.extendedTextMessage?.text || '';
 
       if (!text) continue;
 
+      // Bloqueio total de URAs, bots comerciais, auto-respostas e empresas/PJ (silêncio total)
+      if (
+        policy.isAutoReplyOrCommercialBot(text, { senderName, senderJid: from }) ||
+        policy.isBusinessOrNonDoctorSender(senderName)
+      ) {
+        console.log(`[Brisa Standalone] 🔇 Silenciado (bot/URA/PJ): ${from}`);
+        continue;
+      }
+
+      const quick = policy.quickResponse({
+        question: text,
+        senderName,
+        senderJid: from,
+        hasPendingPaymentContext: false,
+      });
+      if (quick?.suppressed) continue;
+
       console.log(`[${new Date().toLocaleTimeString('pt-BR')}] 📩 Mensagem recebida (${String(text||"").length} caracteres)`);
 
-      const replyText = await getBrisaReply(text);
+      const rawReply = quick?.answer || await getBrisaReply(text);
+      const replyText = policy.sanitizeOutboundAnswer(rawReply);
+      if (!replyText) continue;
 
       await sock.sendMessage(from, { text: replyText });
       console.log(`[${new Date().toLocaleTimeString('pt-BR')}] 📤 Brisa respondeu: "${replyText.slice(0, 80)}..."`);
@@ -112,7 +144,7 @@ async function startBrisaBot() {
           message_in: text,
           message_out: replyText,
           provider: 'gemini',
-          model: 'gemini-3.5-flash',
+          model: quick?.model || 'gemini-2.5-flash',
           status: 'ok',
           http_status: 200
         }).then(() => {}).catch(() => {});

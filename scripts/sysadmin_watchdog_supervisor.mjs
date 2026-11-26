@@ -57,6 +57,8 @@ async function inspectSystemResources() {
   log(`🖥️ RECURSOS: RAM ${memUsagePercent}% usada (${(usedMem / 1024 / 1024).toFixed(0)}MB / ${(totalMem / 1024 / 1024).toFixed(0)}MB) | Carga: [${loadAvg.map(l => l.toFixed(2)).join(', ')}] | Disco: ${diskInfo}`);
 }
 
+const FORBIDDEN_COLD_WORKER_PATTERN = /(cadence|invit|convite|disparo|dispatch|whatsapp-bot|wpp-crm|growth-engine|brevo-whatsapp|cannabis-young-doctors|hostinger-email-dispatcher|instagram-direct-inviter)/i;
+
 async function checkAndHealPM2Services() {
   const failedServices = [];
   try {
@@ -65,6 +67,20 @@ async function checkAndHealPM2Services() {
     const activeMap = new Map();
 
     for (const proc of pm2List) {
+      const execPath = String(proc.pm2_env?.pm_exec_path || '');
+      if (
+        !EXPECTED_SERVICES.includes(proc.name) &&
+        (FORBIDDEN_COLD_WORKER_PATTERN.test(proc.name || '') || FORBIDDEN_COLD_WORKER_PATTERN.test(execPath))
+      ) {
+        log(`🛑 Robô de convite frio/proibido detectado no PM2 ('${proc.name}', script '${execPath}'). Encerrando imediatamente...`);
+        try {
+          execSync(`pm2 delete ${proc.name}`);
+          log(`✅ Robô proibido '${proc.name}' removido do PM2.`);
+        } catch (e) {
+          log(`⚠️ Não foi possível remover '${proc.name}': ${e.message}`);
+        }
+        continue;
+      }
       activeMap.set(proc.name, proc.pm2_env.status);
     }
 

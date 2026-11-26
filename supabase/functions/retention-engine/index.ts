@@ -4,6 +4,11 @@
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import {
+  formatDoctorAddressing,
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+} from "../_shared/whatsapp-outreach-guard.mjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,16 +47,20 @@ Deno.serve(async (req) => {
   const authErr = requireServiceAuth(req, corsHeaders);
   if (authErr) return authErr;
 
-
   try {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const { action } = await req.json().catch(() => ({ action: "health" }));
 
     switch (action) {
       // ═══════════════════════════════════════════════════
-      // 1. UPGRADE AUTOMÁTICO PARA VIP
+      // 1. UPGRADE AUTOMÁTICO PARA VIP (somente Seg–Sáb 9h–19h BRT)
       // ═══════════════════════════════════════════════════
       case "vip_upgrade_check": {
+        if (!isBusinessHoursBRT()) {
+          return new Response(JSON.stringify({ success: true, skipped: "outside_business_hours_brt", upgraded: 0 }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         console.log("💎 [Retention] Verificando médicos elegíveis para VIP...");
 
         const now = new Date();
@@ -60,17 +69,16 @@ Deno.serve(async (req) => {
 
         const { data: metrics } = await supabase
           .from("doctor_performance_metrics")
-          .select("*, doctors:doctor_id(user_id, consultation_price)")
+          .select("*, doctors:doctor_id(user_id, consultation_price, crm, crm_state, council_type)")
           .eq("month", month)
           .eq("year", year)
-          .gte("consultations_count", 15); // threshold
+          .gte("consultations_count", 15);
 
         let upgraded = 0;
         for (const m of metrics || []) {
-          const doctor = (m as any).doctors;
-          if (!doctor) continue;
+          const doctor = (m as { doctors?: { user_id?: string; consultation_price?: number; crm?: string; crm_state?: string; council_type?: string } | null }).doctors;
+          if (!doctor?.user_id) continue;
 
-          // Verificar se já é VIP
           const { data: sub } = await supabase
             .from("medical_subscriptions")
             .select("id, plan_tier")
@@ -80,18 +88,25 @@ Deno.serve(async (req) => {
 
           if (sub?.plan_tier === "vip") continue;
 
-          // Faturamento estimado do mês (a taxa de 7% vale para todos os planos)
           const revenue = m.consultations_count * (doctor.consultation_price || 150);
 
-          // Buscar perfil para telefone
           const { data: profile } = await supabase.from("profiles").select("phone, full_name").eq("id", doctor.user_id).maybeSingle();
           if (!profile?.phone) continue;
 
+          const addressing = formatDoctorAddressing({
+            name: profile.full_name || "",
+            crm: doctor.crm || "",
+            crmState: doctor.crm_state || "",
+            councilType: doctor.council_type || "",
+          });
+          if (!addressing.allowed) continue;
+
           const subscriber = await findSubscriber(profile.phone);
           if (subscriber?.data?.id) {
+            const salutation = addressing.salutation || addressing.cleanName || "";
             await sendContent(subscriber.data.id, [{
               type: "text",
-              text: `💎 Dr. ${profile.full_name}, parabéns!\n\nVocê realizou ${m.consultations_count} consultas este mês e faturou R$ ${revenue.toFixed(0)}! 🎉\n\n🔥 Plano Premium (R$ 99/mês) = prioridade no rodízio de pacientes + Copiloto, Jurídico e Escriba\n\n👉 Upgrade agora: https://plantayraiz.com.br/dashboard-medico\n\nMais pacientes chegam primeiro a quem assina.`
+              text: `💎 ${salutation ? `${salutation}, parabéns` : "Parabéns"}!\n\nVocê realizou ${m.consultations_count} consultas este mês (total bruto R$ ${revenue.toFixed(0)}).\n\n🔥 Plano Premium (R$ 99/mês) = prioridade no rodízio de pacientes + Copiloto, Jurídico e Escriba (taxa fixa de 7% em todos os planos).\n\n👉 Conheça no painel: https://www.plantayraiz.com.br/dashboard-medico\nSe não quiser mais avisos, responda SAIR.`
             }]);
             await tagSubscriber(subscriber.data.id, "VIP_Upgrade_Offer");
             upgraded++;
@@ -104,14 +119,18 @@ Deno.serve(async (req) => {
       }
 
       // ═══════════════════════════════════════════════════
-      // 2. REATIVAÇÃO DE PACIENTES (6 meses sem consulta)
+      // 2. REATIVAÇÃO DE PACIENTES (6 meses sem consulta — somente Seg–Sáb 9h–19h BRT)
       // ═══════════════════════════════════════════════════
       case "patient_reactivation": {
+        if (!isBusinessHoursBRT()) {
+          return new Response(JSON.stringify({ success: true, skipped: "outside_business_hours_brt", reactivated: 0 }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         console.log("🔄 [Retention] Reativando pacientes inativos...");
 
         const sixMonthsAgo = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString();
 
-        // Buscar pacientes com última consulta há 6+ meses
         const { data: oldAppointments } = await supabase
           .from("appointments")
           .select("patient_id, scheduled_at")
@@ -119,7 +138,6 @@ Deno.serve(async (req) => {
           .lt("scheduled_at", sixMonthsAgo)
           .order("scheduled_at", { ascending: false });
 
-        // Agrupar por paciente e pegar apenas os que não têm consulta recente
         const patientLastVisit = new Map<string, string>();
         for (const apt of oldAppointments || []) {
           if (!patientLastVisit.has(apt.patient_id)) {
@@ -127,7 +145,6 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Filtrar: só pacientes sem consulta nos últimos 6 meses
         const { data: recentAppointments } = await supabase
           .from("appointments")
           .select("patient_id")
@@ -135,14 +152,15 @@ Deno.serve(async (req) => {
           .in("patient_id", [...patientLastVisit.keys()]);
 
         const recentPatients = new Set((recentAppointments || []).map(a => a.patient_id));
-        
+
         let reactivated = 0;
         for (const [patientId, lastVisit] of patientLastVisit) {
           if (recentPatients.has(patientId)) continue;
-          if (reactivated >= 30) break; // Limitar por execução
+          if (reactivated >= 30) break;
 
           const { data: profile } = await supabase.from("profiles").select("phone, full_name").eq("id", patientId).maybeSingle();
           if (!profile?.phone) continue;
+          if (isCompanyOrNonDoctorContact({ name: profile.full_name || "" }).blocked) continue;
 
           const sub = await findSubscriber(profile.phone);
           if (sub?.data?.id) {
@@ -150,7 +168,7 @@ Deno.serve(async (req) => {
 
             await sendContent(sub.data.id, [{
               type: "text",
-              text: `Olá ${profile.full_name}! 🌿\n\nFaz ${monthsAgo} meses desde sua última consulta. Como está seu tratamento?\n\n🎁 Temos um cupom especial de 15% para seu retorno: RETORNO15\n\n📅 Agende agora: https://plantayraiz.com.br/agendamento\n\nSeu bem-estar é nossa prioridade! 💚`
+              text: `Olá, ${profile.full_name}! 🌿\n\nFaz ${monthsAgo} meses desde sua última consulta na Planta y Raiz. Caso queira agendar retorno com seu médico:\nhttps://www.plantayraiz.com.br/agendamento\n\nSe não quiser mais avisos, responda SAIR.`
             }]);
             await tagSubscriber(sub.data.id, "Reactivation_Sent");
             reactivated++;
@@ -241,17 +259,26 @@ Deno.serve(async (req) => {
           if (!rx.diagnosis_cid) issues.push("📋 Sem diagnóstico CID");
 
           if (issues.length > 0) {
-            const doctor = (rx as any).doctors;
-            if (!doctor) continue;
+            const doctor = (rx as { doctors?: { user_id?: string; crm?: string; crm_state?: string; council_type?: string } | null }).doctors;
+            if (!doctor?.user_id) continue;
 
             const { data: profile } = await supabase.from("profiles").select("phone, full_name").eq("id", doctor.user_id).maybeSingle();
             if (!profile?.phone) continue;
+
+            const addressing = formatDoctorAddressing({
+              name: profile.full_name || "",
+              crm: doctor.crm || "",
+              crmState: doctor.crm_state || "",
+              councilType: doctor.council_type || "",
+            });
+            if (!addressing.allowed) continue;
+            const salutation = addressing.salutation || addressing.cleanName || "Profissional";
 
             const sub = await findSubscriber(profile.phone);
             if (sub?.data?.id) {
               await sendContent(sub.data.id, [{
                 type: "text",
-                text: `⚠️ ALERTA ANVISA - Prescrição #${rx.id.slice(0, 8)}\n\nDr. ${profile.full_name}, identificamos pendências:\n\n${issues.join("\n")}\n\n🔒 Corrija para manter compliance total.\n\n👉 Acesse: https://plantayraiz.com.br/prontuario`
+                text: `⚠️ ALERTA ANVISA - Prescrição #${rx.id.slice(0, 8)}\n\n${salutation}, identificamos pendências:\n\n${issues.join("\n")}\n\n🔒 Corrija para manter compliance total.\n\n👉 Acesse: https://www.plantayraiz.com.br/prontuario`
               }]);
               await tagSubscriber(sub.data.id, "Prescription_Alert");
               alerts++;

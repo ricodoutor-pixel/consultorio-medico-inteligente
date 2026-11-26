@@ -10,90 +10,39 @@
  * Com PM2: pm2 start scripts/crm/03_whatsapp-crm-engine.mjs --name "wpp-crm"
  */
 
+// 🛑 DESATIVADO PERMANENTEMENTE: Disparos frios via Puppeteer/WhatsApp Web estão suspensos (decisão Dr. Edilson).
+console.log('🛑 [WPP-CRM] Script desativado permanentemente. Convites só por envio manual do admin em horário comercial (Seg-Sáb, 9h-19h BRT) para médicos com CRM confirmado.');
+process.exit(0);
+
 import puppeteer from 'puppeteer';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { T } from '../../supabase/functions/_shared/brisa-templates.mjs';
 
 // ── CONFIG ────────────────────────────────────────────────
-const SUPABASE_URL   = 'https://shmbwdjuddvquszwkvuq.supabase.co';
-const SUPABASE_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDemo'; // Configurar no .env
-const MAX_PER_DAY    = 50;   // Limite diário de mensagens (protege contra banimento)
-const MIN_DELAY_MS   = 15000; // 15 segundos mínimo entre envios
-const MAX_DELAY_MS   = 45000; // 45 segundos máximo
+const SUPABASE_URL   = process.env.SUPABASE_URL || 'https://shmbwdjuddvquszwkvuq.supabase.co';
+const SUPABASE_KEY   = process.env.SUPABASE_ANON_KEY || '';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const MAX_PER_DAY    = 50;
+const MIN_DELAY_MS   = 15000;
+const MAX_DELAY_MS   = 45000;
 
-const INVITE_MESSAGE = `Assunto: *Convite Exclusivo: Seja Médico Sócio Prescritor na Planta y Raíz | A Revolução da Medicina Canabinoide* 🌿
-
-Prezado(a) Doutor(a),
-
-A medicina canabinoide no Brasil vive uma expansão sem precedentes. Convidamos você para se tornar *Médico Sócio Prescritor na Planta y Raíz* — a melhor, mais rentável e mais completa plataforma de telemedicina do país.
-
-🏆 *POR QUE A PLANTA Y RAÍZ É INCOMPARÁVEL?*
-• *Taxa da Plataforma:* Apenas 7% (você retém 93% do valor da consulta)
-• *Repasse Financeiro:* PIX Instantâneo na sua conta ao término da consulta
-• *Preço da Consulta:* Total liberdade para definir seus honorários
-• *Distribuição de Lucros:* Sócio Prescritor com participação nos resultados globais
-• *Plano de Indicação:* Bonificação recorrente até a 3ª Geração de médicos indicados
-• *Tecnologia IA:* Triagem inteligente, prontuário integrado e checagem CYP450
-• *Custo de Adesão:* Cadastro 100% GRATUITO
-
-🌿 *Garanta sua vaga como Médico Sócio Prescritor!*
-O cadastro é gratuito e leva menos de 2 minutos.
-
-👉 *Realize seu cadastro agora mesmo:*
-https://plantayraiz.com.br
-
-Seja muito bem-vindo(a) à medicina do futuro.
-
-Atenciosamente,
-*Diretoria Médica & Conselho Executivo*
-*Planta y Raíz Ltda* 🌿💚`;
-
-const FOLLOWUP_MESSAGE = `🌿 *Olá, Doutor(a)!*
-
-Sou a *Brisa*, assistente da *Planta y Raíz*.
-
-Queria retomar o contato sobre nossa plataforma de telemedicina canabinoide — a única com *93% de repasse e PIX instantâneo* ao médico.
-
-Ficou com alguma dúvida? Estou aqui para ajudar! 😊
-
-👉 Cadastro gratuito em: https://plantayraiz.com.br`;
+const INVITE_MESSAGE = T.doctorInvite('');
+const FOLLOWUP_MESSAGE = T.doctorGreeting('');
 
 // ── SUPABASE & GEMINI ─────────────────────────────────────
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 let genAI = null;
 try {
-  genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+  genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 } catch (e) {
   console.warn('⚠️  Gemini AI não configurado. Respostas automáticas desabilitadas.');
 }
 
-// ── BRISA AI SYSTEM PROMPT ────────────────────────────────
-const BRISA_SYSTEM_PROMPT = `Você é a *Brisa*, a Enfermeira Digital da plataforma Planta y Raíz — a maior plataforma de telemedicina canabinoide do Brasil.
-
-Sua missão é atender médicos prescritores que receberam nosso convite e guiá-los até o cadastro na plataforma.
-
-SOBRE A PLATAFORMA:
-- Taxa de apenas 7% (médico retém 93% do valor)
-- PIX instantâneo ao término da consulta
-- Distribuição de lucros como sócio-prescritor
-- Plano de indicação: bonificação até 3ª geração
-- Tecnologia IA com prontuário integrado e checagem CYP450
-- Cadastro 100% GRATUITO em: https://plantayraiz.com.br
-
-COMO AGIR:
-1. Seja sempre calorosa, profissional e empática
-2. Responda dúvidas sobre a plataforma com clareza
-3. Quebre objeções mostrando os benefícios exclusivos
-4. Sempre termine com o link: https://plantayraiz.com.br
-5. Nunca prometa o que a plataforma não oferece
-6. Máximo 3 parágrafos curtos por resposta
-
-OBJEÇÕES COMUNS:
-- "Já tenho plataforma": Mostre a diferença nos 93% e o plano de sócios
-- "Tenho medo de questões legais": A plataforma é 100% legal e regulamentada
-- "Não sei prescrever cannabis": Oferecemos treinamento e suporte
-- "Taxa muito alta": Nossa taxa é a MENOR do mercado (7% vs 20-40% dos concorrentes)`;
+const BRISA_SYSTEM_PROMPT = `Você é a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
+- Taxa fixa da plataforma: 7% em todos os planos (repasse de 93% via PIX).
+- Cadastro gratuito para médicos com CRM ativo: https://www.plantayraiz.com.br/cadastro-profissional
+- Nunca prometa renda, lucros ou benefícios não implementados.`;
 
 async function askBrisa(doctorMessage, history = []) {
   if (!genAI) return null;

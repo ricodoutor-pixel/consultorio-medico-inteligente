@@ -4,6 +4,12 @@
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import {
+  formatDoctorAddressing,
+  hasConfirmedCrm,
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+} from "../_shared/whatsapp-outreach-guard.mjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,12 +62,16 @@ Deno.serve(async (req) => {
 
     switch (action) {
       // ═══════════════════════════════════════════════════
-      // 1. RECUPERAÇÃO DE ABANDONO DE FUNIL (24h)
+      // 1. RECUPERAÇÃO DE ABANDONO DE FUNIL (24h — somente Seg–Sáb 9h–19h BRT)
       // ═══════════════════════════════════════════════════
       case "ebook_abandonment_recovery": {
+        if (!isBusinessHoursBRT()) {
+          return new Response(JSON.stringify({ success: true, skipped: "outside_business_hours_brt", recovered: 0 }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         console.log("🔄 [Funnel Recovery] Verificando leads que baixaram e-book mas não cadastraram...");
 
-        // Buscar leads criados há mais de 24h com tag 'ebook_download' 
         const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { data: leads } = await supabase
           .from("leads_contatos")
@@ -71,33 +81,32 @@ Deno.serve(async (req) => {
 
         let recovered = 0;
         for (const lead of leads || []) {
-          // Verificar se já tem perfil (cadastro completo)
+          if (isCompanyOrNonDoctorContact({ name: lead.nome, email: lead.email }).blocked) continue;
+
           const { data: profile } = await supabase
             .from("profiles")
             .select("id")
             .eq("phone", lead.telefone)
             .maybeSingle();
 
-          if (profile) continue; // Já cadastrou, pular
-
-          // Verificar se já foi tagado como recuperado
+          if (profile) continue;
           if (lead.tags?.includes("recovery_sent")) continue;
 
-          // Enviar mensagem de recuperação via ManyChat
           const sub = await findSubscriber(lead.telefone);
           if (sub?.status === "success" && sub?.data?.id) {
             const subscriberId = sub.data.id;
+            const addressing = formatDoctorAddressing({ name: lead.nome, email: lead.email });
+            const greeting = addressing.cleanName ? `Olá, ${addressing.cleanName}!` : "Olá!";
 
             await sendContent(subscriberId, [{
               type: "text",
-              text: `Dr. ${lead.nome}, notei que você iniciou sua jornada na Planta y Raiz mas ainda não concluiu seu cadastro! 🌿\n\nFicou alguma dúvida sobre o bônus de 10% sobre lucros? Estou aqui para ajudar!\n\n👉 Complete seu cadastro agora e comece a faturar: https://plantayraiz.com.br/cadastro-profissional`
+              text: `${greeting} Sou a Enfª Brisa, assistente virtual da Planta y Raiz. 🌿\n\nSe ainda tiver interesse em conhecer a plataforma (cadastro gratuito, repasse de 93% via PIX com taxa fixa de 7%), acesse: https://www.plantayraiz.com.br/cadastro-profissional\n\nSe não quiser mais mensagens, responda SAIR.`
             }]);
 
             await tagSubscriber(subscriberId, "recovery_24h");
             recovered++;
           }
 
-          // Marcar lead como recuperação enviada
           await supabase
             .from("leads_contatos")
             .update({ tags: [...(lead.tags || []), "recovery_sent"] })
@@ -111,9 +120,14 @@ Deno.serve(async (req) => {
       }
 
       // ═══════════════════════════════════════════════════
-      // 2. QUALIFICAÇÃO AUTOMÁTICA DE LEADS
+      // 2. QUALIFICAÇÃO AUTOMÁTICA DE LEADS (somente Seg–Sáb 9h–19h BRT)
       // ═══════════════════════════════════════════════════
       case "qualify_lead": {
+        if (!isBusinessHoursBRT()) {
+          return new Response(JSON.stringify({ success: true, skipped: "outside_business_hours_brt" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         console.log("🎯 [Lead Qualification] Qualificando leads pendentes...");
 
         const { data: leads } = await supabase
@@ -123,42 +137,55 @@ Deno.serve(async (req) => {
           .order("created_at", { ascending: false })
           .limit(50);
 
-        let qualified = { medico: 0, paciente: 0, curioso: 0 };
+        let qualified = { medico: 0, paciente: 0, curioso: 0, blockedPj: 0 };
 
         for (const lead of leads || []) {
+          // Jamais tratar empresas/PJ/não-médicos como médico nem oferecer OT de paciente
+          if (isCompanyOrNonDoctorContact({ name: lead.nome, email: lead.email }).blocked) {
+            qualified.blockedPj++;
+            await supabase
+              .from("leads_contatos")
+              .update({ tags: [...(lead.tags || []), "qualified", "blocked_pj"] })
+              .eq("id", lead.id);
+            continue;
+          }
+
           const sub = await findSubscriber(lead.telefone);
           if (sub?.status !== "success" || !sub?.data?.id) continue;
 
           const subscriberId = sub.data.id;
-          let leadType = "curioso";
           let tags: string[] = [...(lead.tags || []), "qualified"];
 
-          // Verificar se é médico (existe na tabela doctors com CRM)
+          // Verificar se é médico com CRM confirmado na tabela doctors
           const { data: doctor } = await supabase
             .from("doctors")
-            .select("id, crm, is_verified")
+            .select("id, crm, crm_state, council_type, is_verified")
             .eq("pix_key", lead.telefone)
             .maybeSingle();
 
-          // Verificar nome com prefixo "Dr." ou "Dra."
-          const isDoctorName = /^(dr\.?|dra\.?)\s/i.test(lead.nome);
+          const crmOk = Boolean(doctor && hasConfirmedCrm(doctor.crm, doctor.crm_state, doctor.council_type));
 
-          if (doctor || isDoctorName) {
-            leadType = "medico";
+          if (crmOk) {
             tags.push("medico", "fast_track");
-
-            // Fast Track: Notificar para aprovação imediata
             await tagSubscriber(subscriberId, "FastTrack_Medico");
             await setCustomField(subscriberId, "lead_type", "MEDICO");
 
+            const addressing = formatDoctorAddressing({
+              name: lead.nome,
+              crm: doctor.crm,
+              crmState: doctor.crm_state,
+              councilType: doctor.council_type,
+              email: lead.email,
+            });
+            const greeting = addressing.salutation ? `Olá, ${addressing.salutation}!` : "Olá!";
+
             await sendContent(subscriberId, [{
               type: "text",
-              text: `Dr. ${lead.nome}, identificamos seu perfil médico! 🩺\n\nVocê foi movido para o Fast Track de aprovação imediata.\n\n✅ Bônus de 10% sobre lucros\n✅ Aprovação em menos de 24h\n\n👉 Complete seu cadastro: https://plantayraiz.com.br/cadastro-profissional`
+              text: `${greeting} Sou a Enfª Brisa, assistente virtual da Planta y Raiz. 🩺\n\nCadastro gratuito, repasse de 93% via PIX (taxa fixa de 7%) e análise cadastral humana em 24 a 48h úteis.\n\n👉 Complete seu cadastro: https://www.plantayraiz.com.br/cadastro-profissional\nSe não quiser mais mensagens, responda SAIR.`
             }]);
 
             qualified.medico++;
           } else {
-            // Verificar se é paciente (já tem perfil ou tags de interesse médico)
             const { data: profile } = await supabase
               .from("profiles")
               .select("id, user_type")
@@ -166,15 +193,13 @@ Deno.serve(async (req) => {
               .maybeSingle();
 
             if (profile?.user_type === "patient" || lead.tags?.includes("interesse_consulta")) {
-              leadType = "paciente";
               tags.push("paciente");
-
               await tagSubscriber(subscriberId, "Paciente_Qualificado");
               await setCustomField(subscriberId, "lead_type", "PACIENTE");
 
               await sendContent(subscriberId, [{
                 type: "text",
-                text: `Olá ${lead.nome}! 🌿\n\nVi que você tem interesse em cannabis medicinal. Nossos especialistas podem te ajudar!\n\n📅 Agende sua consulta online agora (a partir de R$30):\nhttps://plantayraiz.com.br/agendamento`
+                text: `Olá, ${lead.nome}! 🌿 Sou a Enfª Brisa, assistente virtual da Planta y Raiz.\n\nVocê pode começar pela Orientação Técnica educativa (R$ 30) ou escolher um médico na vitrine:\nhttps://www.plantayraiz.com.br/profissionais\n\nSe não quiser mais mensagens, responda SAIR.`
               }]);
 
               qualified.paciente++;
@@ -182,17 +207,10 @@ Deno.serve(async (req) => {
               tags.push("curioso");
               await tagSubscriber(subscriberId, "Lead_Curioso");
               await setCustomField(subscriberId, "lead_type", "CURIOSO");
-
-              await sendContent(subscriberId, [{
-                type: "text",
-                text: `Oi ${lead.nome}! 😊\n\nQuer saber mais sobre cannabis medicinal? Baixe nosso e-book gratuito:\nhttps://plantayraiz.com.br/ebook-medicina-canabinoide\n\nOu fale com nosso assistente Verdinho! 🐸`
-              }]);
-
               qualified.curioso++;
             }
           }
 
-          // Atualizar tags do lead
           await supabase.from("leads_contatos").update({ tags }).eq("id", lead.id);
         }
 

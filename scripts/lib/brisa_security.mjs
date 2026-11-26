@@ -9,6 +9,19 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { BRISA_CONFIG, buildKycChecklistReply } from '../brisa_onboarding_config.mjs';
+import {
+  isAutoReplyOrCommercialBot,
+  isBusinessOrNonDoctorSender,
+  isPaymentClaimText,
+} from '../../supabase/functions/_shared/brisa-response-policy.mjs';
+import { FORBIDDEN_PHRASES } from '../../supabase/functions/_shared/brisa-templates.mjs';
+import {
+  hasConfirmedCrm,
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+} from '../../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
+
+export { hasConfirmedCrm, isBusinessHoursBRT, isBusinessOrNonDoctorSender, isCompanyOrNonDoctorContact };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = path.join(__dirname, '..');
@@ -361,15 +374,19 @@ const AUTO_REPLY_PATTERNS = [
   /para\s+agendar\s+(sua\s+)?consulta\s+(ligue|acesse|clique|envie)/i
 ];
 
-export function isAutoReplyBot(text = '', senderJid = '') {
+export function isAutoReplyBot(text = '', senderJid = '', senderName = '') {
   // Avisos de sistema da Meta ou WhatsApp ou números em laço bloqueados
   if (senderJid) {
-    if (senderJid.includes('status@') || senderJid.includes('@newsletter') || senderJid === '0@s.whatsapp.net') {
+    if (senderJid.includes('status@') || senderJid.includes('@newsletter') || senderJid.includes('@g.us') || senderJid === '0@s.whatsapp.net') {
       return true;
     }
     if (isBlacklisted(senderJid)) {
       return true;
     }
+  }
+
+  if (isAutoReplyOrCommercialBot(text, { senderName, senderJid })) {
+    return true;
   }
 
   if (!text) return false;
@@ -563,8 +580,12 @@ export function sanitizeDoctorName(rawName) {
     return 'Doutor(a)';
   }
 
-  // Remove prefixos institucionais e títulos repetidos no início (ex.: "Consultório Dr. Victor", "Clínica Dra. Katia")
-  n = n.replace(/^(consult[oó]rio|cl[ií]nica|recep[cç][aã]o|equipe|agendamento|espac[oç]|instituto|central)\s+/gi, '');
+  // Bloqueia PJ, empresas, clínicas e não-médicos (jamais sanitizar empresa como médico)
+  if (isCompanyOrNonDoctorContact({ name: n }).blocked) {
+    return '';
+  }
+
+  // Remove títulos repetidos no início
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|médico|médica)\s*/gi, '');
   n = n.replace(/^(dr\(a\)\.?|dr\.|dra\.|dr|dra|doutor\(a\)|doutor|doutora|médico|médica)\s*/gi, '');
   
@@ -619,6 +640,9 @@ export function sanitizePatientName(rawName) {
   if (/\d/.test(n) || /[@_]/.test(n)) {
     return '';
   }
+  if (isBusinessOrNonDoctorSender(n)) {
+    return '';
+  }
   const normFull = n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   if (/\b(consultorio|clinica|recepcao|agendamento|equipe|secretaria|central|espaco|instituto|vital\s+apex|odontologia|dentario|vacinas|urologia|veterinaria|terracannabis|renoveja|imedicos|consulmed)\b/i.test(normFull)) {
     return '';
@@ -648,10 +672,14 @@ export function isPureGreeting(text = '') {
   return pattern.test(clean);
 }
 
-export function isPaymentOrVoucherNotice(text = '') {
+/**
+ * Fail-closed: NUNCA classifica mensagem como aviso de pagamento sem contexto real
+ * de cobrança/pedido pendente pertencente ao próprio contato (`hasPendingPaymentContext === true`).
+ */
+export function isPaymentOrVoucherNotice(text = '', options = {}) {
   if (!text) return false;
-  const clean = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return /(paguei|comprovante|pagamento feito|pagamento realizado|ja paguei|já paguei|fiz o pix|mandei o pix|enviei o comprovante|comprovante em anexo|transferencia feita)/i.test(clean);
+  if (options?.hasPendingPaymentContext !== true) return false;
+  return isPaymentClaimText(text);
 }
 
 export function isUrgentMedicalEmergency(text = '') {
@@ -719,6 +747,50 @@ export function preSendGuard(jid, text, options = {}) {
       reason: 'BARE_LINK_BLOCKED',
       log: `[BLOQUEIO LINK CRU] Mensagem barrada por conter apenas link sem explicação para ${jid}: "${cleanText}"`
     };
+  }
+
+  // 0c. NUNCA disparar frases proibidas (sócio, participação nos lucros, taxa zero, alerta falso de pagamento, etc.)
+  for (const re of [...FORBIDDEN_PHRASES, /\bs[oó]ci[oa](?:\(a\)|s)?\b/i]) {
+    if (re.test(cleanText)) {
+      return {
+        canSend: false,
+        reason: 'FORBIDDEN_COPY_BLOCKED',
+        log: `[BLOQUEIO TEXTO PROIBIDO] Mensagem barrada (${re}) para ${jid}: "${cleanText.slice(0, 80)}"`
+      };
+    }
+  }
+
+  // 0d. Regras estritas de disparo ativo (outreach): horário comercial BRT, bloqueio PJ e CRM confirmado para Dr(a).
+  if (options.isOutreach) {
+    if (!isBusinessHoursBRT(options.now || new Date())) {
+      return {
+        canSend: false,
+        reason: 'OUTSIDE_BUSINESS_HOURS_BRT',
+        log: `[BLOQUEIO HORÁRIO] Disparo fora do horário comercial (Seg-Sáb 9h-19h BRT) barrado para ${jid}.`
+      };
+    }
+    if (options.contact) {
+      const pj = isCompanyOrNonDoctorContact(options.contact);
+      if (pj.blocked) {
+        return {
+          canSend: false,
+          reason: `BLOCKED_PJ_OR_NON_DOCTOR:${pj.reason}`,
+          log: `[BLOQUEIO PJ/NÃO-MÉDICO] Disparo barrado para ${jid} (${pj.reason}).`
+        };
+      }
+    }
+    const crmOk = Boolean(options.crmConfirmed) || hasConfirmedCrm(
+      options.contact?.crm,
+      options.contact?.crmState || options.contact?.crm_state,
+      options.contact?.councilType || options.contact?.council_type,
+    );
+    if (!crmOk && /\b(ol[aá],?\s*)?(dr\(a\)\.?|dr\.|dra\.)\b/i.test(cleanText)) {
+      return {
+        canSend: false,
+        reason: 'UNCONFIRMED_CRM_HONORIFIC_BLOCKED',
+        log: `[BLOQUEIO DR(A) SEM CRM] Prefixo Dr(a). barrado sem CRM confirmado para ${jid}.`
+      };
+    }
   }
 
   // 1. Está no modo DRY-RUN?

@@ -6,7 +6,21 @@ import dotenv from 'dotenv';
 import { acquireBrisaWorkerLock } from './lib/brisa-worker-lock.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { BRISA_CONFIG, buildLgpdOriginReply, buildKycChecklistReply } from './brisa_onboarding_config.mjs';
-import { sanitizeOutboundAnswer, PAYMENT_CLAIM_ANSWER, AUDIO_ANSWER, isMediaOnlyText, introducedWithinDay, patientGreeting } from '../supabase/functions/_shared/brisa-response-policy.mjs';
+import {
+  sanitizeOutboundAnswer,
+  PAYMENT_CLAIM_ANSWER,
+  AUDIO_ANSWER,
+  isMediaOnlyText,
+  introducedWithinDay,
+  patientGreeting,
+  isAutoReplyOrCommercialBot,
+  isBusinessOrNonDoctorSender,
+} from '../supabase/functions/_shared/brisa-response-policy.mjs';
+import { T } from '../supabase/functions/_shared/brisa-templates.mjs';
+import {
+  hasConfirmedCrm,
+  isCompanyOrNonDoctorContact,
+} from '../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 import {
   normalizeJid,
   checkAiPause,
@@ -97,9 +111,102 @@ const EVO_KEY = process.env.EVOLUTION_API_KEY_VPS || process.env.EVOLUTION_API_K
 const INSTANCE = process.env.EVOLUTION_INSTANCE || 'plantayraiz';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://shmbwdjuddvquszwkvuq.supabase.co';
 const ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const ADMIN_PHONE = process.env.ADMIN_WHATSAPP_PHONE || '5511987131241'; // Dr. Edilson Bezerra (Fundador & Diretor Técnico)
 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
+const supabaseAdmin = SERVICE_KEY ? createClient(SUPABASE_URL, SERVICE_KEY) : null;
+
+/**
+ * Verifica no banco se este contato específico possui cobrança/pedido pendente real (últimas 72h).
+ * Fail-closed: retorna false caso não haja chave de serviço, telefone válido ou pedido pendente.
+ */
+async function hasPendingPaymentForContact(rawPhone = '') {
+  try {
+    if (!supabaseAdmin || !rawPhone) return false;
+    const digits = String(rawPhone).split('@')[0].replace(/\D/g, '');
+    if (digits.length < 10) return false;
+    const variants = new Set([digits]);
+    if (digits.startsWith('55')) {
+      const local = digits.slice(2);
+      variants.add(local);
+      if (local.length === 11 && local[2] === '9') {
+        const noNine = local.slice(0, 2) + local.slice(3);
+        variants.add(noNine);
+        variants.add('55' + noNine);
+      } else if (local.length === 10) {
+        const withNine = local.slice(0, 2) + '9' + local.slice(2);
+        variants.add(withNine);
+        variants.add('55' + withNine);
+      }
+    } else {
+      variants.add('55' + digits);
+    }
+    const list = Array.from(variants);
+    const cutoffIso = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
+    const pendingStatuses = ['pending', 'awaiting_payment', 'in_process'];
+
+    const { data: otOrders } = await supabaseAdmin
+      .from('orientacao_tecnica_orders')
+      .select('id, status, flow_status, paid_at')
+      .in('patient_whatsapp', list)
+      .is('paid_at', null)
+      .gte('created_at', cutoffIso)
+      .limit(5);
+    if (
+      Array.isArray(otOrders) &&
+      otOrders.some(
+        (r) =>
+          !r.paid_at &&
+          (pendingStatuses.includes(String(r.status || '').toLowerCase()) ||
+            String(r.flow_status || '').toLowerCase() === 'aguardando_pagamento')
+      )
+    ) {
+      return true;
+    }
+
+    const { data: brisaPayments } = await supabaseAdmin
+      .from('brisa_orientacao_payments')
+      .select('id, status')
+      .in('patient_phone', list)
+      .in('status', pendingStatuses)
+      .gte('created_at', cutoffIso)
+      .limit(3);
+    if (Array.isArray(brisaPayments) && brisaPayments.length > 0) return true;
+
+    const tail8 = digits.slice(-8);
+    const { data: profiles } = await supabaseAdmin
+      .from('profiles')
+      .select('id, phone')
+      .ilike('phone', `%${tail8}%`)
+      .limit(10);
+    const matchedIds = (profiles || [])
+      .filter((p) => {
+        const d = String(p.phone || '').replace(/\D/g, '');
+        return d.length >= 10 && variants.has(d);
+      })
+      .map((p) => p.id);
+
+    if (matchedIds.length > 0) {
+      const { data: pendingAppts } = await supabaseAdmin
+        .from('appointments')
+        .select('id, status, payment_status')
+        .in('patient_id', matchedIds)
+        .in('payment_status', pendingStatuses)
+        .gte('created_at', cutoffIso)
+        .limit(5);
+      if (
+        Array.isArray(pendingAppts) &&
+        pendingAppts.some((a) => !['cancelled', 'canceled', 'completed'].includes(String(a.status || '').toLowerCase()))
+      ) {
+        return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
 
 // 🛡️ BLINDAGEM MÁXIMA ANTI-DUPLICIDADE
 // Mapa persistente de correspondência entre LID (@lid) e Telefone real (@s.whatsapp.net)
@@ -1208,17 +1315,34 @@ function classifyAudience(jid, senderName, text) {
     };
   }
 
-  // Verificação de Secretária / Recepção / Clínica
-  if (/\b(secretari[ao]|recepcao|recepção|atendente|consultorio|consultório|clinica|clínica|agendamento|equipe|central|instituto|espaco|espaço|vital apex|odontologia|dentario|veterinaria)\b/i.test(normName) || /\b(sou secretari[ao]|aqui e da recepcao|repassar ao medico|repassar ao doutor|este canal e da|este canal e de|nao agendamos consulta)\b/i.test(normText)) {
-    return {
-      role: 'clinic_secretary',
-      name: senderName,
-      doctor: null
-    };
+  // Verificação de Secretária / Recepção / Clínica / PJ / Empresa / Não-médico
+  const docByPhoneEarly = findDoctorByPhone(cleanPhone);
+  const isRegisteredDoctorWithCrm = Boolean(
+    docByPhoneEarly && hasConfirmedCrm(docByPhoneEarly.crm, docByPhoneEarly.crm_state, docByPhoneEarly.council_type)
+  );
+
+  // Farmácia / Drogaria parceira: permite resposta B2B apenas quando fala de farmácia/lojista
+  const isPharmacyKeywordsEarly = /(farmacia|drogaria|dispensacao|dispensar|estoque|balcao|catalogo|venda de canabidiol|preco de atacado|crf|farmaceutico|farmaceutica|receita que o paciente|fornecedor|lojista|painel farmacia|comissao da farmacia|distribuidora|manipulacao)/i.test(normText);
+  const isPharmacyNameEarly = /(farmacia|drogaria|pharma|farma|manipulacao)/i.test(normName);
+
+  if (!isRegisteredDoctorWithCrm && !isPharmacyKeywordsEarly && !isPharmacyNameEarly) {
+    const pjCheck = isCompanyOrNonDoctorContact({ name: senderName });
+    if (
+      pjCheck.blocked ||
+      /\b(secretari[ao]|recepcao|recepção|atendente|consultorio|consultório|clinica|clínica|agendamento|equipe|central|instituto|espaco|espaço|vital apex|odontologia|dentario|veterinaria|contabil|contabilidade|assessoria|imobiliaria|financeira|psicologia|ltda|cartao beneficios)\b/i.test(normName) ||
+      /\b(sou secretari[ao]|aqui e da recepcao|repassar ao medico|repassar ao doutor|este canal e da|este canal e de|nao agendamos consulta)\b/i.test(normText)
+    ) {
+      return {
+        role: 'business_blocked',
+        name: senderName,
+        doctor: null,
+        blockReason: pjCheck.blocked ? pjCheck.reason : 'clinic_or_secretary'
+      };
+    }
   }
 
-  // 2. VERIFICAÇÃO DE MÉDICO / PRESCRIBER
-  const docByPhone = findDoctorByPhone(cleanPhone);
+  // 2. VERIFICAÇÃO DE MÉDICO / PRESCRIBER (somente CRM confirmado recebe Dr./Dra.)
+  const docByPhone = docByPhoneEarly;
   const docByName = findDoctorByName(senderName);
   const invitedDoc = findInvitedDoctor(cleanPhone);
   let doctorObj = docByPhone || docByName;
@@ -1245,35 +1369,35 @@ function classifyAudience(jid, senderName, text) {
   }
 
   // Uso estrito de palavras exclusivas de médico prescritor (nunca 'prescricao' ou 'receita controlada' isoladas, pois pacientes usam!)
-  const isDoctorKeywords = /(\bcrm\b|sou prescritor|quero prescrever|prontuario|meus pacientes|minha agenda|honorarios|plano vip|plano premium|credenciamento|sou medico|sou medica|sou doutor|sou doutora|minha clinica|minha cedula|documentos medicos|assinatura digital|icp-brasil|vidaas|birdid|posso prescrever|como prescrever|cadastro profissional)/i.test(normText);
-  const isDoctorName = /^(dr\b|dra\b|doutor|doutora)\s+[a-zá-ú]/i.test(normName) && !/\b(consultorio|clinica|equipe|recepcao|agendamento)\b/i.test(normName);
+  const isDoctorKeywords = /(\bcrm\b|sou prescritor|quero prescrever|prontuario|meus pacientes|minha agenda|honorarios|plano vip|plano premium|credenciamento|sou medico|sou medica|sou doutor|sou doutora|minha cedula|documentos medicos|assinatura digital|icp-brasil|vidaas|birdid|posso prescrever|como prescrever|cadastro profissional)/i.test(normText);
 
-  if (doctorObj || invitedDoc || isDoctorKeywords || isDoctorName) {
+  if (doctorObj || invitedDoc || isDoctorKeywords) {
     let cleanName = cleanDoctorName(doctorObj?.name || (invitedDoc ? invitedDoc.name : senderName));
     if (cleanName.toLowerCase().includes('edilson bezerra') && !cleanPhone.includes(ADMIN_PHONE.slice(-8))) {
       cleanName = cleanDoctorName(senderName);
     }
-    // Só usa "Dr./Dra." se o médico estiver verificado no banco ou o próprio nome já trouxer Dr./Dra. (nunca chama psicólogo/clínica de Dr(a).)
+    // JAMAIS prefixa "Dr./Dra." sem CRM confirmado (bloqueia falso título em empresas e contatos não confirmados)
+    const crmConfirmed = Boolean(
+      doctorObj && hasConfirmedCrm(doctorObj.crm, doctorObj.crm_state, doctorObj.council_type)
+    );
     let formattedName = cleanName || '';
-    if (doctorObj || isDoctorName) {
+    if (crmConfirmed && cleanName) {
       const isFemale = /\b(dra|doutora|edna|veronica|verônica|mariana|geovana|barbara|bárbara|stella|camyla|leticia|letícia|patricia|patrícia|ana|carolina|fernanda|juliana|camila|paula)\b/i.test(cleanName);
       const prefix = isFemale ? 'Dra.' : 'Dr.';
-      formattedName = cleanName && !cleanName.startsWith('Dr') ? `${prefix} ${cleanName}` : cleanName;
+      formattedName = !cleanName.startsWith('Dr') ? `${prefix} ${cleanName}` : cleanName;
     }
 
     return {
       role: 'doctor',
       name: formattedName,
-      verifiedDoctor: Boolean(doctorObj),
+      verifiedDoctor: crmConfirmed,
+      isColdContact: Boolean(invitedDoc && !doctorObj),
       doctor: doctorObj || (invitedDoc ? { name: invitedDoc.name, phone: cleanPhone } : null)
     };
   }
 
   // 3. VERIFICAÇÃO DE FARMÁCIA / DROGARIA PARCEIRA
-  const isPharmacyKeywords = /(farmacia|drogaria|dispensacao|dispensar|estoque|balcao|catalogo|produtos|venda de canabidiol|preco de atacado|crf|farmaceutico|farmaceutica|receita que o paciente|fornecedor|lojista|painel farmacia|comissao da farmacia|distribuidora|manipulacao)/i.test(normText);
-  const isPharmacyName = /(farmacia|drogaria|pharma|farma|drog|manipulacao|distribuidora)/i.test(normName);
-
-  if (isPharmacyKeywords || isPharmacyName) {
+  if (isPharmacyKeywordsEarly || isPharmacyNameEarly) {
     return {
       role: 'pharmacy',
       name: senderName || 'Equipe da Farmácia',
@@ -1312,7 +1436,12 @@ function classifyAudience(jid, senderName, text) {
 // 🩺 RESPOSTAS EXCLUSIVAS PARA PROFISSIONAIS / MÉDICOS PRESCRITORES (Diretriz 19/11/2026)
 function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
   const q = question.toLowerCase();
-  const displayTitle = senderName && /^dra?\.?\s+/i.test(senderName) ? senderName : (sanitizePatientName(senderName) || '');
+  const crmConfirmed = Boolean(
+    doctorObj && hasConfirmedCrm(doctorObj.crm, doctorObj.crm_state, doctorObj.council_type)
+  );
+  const displayTitle = crmConfirmed && senderName && /^dra?\.?\s+/i.test(senderName)
+    ? senderName
+    : (sanitizePatientName(senderName) || '');
   const hi = displayTitle ? `Olá, ${displayTitle}!` : 'Olá!';
 
   // 1. Origem do contato (Resposta Oficial LGPD aprovada pelo Dr. Edilson)
@@ -1332,7 +1461,7 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
 
   // Dúvidas de credenciamento: "como seria?", "como funciona?", "qual a proposta?", "o que é?"
   if (q.includes('como seria') || q.includes('como funciona') || q.includes('qual a proposta') || q.includes('qual o objetivo') || q.includes('do que se trata') || q.includes('o que e') || q.includes('o que é') || q.includes('me explica') || q.includes('explicar')) {
-    if (doctorObj && doctorObj.is_approved_by_admin !== false && doctorObj.crm) {
+    if (doctorObj && doctorObj.is_approved_by_admin !== false && crmConfirmed) {
       return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (equipe humana acompanha). Seu perfil já está na base! Acesse seu consultório (prontuário CFM, ferramentas de IA e repasse de 93% via PIX) em https://www.plantayraiz.com.br/consultorio. Como posso ajudar?`;
     }
     return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14 — a equipe humana acompanha). 🌿\n\nPara profissionais com registro ativo em conselho: cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional, plano Médico VIP opcional de R$ 99/mês (prioridade na fila e ferramentas de IA) e repasse de 93% de cada consulta via PIX (taxa fixa de 7%). Quer iniciar o cadastro?`;
@@ -1399,7 +1528,7 @@ function getPharmacySpecializedAnswer(question, senderName) {
 }
 
 // 🌿 RESPOSTAS CONSULTIVAS PARA PACIENTES (Treinamento de Vendas — 19/11/2026)
-function getPatientSpecializedAnswer(question, senderName, recipient = '') {
+function getPatientSpecializedAnswer(question, senderName, recipient = '', hasPendingPaymentContext = false) {
   const q = question.toLowerCase();
   const displayName = sanitizePatientName(senderName);
   const greeting = displayName ? `Olá, ${displayName}!` : `Olá!`;
@@ -1419,8 +1548,8 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
     return `Ligue agora para 192 (SAMU) ou procure o pronto-socorro mais próximo. Não espere atendimento por aqui.`;
   }
 
-  // 3. Pagamento e comprovante -> Nunca libera acesso por frase ou print
-  if (isPaymentOrVoucherNotice(question)) {
+  // 3. Pagamento e comprovante -> SOMENTE se houver pedido/cobrança pendente real deste contato
+  if (isPaymentOrVoucherNotice(question, { hasPendingPaymentContext })) {
     return PAYMENT_CLAIM_ANSWER;
   }
 
@@ -1500,10 +1629,16 @@ function getUnknownAudienceGreeting(senderName) {
   return `${hi} Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). O que te trouxe até a Planta y Raiz hoje?`;
 }
 
-async function askBrisaGemini(question, senderName, audience, recipient) {
+async function askBrisaGemini(question, senderName, audience, recipient, { hasPendingPaymentContext = false, isColdContact = false } = {}) {
   const role = audience?.role || 'unknown';
   const mem = recipient ? getContactMemory(recipient) : null;
   const patientCleanName = sanitizePatientName(senderName);
+  const coldContact = Boolean(isColdContact || audience?.isColdContact);
+
+  // 0. Empresas / PJ / clínicas / secretárias eletrônicas: silêncio total
+  if (role === 'business_blocked' || role === 'clinic_secretary' || (role !== 'doctor' && role !== 'pharmacy' && isBusinessOrNonDoctorSender(senderName))) {
+    return "";
+  }
 
   // 1. Handoff humano obrigatório para reembolso, menor de idade, jurídico ou pedido de condição especial de repasse
   if (/\b(reembolso|estorno|devolucao do dinheiro|devolução do dinheiro|quero meu dinheiro|menor de idade|crianca de \d+ anos|criança de \d+ anos|meu filho de \d+ anos|minha filha de \d+ anos|processo juridico|processo jurídico|advogado|procon)\b/i.test(question)) {
@@ -1536,27 +1671,36 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
   } else if (role === 'pharmacy') {
     reply = getPharmacySpecializedAnswer(question, senderName);
+  } else if (coldContact) {
+    // Contato frio não recebe oferta de Orientação Técnica (R$ 30) de paciente
+    reply = T.coldContactGreeting;
   } else if (role === 'patient') {
-    reply = getPatientSpecializedAnswer(question, senderName, recipient);
+    reply = getPatientSpecializedAnswer(question, senderName, recipient, hasPendingPaymentContext);
   } else if (role === 'unknown') {
     return getUnknownAudienceGreeting(senderName);
   }
 
-  // 3. Consulta à Edge Function chat-brisa com role explícito e histórico
+  // 3. Consulta à Edge Function chat-brisa com role explícito, autenticação e histórico
   if (!reply) {
     try {
+      const resolvedPhone = (() => {
+        const canonicalPhone = getCanonicalContactId(recipient);
+        if (canonicalPhone && !canonicalPhone.includes('@')) return canonicalPhone.replace(/\D/g, '');
+        return String(recipient || '').split('@')[0].replace(/\D/g, '');
+      })();
+      const headers = { 'Content-Type': 'application/json' };
+      if (SERVICE_KEY) headers['Authorization'] = `Bearer ${SERVICE_KEY}`;
+
       const res = await fetch(`${SUPABASE_URL}/functions/v1/chat-brisa`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           question,
           role,
-          phone: (() => {
-            const resolved = resolveSenderPhone(recipient);
-            if (resolved && !resolved.includes('@')) return resolved.replace(/\D/g, '');
-            return String(recipient || '').replace(/\D/g, '');
-          })(),
+          phone: SERVICE_KEY ? resolvedPhone : '',
+          senderJid: recipient,
           senderName: patientCleanName || senderName,
+          isColdContact: coldContact,
           history: mem?.turns ? mem.turns.slice(-8) : [],
           lastAnswer: mem?.lastAnswerSent || ''
         })
@@ -1585,8 +1729,12 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
         if (apiReply && !isDegraded) {
           reply = apiReply;
         } else if (isDegraded) {
-          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro consultivo.`);
-          reply = `Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou ver os médicos disponíveis em https://www.plantayraiz.com.br/profissionais. O que faz mais sentido para você?`;
+          log(`⚠️ [CHAT-BRISA REJEITADO] Resposta degradada interceptada. Aplicando roteiro seguro.`);
+          reply = coldContact
+            ? T.coldContactGreeting
+            : role === 'doctor'
+              ? getDoctorSpecializedAnswer('como funciona', senderName, audience?.doctor)
+              : `Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou ver os médicos disponíveis em https://www.plantayraiz.com.br/profissionais. O que faz mais sentido para você?`;
         }
       }
     } catch (e) {
@@ -1594,7 +1742,7 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     }
   }
 
-  // 4. Fallbacks de segurança se ainda não tiver resposta
+  // 4. Fallbacks de segurança se ainda não tiver resposta (NUNCA oferece OT a empresas ou contatos frios)
   if (!reply) {
     const locked = loadHumanLocked();
     if (locked.has(recipient) || checkAiPause(recipient).paused || isPauseRequested(question)) {
@@ -1603,8 +1751,12 @@ async function askBrisaGemini(question, senderName, audience, recipient) {
     }
     if (role === 'doctor') {
       reply = getDoctorSpecializedAnswer(question, senderName, audience?.doctor);
-    } else {
+    } else if (coldContact) {
+      reply = T.coldContactGreeting;
+    } else if (role === 'patient') {
       reply = `Sou a Enfª Brisa, assistente virtual da Planta y Raiz (a equipe humana acompanha). Você pode começar pela Orientação Técnica educativa (R$ 30) em https://www.plantayraiz.com.br/orientacao-tecnica ou escolher um médico em https://www.plantayraiz.com.br/profissionais. O que prefere?`;
+    } else {
+      return "";
     }
   }
 
@@ -1825,19 +1977,32 @@ async function loop() {
           const lastMsg = chat.lastMessage;
           const lastMsgText = (lastMsg?.message?.conversation || lastMsg?.message?.extendedTextMessage?.text || '').trim();
           const normLastText = lastMsgText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          const isExplicitPause = isPauseRequested(normLastText);
-          const isHumanDemand = /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|equipe humana|nao quero (falar com )?(robo|bot|ia))/i.test(normLastText);
+          const lastIsAutoReply = !lastMsg?.key?.fromMe && isAutoReplyBot(lastMsgText, jid, chat.pushName || chat.name || '');
+          const isExplicitPause = !lastIsAutoReply && isPauseRequested(normLastText);
+          const isHumanDemand = !lastIsAutoReply && /(humano|atendente|pessoa real|pessoa de verdade|preciso falar com|quero falar com|falar com (humano|atendente|alguem|uma pessoa|o dr|a dra|o doutor|a doutora|o edilson|a equipe|o suporte)|equipe humana|nao quero (falar com )?(robo|bot|ia))/i.test(normLastText);
 
           const mem = getContactMemory(jid);
           const isBotOrAutomation = 
             (mem?.lastAnswerSent && lastMsgText.includes(mem.lastAnswerSent.slice(0, 30))) || 
             lastMsgText.includes('assistente virtual') ||
-            lastMsgText.includes('Médicos Prescritores Sócios') ||
+            /m[eé]dicos?\s+prescritores?\s+s[oó]cios?/i.test(lastMsgText) ||
+            lastMsgText.includes('marketing médico') ||
             lastMsgText.includes('Relatório Diário') ||
             lastMsgText.includes('AVISO PLANO VENCIDO') ||
             lastMsgText.includes('Plano Médico VIP') ||
             lastMsgText.includes('WeCann Planta y Raíz') ||
             lastMsgText.includes('Enfª Brisa');
+
+          if (lastIsAutoReply) {
+            registerHumanTakeover(jid, true, false, { permanent: true });
+            registerHumanTakeover(canonical, true, false, { permanent: true });
+            registerOptOut(canonical, 'auto_reply_bot_detected');
+            humanLocked.add(jid);
+            humanLocked.add(canonical);
+            saveHumanLocked(humanLocked);
+            log(`🤖 [AUTO-REPLY / URA DETECTADA NO PRE-CHECK] Chat ${canonical} (${jid}) silenciado permanentemente. Texto: "${lastMsgText.slice(0, 60)}"`);
+            continue;
+          }
 
           if ((lastMsg?.key?.fromMe === true && (isExplicitPause || !isBotOrAutomation && lastMsgText.length > 0)) || isExplicitPause || isHumanDemand) {
             registerHumanTakeover(jid, true, false, { permanent: true });
@@ -1856,16 +2021,18 @@ async function loop() {
           const pauseCheck = checkAiPause(jid);
           const pauseCheckCanonical = checkAiPause(canonical);
           if (pauseCheck.paused || pauseCheckCanonical.paused || humanLocked.has(jid) || humanLocked.has(canonical) || (altJid && humanLocked.has(altJid))) {
-            // Mesmo com a conversa pausada para resposta da IA, o agente colhedor de documentos KYC continua recolhendo anexos silenciosamente
+            // Somente colhe anexos KYC silenciosamente se o contato já for médico conhecido (nunca empresas/desconhecidos)
+            const knownDocForSilentKyc = findDoctorByPhone(canonical) || findDoctorByName(chat.name || chat.pushName || '');
             if (
+              knownDocForSilentKyc &&
               lastMsg &&
               !lastMsg.key?.fromMe &&
               lastMsg.key?.id &&
-              !processedSet.has(lastMsg.key.id) &&
+              !processed.has(lastMsg.key.id) &&
               (lastMsg.message?.imageMessage || lastMsg.message?.documentMessage || lastMsg.message?.documentWithCaptionMessage)
             ) {
-              processedSet.add(lastMsg.key.id);
-              saveProcessed(processedSet);
+              processed.add(lastMsg.key.id);
+              saveProcessed(processed);
               await ingestIncomingDoc(lastMsg, jid, chat.name || '').catch((e) => log(`⚠️ [KYC SILENT HARVEST] ${e.message}`));
             }
             continue;
@@ -1906,19 +2073,27 @@ async function loop() {
               const msgsData = await msgsRes.json().catch(() => ({}));
               const messages = msgsData?.messages?.records || msgsData?.records || (Array.isArray(msgsData) ? msgsData : []);
 
+              // Detecta se houve envio de convite frio no histórico deste contato (para jamais oferecer OT de paciente)
+              let hasColdOutreachInHistory = Boolean(findInvitedDoctor(canonical));
+
               // 🛡️ DETECÇÃO DE INTERVENÇÃO HUMANA / ASSUMIU HUMANO:
               // Toda mensagem enviada manualmente pela equipe (fromMe sem ser automação/convite/relatório)
-              // pausa a IA nesta conversa por 24 horas para evitar respostas concorrentes.
+              // pausa a IA nesta conversa até liberação explícita do operador.
               for (const msg of messages) {
                 if (msg.key?.fromMe) {
                   const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || '').trim();
                   if (!text) continue;
 
+                  if (/marketing médico|cadastro-profissional|consultório virtual com vídeo|prescritores?\s+s[oó]cios?|convite/i.test(text)) {
+                    hasColdOutreachInHistory = true;
+                  }
+
                   const mem = getContactMemory(jid);
                   const isBotOrAutomation = 
                     (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || 
                     text.includes('assistente virtual') ||
-                    text.includes('Médicos Prescritores Sócios') ||
+                    /m[eé]dicos?\s+prescritores?\s+s[oó]cios?/i.test(text) ||
+                    text.includes('marketing médico') ||
                     text.includes('Relatório Diário') ||
                     text.includes('AVISO PLANO VENCIDO') ||
                     text.includes('Plano Médico VIP') ||
@@ -2072,7 +2247,35 @@ async function loop() {
                 continue;
               }
 
-              // 🛑 VERIFICAÇÃO 1.5: Solicitação de Pausa Explícita ("pausar esta conversa", "pausar automação", etc.)
+              // 🛑 VERIFICAÇÃO 1.5: Filtro de resposta de outro AGENTE, URA, BOT COMERCIAL ou SECRETÁRIA VIRTUAL (ANTES de handoff/pagamento/mídia — SILÊNCIO TOTAL)
+              if (isAutoReplyBot(combinedText, recipient, senderName) || isAutoReplyOrCommercialBot(combinedText, { senderName, senderJid: jid })) {
+                log(`🤖 [AUTO-REPLY / URA / BOT COMERCIAL DETECTADO] Silêncio total para ${senderName} (${canonical}): "${combinedText.slice(0, 80)}..."`);
+
+                registerHumanTakeover(canonical, true, false, { permanent: true });
+                registerHumanTakeover(recipient, true, false, { permanent: true });
+                registerOptOut(canonical, 'auto_reply_bot_detected');
+                registerOptOut(recipient, 'auto_reply_bot_detected');
+                upsertLeadToSupabase(canonical, senderName, 'clinic_secretary', 'silenciado_robo_clinica', { sample: combinedText.slice(0, 200) });
+
+                lastRepliedAt.set(canonical, Date.now());
+                lastRepliedAt.set(recipient, Date.now());
+                continue;
+              }
+
+              // 🛑 VERIFICAÇÃO 1.6: Bloqueio de empresas/PJ/clínicas/não-médicos (silêncio total; nunca oferecer Orientação Técnica)
+              const preAudience = classifyAudience(canonical || recipient, senderName, combinedText);
+              if (preAudience.role === 'business_blocked' || preAudience.role === 'clinic_secretary') {
+                log(`🏢 [EMPRESA/PJ/CLÍNICA BLOQUEADA] Silêncio total para ${senderName} (${canonical}) [${preAudience.blockReason || preAudience.role}].`);
+                registerHumanTakeover(canonical, true, false, { permanent: true });
+                registerHumanTakeover(recipient, true, false, { permanent: true });
+                upsertLeadToSupabase(canonical, senderName, 'clinic_secretary', 'silenciado_empresa_pj', {
+                  reason: preAudience.blockReason || preAudience.role,
+                  sample: combinedText.slice(0, 200),
+                });
+                continue;
+              }
+
+              // 🛑 VERIFICAÇÃO 2: Solicitação de Pausa Explícita ("pausar esta conversa", "pausar automação", etc.)
               if (isPauseRequested(combinedText)) {
                 humanLocked.add(recipient);
                 humanLocked.add(canonical);
@@ -2085,7 +2288,7 @@ async function loop() {
                 continue;
               }
 
-              // 🚨 VERIFICAÇÃO 2: Solicitação de Atendente Humano OU Emojis de Raiva / Reclamação
+              // 🚨 VERIFICAÇÃO 3: Solicitação de Atendente Humano OU Emojis de Raiva / Reclamação (somente após eliminar bots/URAs/PJ)
               if (isAngryOrDemandsHuman(combinedText) || isHumanRequested(combinedText)) {
                 humanLocked.add(recipient);
                 humanLocked.add(canonical);
@@ -2094,10 +2297,10 @@ async function loop() {
                 registerHumanTakeover(jid, true, false, { permanent: true });
                 registerHumanTakeover(canonical, true, false, { permanent: true });
                 if (altJid) registerHumanTakeover(altJid, true, false, { permanent: true });
-                upsertLeadToSupabase(canonical, senderName, 'unknown', 'handoff_humano', { last_message: combinedText.slice(0, 200) });
+                upsertLeadToSupabase(canonical, senderName, preAudience.role || 'unknown', 'handoff_humano', { last_message: combinedText.slice(0, 200) });
                 log(`🚨 [HUMANO SOLICITADO / RECLAMAÇÃO] Contato ${senderName} (${canonical}) pediu humano ou expressou insatisfação. Silenciando IA até liberação do operador.`);
 
-                const humanHandoffMsg = "Vou passar para nossa equipe e retornamos por aqui.";
+                const humanHandoffMsg = "Vou passar para nossa equipe humana. Retornamos por aqui.";
                 if (!hasRecentlySent(canonical, humanHandoffMsg)) {
                   await sendWhatsApp(recipient, humanHandoffMsg);
                   lastRepliedAt.set(canonical, Date.now());
@@ -2106,29 +2309,6 @@ async function loop() {
 
                 try {
                   const alertMsg = `🚨 *[ALERTA: ATENDIMENTO HUMANO REQUISITADO]*\n\n*Nome:* ${senderName}\n*Contato:* ${recipient}\n*Mensagem:* "${combinedText}"\n\n🛑 A assistente virtual foi pausada permanentemente para esta conversa até liberação manual.`;
-                  await sendWhatsApp(ADMIN_PHONE, alertMsg);
-                } catch (e) {}
-
-                continue;
-              }
-
-              // 🛑 VERIFICAÇÃO 3: Filtro de resposta de outro AGENTE, BOT ou SECRETÁRIA VIRTUAL
-              if (isAutoReplyBot(combinedText, recipient)) {
-                log(`🤖 [OUTRO AGENTE/BOT DETECTADO] Mensagem de outro bot/assistente identificada de ${senderName} (${canonical}): "${combinedText.slice(0, 80)}...". PAUSANDO automação permanentemente para impedir loop de robôs.`);
-                
-                // 🔒 PAUSA A IA PERMANENTEMENTE E ADICIONA À BLACKLIST PARA ESTE CONTATO (impede retorno do loop no dia seguinte)
-                registerHumanTakeover(canonical, true, false, { permanent: true });
-                registerHumanTakeover(recipient, true, false, { permanent: true });
-                registerOptOut(canonical, 'auto_reply_bot_detected');
-                registerOptOut(recipient, 'auto_reply_bot_detected');
-                upsertLeadToSupabase(canonical, senderName, 'clinic_secretary', 'silenciado_robo_clinica', { sample: combinedText.slice(0, 200) });
-
-                // NÃO RESPONDE! (Silêncio total para cortar a conversa e nunca ficar falando por horas)
-                lastRepliedAt.set(canonical, Date.now());
-                lastRepliedAt.set(recipient, Date.now());
-
-                try {
-                  const alertMsg = `🤖 *[ALERTA: OUTRO AGENTE/BOT DETECTADO]*\n\n*Contato:* ${senderName} (${recipient})\n*Mensagem:* "${combinedText.slice(0, 200)}"\n\n🛑 A assistente foi silenciada permanentemente para esta conversa para evitar loop entre robôs.`;
                   await sendWhatsApp(ADMIN_PHONE, alertMsg);
                 } catch (e) {}
 
@@ -2152,30 +2332,36 @@ async function loop() {
                 continue;
               }
 
-              // 📄 Processamento de documentos/mídias KYC de médicos
+              const isColdContact = Boolean(hasColdOutreachInHistory || preAudience.isColdContact);
+
+              // 📄 Processamento de documentos/mídias: KYC SOMENTE para médicos já identificados (nunca cria médico falso para empresas/pacientes)
               const docMsgs = newInbounds.filter(m => 
                 Boolean(m.message?.documentMessage || m.message?.imageMessage || m.message?.documentWithCaptionMessage)
               );
               if (docMsgs.length > 0) {
-                log(`📄 Lote contém ${docMsgs.length} documento(s) anexado(s) de ${senderName} (${canonical}).`);
-                for (const docMsg of docMsgs) {
-                  await ingestIncomingDoc(docMsg, recipient, senderName);
-                }
-                const cleanName = sanitizeDoctorName(senderName);
-                const docReply = buildKycChecklistReply(cleanName, ['crm']);
-                if (!hasRecentlySent(canonical, docReply)) {
-                  await sendWhatsApp(recipient, docReply);
-                  lastRepliedAt.set(canonical, Date.now());
-                  lastRepliedAt.set(recipient, Date.now());
+                if (preAudience.role === 'doctor') {
+                  log(`📄 Lote contém ${docMsgs.length} documento(s) KYC de médico ${senderName} (${canonical}).`);
+                  for (const docMsg of docMsgs) {
+                    await ingestIncomingDoc(docMsg, recipient, senderName);
+                  }
+                  const cleanName = sanitizeDoctorName(senderName);
+                  const docReply = buildKycChecklistReply(cleanName, ['crm']);
+                  if (!hasRecentlySent(canonical, docReply)) {
+                    await sendWhatsApp(recipient, docReply);
+                    lastRepliedAt.set(canonical, Date.now());
+                    lastRepliedAt.set(recipient, Date.now());
+                  }
+                } else {
+                  log(`🖼️ [MÍDIA NÃO-MÉDICO IGNORADA] Anexo recebido de ${senderName} (${canonical}) [${preAudience.role}] — sem disparo falso de pagamento ou KYC.`);
                 }
                 continue;
               }
 
-              // 🎙️ SE FOR ÁUDIO (sem texto transcrito): Regra oficial 5
+              // 🎙️ SE FOR ÁUDIO (sem texto transcrito): jamais enviar link de Orientação Técnica para médicos ou contatos frios
               const audioMsgs = newInbounds.filter(m => Boolean(m.message?.audioMessage || m.message?.pttMessage));
               if (audioMsgs.length > 0 && !combinedText.trim()) {
-                log(`🎙️ [ÁUDIO RECEBIDO] Áudio recebido de ${senderName} (${canonical}). Enviando aviso oficial.`);
-                const audioReply = AUDIO_ANSWER;
+                log(`🎙️ [ÁUDIO RECEBIDO] Áudio recebido de ${senderName} (${canonical}) [${preAudience.role}].`);
+                const audioReply = (preAudience.role === 'doctor' || isColdContact) ? T.audioNeutral : AUDIO_ANSWER;
                 if (!hasRecentlySent(canonical, audioReply)) {
                   await sendWhatsApp(recipient, audioReply);
                   lastRepliedAt.set(canonical, Date.now());
@@ -2214,17 +2400,8 @@ async function loop() {
               // 💬 SE FOR TEXTO: PROCESSAMENTO COGNITIVO COM MEMÓRIA E ANTI-REPETIÇÃO
               if (combinedText.trim().length > 0) {
                 const cleanSenderName = sanitizePatientName(senderName) || sanitizeDoctorName(senderName);
-                const audience = classifyAudience(canonical || recipient, senderName, combinedText);
-                log(`🎯 Público classificado para ${cleanSenderName} (${canonical}): [${audience.role.toUpperCase()}]`);
-
-                // Se for secretária/recepção de clínica, silencia e nunca responde como se fosse paciente ou médico
-                if (audience.role === 'clinic_secretary') {
-                  log(`🏥 [RECEPÇÃO/CONSULTÓRIO DETECTADO] Silenciando conversa com ${senderName} (${canonical}) para evitar falar com secretária eletrônica.`);
-                  registerHumanTakeover(canonical, true, false, { permanent: true });
-                  registerHumanTakeover(recipient, true, false, { permanent: true });
-                  upsertLeadToSupabase(canonical, senderName, 'clinic_secretary', 'silenciado_recepcao');
-                  continue;
-                }
+                const audience = preAudience;
+                log(`🎯 Público classificado para ${cleanSenderName} (${canonical}): [${audience.role.toUpperCase()}]${isColdContact ? ' [COLD]' : ''}`);
 
                 // Impede saudações repetidas no mesmo dia
                 const mem = getContactMemory(canonical);
@@ -2233,10 +2410,16 @@ async function loop() {
                   continue;
                 }
 
+                // Verifica cobrança/pedido pendente real deste contato antes de qualquer classificação de pagamento
+                const hasPendingPaymentContext = await hasPendingPaymentForContact(canonical || recipient);
+
                 addMessageToMemory(recipient, 'user', combinedText, audience.role);
                 if (canonical !== recipient) addMessageToMemory(canonical, 'user', combinedText, audience.role);
 
-                let reply = await askBrisaGemini(combinedText, audience.name || cleanSenderName, audience, recipient);
+                let reply = await askBrisaGemini(combinedText, audience.name || cleanSenderName, audience, recipient, {
+                  hasPendingPaymentContext,
+                  isColdContact,
+                });
                 if (!reply) {
                   log(`ℹ️ Nenhuma resposta gerada para ${canonical}.`);
                   continue;

@@ -49,10 +49,13 @@ const clinicalRegex = /rem[eé]dio|dormir|ins[oô]nia|ansiedade|dor|sintoma/i;
 assert(clinicalRegex.test("Qual remédio para dormir?"), "Detecta pergunta sobre remédio para dormir");
 assert(clinicalRegex.test("tenho insônia"), "Detecta insônia");
 
-// 4. Teste de Pagamento e Documentos (Defeito 6)
-assert(isPaymentOrVoucherNotice("Paguei o pix") === true, "Detecta 'Paguei o pix'");
-assert(isPaymentOrVoucherNotice("Segue comprovante") === true, "Detecta 'Segue comprovante'");
-assert(isPaymentOrVoucherNotice("Qual o valor da consulta?") === false, "Pergunta de valor não é aviso de pagamento");
+// 4. Teste de Pagamento e Documentos (Defeito 6 + Falha 4: exige cobrança pendente real)
+assert(isPaymentOrVoucherNotice("Paguei o pix") === false, "Sem pedido pendente real, 'Paguei o pix' NÃO dispara aviso de pagamento");
+assert(isPaymentOrVoucherNotice("Segue comprovante") === false, "Sem pedido pendente real, 'Segue comprovante' NÃO dispara aviso de pagamento");
+assert(isPaymentOrVoucherNotice("Paguei o pix", { hasPendingPaymentContext: true }) === true, "Com pedido pendente real, detecta 'Paguei o pix'");
+assert(isPaymentOrVoucherNotice("Segue comprovante", { hasPendingPaymentContext: true }) === true, "Com pedido pendente real, detecta 'Segue comprovante'");
+assert(isPaymentOrVoucherNotice("Segue comprovante de residência", { hasPendingPaymentContext: true }) === false, "Comprovante de residência NUNCA é aviso de pagamento");
+assert(isPaymentOrVoucherNotice("Qual o valor da consulta?", { hasPendingPaymentContext: true }) === false, "Pergunta de valor não é aviso de pagamento");
 
 // 5. Teste de Emergência Médica (CFM / SAMU 192)
 assert(isUrgentMedicalEmergency("dor no peito forte e falta de ar") === true, "Detecta emergência cardiorrespiratória");

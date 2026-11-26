@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { isBusinessHoursBRT } from "../_shared/whatsapp-outreach-guard.mjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,19 +18,19 @@ const FOLLOWUP_RULES = [
     id: "d7_acolhimento",
     daysAfter: 7,
     message: (name: string) =>
-      `Olá ${name}! Aqui é a Brisa 🌿 Passando para saber como foi sua primeira semana com o tratamento indicado pelo seu médico. Alguma dúvida sobre a administração das gotas? Estou aqui para te ajudar! 💚`,
+      `Olá ${name}! Aqui é a Enfª Brisa, assistente virtual da Planta y Raiz. 🌿 Passando para saber como foi sua primeira semana após a consulta. Se tiver dúvidas clínicas, consulte seu médico pela plataforma. Se não quiser mais avisos, responda SAIR.`,
   },
   {
     id: "d30_estoque",
     daysAfter: 30,
     message: (name: string) =>
-      `Oi ${name}! 🌿 Notei que seu frasco deve estar chegando ao fim. Para não interromper seu progresso, quer que eu gere o link para reposição no nosso Shopping? 🛒\n\n👉 https://plantayraiz.com.br/shopping?utm_source=brisa_ia&utm_medium=whatsapp&utm_campaign=restock_d30`,
+      `Oi ${name}! 🌿 Passando para lembrar do acompanhamento do seu tratamento na Planta y Raiz. Para agendar retorno com seu médico: https://www.plantayraiz.com.br/agendamento\nSe não quiser mais avisos, responda SAIR.`,
   },
   {
     id: "d60_renovacao",
     daysAfter: 60,
     message: (name: string) =>
-      `Olá ${name}! 🌿 Sua próxima consulta de acompanhamento está se aproximando. É essencial para ajustarmos a dose e garantir os melhores resultados. Posso te enviar os horários disponíveis? 📅\n\n👉 https://plantayraiz.com.br/falar-com-especialista?utm_source=brisa_ia&utm_medium=whatsapp&utm_campaign=renewal_d60`,
+      `Olá ${name}! 🌿 Sua próxima consulta de acompanhamento pode estar se aproximando. Para consultar horários disponíveis com seu médico: https://www.plantayraiz.com.br/agendamento\nSe não quiser mais avisos, responda SAIR.`,
   },
 ];
 
@@ -47,6 +48,10 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const action = body.action || "follow_up";
+
+    if (["follow_up", "win_back", "restock_alert"].includes(action) && !isBusinessHoursBRT()) {
+      return jsonResp({ ok: true, skipped: "outside_business_hours_brt" }, 200);
+    }
 
     const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
     const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");

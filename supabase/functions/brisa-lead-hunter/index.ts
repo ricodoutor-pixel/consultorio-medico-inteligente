@@ -173,8 +173,32 @@ serve(async (req: Request) => {
         if (aiExtracted.telefone && !telefone) telefone = sanitizePhone(aiExtracted.telefone);
       }
 
+      // Bloqueia PJ/empresas/clínicas/não-médicos antes de salvar ou sincronizar no Brevo
+      const { isCompanyOrNonDoctorContact, hasConfirmedCrm, stripDoctorHonorific } = await import(
+        "../_shared/whatsapp-outreach-guard.mjs"
+      );
+      const pjCheck = isCompanyOrNonDoctorContact({
+        name: nome || canal_username || "",
+        email: email || "",
+        specialty: especialidade || "",
+        bio: item.text || "",
+        crm: crm || "",
+      });
+      if (pjCheck.blocked) {
+        results.push({
+          success: false,
+          skipped: true,
+          reason: `blocked_pj_or_non_doctor:${pjCheck.reason}`,
+        });
+        continue;
+      }
+
+      const crmOk = hasConfirmedCrm(crm || "", uf || "");
       if (!nome) {
-        nome = canal_username ? `Dr(a). @${canal_username}` : "Dr(a). Prescritor(a)";
+        nome = canal_username ? `@${canal_username}` : "Profissional sem nome";
+      } else if (!crmOk) {
+        // Jamais manter/prefixar Dr(a). sem CRM confirmado
+        nome = stripDoctorHonorific(nome) || nome;
       }
 
       // Sincronização com Brevo API v3
@@ -185,7 +209,7 @@ serve(async (req: Request) => {
         const brevoRes = await syncWithBrevo({
           email,
           nome,
-          crm,
+          crm: crmOk ? crm : undefined,
           uf,
           telefone,
           especialidade,
@@ -198,14 +222,14 @@ serve(async (req: Request) => {
       // Ingestão no Supabase com proteção contra duplicatas
       const leadRecord = {
         nome,
-        crm: crm || null,
+        crm: crmOk ? (crm || null) : null,
         uf: uf || "SP",
         especialidade,
         email: email || null,
         telefone: telefone || null,
         origem,
         canal_username: canal_username || null,
-        status_qualificacao: "qualificado",
+        status_qualificacao: crmOk ? "qualificado" : "pendente_crm",
         brevo_synced: brevoSynced,
         brevo_contact_id: brevoContactId || null,
         raw_payload: item,

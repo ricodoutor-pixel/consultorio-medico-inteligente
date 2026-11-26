@@ -18,6 +18,13 @@ console.log('🛑 [CADENCE-INVITER] Script desativado permanentemente para prote
 process.exit(0);
 
 import { T } from '../supabase/functions/_shared/brisa-templates.mjs';
+import {
+  evaluateOutboundDoctorInvite,
+  formatDoctorAddressing,
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+  hasConfirmedCrm,
+} from '../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -384,15 +391,34 @@ async function sendEmailInvite(doctor) {
   const email = (doctor.email || '').toLowerCase().trim();
   if (!email || !email.includes('@') || !BREVO_KEY) return false;
 
+  const gate = evaluateOutboundDoctorInvite({
+    contact: doctor,
+    manualAdminSend: process.env.MANUAL_ADMIN_SEND === '1',
+    requireConfirmedCrm: true,
+  });
+  if (!gate.allowed) {
+    log(`⛔ [BLOQUEIO E-MAIL] ${doctor.name || email} -> ${gate.reason}`);
+    return false;
+  }
+
   const check = await verifyEmailDeliverability(email, doctor.name, BREVO_KEY);
   if (!check.valid) {
     log(`⛔ [FILTRO ANTI-BOUNCE] Descartando e-mail ${doctor.name || '(sem nome)'} <${email}> -> ${check.reason}`);
     return false;
   }
 
-  const cleanName = sanitizeDisplayDoctorName(doctor.name);
-  const subject = `Parabéns Dr(a). ${cleanName}, você foi escolhido(a) como Médico(a) Prescritor(a) Sócio(a) da Planta y Raíz 🌿🩺`;
-  const html = buildCampaignEmailHtml(doctor.name);
+  const addressing = formatDoctorAddressing({
+    name: doctor.name,
+    crm: doctor.crm || '',
+    crmState: doctor.crm_state || '',
+    councilType: doctor.council_type || '',
+    email,
+    specialty: doctor.specialty || '',
+  });
+  if (!addressing.allowed) return false;
+  const displayName = addressing.salutation || addressing.cleanName || 'Profissional';
+  const subject = `Convite Profissional — Consultório Digital Planta y Raiz`;
+  const html = buildCampaignEmailHtml(displayName);
 
   try {
     const res = await fetch(`${BREVO_BASE}/smtp/email`, {
@@ -402,8 +428,8 @@ async function sendEmailInvite(doctor) {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        sender: { name: 'Dr. Edilson Bezerra | Planta y Raíz', email: SMTP_USER },
-        to: [{ email, name: `Dr(a). ${cleanName}` }],
+        sender: { name: 'Enfª Brisa | Planta y Raiz', email: SMTP_USER },
+        to: [{ email, name: displayName }],
         subject,
         htmlContent: html
       })
@@ -411,13 +437,13 @@ async function sendEmailInvite(doctor) {
 
     if (res.ok || res.status === 201) {
       const data = await res.json().catch(() => ({}));
-      log(`✉️ [E-MAIL BREVO] Sucesso: Dr(a). ${cleanName} <${email}>`);
+      log(`✉️ [E-MAIL BREVO] Sucesso: ${displayName} <${email}>`);
       await logEmailSendInSupabase({
         email,
-        templateName: 'cadence_10min_invite',
+        templateName: 'cadence_manual_invite',
         status: 'sent',
         messageId: data.messageId || null,
-        metadata: { doctor_name: cleanName }
+        metadata: { doctor_name: displayName }
       });
       return true;
     } else {
@@ -434,29 +460,49 @@ async function sendEmailInvite(doctor) {
   }
 }
 
-// Mensagem Oficial WhatsApp (enxuta, humana e direta para aumentar a taxa de resposta sem parecer spam)
-function buildCampaignWhatsAppMessage(doctorName) {
-  // Texto oficial único (supabase/functions/_shared/brisa-templates.mjs): sem promessa, assinado, com SAIR.
-  const cleanName = sanitizeDisplayDoctorName(doctorName);
-  return T.doctorInvite(cleanName && cleanName.toLowerCase() !== 'doutor(a)' ? cleanName : '');
+// Mensagem Oficial WhatsApp: fonte única brisa-templates.mjs; bloqueia PJ e jamais prefixa Dr(a). sem CRM confirmado.
+function buildCampaignWhatsAppMessage(doctor) {
+  const doc = typeof doctor === 'string' ? { name: doctor } : (doctor || {});
+  const cleanName = sanitizeDisplayDoctorName(doc.name || '');
+  return T.doctorInvite(cleanName && cleanName.toLowerCase() !== 'doutor(a)' ? cleanName : '', {
+    crm: doc.crm || '',
+    crmState: doc.crm_state || '',
+    councilType: doc.council_type || '',
+    email: doc.email || '',
+    specialty: doc.specialty || '',
+  });
 }
 
-// Disparo WhatsApp
+// Disparo WhatsApp (estritamente horário comercial Seg–Sáb 9h–19h BRT, sem PJ/não-médicos, CRM confirmado)
 async function sendWhatsAppInvite(doctor, humanLocked, blacklist) {
+  const gate = evaluateOutboundDoctorInvite({
+    contact: doctor,
+    manualAdminSend: process.env.MANUAL_ADMIN_SEND === '1',
+    requireConfirmedCrm: true,
+  });
+  if (!gate.allowed) {
+    log(`⛔ [BLOQUEIO WHATSAPP] ${doctor?.name || ''} -> ${gate.reason}`);
+    return { success: false, reason: gate.reason };
+  }
+
   const phone = normalizePhone(doctor.phone);
   if (!phone) return { success: false, reason: 'NO_PHONE' };
 
   if (humanLocked.has(phone)) {
-    log(`🔒 [HUMAN LOCK] Pulando Dr(a). ${doctor.name} (${phone}) - Em atendimento humano`);
+    log(`🔒 [HUMAN LOCK] Pulando ${doctor.name} (${phone}) - Em atendimento humano`);
     return { success: false, reason: 'HUMAN_LOCKED' };
   }
 
   if (blacklist.has(phone)) {
-    log(`⛔ [BLACKLIST] Pulando Dr(a). ${doctor.name} (${phone}) - Opt-out`);
+    log(`⛔ [BLACKLIST] Pulando ${doctor.name} (${phone}) - Opt-out`);
     return { success: false, reason: 'BLACKLISTED' };
   }
 
-  const message = buildCampaignWhatsAppMessage(doctor.name);
+  const message = buildCampaignWhatsAppMessage(doctor);
+  if (!message) {
+    log(`⛔ [BLOQUEIO PJ/MENSAGEM] ${doctor.name} (${phone}) bloqueado pelo template oficial.`);
+    return { success: false, reason: 'BLOCKED_PJ_OR_NON_DOCTOR' };
+  }
 
   try {
     const res = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
@@ -477,7 +523,7 @@ async function sendWhatsAppInvite(doctor, humanLocked, blacklist) {
     });
 
     if (res.ok) {
-      log(`💬 [WHATSAPP ENVIADO] Sucesso: Dr(a). ${doctor.name} (${phone}) [Origem: ${doctor.source}]`);
+      log(`💬 [WHATSAPP ENVIADO] Sucesso: ${doctor.name} (${phone}) [Origem: ${doctor.source}]`);
       return { success: true };
     } else {
       const err = await res.text().catch(() => '');
@@ -491,17 +537,19 @@ async function sendWhatsAppInvite(doctor, humanLocked, blacklist) {
   }
 }
 
-// Loop Principal de Cadência Estrita (1 envio a cada 10 min)
+// Loop Principal (desativado por padrão; exige envio manual do admin + horário comercial Seg–Sáb 9h–19h BRT)
 async function startCadenceInviter() {
-  // O WhatsApp marcou a conta por spam: o convite "Parabéns, Dr(a)... selecionado(a)" a quem não
-  // iniciou conversa não roda mais sozinho (PM2/cron). Só execução manual do admin:
+  // Convite frio automático desligado permanentemente. Só execução manual do admin:
   //   MANUAL_ADMIN_SEND=1 node scripts/agent_cadence_10min_inviter.mjs
   if (process.env.MANUAL_ADMIN_SEND !== '1') {
     log('🚫 Convite automático desligado (conta marcada por spam). Use MANUAL_ADMIN_SEND=1 para um envio manual do admin.');
     return;
   }
-  log(`🌟 INICIANDO AGENTE DE CADÊNCIA: 1 CONVITE A CADA 10 MINUTOS`);
-  log(`Objetivo: 50 Médicos Ativos na Vitrine | Ordem: VCF do Dr. Edilson -> Apify Harvested Leads`);
+  if (!isBusinessHoursBRT()) {
+    log('⏰ Fora do horário comercial permitido (Seg–Sáb, 09h–19h BRT). Envio bloqueado.');
+    return;
+  }
+  log(`🌟 INICIANDO ENVIO MANUAL CONTROLADO (Seg–Sáb, 09h–19h BRT | somente médicos com CRM confirmado)`);
 
   const vitrineSet = getVitrineDoctorsSet();
   log(`Médicos da vitrine carregados para exclusão estrita: ${vitrineSet.size}`);
@@ -511,10 +559,12 @@ async function startCadenceInviter() {
   const apifyLeads = loadApifyHarvestedLeads();
   log(`Base carregada: VCF Edilson = ${vcfContacts.length} contatos | Grupo WhatsApp = ${groupLeads.length} membros | Apify = ${apifyLeads.length} leads`);
 
-  // Deduplica por sufixo de 8 dígitos preservando o primeiro contato com nome real (VCF -> Grupo -> Apify)
+  // Deduplica por sufixo de 8 dígitos e bloqueia PJ/empresas/não-médicos e contatos sem CRM confirmado
   const seenSuffixes = new Set();
   const allCandidateLeads = [];
   for (const item of [...vcfContacts, ...groupLeads, ...apifyLeads]) {
+    if (isCompanyOrNonDoctorContact(item).blocked) continue;
+    if (!hasConfirmedCrm(item.crm, item.crm_state, item.council_type)) continue;
     const p = normalizePhone(item.phone);
     if (!p) continue;
     const suffix = p.slice(-8);
@@ -522,9 +572,15 @@ async function startCadenceInviter() {
     seenSuffixes.add(suffix);
     allCandidateLeads.push(item);
   }
-  log(`Total de contatos únicos na fila de convites: ${allCandidateLeads.length}`);
+  log(`Total de médicos elegíveis com CRM confirmado na fila: ${allCandidateLeads.length}`);
 
   while (true) {
+    if (!isBusinessHoursBRT()) {
+      log(`⏰ Fora do horário comercial (Seg–Sáb, 09h–19h BRT). Aguardando janela comercial...`);
+      await sleep(15 * 60 * 1000);
+      continue;
+    }
+
     if (fs.existsSync(PAUSE_FILE)) {
       log(`⏸️ PAUSE_AUTOMATION.flag detectado. Aguardando 1 minuto...`);
       await sleep(60000);
@@ -542,6 +598,9 @@ async function startCadenceInviter() {
     let targetDoctor = null;
 
     for (const lead of allCandidateLeads) {
+      if (isCompanyOrNonDoctorContact(lead).blocked) continue;
+      if (!hasConfirmedCrm(lead.crm, lead.crm_state, lead.council_type)) continue;
+
       const phone = normalizePhone(lead.phone);
       if (!phone) continue;
 
@@ -567,15 +626,14 @@ async function startCadenceInviter() {
     }
 
     if (!targetDoctor) {
-      log(`🎉 Todos os contatos da lista VCF e do Apify já foram convidados! Verificando novamente em 30 min.`);
-      await sleep(30 * 60 * 1000);
-      continue;
+      log(`🎉 Nenhum médico elegível com CRM confirmado pendente. Encerrando.`);
+      return;
     }
 
     const targetPhone = normalizePhone(targetDoctor.phone);
     const variants = getPhoneVariants(targetPhone);
 
-    // Trava extra no Evolution API: confere se já recebeu boas-vindas antes de disparar (evita qualquer envio duplicado aos 254 que já receberam)
+    // Trava extra no Evolution API: confere se já recebeu boas-vindas antes de disparar
     const alreadyInEvolution = await hasAlreadyReceivedWelcomeOnEvolution(targetPhone);
     if (alreadyInEvolution) {
       variants.forEach(v => {
@@ -589,12 +647,12 @@ async function startCadenceInviter() {
         status: 'JA_ENVIADO_NO_EVOLUTION'
       };
       saveState(state);
-      log(`⏭️ [JÁ RECEBEU NO WHATSAPP] Contato ${targetDoctor.name} (${targetPhone}) já consta com convite enviado no histórico da Evolution. Marcado e avançando...`);
+      log(`⏭️ [JÁ RECEBEU NO WHATSAPP] Contato ${targetDoctor.name} (${targetPhone}) já consta no histórico da Evolution.`);
       await sleep(800);
       continue;
     }
 
-    log(`\n🎯 [VEZ DO DISPARO] Convidando Dr(a). ${targetDoctor.name} (${targetPhone}) [${targetDoctor.source}]`);
+    log(`\n🎯 [VEZ DO DISPARO] Convidando ${targetDoctor.name} (${targetPhone}) [${targetDoctor.source}]`);
 
     // 1. Envia E-mail se disponível e ainda não enviado
     const doctorEmail = (targetDoctor.email || '').toLowerCase().trim();

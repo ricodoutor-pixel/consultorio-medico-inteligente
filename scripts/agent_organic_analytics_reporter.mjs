@@ -10,7 +10,7 @@
  *    - Visita (GA4 / Web Analytics)
  *    - Clique na Enfª Brisa
  *    - Triagem R$ 30 (Loss Leader pago via Mercado Pago)
- *    - Médico Cadastrado (Taxa Zero)
+ *    - Médico Cadastrado (Repasse 93%, taxa fixa 7%)
  *    - Assinatura VIP R$ 99/mês ativada
  * 3. Alerta Diário Automatizado no WhatsApp da Diretoria (Dr. Edilson):
  *    - Disparado pontualmente às 20:00 BRT via Evolution API com o resumo operacional do dia.

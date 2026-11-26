@@ -82,14 +82,16 @@ export const BRISA_CONFIG = {
     whatsappOficial: "https://wa.me/5511991363154"
   },
 
-  // REGRA DE HORÁRIO COMERCIAL SEGURO
+  // REGRA DE HORÁRIO COMERCIAL SEGURO (estritamente Seg–Sáb, 09h–19h BRT)
   HORARIO_COMERCIAL: {
-    inicioHora: 8,
-    fimHora: 18,
-    diasPermitidos: [1, 2, 3, 4, 5], // Segunda a Sexta
+    inicioHora: 9,
+    fimHora: 19,
+    diasPermitidos: [1, 2, 3, 4, 5, 6], // Segunda a Sábado (Domingo bloqueado)
     timeZone: "America/Sao_Paulo"
   }
 };
+
+import { formatDoctorAddressing } from '../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 
 /**
  * Monta o texto de resposta sobre a origem do contato com saudação contextual
@@ -126,13 +128,25 @@ export function buildKycChecklistReply(contactName = '', docsRecebidos = []) {
 }
 
 /**
- * Mensagem do convite oficial (exclusiva para médicos com CRM confirmado)
+ * Mensagem do convite oficial (exclusiva para envio manual do admin a médicos com CRM confirmado).
+ * Bloqueia PJ/empresas/não-médicos e jamais prefixa "Dr(a)." sem CRM confirmado.
  */
-export function buildOfficialInvitationMessage(contactName = '') {
-  const saudacao = contactName ? `Olá, ${contactName}!` : 'Olá!';
+export function buildOfficialInvitationMessage(contactName = '', options = {}) {
+  const addressing = formatDoctorAddressing({
+    name: contactName,
+    crm: options?.crm || '',
+    crmState: options?.crmState || options?.crm_state || '',
+    councilType: options?.councilType || options?.council_type || '',
+    crmConfirmed: Boolean(options?.crmConfirmed),
+    email: options?.email || '',
+    specialty: options?.specialty || '',
+    company: options?.company || '',
+  });
+  if (!addressing.allowed) return '';
+  const saudacao = addressing.salutation ? `Olá, ${addressing.salutation}!` : 'Olá!';
   return `${saudacao} Tudo bem? 🌿
 
-Sou a Enf. Brisa, assistente virtual da Planta y Raiz (${BRISA_CONFIG.EMPRESA.razaoSocial}, CNPJ ${BRISA_CONFIG.EMPRESA.cnpj} — a equipe humana acompanha).
+Sou a Enfª Brisa, assistente virtual da Planta y Raiz (${BRISA_CONFIG.EMPRESA.razaoSocial}, CNPJ ${BRISA_CONFIG.EMPRESA.cnpj} — a equipe humana acompanha).
 
 Para profissionais com registro ativo em conselho:
 • *Cadastro gratuito:* ${BRISA_CONFIG.URLS.cadastroProfissional}
@@ -140,5 +154,5 @@ Para profissionais com registro ativo em conselho:
 • *Plano Médico VIP opcional (R$ 99/mês):* ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}
 • *Conformidade CFM / ANVISA:* prontuário eletrônico e prescrição digital ICP-Brasil / Gov.br.
 
-Se tiver interesse ou dúvida, responda por aqui que nossa equipe humana acompanha.`;
+Se tiver interesse ou dúvida, responda por aqui que nossa equipe humana acompanha. Se não quiser mais mensagens, responda SAIR.`;
 }

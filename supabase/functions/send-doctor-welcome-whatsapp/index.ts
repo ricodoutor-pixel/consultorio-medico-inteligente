@@ -80,16 +80,30 @@ serve(async (req) => {
       }
     }
 
+    const { formatDoctorAddressing } = await import("../_shared/whatsapp-outreach-guard.mjs");
+    const addressing = formatDoctorAddressing({
+      name: String(fullName || ""),
+      crm: String(crm || ""),
+      crmState: String(payload.crmState || payload.crm_state || ""),
+      councilType: String(payload.councilType || payload.council_type || ""),
+      email: String(email || ""),
+    });
+    if (!addressing.allowed) {
+      return new Response(JSON.stringify({ ok: true, skipped: `blocked_pj_or_non_doctor:${addressing.reason}` }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const doctorSalutation = addressing.salutation || addressing.cleanName || "Colega";
+
     console.log(`[VIP Lifecycle] action=${actionType} sent`);
 
     let doctorMsg = "";
     let adminMsg = "";
 
     if (actionType === "welcome_standard") {
-      const name = String(fullName || "").replace(/^Dr\(?a?\)?\.?\s*/i, "");
-      doctorMsg = `🌿 *Seja bem-vindo(a) à Planta y Raíz, Dr(a). ${name}!*
+      doctorMsg = `🌿 *Seja bem-vindo(a) à Planta y Raiz, ${doctorSalutation}!*
 
-Agora você faz parte de um grupo seleto de médicos prescritores da nossa plataforma de telemedicina e cuidado canabinoide.
+Agora você faz parte da nossa plataforma de telemedicina e medicina integrativa.
 
 📋 *Para começar a atender, falta pouco:*
 1. ✍️ Cadastrar sua *assinatura digital gov.br* (sem ela não é possível emitir receitas).
@@ -97,54 +111,49 @@ Agora você faz parte de um grupo seleto de médicos prescritores da nossa plata
 3. ✅ Aguardar a aprovação final do seu cadastro pela nossa equipe.
 
 Assim que aprovado(a), é só ligar o botão *ON* no Consultório para receber pacientes:
-👉 https://plantayraiz.com.br/consultorio
+👉 https://www.plantayraiz.com.br/consultorio
 
-⭐ *Médico assinante vale mais!*
-Com o *Plano Premium por apenas R$ 99/mês* você:
-• recebe os pacientes *antes* no rodízio de consultas (assinantes online têm prioridade);
-• usa o Copiloto Clínico com PubMed, o Assistente Jurídico e o Escriba de consulta;
-• atende mais e melhor.
-👉 https://plantayraiz.com.br/precos
+⭐ *Plano Médico VIP opcional (R$ 99/mês):*
+• prioridade no rodízio de consultas (assinantes online têm prioridade);
+• acesso ao Copiloto Clínico com PubMed, Assistente Jurídico e Escriba de consulta;
+• repasse de 93% de cada consulta via PIX (taxa fixa de 7% em todos os planos).
+👉 https://www.plantayraiz.com.br/precos
 
-Qualquer dúvida, responda esta mensagem. 💚
+Qualquer dúvida, responda esta mensagem. Se não quiser mais avisos, responda SAIR. 💚
 
-Enfª Brisa | Relacionamento Médico
-Planta y Raíz`;
+Enfª Brisa (assistente virtual) | Relacionamento Médico
+Planta y Raiz`;
       adminMsg = `🩺 *Boas-vindas enviada*
-Médico(a): ${fullName}
+Médico(a): ${doctorSalutation}
 CRM: ${crm || "N/A"}
 Plano: normal (sem VIP grátis). Pendências: assinatura gov.br, contrato, aprovação.`;
     } else if (actionType === "vip_expired") {
-      // Regra de Vencimento e Renovação
-      doctorMsg = `Olá, Dr(a). ${fullName}!
+      doctorMsg = `Olá, ${doctorSalutation}!
 
 Identificamos que a vigência do seu Plano Médico VIP na Planta y Raiz encerrou sua competência mensal.
 
-⚠️ *Atenda mais, não atrase seu plano!*
-
-Para manter sua prioridade no rodízio de pacientes, destaque na vitrine médica e acesso às ferramentas de IA (Copiloto Clínico, Assistente Jurídico e Escriba) — mantendo o repasse de 93% de cada consulta via PIX — renove agora:
-👉 ${renewalLink || "https://plantayraiz.com.br/precos"}
+Para manter sua prioridade no rodízio de pacientes, destaque na vitrine médica e acesso às ferramentas de IA (Copiloto Clínico, Assistente Jurídico e Escriba) — mantendo o repasse de 93% de cada consulta via PIX (taxa fixa de 7%) — renove quando desejar:
+👉 ${renewalLink || "https://www.plantayraiz.com.br/precos"}
 
 🛡️ *Seus Prontuários e Pacientes Estão Seguros:*
 Conforme as normas do CFM e a política de segurança da Planta y Raiz (Bezerra Med Soluções Integradas Ltda.), o histórico de seus pacientes e prontuários permanece 100% íntegro e arquivado de forma confidencial.
 
 Equipe de Gestão Médica | Planta y Raiz`;
 
-      adminMsg = `🚨 *AVISO PLANO VENCIDO — PLANTA Y RAÍZ*
-Médico: Dr(a). ${fullName}
+      adminMsg = `🚨 *AVISO PLANO VENCIDO — PLANTA Y RAIZ*
+Médico: ${doctorSalutation}
 CRM: ${crm || "N/A"}
 Telefone: ${phone}
-Status: VIP expirado. Mensagem de regularização ("Atenda mais, não atrase seu plano!") enviada via WhatsApp.`;
+Status: VIP expirado. Mensagem de regularização enviada via WhatsApp.`;
 
     } else {
-      // Boas-vindas do plano: lista apenas o que o servidor realmente aplica (doctor-plans.ts)
       const plan = doctorPlan(planTier);
       const tools = proToolsForPlan(plan.key).map((t) => `   • ${DOCTOR_PRO_TOOLS[t].title}`).join("\n");
       doctorMsg = `🌟 *BEM-VINDO(A) AO PLANO MÉDICO ${plan.name.toUpperCase()}!*
 
-Prezado(a) Dr(a). ${fullName}${crm ? ` (CRM ${crm})` : ""},
+Prezado(a) ${doctorSalutation}${crm ? ` (CRM ${crm})` : ""},
 
-Sua assinatura do *Plano ${plan.name}* (R$ ${plan.priceBrl.toLocaleString("pt-BR")}/mês) está ativa na Planta y Raíz.
+Sua assinatura do *Plano ${plan.name}* (R$ ${plan.priceBrl.toLocaleString("pt-BR")}/mês) está ativa na Planta y Raiz.
 
 👑 *O QUE SEU PLANO LIBERA:*
 1. 🚦 *Prioridade na fila de consultas:* nível ${plan.queueRank} de 6 — planos maiores recebem a oferta do paciente antes.
@@ -152,18 +161,16 @@ Sua assinatura do *Plano ${plan.name}* (R$ ${plan.priceBrl.toLocaleString("pt-BR
 3. ⚖️ *Assistente Jurídico:* até ${plan.limits.juridico} perguntas por dia.
 4. 🎙️ *Escriba de consulta:* até ${plan.limits.escriba} trechos de áudio/SOAP por dia.
 ${tools ? `5. 🧰 *Ferramentas exclusivas* (até ${plan.limits.pro} usos por dia):\n${tools}\n` : ""}
-Além disso: prontuário com CID-10, receitas assinadas, lembretes automáticos, lista de espera, painel financeiro e vídeo HD.
+Além disso: prontuário com CID-10, receitas assinadas, lembretes automáticos, lista de espera, painel financeiro e vídeo HD (taxa fixa de 7% em todas as consultas).
 
 Para acessar seu Consultório Virtual:
-👉 https://plantayraiz.com.br/consultorio
+👉 https://www.plantayraiz.com.br/consultorio
 
-Conte sempre conosco para alavancar a sua prática clínica com tecnologia e humanização!
-
-Enfª Brisa | Gestão & Relacionamento Médico
-🌿 Planta y Raíz — Democratizando a Medicina e Cuidado Canabinoide`;
+Enfª Brisa (assistente virtual) | Gestão & Relacionamento Médico
+🌿 Planta y Raiz`;
 
       adminMsg = `🩺 *Novo médico ativado — plano ${doctorPlan(planTier).name}*
-Médico: Dr(a). ${fullName}
+Médico: ${doctorSalutation}
 CRM: ${crm || "N/A"}
 WhatsApp: ${phone}
 Plano: ${doctorPlan(planTier).name} (R$ ${doctorPlan(planTier).priceBrl.toLocaleString("pt-BR")}/mês)

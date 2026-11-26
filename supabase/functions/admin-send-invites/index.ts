@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { T } from "../_shared/brisa-templates.mjs";
+import {
+  hasConfirmedCrm,
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+} from "../_shared/whatsapp-outreach-guard.mjs";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,8 +21,6 @@ const WAHA_SESSION = Deno.env.get('WAHA_SESSION') || 'default';
 const EVOLUTION_API_URL = (Deno.env.get('EVOLUTION_API_URL') || '').replace(/\/$/, '');
 const EVOLUTION_API_KEY = Deno.env.get('EVOLUTION_API_KEY') || '';
 const EVOLUTION_INSTANCE = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz';
-
-const INVITATION_MESSAGE = `Olá, Doutor(a)! Tudo bem? 🌿\n\nVi que você faz parte do nosso grupo médico da *Planta y Raíz* e gostaria de saber se já ativou seu Consultório Digital gratuito na nossa vitrine de prescritores.\n\n• *Repasse líquido de 93% via PIX* após cada teleconsulta (taxa fixa de apenas 7% da plataforma);\n• *Prontuário CFM e prescrição com assinatura ICP-Brasil / Gov.br*;\n• *Encaminhamento de pacientes* que passam pela nossa triagem.\n\nPara ativar seu perfil (leva menos de 2 minutos), acesse:\n👉 https://www.plantayraiz.com.br/cadastro-profissional\n\nOu, se preferir, pode me enviar seu CRM por aqui mesmo que nossa equipe te ajuda na ativação!`;
 
 async function isAdminRequest(req: Request): Promise<boolean> {
   if (!SB_URL || !SB_KEY) return false;
@@ -98,11 +102,10 @@ serve(async (req: Request): Promise<Response> => {
     });
   }
 
-  // Verifica admin (JWT com role admin) ou service-role key (cron)
+  // Convite a médicos: SOMENTE disparo manual autenticado de administrador
   const isAdmin = await isAdminRequest(req);
-  const authHeader = req.headers.get("Authorization");
-  if (!isAdmin && !(SB_KEY && authHeader === `Bearer ${SB_KEY}`)) {
-    return new Response(JSON.stringify({ error: 'unauthorized' }), {
+  if (!isAdmin) {
+    return new Response(JSON.stringify({ error: 'unauthorized_admin_manual_only' }), {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
@@ -117,76 +120,106 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   const testOnly = Boolean(body?.testOnly ?? true);
-  
+
   if (testOnly) {
-    return new Response(JSON.stringify({ 
-      ok: true, 
-      message: "Modo de teste ativo. Nenhuma mensagem em massa foi enviada.",
-      systemStatus: "Sistema blindado e pronto para disparo.",
-      invitationTemplate: INVITATION_MESSAGE
+    return new Response(JSON.stringify({
+      ok: true,
+      message: "Modo de teste ativo. Nenhuma mensagem foi enviada.",
+      businessHoursBRT: isBusinessHoursBRT(),
+      invitationTemplate: T.doctorInvite("Exemplo", { crmConfirmed: true }),
     }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
 
-  // AQUI FICARIA O CÓDIGO DE DISPARO REAL
-  // BUSCA MÉDICOS NO BANCO E ENVIA
-  
+  // Trava estrita de horário comercial: Seg–Sáb, 09h–19h BRT
+  if (!isBusinessHoursBRT()) {
+    return new Response(JSON.stringify({
+      ok: false,
+      error: 'outside_business_hours_brt',
+      message: 'Envio bloqueado fora do horário comercial (Seg–Sáb, 09h–19h BRT).',
+    }), {
+      status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
   const supabase = createClient(SB_URL, SB_KEY);
   const { data: doctorsData, error } = await supabase
     .from('doctors')
-    .select('user_id, personal_phone')
+    .select('user_id, personal_phone, crm, crm_state, council_type, specialty, profiles:user_id(full_name, email)')
     .not('personal_phone', 'is', null);
 
   if (error) {
     console.error("DB Error:", error.message);
   }
 
-  let doctorsList = doctorsData || [];
-  
-  // Garantir que a primeira mensagem vá para o número do usuário
-  doctorsList.unshift({ user_id: 'admin-test', personal_phone: '5511987131241' });
-  
-  if (doctorsList.length === 1) { // Só tem o número do usuário
-    const fallbackPhone = Deno.env.get('VITE_DOCTOR_WHATSAPP_NUMBER') || '5511999999999';
-    if (fallbackPhone !== '5511987131241') {
-      doctorsList.push({ user_id: 'test-fallback', personal_phone: fallbackPhone });
-    }
-  }
+  const doctorsList = doctorsData || [];
 
   let sentCount = 0;
+  let skippedCount = 0;
   let errorCount = 0;
-  const errors = [];
+  const errors: Array<{ phone: string; error?: string }> = [];
 
-  // Envio sequencial para não estourar rate limit
   for (const doc of doctorsList) {
+    if (!isBusinessHoursBRT()) break;
     if (!doc.personal_phone) continue;
-    const phone = doc.personal_phone.replace(/\D/g, '');
-    if (phone.length < 10) continue; // Número inválido
-    
-    const chatId = phone.includes("@") ? phone : `${phone}@c.us`;
 
-    let result = await sendWAHA(chatId, INVITATION_MESSAGE);
-    if (!result.ok) {
-      result = await sendEvolution(phone, INVITATION_MESSAGE);
+    const prof = (doc as { profiles?: { full_name?: string; email?: string } | null }).profiles;
+    const fullName = String(prof?.full_name || '').trim();
+    const email = String(prof?.email || '').trim();
+
+    // Bloqueia PJ/empresas/não-médicos e exige CRM confirmado
+    if (
+      isCompanyOrNonDoctorContact({
+        name: fullName,
+        email,
+        specialty: doc.specialty || '',
+        crm: doc.crm || '',
+        councilType: doc.council_type || '',
+      }).blocked ||
+      !hasConfirmedCrm(doc.crm || '', doc.crm_state || '', doc.council_type || '')
+    ) {
+      skippedCount++;
+      continue;
     }
-    
+
+    const message = T.doctorInvite(fullName, {
+      crm: doc.crm || '',
+      crmState: doc.crm_state || '',
+      councilType: doc.council_type || '',
+      email,
+      specialty: doc.specialty || '',
+    });
+    if (!message) {
+      skippedCount++;
+      continue;
+    }
+
+    const phone = String(doc.personal_phone).replace(/\D/g, '');
+    if (phone.length < 10) continue;
+
+    const chatId = phone.includes("@") ? phone : `${phone}@c.us`;
+    let result = await sendWAHA(chatId, message);
+    if (!result.ok) {
+      result = await sendEvolution(phone, message);
+    }
+
     if (result.ok) {
       sentCount++;
     } else {
       errorCount++;
       errors.push({ phone: doc.personal_phone, error: result.error });
     }
-    
-    // Pequena pausa para evitar flood (Rate Limiting protection)
-    await new Promise(r => setTimeout(r, 2000));
+
+    await new Promise((r) => setTimeout(r, 2000));
   }
 
   return new Response(JSON.stringify({
     ok: true,
     sentCount,
+    skippedCount,
     errorCount,
-    errors
+    errors,
   }), {
     status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });

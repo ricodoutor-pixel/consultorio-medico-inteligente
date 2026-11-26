@@ -1,12 +1,18 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import {
+  formatDoctorAddressing,
+  hasConfirmedCrm,
+  isBusinessHoursBRT,
+  isCompanyOrNonDoctorContact,
+} from "../_shared/whatsapp-outreach-guard.mjs";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") || "";
 
 const INVITE_SUBJECT = "Convite Profissional: Credencie seu Consultório Digital na Planta y Raiz (93% de Repasse via PIX)";
 
-function buildInviteHTML(doctorName: string): string {
-  const firstName = doctorName.split(" ")[0] || "Colega";
+function buildInviteHTML(salutation: string): string {
+  const safeSalutation = salutation || "Colega";
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -23,7 +29,7 @@ function buildInviteHTML(doctorName: string): string {
 
     <!-- Corpo do E-mail -->
     <div style="padding:35px 30px;line-height:1.7;color:#1e293b;font-size:15px;">
-      <p style="font-size:16px;">Olá, <strong>${firstName}</strong>,</p>
+      <p style="font-size:16px;">Olá, <strong>${safeSalutation}</strong>,</p>
       
       <p>Convidamos médicos com registro ativo no CRM para credenciar gratuitamente seu consultório digital na <strong>Planta y Raiz</strong>, plataforma de telemedicina desenvolvida para apoiar a autonomia clínica com prontuário CFM, emissão de receitas digitais e repasse transparente via PIX.</p>
 
@@ -103,6 +109,16 @@ serve(async (req) => {
   try {
     const { contacts, batchSize = 10, dryRun = false } = await req.json();
 
+    if (!dryRun && !isBusinessHoursBRT()) {
+      return new Response(JSON.stringify({
+        error: "outside_business_hours_brt",
+        message: "Envio bloqueado fora do horário comercial (Seg–Sáb, 09h–19h BRT).",
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
       return new Response(JSON.stringify({ error: "No contacts provided" }), {
         status: 400,
@@ -124,16 +140,42 @@ serve(async (req) => {
       });
     }
 
-    const results = { sent: 0, failed: 0, imported: 0, errors: [] as string[] };
+    const results = { sent: 0, skipped: 0, failed: 0, imported: 0, errors: [] as string[] };
     const safeBatchSize = Math.max(1, Math.min(Number(batchSize) || 10, 25));
     const batch = contacts.slice(0, safeBatchSize);
 
     for (const contact of batch) {
-      const { email, name, specialty, city, state, phone } = contact;
+      const { email, name, specialty, city, state, phone, crm, crm_state, council_type } = contact;
 
       if (!email) {
         results.failed++;
         results.errors.push(`Missing email for ${name}`);
+        continue;
+      }
+
+      // Bloqueia PJ/empresas/não-médicos e exige CRM confirmado para convites médicos
+      const pjCheck = isCompanyOrNonDoctorContact({
+        name,
+        email,
+        specialty,
+        crm,
+        councilType: council_type,
+      });
+      if (pjCheck.blocked || !hasConfirmedCrm(crm || "", crm_state || state || "", council_type || "")) {
+        results.skipped++;
+        continue;
+      }
+
+      const addressing = formatDoctorAddressing({
+        name,
+        crm: crm || "",
+        crmState: crm_state || state || "",
+        councilType: council_type || "",
+        email,
+        specialty,
+      });
+      if (!addressing.allowed) {
+        results.skipped++;
         continue;
       }
 
@@ -142,14 +184,14 @@ serve(async (req) => {
         const contactPayload = {
           email,
           attributes: {
-            FIRSTNAME: name?.split(" ")[0] || "",
-            LASTNAME: name?.split(" ").slice(1).join(" ") || "",
+            FIRSTNAME: addressing.cleanName?.split(" ")[0] || "",
+            LASTNAME: addressing.cleanName?.split(" ").slice(1).join(" ") || "",
             SPECIALTY: specialty || "",
             CITY: city || "",
             STATE: state || "",
             SMS: phone || "",
           },
-          listIds: [2], // Default contact list
+          listIds: [2],
           updateEnabled: true,
         };
 
@@ -167,7 +209,6 @@ serve(async (req) => {
           results.imported++;
         } else {
           const errBody = await importRes.text();
-          // Contact may already exist (duplicate_parameter), that's OK
           if (errBody.includes("duplicate_parameter")) {
             results.imported++;
           } else {
@@ -177,11 +218,12 @@ serve(async (req) => {
 
         // 2. Send invite email via Brevo transactional
         if (!dryRun) {
+          const displaySalutation = addressing.salutation || addressing.cleanName || "Colega";
           const emailPayload = {
-            sender: { name: "Planta y Raíz · Enfª Brisa", email: "contato@plantayraiz.com.br" },
-            to: [{ email, name: name || "Doutor(a)" }],
+            sender: { name: "Planta y Raiz · Enfª Brisa", email: "contato@plantayraiz.com.br" },
+            to: [{ email, name: displaySalutation }],
             subject: INVITE_SUBJECT,
-            htmlContent: buildInviteHTML(name || "Doutor(a)"),
+            htmlContent: buildInviteHTML(displaySalutation),
             tags: ["invite-campaign", "abrace-prescritores"],
             headers: {
               "X-Mailin-Tag": "invite-prescritores-abrace",
@@ -208,7 +250,6 @@ serve(async (req) => {
             console.error(`Send error for recipient:`, sendErr);
           }
 
-          // Rate limit: ~2 emails/sec to avoid Brevo throttling
           await new Promise((r) => setTimeout(r, 500));
         } else {
           results.sent++;

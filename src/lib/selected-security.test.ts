@@ -54,6 +54,9 @@ function handler(name: string, db: ReturnType<typeof database>, fetcher = vi.fn(
     if (id.includes("ai-guard")) return { rateLimit: async () => null, clientIp: () => "test" };
     if (id.includes("gemini")) return {};
     if (id.includes("brisa-response-policy")) return {};
+    if (id.includes("brisa-templates")) return { T: {}, BRISA_IDENTITY: "Enfª Brisa, assistente virtual", OT_DESCRIPTION: "", PATIENT_PAY_LINK: "", DOCTOR_SIGNUP_LINK: "" };
+    if (id.includes("whatsapp-outreach-guard")) return { hasConfirmedCrm: () => false, isCompanyOrNonDoctorContact: () => ({ blocked: false }) };
+    if (id.includes("pending-payment-context")) return { hasPendingPaymentForPhone: async () => false };
     throw new Error(`Unhandled test adapter: ${id}`);
   };
   const source = readFileSync(`supabase/functions/${name}/index.ts`, "utf8");

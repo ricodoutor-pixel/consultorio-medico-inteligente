@@ -73,8 +73,17 @@ function saveRegistry() {
   } catch (_) {}
 }
 
+import {
+  formatDoctorAddressing,
+  isBusinessHoursBRT,
+} from '../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
+
 // ─── Disparo de Mensagem WhatsApp via Evolution API ───
 async function sendWhatsAppMessage(phone, messageText) {
+  if (!isBusinessHoursBRT()) {
+    log(`⏰ [BLOQUEIO HORÁRIO] Disparo fora do horário comercial (Seg-Sáb 9h-19h BRT) bloqueado para ${phone}.`);
+    return false;
+  }
   let cleanPhone = String(phone || '').replace(/\D/g, '');
   if (!cleanPhone) return false;
   if (!cleanPhone.startsWith('55')) cleanPhone = `55${cleanPhone}`;
@@ -120,7 +129,7 @@ export function detectMeetingIntent(text) {
 }
 
 export async function handlePartnerMeetingInquiry(partnerData) {
-  const { name, phone, email, persona, message } = partnerData;
+  const { name, phone, email, persona, message, crm, crmState, councilType } = partnerData;
   log(`🎯 Nova intenção de parceria detectada: ${name} (${persona || 'Geral'}) - Tel: ${phone || email}`);
 
   const isDoctor = persona === 'medico' || (message && (message.includes('crm') || message.includes('médic')));
@@ -128,7 +137,13 @@ export async function handlePartnerMeetingInquiry(partnerData) {
 
   let responseText = '';
   if (isDoctor) {
-    responseText = `Olá, Dr(a). ${name}! Que excelente iniciativa.\n\nSerá um prazer apresentar o modelo de Consultório Virtual Gratuito (93% de repasse líquido via PIX) e o Plano Premium por R$ 99/mês.\n\n📅 Escolha o melhor dia e horário na nossa agenda oficial de 15 minutos: ${MEETING_CALENDAR_URL}?tipo=medico\n\nNossa coordenação médica aguarda você! 🌿`;
+    const addressing = formatDoctorAddressing({ name, crm, crmState, councilType, email });
+    if (!addressing.allowed) {
+      log(`🏢 [BLOQUEIO PJ/NÃO-MÉDICO] Contato bloqueado para fluxo médico: ${name} (${addressing.reason})`);
+      return '';
+    }
+    const greeting = addressing.salutation ? `Olá, ${addressing.salutation}!` : 'Olá!';
+    responseText = `${greeting} Que excelente iniciativa.\n\nSerá um prazer apresentar o modelo de Consultório Virtual Gratuito (93% de repasse líquido via PIX, taxa fixa de 7%) e o Plano Premium por R$ 99/mês.\n\n📅 Escolha o melhor dia e horário na nossa agenda oficial de 15 minutos: ${MEETING_CALENDAR_URL}?tipo=medico\n\nNossa coordenação médica aguarda você! 🌿`;
   } else if (isPharmacy) {
     responseText = `Olá, ${name}! Agradecemos o interesse em integrar o catálogo da sua empresa ao ecossistema Planta y Raíz.\n\n📅 Agende a reunião de homologação de 15 minutos com nossa Diretoria Técnica: ${MEETING_CALENDAR_URL}?tipo=farmacia\n\nNesta conversa alinhamos o fluxo regulatório (RDC 660 / RDC 327) e a conexão com os médicos prescritores! 🌿`;
   } else {

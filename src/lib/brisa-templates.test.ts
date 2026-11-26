@@ -102,6 +102,8 @@ const AGENT_TEXT_FILES = [
   "supabase/functions/ebook-capture/index.ts",
   "supabase/functions/verdinho-chat/index.ts",
   "scripts/agent_evolution_brisa_live_responder.mjs",
+  "scripts/agent_brevo_doctor_whatsapp_inviter.mjs",
+  "scripts/agent_brevo_multi_pipeline.mjs",
   "scripts/agent_cadence_10min_inviter.mjs",
   "scripts/agent_hostinger_email_dispatcher.mjs",
   "scripts/whatsapp-bot.cjs",
@@ -139,9 +141,11 @@ describe("Nenhum texto ativo do agente contém frase proibida", () => {
     expect(rel).toMatch(/IDENTITY_CHANGE_AT = new Date\("2026-11-25/);
     expect(rel).toContain("Supervisão técnica: {TECH_SUPERVISOR}");
   });
-  it("robôs de convite frio e captação ficam fora do PM2 e o vigia não os religa", async () => {
+  it("somente brevo-whatsapp-inviter (15 min) e brevo-multi-pipeline (300/dia) ficam ativos; legados continuam fora do PM2 e do vigia", async () => {
     const eco = await import("../../ecosystem.config.cjs");
     const names: string[] = (eco.default ?? eco).apps.map((a: { name: string }) => a.name);
+    expect(names).toContain("brevo-whatsapp-inviter");
+    expect(names).toContain("brevo-multi-pipeline");
     for (const off of [
       "growth-engine",
       "lead-harvesters-master",
@@ -149,14 +153,18 @@ describe("Nenhum texto ativo do agente contém frase proibida", () => {
       "hostinger-email-dispatcher",
       "cannabis-young-doctors-hunter",
       "cadence-10min-inviter",
-      "brevo-whatsapp-inviter",
       "whatsapp-bot",
       "wpp-crm",
+      "patient-traffic-booster",
+      "apify-lead-sync",
+      "anvisa-rdc660-rpa",
     ]) {
       expect(names).not.toContain(off);
     }
     const watchdog = fs.readFileSync("scripts/sysadmin_watchdog_supervisor.mjs", "utf8");
     const expected = watchdog.slice(watchdog.indexOf("EXPECTED_SERVICES"), watchdog.indexOf("];", watchdog.indexOf("EXPECTED_SERVICES")));
-    expect(expected).not.toMatch(/cadence|growth-engine|lead-harvesters|patient-traffic|anvisa-rdc660|whatsapp-bot|wpp-crm|brevo-whatsapp/);
+    expect(expected).toContain("brevo-whatsapp-inviter");
+    expect(expected).toContain("brevo-multi-pipeline");
+    expect(expected).not.toMatch(/cadence|growth-engine|lead-harvesters|patient-traffic|anvisa-rdc660|whatsapp-bot|wpp-crm|hostinger-email|instagram-direct|cannabis-young/);
   });
 });

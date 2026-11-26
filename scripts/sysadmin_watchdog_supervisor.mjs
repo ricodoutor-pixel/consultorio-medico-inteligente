@@ -10,14 +10,17 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOG_FILE = path.join(__dirname, 'sysadmin_watchdog.log');
 
-// Só os robôs em uso. Convite frio, captação de leads e robôs quebrados foram desligados
-// em 2026-11-25 (ver DESLIGADOS em ecosystem.config.cjs) e o vigia NUNCA os religa.
+// Robôs operacionais autorizados pelo Dr. Edilson (incluindo brevo-whatsapp-inviter 15 min e
+// brevo-multi-pipeline 300/dia em horário comercial BRT). Robôs legados de 10 min e captação
+// continuam em DESLIGADOS (ecosystem.config.cjs) e o vigia os derruba imediatamente.
 const EXPECTED_SERVICES = [
   'brisa-live-responder',
   'doctor-kyc-listener',
   'partner-meeting-scheduler',
   'organic-analytics-reporter',
-  'email-bounce-guardian'
+  'email-bounce-guardian',
+  'brevo-whatsapp-inviter',
+  'brevo-multi-pipeline'
 ];
 
 function log(msg) {
@@ -56,7 +59,7 @@ async function inspectSystemResources() {
   log(`🖥️ RECURSOS: RAM ${memUsagePercent}% usada (${(usedMem / 1024 / 1024).toFixed(0)}MB / ${(totalMem / 1024 / 1024).toFixed(0)}MB) | Carga: [${loadAvg.map(l => l.toFixed(2)).join(', ')}] | Disco: ${diskInfo}`);
 }
 
-const FORBIDDEN_COLD_WORKER_PATTERN = /(cadence|invit|convite|disparo|dispatch|whatsapp-bot|wpp-crm|growth-engine|brevo-whatsapp|cannabis-young-doctors|hostinger-email-dispatcher|instagram-direct-inviter)/i;
+const FORBIDDEN_COLD_WORKER_PATTERN = /(cadence-10min|agent_cadence_10min|priority-15min|whatsapp-bot|wpp-crm|03_whatsapp-crm|04_autonomous-growth|growth-engine|cannabis-young-doctors|hostinger-email-dispatcher|instagram-direct-inviter|disparo)/i;
 
 async function checkAndHealPM2Services() {
   const failedServices = [];

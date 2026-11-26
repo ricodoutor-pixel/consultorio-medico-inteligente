@@ -130,13 +130,42 @@ export async function collectDailyMetrics() {
     } catch (_) {}
   }
 
+  // 6. Métricas reais de e-mail Brevo (300/dia) e WhatsApp convites (15 min)
+  let brevoEmailsToday = '—';
+  let brevoTotalUnique = '—';
+  let brevoBlockedNote = '';
+  const brevoStateFile = path.join(__dirname, 'brevo_multi_pipeline_state.json');
+  if (fs.existsSync(brevoStateFile)) {
+    try {
+      const bs = JSON.parse(fs.readFileSync(brevoStateFile, 'utf8'));
+      brevoEmailsToday = `${bs.dailyBrevoCount ?? 0}/300`;
+      brevoTotalUnique = String(bs.metrics?.totalUniqueSent ?? Object.keys(bs.pipelineProgress || {}).length);
+      if (bs.lastProviderBlockedReason) {
+        brevoBlockedNote = ` (⚠️ ${bs.lastProviderBlockedReason.slice(0, 60)})`;
+      }
+    } catch (_) {}
+  }
+
+  let wppInvitedTotal = '—';
+  const wppStateFile = path.join(__dirname, 'brevo_whatsapp_invited_doctors.json');
+  if (fs.existsSync(wppStateFile)) {
+    try {
+      const ws = JSON.parse(fs.readFileSync(wppStateFile, 'utf8'));
+      wppInvitedTotal = String(ws.totalInvited ?? 0);
+    } catch (_) {}
+  }
+
   return {
     date: new Date().toLocaleDateString('pt-BR'),
     newDoctorsToday,
     newTriagesToday,
     vipSubscriptions,
     metaMetrics,
-    meetingsBooked
+    meetingsBooked,
+    brevoEmailsToday,
+    brevoTotalUnique,
+    brevoBlockedNote,
+    wppInvitedTotal,
   };
 }
 
@@ -157,16 +186,15 @@ Planta y Raíz Ltda · ${m.date}
 • Novos Médicos Cadastrados Hoje: ${m.newDoctorsToday}
 • Total de Assinantes VIP (R$ 99/mês): ${m.vipSubscriptions}
 
+📣 *Convites a Médicos (Dados Reais do Disco VPS):*
+• E-mails Brevo hoje: ${m.brevoEmailsToday}${m.brevoBlockedNote} (únicos acumulados: ${m.brevoTotalUnique})
+• Convites WhatsApp (15 min) acumulados: ${m.wppInvitedTotal}
+
 🎯 *Pacientes & Conversão:*
 • Sessões de Triagem / Enfª Brisa: ${m.newTriagesToday}
 • Reuniões de Parcerias Agendadas: ${m.meetingsBooked}
 
-🚀 *Status dos Daemons VPS (Hostinger):*
-• Meta Social 24/7 (Porta 3030): 🟢 ONLINE
-• Brevo Multi-Pipeline: 🟢 ATIVO (Quota 300/dia)
-• Agendador de Reuniões: 🟢 ATIVO
-
-_Relatório gerado automaticamente pelo Agente Antigravity._`;
+_Relatório gerado automaticamente a partir dos arquivos reais de estado da VPS._`;
 
   const url = `${EVO_BASE_URL}/message/sendText/${EVO_INSTANCE}`;
   const payload = {

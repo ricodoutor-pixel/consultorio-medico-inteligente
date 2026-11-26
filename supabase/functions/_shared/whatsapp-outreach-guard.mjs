@@ -140,7 +140,7 @@ const PJ_LEGAL_ENTITY_NAME_PATTERNS = [
   /\b(imobiliaria|imoveis|corretora\s+de\s+imoveis|incorporadora|construtora|engenharia|arquitetura)\b/i,
   /\b(financeira|financas|credito|emprestimo|consorcio|factoring|cobranca|seguros|corretora|banco)\b/i,
   /\b(advocacia|advogados?\s+associados|escritorio\s+de\s+advocacia)\b/i,
-  /\b(agencia|marketing|publicidade|propaganda|midia|digital|estetica|beleza|salao|barbearia|academia|otica|optica)\b/i,
+  /\b(agencia|marketing|publicidade|propaganda|midia|digital|estetica|salao\s+de\s+beleza|estetica\s+e\s+beleza|clinica\s+de\s+beleza|espaco\s+beleza|instituto\s+de\s+beleza|studio\s+de\s+beleza|salao|barbearia|academia|otica|optica)\b/i,
   /\b(associacao|cooperativa|sindicato|fundacao|igreja|escola|colegio|faculdade|universidade)\b/i,
   /\b(supermercado|mercado|restaurante|padaria|loja|oficina|transportadora|logistica|distribuidora|industria|comercial)\b/i,
 ];
@@ -166,7 +166,7 @@ const CLINIC_OR_FACILITY_NAME_PATTERNS = [
  */
 const NON_DOCTOR_PROFESSION_PATTERNS = [
   /\b(odontologia|odontologic[oa]|odonto|dentista|cirurgiao[- ]?dentista|ortodontia|implantodontia|endodontia|periodontia|protese\s+dentaria|oral\s*face|sorriso|smile)\b/i,
-  /\b(psicologia|psicolog[oa]s?|psicoterapia|psicanalise|neuropsicologia|terapeuta)\b/i,
+  /\b(psicologia|psicolog[oa]s?|neuropsicologia|terapeuta)\b/i,
   /\b(veterinari[oa]s?|medicina\s+veterinaria|pet\s*shop)\b/i,
   /\b(fisioterapia|fisioterapeutas?|quiropraxia|osteopatia|pilates)\b/i,
   /\b(nutricao|nutricionistas?)\b/i,
@@ -256,6 +256,12 @@ export function isCompanyOrNonDoctorContact(contact = {}) {
       if (re.test(normText)) {
         return { blocked: true, reason: `non_doctor_profession_${label}` };
       }
+    }
+    if (
+      /\b(psicoterapia|psicanalise)\b/i.test(normText) &&
+      !/\b(psiquiatr[ia]a?|medicina|medic[oa])\b/i.test(`${specialtyNorm} ${bioNorm}`)
+    ) {
+      return { blocked: true, reason: `non_doctor_profession_${label}` };
     }
   }
 

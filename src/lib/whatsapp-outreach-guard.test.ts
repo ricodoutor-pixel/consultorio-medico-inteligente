@@ -230,3 +230,50 @@ describe('Falha 4 — Classificação de pagamento exige cobrança/pedido penden
     expect(sanitized).not.toMatch(/recebemos sua mensagem sobre o pagamento|pagamento informado/i);
   });
 });
+
+describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails estritos', () => {
+  it('evita falsos positivos em sobrenome "Beleza" e psiquiatra com "Psiquiatria/Psicoterapia", mantendo bloqueios PJ/psicologia', () => {
+    expect(isCompanyOrNonDoctorContact({ name: 'Dr(a). Flaeste Cruz Beleza', specialty: 'Médico de Familia e Comunidade' }).blocked).toBe(false);
+    expect(isCompanyOrNonDoctorContact({ name: 'Dr(a). Carlos Eduardo Santana de Oliveira', specialty: 'Psiquiatria/Psicoterapia' }).blocked).toBe(false);
+    expect(isCompanyOrNonDoctorContact({ name: 'Salão de Beleza Glamour' }).blocked).toBe(true);
+    expect(isCompanyOrNonDoctorContact({ name: 'Ana Paula', specialty: 'Psicoterapia Clínica' }).blocked).toBe(true);
+  });
+
+  it('WhatsApp inviter mantém cadência mínima de 15 min, bloqueia PJ e não prefixa Dr(a). sem CRM', async () => {
+    const wpp = await import('../../scripts/agent_brevo_doctor_whatsapp_inviter.mjs');
+    expect(wpp.CADENCE_MS).toBe(15 * 60 * 1000);
+    expect(wpp.isExcludedAudience('Americana Contábil', 'contato@americanacontabil.com.br', '').excluded).toBe(true);
+    expect(wpp.isExcludedAudience('Ari da Silva Avelar', 'ari@gmail.com', 'Pneumologista').excluded).toBe(false);
+
+    const neutralMsg = wpp.buildInvitationMessage('Dr(a). Ari da Silva Avelar', { email: 'ari@gmail.com', specialty: 'Pneumologista' });
+    expect(neutralMsg).toContain('Olá, Ari da Silva!');
+    expect(neutralMsg).not.toMatch(/\bDr\(a\)\./);
+    expect(neutralMsg).toContain('SAIR');
+    expect(neutralMsg).toContain('cadastro-profissional');
+
+    const crmMsg = wpp.buildInvitationMessage('Ana Paula', { crm: '49354', crmState: 'PR' });
+    expect(crmMsg).toContain('Olá, Dr(a). Ana Paula!');
+  });
+
+  it('Brevo multi-pipeline opera com cota de 300/dia (2 min), bloqueia PJ, sem Dr(a). sem CRM e sem frases proibidas', async () => {
+    const brevo = await import('../../scripts/agent_brevo_multi_pipeline.mjs');
+    expect(brevo.DAILY_BREVO_LIMIT).toBe(300);
+    expect(brevo.CADENCE_MS).toBe(120000);
+
+    const pjBlocked = brevo.buildDoctorEmailForStep({ name: 'Plan Saúde Cartão Benefícios Ltda', email: 'contato@plansaude.com.br' }, 1);
+    expect(pjBlocked.allowed).toBe(false);
+
+    for (const step of [1, 2, 3]) {
+      const noCrm = brevo.buildDoctorEmailForStep({ name: 'Dr(a). Ari da Silva Avelar', email: 'ari@gmail.com', specialty: 'Pneumologista' }, step);
+      expect(noCrm.allowed, `step ${step}`).toBe(true);
+      expect(noCrm.subject, `step ${step}`).not.toMatch(/\bDr\(a\)\./);
+      expect(noCrm.htmlContent, `step ${step}`).not.toMatch(/Dr\(a\)\.|medicina canabin|40\.000|s[oó]ci[oa]|taxa zero/i);
+      expect(noCrm.htmlContent, `step ${step}`).toContain('SAIR');
+      expect(noCrm.textContent, `step ${step}`).toContain('SAIR');
+    }
+
+    const withCrm = brevo.buildDoctorEmailForStep({ name: 'Ana Paula', email: 'ana@gmail.com', crm: '49354', uf: 'PR' }, 1);
+    expect(withCrm.allowed).toBe(true);
+    expect(withCrm.subject).toContain('Dr(a). Ana Paula');
+  });
+});

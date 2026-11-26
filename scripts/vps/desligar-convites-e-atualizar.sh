@@ -8,14 +8,16 @@ echo "=== ANTES ==="
 pm2 list
 
 DESLIGADOS=(patient-traffic-booster growth-engine lead-harvesters-master instagram-direct-inviter apify-lead-sync
-  anvisa-rdc660-rpa brevo-multi-pipeline hostinger-email-dispatcher cannabis-young-doctors-hunter cadence-10min-inviter
-  brevo-whatsapp-inviter whatsapp-bot wpp-crm priority-15min-inviter meta-social-engine)
+  anvisa-rdc660-rpa hostinger-email-dispatcher cannabis-young-doctors-hunter cadence-10min-inviter
+  whatsapp-bot wpp-crm priority-15min-inviter meta-social-engine)
 
-# Qualquer outro processo PM2 rodando um script de convite/disparo/loop de 10 min também para.
+# Qualquer outro processo PM2 rodando script legado de 10 min/disparo proibido para (preservando os 2 autorizados: brevo-whatsapp-inviter e brevo-multi-pipeline).
 EXTRA=$(pm2 jlist 2>/dev/null | node -e '
+  const ALLOWED = new Set(["brevo-whatsapp-inviter", "brevo-multi-pipeline"]);
   let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{
     for(const p of JSON.parse(s)){const f=String(p.pm2_env?.pm_exec_path||"");const n=String(p.name||"");
-      if(/invit|convite|disparo|dispatch|campaign|campanha|harvest|hunter|send_|send-|cadence|whatsapp-bot|wpp-crm|03_whatsapp-crm|04_autonomous-growth/i.test(f+" "+n)) console.log(p.name);}
+      if(ALLOWED.has(n)) continue;
+      if(/cadence|priority-15min|whatsapp-bot|wpp-crm|03_whatsapp-crm|04_autonomous-growth|disparo|campaign|campanha|harvest|hunter|send_|send-/i.test(f+" "+n)) console.log(p.name);}
   }catch{}});')
 
 for name in "${DESLIGADOS[@]}" $EXTRA; do

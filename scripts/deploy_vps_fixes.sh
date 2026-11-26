@@ -28,9 +28,10 @@ export NODE_OPTIONS="--dns-result-order=ipv4first"
 echo "⚙️ 3. Aplicando nova configuração do PM2..."
 pm2 startOrReload ecosystem.config.cjs --update-env
 
-# Garante que os agentes bloqueados pelo Brevo ou Apify e TODOS os disparadores frios fiquem desligados e excluídos do PM2
-echo "🛑 4. Desligando e excluindo agentes frios e bloqueados..."
-for app in cadence-10min-inviter brevo-whatsapp-inviter whatsapp-bot wpp-crm growth-engine brevo-multi-pipeline apify-lead-sync hostinger-email-dispatcher cannabis-young-doctors-hunter instagram-direct-inviter; do
+# Garante que os agentes legados (loop de 10 min, Apify vencida, SMTP Hostinger, Instagram frio) fiquem desligados;
+# preserva brevo-whatsapp-inviter (15 min) e brevo-multi-pipeline (300/dia) autorizados pelo Dr. Edilson.
+echo "🛑 4. Desligando e excluindo agentes legados/proibidos..."
+for app in cadence-10min-inviter whatsapp-bot wpp-crm growth-engine apify-lead-sync hostinger-email-dispatcher cannabis-young-doctors-hunter instagram-direct-inviter; do
   pm2 stop "$app" 2>/dev/null || true
   pm2 delete "$app" 2>/dev/null || true
 done

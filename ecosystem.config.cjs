@@ -163,12 +163,32 @@ module.exports = {
       cwd: '/opt/plantayraiz',
       instances: 1,
       exec_mode: 'fork',
-      autorestart: false, // PAUSADO: Brevo responde 554 Outbound sending disabled (desligado para proteger reputação)
+      autorestart: true,
       watch: false,
       max_memory_restart: '1G',
       restart_delay: 10000,
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
+        BREVO_DAILY_LIMIT: '300',
+        BREVO_CADENCE_MS: '120000'
+      }
+    },
+    {
+      name: 'brevo-whatsapp-inviter',
+      node_args: '--dns-result-order=ipv4first',
+      script: 'scripts/agent_brevo_doctor_whatsapp_inviter.mjs',
+      cwd: '/opt/plantayraiz',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 10000,
+      env: {
+        NODE_ENV: 'production',
+        BRISA_DRY_RUN: 'false',
+        BRISA_COLD_OUTREACH_ENABLED: 'true',
+        WPP_INVITE_CADENCE_MS: '900000'
       }
     },
     {
@@ -248,25 +268,25 @@ module.exports = {
     }
   ]
 };
-// Desligados em 2026-11-25 por decisão do Dr. Edilson: convite frio a médicos, captação de leads
-// e robôs quebrados (arquivo inexistente ou bloqueio). Não voltam com `pm2 start ecosystem.config.cjs`
-// nem pelo sysadmin-watchdog. Para religar algum, é preciso decisão explícita do dono.
+// Em 2026-11-26 o Dr. Edilson autorizou explicitamente religar APENAS:
+// - brevo-whatsapp-inviter (1 convite a cada 15 min, Seg–Sáb 9h–19h BRT, filtro PJ, sem Dr(a). sem CRM)
+// - brevo-multi-pipeline (300 e-mails/dia via Brevo, Seg–Sáb 9h–19h BRT, filtro PJ, sem Dr(a). sem CRM)
+// Todos os demais robôs legados (loop de 10 min, SMTP Hostinger, Instagram frio, captação e quebrados)
+// permanecem em DESLIGADOS e nunca são religados pelo pm2 nem pelo sysadmin-watchdog.
 const DESLIGADOS = [
-  'patient-traffic-booster',      // arquivo não existe
-  'growth-engine',                // motor de captação até 500 médicos (convite frio)
-  'lead-harvesters-master',       // arquivo não existe (captação de leads)
-  'instagram-direct-inviter',     // convite frio por Direct do Instagram
-  'apify-lead-sync',              // captação de leads (chave Apify vencida)
-  'anvisa-rdc660-rpa',            // arquivo não existe
-  'brevo-multi-pipeline',         // Brevo bloqueado (554)
-  'hostinger-email-dispatcher',   // e-mail frio a médicos
-  'cannabis-young-doctors-hunter', // e-mail frio a médicos
-  'cadence-10min-inviter',        // WhatsApp frio em loop de 10 min (nunca religar)
-  'brevo-whatsapp-inviter',       // WhatsApp frio via Brevo (nunca religar)
-  'whatsapp-bot',                 // WhatsApp frio em loop de 10 min legado (nunca religar)
-  'wpp-crm',                      // CRM WhatsApp frio legado (nunca religar)
-  'priority-15min-inviter',       // WhatsApp frio "Parabéns, Dr(a)" a cada 15 min (parado na VPS em 26/11; nunca religar)
-  'meta-social-engine',           // desligado a pedido do dono em 26/11 (o webhook oficial é a função meta-social-webhook)
+  'patient-traffic-booster',       // arquivo não existe
+  'growth-engine',                 // motor legado de captação até 500 médicos
+  'lead-harvesters-master',        // arquivo não existe (captação de leads)
+  'instagram-direct-inviter',      // convite frio por Direct do Instagram
+  'apify-lead-sync',               // captação de leads (chave Apify vencida)
+  'anvisa-rdc660-rpa',             // arquivo não existe
+  'hostinger-email-dispatcher',    // e-mail frio via SMTP Hostinger (desligado)
+  'cannabis-young-doctors-hunter', // e-mail frio legado (desligado)
+  'cadence-10min-inviter',         // WhatsApp frio em loop de 10 min (nunca religar)
+  'whatsapp-bot',                  // WhatsApp frio em loop de 10 min legado (nunca religar)
+  'wpp-crm',                       // CRM WhatsApp frio legado (nunca religar)
+  'priority-15min-inviter',        // WhatsApp frio "Parabéns, Dr(a)" a cada 15 min (parado na VPS em 26/11; nunca religar)
+  'meta-social-engine',            // desligado a pedido do dono em 26/11 (o webhook oficial é a função meta-social-webhook)
 ];
 module.exports.apps = module.exports.apps.filter((app) => !DESLIGADOS.includes(app.name));
 module.exports.DESLIGADOS = DESLIGADOS;

@@ -148,13 +148,18 @@ export function buildOfficialInvitationMessage(contactName = '', options = {}) {
   const saudacao = addressing.salutation ? `Olá, ${addressing.salutation}!` : 'Olá!';
   return `${saudacao} Tudo bem? 🌿
 
-Sou a Enfª Brisa, assistente virtual da Planta y Raiz (${BRISA_CONFIG.EMPRESA.razaoSocial}, CNPJ ${BRISA_CONFIG.EMPRESA.cnpj} — a equipe humana acompanha).
+Sou a Enfª Brisa, da plataforma Planta y Raíz (plantayraiz.com.br).
 
-Para profissionais com registro ativo em conselho:
-• *Cadastro gratuito:* ${BRISA_CONFIG.URLS.cadastroProfissional}
-• *Repasse oficial:* ${BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao}
-• *Plano Médico VIP opcional (R$ 99/mês):* ${BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho}
-• *Conformidade CFM / ANVISA:* prontuário eletrônico e prescrição digital ICP-Brasil / Gov.br.
+Estamos credenciando médicos prescritores para telemedicina integrativa em todo o Brasil:
 
-Se tiver interesse ou dúvida, responda por aqui que nossa equipe humana acompanha. Se não quiser mais mensagens, responda SAIR.`;
+• Autonomia clínica e controle total da sua agenda
+• Emissor de receitas e prontuário integrado (ICP-Brasil / Gov.br)
+• Pacientes pré-triados para atendimento em vídeo ou chat
+• Repasse líquido de 93% direto via Pix (Mercado Pago)
+• Sem taxa de adesão ou mensalidade fixa
+
+👉 Conheça e ative seu consultório:
+${BRISA_CONFIG.URLS.cadastroProfissional}
+
+Caso prefira tirar dúvidas por aqui, basta responder esta mensagem. (Para não receber novos avisos, responda SAIR).`;
 }

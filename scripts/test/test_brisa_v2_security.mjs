@@ -260,10 +260,8 @@ it('T8.1: Resposta padrão de origem do contato deve conter o texto exato da LGP
 
 it('T8.2: Mensagem oficial de convite deve conter as duas modalidades de monetização', () => {
   const invite = buildOfficialInvitationMessage('Amir');
-  // Proposta de entrada gancho
-  assert(invite.includes(BRISA_CONFIG.POLITICA_COMERCIAL.ofertaGancho));
-  // Regra padrão da plataforma
-  assert(invite.includes(BRISA_CONFIG.POLITICA_COMERCIAL.regraPadrao));
+  assert(invite.includes('Repasse líquido de 93%'));
+  assert(invite.includes('responda SAIR'));
   // Link oficial canônico
   assert(invite.includes(BRISA_CONFIG.URLS.cadastroProfissional));
 });

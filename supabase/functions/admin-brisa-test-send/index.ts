@@ -63,10 +63,9 @@ Deno.serve(async (req) => {
     }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
-  let body: any = {};
-  try { body = await req.json(); } catch {}
-  const number = String(body.number || ADMIN_WA).replace(/\D/g, "");
-  const text = String(body.text ||
+  // Test sends go only to the configured admin number with the fixed test text.
+  const number = String(ADMIN_WA).replace(/\D/g, "");
+  const text = String(
     `✅ Teste Brisa 2.0 — Dr. Edilson, sistema Planta y Raiz online (${new Date().toLocaleString("pt-BR")}). Canal WhatsApp autônomo confirmado. 🌿`
   ).slice(0, 4096);
 

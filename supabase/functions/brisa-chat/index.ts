@@ -269,20 +269,21 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Se a chamada for diretamente uma requisição de tool UCP/MCP:
+    // Every path (chat and tools) requires a signed-in user.
+    const authH = req.headers.get("Authorization") || "";
+    let callerId: string | undefined;
+    if (authH.toLowerCase().startsWith("bearer ")) {
+      const { data: cl } = await createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!)
+        .auth.getClaims(authH.slice(7).trim());
+      callerId = (cl?.claims?.sub as string) || undefined;
+    }
+    if (!callerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (tool_call) {
-      const authH = req.headers.get("Authorization") || "";
-      let callerId: string | undefined;
-      if (authH.toLowerCase().startsWith("bearer ")) {
-        const { data: cl } = await createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!)
-          .auth.getClaims(authH.slice(7).trim());
-        callerId = (cl?.claims?.sub as string) || undefined;
-      }
-      if (!callerId) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const result = await executeAgenticTool(tool_call, tool_args || {}, supabase, callerId);
       return new Response(JSON.stringify(result), {
         status: 200,

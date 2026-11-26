@@ -456,6 +456,13 @@
       "when": 1795667273287,
       "tag": "0064_apply_checkout_consents",
       "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1795710516391,
+      "tag": "0065_consultation_chat_is_live_participant_only",
+      "breakpoints": true
     }
   ]
 }

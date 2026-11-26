@@ -1830,7 +1830,7 @@ async function handleAdminGeminiCommand(prompt) {
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/chat-brisa`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(SERVICE_KEY ? { Authorization: `Bearer ${SERVICE_KEY}` } : {}) },
       body: JSON.stringify({
         question: prompt,
         context: 'admin_gemini_remote_command_plantayraiz',

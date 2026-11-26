@@ -1,6 +1,7 @@
 // AI Error Gateway — autocura: recebe erros, dedup por fingerprint, classifica via Gemini
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireAdminOrService } from "../_shared/admin-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -105,6 +106,10 @@ serve(async (req) => {
     });
   }
 
+  // Only internal callers or verified admins get AI classification and counter updates;
+  // public reports are stored once, unclassified, and never alter existing records.
+  const trusted = (await requireAdminOrService(req, corsHeaders)) === null;
+
   try {
     const body = await req.json();
     const {
@@ -134,7 +139,7 @@ serve(async (req) => {
       .maybeSingle();
 
     if (existing) {
-      await supabase.from("error_autohealing").update({
+      if (trusted) await supabase.from("error_autohealing").update({
         occurrences: existing.occurrences + 1,
         last_seen_at: new Date().toISOString(),
       }).eq("id", existing.id).neq("status", "resolved");
@@ -145,7 +150,9 @@ serve(async (req) => {
     }
 
     // Novo erro → classifica via Gemini
-    const ai = await classifyError({ source, source_ref, error_type, error_message, stack, context });
+    const ai = trusted
+      ? await classifyError({ source, source_ref, error_type, error_message, stack, context })
+      : { severity: "medium", diagnosis: "Aguardando classificação.", suggested_fix: "Revisar manualmente.", confidence: 0 };
 
     const { data: inserted, error: insErr } = await supabase
       .from("error_autohealing")
@@ -162,12 +169,12 @@ serve(async (req) => {
 
     if (insErr) throw insErr;
 
-    return new Response(JSON.stringify({ ok: true, id: inserted.id, severity: inserted.severity, diagnosis: ai.diagnosis }), {
+    return new Response(JSON.stringify(trusted ? { ok: true, id: inserted.id, severity: inserted.severity, diagnosis: ai.diagnosis } : { ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("[ai-error-gateway] error:", e);
-    return new Response(JSON.stringify({ error: String(e) }), {
+    return new Response(JSON.stringify({ error: "Falha ao registrar erro" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

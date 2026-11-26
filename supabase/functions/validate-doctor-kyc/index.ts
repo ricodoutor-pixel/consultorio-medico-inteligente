@@ -190,8 +190,12 @@ Deno.serve(async (req) => {
     }
 
     // 4. Determine KYC status — only "verified" when CRM was actually confirmed by CFM/Brasil API.
-    const kycStatus = results.crm_valid && results.document_valid
-      ? "verified"
+    // Doctors never self-approve: passing automated checks only queues manual review,
+    // and only a verified admin caller can set "verified".
+    const { data: callerIsAdmin } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    const checksPassed = results.crm_valid && results.document_valid;
+    const kycStatus = checksPassed
+      ? (callerIsAdmin === true ? "verified" : "pending_manual_review")
       : (crmResult.status === "pending_manual_review" ? "pending_manual_review" : "rejected");
 
     // 5. Update doctor record
@@ -209,7 +213,7 @@ Deno.serve(async (req) => {
     // 6. Audit log
     await supabase.from("audit_log").insert({
       user_id: user.id,
-      action: kycStatus === "verified" ? "kyc_verified" : "kyc_rejected",
+      action: kycStatus === "verified" ? "kyc_verified" : kycStatus === "pending_manual_review" ? "kyc_pending_review" : "kyc_rejected",
       table_name: "doctors",
       record_id: doctor_id,
       old_data: null,

@@ -52,6 +52,16 @@ Deno.serve(async (req) => {
   if (!number || number.length < 10 || number.length > 15) return json({ error: "invalid_number" }, 400);
   if (!text || text.length > 4096) return json({ error: "invalid_text" }, 400);
 
+  // Operators may only reply to contacts that already wrote to the platform.
+  const { data: inbound } = await admin
+    .from("whatsapp_messages")
+    .select("id")
+    .in("remote_jid", [`${number}@s.whatsapp.net`, `${number}@c.us`])
+    .eq("direction", "in")
+    .limit(1)
+    .maybeSingle();
+  if (!inbound) return json({ error: "no_inbound_conversation" }, 403);
+
   const res = await sendWhatsApp(number, text);
   let sent = { ok: res.ok, status: res.status, body: res.error || "" };
 

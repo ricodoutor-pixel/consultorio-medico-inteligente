@@ -48,7 +48,7 @@ serve(async (req) => {
             model: modelToTry,
             messages: [
               { role: "system", content: agent.system_prompt + "\n\nContexto: você está conversando com o admin (Dr. Edilson) via painel ADM. Responda objetivo, em PT-BR, com sugestões acionáveis." },
-              ...messages.slice(-10),
+              ...messages.slice(-10).map((m: any) => ({ role: m?.role === "assistant" ? "assistant" : "user", content: String(m?.content ?? "").slice(0, 8000) })),
             ],
           }),
         });

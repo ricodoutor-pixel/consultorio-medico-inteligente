@@ -14,6 +14,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { getCorsHeaders } from "../_shared/cors.ts"
 import { requireServiceAuth } from "../_shared/service-auth.ts"
+import { requireAdminOrService } from "../_shared/admin-auth.ts"
 import {
   callGeminiApiWithFallback,
   GEMINI_PRIMARY_MODEL,
@@ -48,6 +49,10 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
+
+  // Paid AI replies only for the WhatsApp robot (service key) or verified admins.
+  const denied = await requireAdminOrService(req, corsHeaders)
+  if (denied) return denied
 
   let rawRole = "unknown";
   let senderName = "";

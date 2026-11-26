@@ -36,9 +36,11 @@ serve(async (req: Request) => {
   try {
     const { messages, leadInfo } = await req.json();
 
-    const safeName = sanitizePromptInput(leadInfo?.name, 80);
-    const safePhone = sanitizePromptInput(leadInfo?.phone, 30);
-    const safeCategory = sanitizePromptInput(leadInfo?.category, 50);
+    // Only name-shaped, digit-only and short word values may reach the instructions.
+    const nameOnly = (v: unknown, words = 4, max = 40) => String(v ?? "").normalize("NFC").replace(/[^\p{L}\s]/gu, " ").replace(/\s+/g, " ").trim().split(" ").slice(0, words).join(" ").slice(0, max);
+    const safeName = nameOnly(sanitizePromptInput(leadInfo?.name, 80));
+    const safePhone = String(leadInfo?.phone ?? "").replace(/\D/g, "").slice(0, 15);
+    const safeCategory = nameOnly(sanitizePromptInput(leadInfo?.category, 50), 3, 30);
     const safeAudience = sanitizePromptInput(leadInfo?.audience, 40).toLowerCase();
     const isDoctor = safeAudience.includes("medic") || safeAudience.includes("doutor") || safeAudience.includes("prescritor");
 

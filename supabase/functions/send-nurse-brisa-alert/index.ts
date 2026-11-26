@@ -149,6 +149,19 @@ Deno.serve(async (req) => {
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+      // A doctor may only link alerts to their own appointments and those patients.
+      if (payload.appointmentId || payload.patientId) {
+        let q = supabase.from("appointments").select("id, patient_id").eq("doctor_id", callerDoctorId);
+        if (payload.appointmentId) q = q.eq("id", payload.appointmentId);
+        if (payload.patientId) q = q.eq("patient_id", payload.patientId);
+        const { data: link } = await q.limit(1).maybeSingle();
+        if (!link) {
+          return new Response(
+            JSON.stringify({ error: "Forbidden" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
     }
 
     // Validate actionUrl (same-origin only)

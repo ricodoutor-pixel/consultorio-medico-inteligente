@@ -121,7 +121,9 @@ Deno.serve(async (req) => {
       .map((b) => b.toString(16).padStart(2, "0")).join("");
 
     // Upload no bucket privado `prescriptions`
-    const objectPath = `gov-br/${user.id}/${Date.now()}_${documentPath}`;
+    // documentPath is reduced to a single safe file name so uploads stay in the doctor's folder.
+    const safeFileName = String(documentPath).split(/[\\/]/).pop()!.replace(/[^A-Za-z0-9._-]/g, "_").replace(/^\.+/, "").slice(0, 120) || "receita.pdf";
+    const objectPath = `gov-br/${user.id}/${Date.now()}_${safeFileName}`;
     const { error: upErr } = await admin.storage
       .from("prescriptions")
       .upload(objectPath, pdfBytes, { contentType: "application/pdf", upsert: false });

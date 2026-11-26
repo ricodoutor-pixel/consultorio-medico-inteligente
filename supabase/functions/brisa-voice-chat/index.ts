@@ -71,8 +71,8 @@ function classificarBpm(bpm: number): string {
 }
 
 function montarSystemPrompt(body: ChatBody): string {
-  const agora = body.now?.human
-    || new Date().toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short", timeZone: "America/Sao_Paulo" });
+  // Server clock only: caller-supplied text never enters the instructions.
+  const agora = new Date().toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short", timeZone: "America/Sao_Paulo" });
 
   const bpmNum = Number(body.contextBpm);
   body.contextBpm = Number.isFinite(bpmNum) && bpmNum >= 20 && bpmNum <= 250 ? Math.round(bpmNum) : (undefined as any);

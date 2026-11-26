@@ -6,7 +6,7 @@
  * Funcionalidades:
  * 1. Disparo nativo via Hostinger SMTP oficial (contato@plantayraiz.com.br / smtp.hostinger.com:465 SSL).
  * 2. Alternativa 100% autônoma e resiliente à API do Brevo (que pode ter limites ou bloqueios de conta).
- * 3. Apresenta o Programa Médico Sócio com a Meta Oficial de R$ 15.000,00/mês (3 que indicam 3 em 3 gerações).
+ * 3. Apresenta o Programa Médico Sócio (sem promessa de renda; decisão de 25/11/2026). Robô desligado do PM2.
  * 4. Verificação estrita anti-bounce e filtro de entregabilidade (email_validator.mjs).
  * 5. Cadência segura de entrega: 60 a 90 segundos entre envios para manter score máximo e reputação intacta.
  * 6. Sincronização em tempo real de disparos no Lovable Cloud Supabase (email_send_log e leads_contatos).
@@ -141,29 +141,6 @@ function buildDoctorInviteEmail(doctorName) {
           Nossa condição oficial oferece <strong style="color: #10b981;">93% de repasse líquido via Pix</strong> em cada consulta (taxa fixa de 7% da plataforma em todos os planos), consultório virtual em conformidade com o CFM e emissão de receitas digitais com padrão ICP-Brasil / Gov.br.
         </p>
 
-        <!-- Destaque: Programa de Indicações em 3 Gerações -->
-        <div style="background-color: #172a1e; border: 2px solid #10b981; border-radius: 12px; padding: 22px; margin: 24px 0;">
-          <div style="display: flex; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 18px; margin-right: 8px;">🎯</span>
-            <strong style="color: #34d399; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">
-              Programa de Indicações até a 3ª Geração (Exemplo R$ 15.000/mês)
-            </strong>
-          </div>
-          <p style="margin: 0 0 12px 0; font-size: 13.5px; color: #e2e8f0;">
-            Indicando colegas e pacientes pelo seu link personalizado (3 colegas que indicam 3 até a 3ª geração — 39 médicos na rede), você recebe comissões recorrentes de 25% / 15% / 10%:
-          </p>
-          <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #94a3b8; line-height: 1.8;">
-            <li><strong style="color: #e2e8f0;">R$ 1.560,00/mês</strong> em comissões sobre assinaturas de planos médicos.</li>
-            <li><strong style="color: #e2e8f0;">R$ 6.240,00/mês</strong> sobre consultas e teleatendimentos da sua rede.</li>
-            <li><strong style="color: #e2e8f0;">R$ 7.200,00/mês</strong> em comissões de compras no marketplace integrado.</li>
-          </ul>
-          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #234832; text-align: center;">
-            <span style="font-size: 16px; font-weight: 900; color: #10b981;">
-              Exemplo ilustrativo de rede ativa: R$ 15.000,00/mês via Pix
-            </span>
-          </div>
-        </div>
-
         <!-- Recursos do Consultório -->
         <div style="background-color: #0d1811; border: 1px solid #1f3a2b; border-radius: 10px; padding: 18px; margin-bottom: 26px;">
           <strong style="color: #a7f3d0; font-size: 14px;">⚡ O que você recebe ao se cadastrar gratuitamente:</strong>
@@ -216,7 +193,6 @@ CONDIÇÕES OFICIAIS:
 • Cadastro gratuito em https://www.plantayraiz.com.br/cadastro-profissional
 • Repasse de 93% de cada consulta via Pix (taxa fixa de 7% da plataforma em todos os planos).
 • Plano Médico VIP opcional (R$ 99/mês): prioridade na fila de pacientes e ferramentas de IA (Copiloto Clínico, Assistente Jurídico e Escriba).
-• Programa de Indicações até a 3ª geração (25% / 15% / 10%).
 
 Dúvidas? WhatsApp oficial: (11) 99136-3154
 Equipe Planta y Raiz`;

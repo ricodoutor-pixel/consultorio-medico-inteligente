@@ -42,7 +42,6 @@ function buildInviteHTML(doctorName: string): string {
           <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Repasse Financeiro</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">30 a 60 dias</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">PIX</td></tr>
           <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Preço da Consulta</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Tabela fixa</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Autonomia na vitrine</td></tr>
           <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Plano Médico VIP (Opcional)</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;">Sem prioridade</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">R$ 99/mês (prioridade + IA)</td></tr>
-          <tr style="background:#f8fafb;"><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Programa de Indicação</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Inexistente</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Comissão até 3ª Geração</td></tr>
           <tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:600;">Custo de Adesão</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">Mensalidades obrigatórias</td><td style="padding:8px;border:1px solid #e2e8f0;text-align:center;color:#059669;font-weight:bold;">Cadastro Gratuito</td></tr>
         </tbody>
       </table>
@@ -67,7 +66,7 @@ function buildInviteHTML(doctorName: string): string {
     <!-- Rodapé Executivo -->
     <div style="background:#f1f5f9;border-top:1px solid #e2e8f0;padding:25px 30px;">
       <p style="margin:0 0 5px;font-size:14px;color:#334155;">Atenciosamente,</p>
-      <p style="margin:0;font-size:15px;font-weight:700;color:#0f4c35;">Enf. Brisa (Assistente Virtual) · Equipe Planta y Raiz</p>
+      <p style="margin:0;font-size:15px;font-weight:700;color:#0f4c35;">Enfª Brisa (Assistente Virtual) · Equipe Planta y Raiz</p>
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:15px 0;">
       <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Bezerra Med Soluções Integradas Ltda. · CNPJ 30.740.319/0001-14 · Planta y Raiz</p>
     </div>
@@ -179,7 +178,7 @@ serve(async (req) => {
         // 2. Send invite email via Brevo transactional
         if (!dryRun) {
           const emailPayload = {
-            sender: { name: "Planta y Raíz · Enf. Brisa", email: "contato@plantayraiz.com.br" },
+            sender: { name: "Planta y Raíz · Enfª Brisa", email: "contato@plantayraiz.com.br" },
             to: [{ email, name: name || "Doutor(a)" }],
             subject: INVITE_SUBJECT,
             htmlContent: buildInviteHTML(name || "Doutor(a)"),

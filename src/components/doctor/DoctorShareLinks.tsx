@@ -54,9 +54,9 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
         },
         { 
           icon: Users, 
-          label: "Colegas médicos — convite & comissões em 3 gerações", 
+          label: "Colegas médicos — convite (Médico Sócio)", 
           url: links.colleague,
-          shareText: "Olá, colega médico! Convido você a fazer parte da equipe da Planta y Raíz. Conheça nosso programa Médico Sócio onde 3 indicações que duplicam até a 3ª geração geram uma meta de R$ 15.000/mês de renda vitalícia no Pix:"
+          shareText: "Olá, colega! Conheça a Planta y Raiz: consultório virtual com vídeo, prontuário e receita digital, repasse de 93% de cada consulta (taxa de 7% da plataforma). Cadastro pelo meu link:"
         },
         { 
           icon: UserPlus, 
@@ -79,19 +79,6 @@ export function DoctorShareLinks({ doctorId, userId }: Props) {
           segue na fila oficial (assinantes → plantão online → sala de espera).
         </p>
 
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="space-y-0.5">
-            <span className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
-              <Sparkles size={13} /> Meta R$ 15.000/mês: Renda Vitalícia em 3 Gerações (Médico Sócio)
-            </span>
-            <p className="text-[11px] text-emerald-200/90 leading-tight">
-              Indique 3 colegas médicos que indicam 3 até a 3ª geração (39 médicos na rede) e alcance a meta de <strong>R$ 15.000,00/mês</strong> no seu Pix somando planos, consultas e farmácia!
-            </p>
-          </div>
-          <Button size="sm" variant="outline" className="h-7 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 shrink-0" asChild>
-            <a href="/indicacoes">Simulador & Extrato <ArrowRight size={12} className="ml-1" /></a>
-          </Button>
-        </div>
         {error && <p className="text-sm text-red-600">Não foi possível carregar seus links agora. Recarregue a página.</p>}
         {!links && !error && (
           <p className="text-sm text-muted-foreground inline-flex items-center gap-2">

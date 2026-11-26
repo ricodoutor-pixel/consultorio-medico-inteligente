@@ -2,7 +2,7 @@
 -- registrado em cada checkout. Só o servidor grava (checkout-express); o paciente lê os próprios aceites.
 CREATE TABLE IF NOT EXISTS public.checkout_consents (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL, -- id do usuário (sem chave estrangeira)
   product text NOT NULL,
   terms_version text NOT NULL,
   accepted_terms boolean NOT NULL,
@@ -19,6 +19,7 @@ CREATE INDEX IF NOT EXISTS checkout_consents_user_idx ON public.checkout_consent
 ALTER TABLE public.checkout_consents ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.checkout_consents FROM anon, authenticated;
 GRANT SELECT ON public.checkout_consents TO authenticated;
+GRANT ALL ON public.checkout_consents TO service_role;
 
 DROP POLICY IF EXISTS checkout_consents_own_read ON public.checkout_consents;
 CREATE POLICY checkout_consents_own_read ON public.checkout_consents

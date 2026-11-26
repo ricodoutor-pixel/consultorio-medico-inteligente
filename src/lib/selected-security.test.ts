@@ -49,7 +49,10 @@ function handler(name: string, db: ReturnType<typeof database>, fetcher = vi.fn(
     if (id.includes("http/server")) return { serve: capture };
     if (id.includes("cors")) return { getCorsHeaders: () => ({}) };
     if (id.includes("patient-authorization")) return { hasPaidPatientRelationship };
-    if (id.includes("admin-auth")) return { getCallerUserId: async () => "doctor-account" };
+    if (id.includes("admin-auth")) return {
+      getCallerUserId: async () => "doctor-account",
+      requireAdminOrService: async () => new Response(null, { status: 401 }),
+    };
     if (id.includes("service-auth")) return { requireServiceAuth: () => new Response(null, { status: 401 }) };
     if (id.includes("ai-guard")) return { rateLimit: async () => null, clientIp: () => "test" };
     if (id.includes("gemini")) return {};

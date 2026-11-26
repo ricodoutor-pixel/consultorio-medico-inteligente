@@ -463,6 +463,13 @@
       "when": 1795710516391,
       "tag": "0065_consultation_chat_is_live_participant_only",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1795710955368,
+      "tag": "0066_server_only_orders_and_safe_vendor_insert",
+      "breakpoints": true
     }
   ]
 }

@@ -126,36 +126,6 @@ export function useFarmaciaVirtual() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      // Master Test Bypass / Auto-Provision para contato@plantayraiz.com.br
-      if (!vendor && (user.email === 'contato@plantayraiz.com.br' || user.user_metadata?.role === 'lojista')) {
-        const { data: newVendor } = await supabase
-          .from('vendors')
-          .insert({
-            user_id: user.id,
-            store_name: "Planta y Raiz Ltda",
-            store_description: "Farmácia de manipulação e dispensação de fitocanabinoides regulados ANVISA.",
-            store_logo_url: "/dr-verdinho.png",
-            balance: 14250.00,
-            total_sales: 48,
-            rating: 5.0,
-            is_active: true
-          })
-          .select('*')
-          .single();
-        vendor = newVendor;
-      }
-
-      if (!vendor) {
-        // Tenta pegar qualquer vendor ativo como fallback caso seja teste administrativo
-        const { data: fallbackVendor } = await supabase
-          .from('vendors')
-          .select('*')
-          .eq('is_active', true)
-          .limit(1)
-          .maybeSingle();
-        vendor = fallbackVendor;
-      }
-
       if (!vendor) {
         setError("Nenhuma farmácia vinculada a esta conta.");
         setLoading(false);

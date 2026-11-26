@@ -83,7 +83,7 @@ export default function AdminLeadDetail() {
     lines.push("# METADATA");
     Object.entries(lead.metadata ?? {}).forEach(([k, v]) => {
       const val = (typeof v === "object" ? JSON.stringify(v) : String(v)).replace(/"/g, "'");
-      lines.push(`"${k}","${val}"`);
+      lines.push([k, val].map(csvCell).join(","));
     });
 
     lines.push("");

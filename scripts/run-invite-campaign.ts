@@ -71,7 +71,7 @@ async function runCampaign() {
     
     const chatId = phone.includes("@") ? phone : `${phone}@c.us`;
 
-    console.log(`[${i+1}/${doctorsList.length}] 🚀 Enviando para ${doc.full_name || 'Usuário'} (${phone})...`);
+    console.log(`[${i+1}/${doctorsList.length}] 🚀 Enviando para contato ***${String(phone).slice(-4)}...`);
     
     const result = await sendWAHA(chatId, INVITATION_MESSAGE);
     

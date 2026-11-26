@@ -109,7 +109,7 @@ async function syncLeadToBrevo(phone, name, category, listIds) {
 async function sendWhatsAppMessage(chatId, text) {
   // HARD LOCK: Envio automatizado desativado para eliminar qualquer risco de respostas cruzadas.
   // O atendimento é conduzido exclusivamente pelo agente Claude no WhatsApp Web (Google Chrome).
-  console.log(`[WAHA MUTE] 🔇 Resposta para ${chatId} silenciada. Atendimento exclusivo via Claude no WhatsApp Web.`);
+  console.log(`[WAHA MUTE] 🔇 Resposta para ***${String(chatId).slice(-9,-5)} silenciada. Atendimento exclusivo via Claude no WhatsApp Web.`);
   return false;
 }
 
@@ -187,18 +187,18 @@ async function handleIncomingMessage(msg, chat) {
     '../supabase/functions/_shared/brisa-response-policy.mjs'
   );
   if (isAutoReplyOrCommercialBot(bodyText, { senderName: contactName, senderJid: chatId })) {
-    console.log(`[WAHA] 🔇 Silenciado (auto-reply/URA/bot comercial): ${chatId}`);
+    console.log(`[WAHA] 🔇 Silenciado (auto-reply/URA/bot comercial): ***${String(chatId).slice(-9,-5)}`);
     return;
   }
   if (isBusinessOrNonDoctorSender(contactName)) {
-    console.log(`[WAHA] 🔇 Silenciado (empresa/PJ/não-médico): ${contactName}`);
+    console.log(`[WAHA] 🔇 Silenciado (empresa/PJ/não-médico): ***${String(rawPhone).slice(-4)}`);
     return;
   }
 
   // Rate limit por chat: evitar responder mais de uma vez a cada 10 segundos
   const lastReply = lastRepliedChatTimes.get(chatId) || 0;
   if (Date.now() - lastReply < 10000) {
-    console.log(`[RateLimit] Ignorando mensagem rápida consecutiva de ${chatId}`);
+    console.log(`[RateLimit] Ignorando mensagem rápida consecutiva de ***${String(chatId).slice(-9,-5)}`);
     return;
   }
 
@@ -251,7 +251,7 @@ async function handleIncomingMessage(msg, chat) {
       lastRepliedChatTimes.set(chatId, Date.now());
     }
   } else {
-    console.log(`[HARVESTER] 📡 Lead capturado: ${chat.name || rawPhone} (${category}). CRM atualizado na Brevo (Claude responde no WhatsApp Web).`);
+    console.log(`[HARVESTER] 📡 Lead capturado: ***${String(rawPhone).slice(-4)} (${category}). CRM atualizado na Brevo (Claude responde no WhatsApp Web).`);
   }
 
   // Sincronizar lead no Brevo CRM com a categoria correspondente

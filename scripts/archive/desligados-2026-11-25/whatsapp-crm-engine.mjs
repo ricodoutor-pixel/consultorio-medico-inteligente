@@ -75,7 +75,7 @@ export async function processOutboundMessages() {
   
   for (const lead of leads) {
     try {
-      console.log(`[CRM Engine] Enviando convite para ${lead.phone}...`);
+      console.log(`[CRM Engine] Enviando convite para ***${String(lead.phone).slice(-4)}...`);
       
       const payload = {
         chatId: `${lead.phone}@c.us`,

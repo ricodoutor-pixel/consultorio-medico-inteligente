@@ -409,7 +409,7 @@ export async function startHybridDispatchEngine() {
     const currentIndex = state.lastOffset + 1;
     const progressText = `[#${String(state.totalSent + 1).padStart(4, '0')}/${state.targetGoal}] [Idx: ${currentIndex}/${pharmacies.length}] [GW: ${currentGateway}]`;
 
-    console.log(`📨 ${progressText} → ${pharmacy.nome_fantasia} (${pharmacy.cidade}/${pharmacy.uf}) <${pharmacy.email}>`);
+    console.log(`📨 ${progressText} → farmácia #${state.lastOffset} (${pharmacy.uf})`);
 
     const html = buildPharmacyEmailHtml(pharmacy);
     let sendResult = null;

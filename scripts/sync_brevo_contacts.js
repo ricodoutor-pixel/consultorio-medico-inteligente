@@ -177,14 +177,14 @@ export async function syncPharmaciesToBrevo() {
       const result = await syncContact(pharmacy, listId);
       if (result.ok) {
         successCount++;
-        console.log(`  ✅ ${prefix} Sincronizado: ${pharmacy.nome_fantasia} (${pharmacy.email}) [${result.status}]`);
+        console.log(`  ✅ ${prefix} Sincronizado: registro ${i + 1} [${result.status}]`);
       } else {
         failedCount++;
-        console.log(`  ❌ ${prefix} Falha: ${pharmacy.nome_fantasia} (${pharmacy.email}) → Status ${result.status}: ${result.error?.slice(0, 100)}`);
+        console.log(`  ❌ ${prefix} Falha: registro ${i + 1} → Status ${result.status}: ${result.error?.slice(0, 100)}`);
       }
     } catch (err) {
       failedCount++;
-      console.log(`  ⚠️ ${prefix} Erro de rede: ${pharmacy.email} → ${err.message}`);
+      console.log(`  ⚠️ ${prefix} Erro de rede: registro ${i + 1} → ${err.message}`);
     }
 
     // Intervalo de segurança entre chamadas (200ms)

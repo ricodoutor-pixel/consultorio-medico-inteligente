@@ -29,7 +29,7 @@ async function searchAndDelete() {
   console.log('Found matches:', matches);
   
   for (const match of matches) {
-    console.log(`Deleting ID ${match.id} (${match.nome} / ${match.telefone})...`);
+    console.log(`Deleting ID ${match.id} (***${String(match.telefone).slice(-4)})...`);
     const { error: delErr } = await supabase
       .from('leads_crm')
       .delete()

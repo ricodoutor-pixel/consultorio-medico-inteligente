@@ -100,7 +100,7 @@ async function sendWhatsAppMessage(browser, phone, message) {
       .catch(() => false);
 
     if (invalidPhone) {
-      console.log(`   ⚠️  Número inválido: ${phone}`);
+      console.log(`   ⚠️  Número inválido: ***${String(phone).slice(-4)}`);
       return 'invalid';
     }
 
@@ -120,7 +120,7 @@ async function sendWhatsAppMessage(browser, phone, message) {
     await sleep(2000);
     return 'sent';
   } catch (err) {
-    console.error(`   ❌ Erro ao enviar para ${phone}:`, err.message);
+    console.error(`   ❌ Erro ao enviar para ***${String(phone).slice(-4)}:`, err.message);
     return 'error';
   } finally {
     await page.close();
@@ -155,7 +155,7 @@ async function processInvites(browser, dailyCount) {
 
   for (const lead of leads) {
     const phone = lead.phone.replace(/\D/g, '');
-    console.log(`[${sent + 1}/${leads.length}] 📱 Enviando para: ${lead.name} | +${phone}`);
+    console.log(`[${sent + 1}/${leads.length}] 📱 Enviando para: ***${String(phone).slice(-4)}`);
 
     const result = await sendWhatsAppMessage(browser, phone, INVITE_MESSAGE);
 

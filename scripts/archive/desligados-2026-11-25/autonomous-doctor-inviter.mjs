@@ -144,7 +144,7 @@ async function sendWhatsAppMessage(phone, text) {
       return { ok: true, via: 'waha_direct', status: res.status };
     }
   } catch (err) {
-    console.error(`[WAHA Direct] Erro para +${cleanPhone}:`, err.response?.data || err.message);
+    console.error(`[WAHA Direct] Erro para ***${String(cleanPhone).slice(-4)}:`, err.response?.data || err.message);
   }
 
   return { ok: false };
@@ -181,13 +181,13 @@ async function runAutonomousInviter() {
 
     const currentSuccessCount = Object.values(state.sent).filter(s => s.success).length + 1;
     console.log(`\n------------------------------------------------------------`);
-    console.log(`[Disparo ${currentSuccessCount}/${uniqueContacts.length}] Enviando convite para: +${phone}`);
+    console.log(`[Disparo ${currentSuccessCount}/${uniqueContacts.length}] Enviando convite para: ***${String(phone).slice(-4)}`);
     console.log(`Timestamp: ${new Date().toLocaleTimeString('pt-BR')}`);
 
     const result = await sendWhatsAppMessage(phone, INVITE_MESSAGE);
 
     if (result.ok) {
-      console.log(`✅ [Sucesso] Convite entregue para +${phone}! (Via: ${result.via})`);
+      console.log(`✅ [Sucesso] Convite entregue para ***${String(phone).slice(-4)}! (Via: ${result.via})`);
       state.sent[phone] = {
         success: true,
         sent_at: new Date().toISOString(),
@@ -195,7 +195,7 @@ async function runAutonomousInviter() {
       };
       state.total_sent = (state.total_sent || 0) + 1;
     } else {
-      console.error(`❌ [Falha] Não foi possível entregar para +${phone}. Registrando status.`);
+      console.error(`❌ [Falha] Não foi possível entregar para ***${String(phone).slice(-4)}. Registrando status.`);
       state.sent[phone] = {
         success: false,
         last_attempt_at: new Date().toISOString(),

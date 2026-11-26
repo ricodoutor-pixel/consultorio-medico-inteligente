@@ -8,8 +8,10 @@
 export const BRISA_CONFIG = {
   // 🛡️ MODO DE SEGURANÇA DRY-RUN
   // true = calcula e registra tudo, mas não dispara requisições reais de envio para o WhatsApp
-  // Desligado apenas quando BRISA_DRY_RUN=false for explicitamente fornecido
-  DRY_RUN: process.env.BRISA_DRY_RUN !== 'false',
+  // Desligado apenas quando BRISA_DRY_RUN=false for explicitamente fornecido (getter dinâmico pós-dotenv)
+  get DRY_RUN() {
+    return process.env.BRISA_DRY_RUN !== 'false';
+  },
 
   // 1. ORIGEM DO CONTATO (RESPOSTA PADRÃO LGPD)
   ORIGEM_CONTATO_LGPD: "Localizamos seu contato público profissional divulgado em diretórios médicos abertos e guias de saúde, em conformidade com as diretrizes de prospecção profissional da LGPD.",

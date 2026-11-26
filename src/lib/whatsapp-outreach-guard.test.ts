@@ -232,6 +232,10 @@ describe('Falha 4 — Classificação de pagamento exige cobrança/pedido penden
 });
 
 describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails estritos', () => {
+  it('scripts/PAUSE_AUTOMATION.flag NUNCA fica commitado no repositório (bloqueava Brisa, WhatsApp e Brevo)', () => {
+    expect(fs.existsSync('scripts/PAUSE_AUTOMATION.flag')).toBe(false);
+  });
+
   it('evita falsos positivos em sobrenome "Beleza" e psiquiatra com "Psiquiatria/Psicoterapia", mantendo bloqueios PJ/psicologia', () => {
     expect(isCompanyOrNonDoctorContact({ name: 'Dr(a). Flaeste Cruz Beleza', specialty: 'Médico de Familia e Comunidade' }).blocked).toBe(false);
     expect(isCompanyOrNonDoctorContact({ name: 'Dr(a). Carlos Eduardo Santana de Oliveira', specialty: 'Psiquiatria/Psicoterapia' }).blocked).toBe(false);
@@ -275,5 +279,227 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
     const withCrm = brevo.buildDoctorEmailForStep({ name: 'Ana Paula', email: 'ana@gmail.com', crm: '49354', uf: 'PR' }, 1);
     expect(withCrm.allowed).toBe(true);
     expect(withCrm.subject).toContain('Dr(a). Ana Paula');
+  });
+
+  it('E2E real: inicia sob PM2 (ProcessContainerFork.js), envia WhatsApp via Evolution mock e ignora lastOffset obsoleto', async () => {
+    const http = await import('node:http');
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const { spawn } = await import('node:child_process');
+
+    const sentPayloads: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const server = http.createServer((req, res) => {
+      if (req.url?.includes('/instance/connectionState/')) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ instance: { state: 'open' } }));
+        return;
+      }
+      if (req.url?.includes('/message/sendText/')) {
+        let body = '';
+        req.on('data', (c) => { body += c; });
+        req.on('end', () => {
+          sentPayloads.push({ url: req.url || '', body: JSON.parse(body || '{}') });
+          res.writeHead(201, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ key: { id: 'mock-msg-1' } }));
+        });
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const { port } = server.address() as { port: number };
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pyr-wpp-e2e-'));
+    const stateFile = path.join(tmpDir, 'state.json');
+    const logFile = path.join(tmpDir, 'wpp.log');
+    const lockFile = path.join(tmpDir, 'wpp.pid.lock');
+    // Simula state antigo da VPS com lastOffset maior que a base local
+    fs.writeFileSync(stateFile, JSON.stringify({ lastOffset: 9999, totalInvited: 0, invitedPhones: {}, invitedEmails: {} }));
+
+    try {
+      // 1. Executa um ciclo completo via runOneInviteCycle em horário comercial BRT
+      process.env.EVOLUTION_URL_VPS = `http://127.0.0.1:${port}`;
+      process.env.EVOLUTION_API_KEY_VPS = 'mock-evo-key';
+      process.env.EVOLUTION_INSTANCE = 'plantayraiz';
+      process.env.BRISA_DRY_RUN = 'false';
+      process.env.WPP_INVITER_STATE_FILE = stateFile;
+      process.env.WPP_INVITER_LOG_FILE = logFile;
+      process.env.WPP_INVITER_PID_LOCK = lockFile;
+
+      const wpp = await import('../../scripts/agent_brevo_doctor_whatsapp_inviter.mjs');
+      const localLeads = wpp.loadLocalCuratedLeads();
+      expect(localLeads.length).toBeGreaterThan(700);
+      const state = { lastOffset: 9999, brevoOffset: 0, totalInvited: 0, invitedPhones: {}, invitedEmails: {} };
+      const cycle = await wpp.runOneInviteCycle({
+        localLeads,
+        knownPhones: new Set(),
+        knownNames: new Set(),
+        state,
+        now: new Date('2026-11-26T15:00:00Z'), // Quinta 12:00 BRT
+      });
+      expect(cycle.action).toBe('sent');
+      expect(cycle.ms).toBe(15 * 60 * 1000);
+      expect(state.totalInvited).toBe(1);
+      expect(sentPayloads).toHaveLength(1);
+      expect(String(sentPayloads[0].body.text || '')).not.toMatch(/\bDr\(a\)\./);
+      expect(String(sentPayloads[0].body.text || '')).toContain('SAIR');
+
+      // 2. Prova que sob PM2 ProcessContainerFork.js (argv[1] != script) o daemon REALMENTE inicia e grava log
+      const fakePm2Wrapper = path.join(tmpDir, 'ProcessContainerFork.js');
+      const scriptUrl = new URL('../../scripts/agent_brevo_doctor_whatsapp_inviter.mjs', import.meta.url).href;
+      fs.writeFileSync(fakePm2Wrapper, `import(${JSON.stringify(scriptUrl)});\n`);
+
+      const child = spawn(process.execPath, [fakePm2Wrapper], {
+        env: {
+          ...process.env,
+          VITEST: '',
+          NODE_ENV: 'production',
+          BRISA_NO_AUTOSTART: '',
+          BRISA_DRY_RUN: 'true',
+          EVOLUTION_URL_VPS: `http://127.0.0.1:${port}`,
+          EVOLUTION_API_KEY_VPS: 'mock-evo-key',
+          WPP_INVITER_STATE_FILE: stateFile,
+          WPP_INVITER_LOG_FILE: logFile,
+          WPP_INVITER_PID_LOCK: lockFile,
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      let stdout = '';
+      child.stdout.on('data', (d) => { stdout += d.toString(); });
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, 2500);
+        child.stdout.on('data', () => {
+          if (stdout.includes('AGENTE DE CONVITES WHATSAPP PARA MÉDICOS INICIADO')) {
+            clearTimeout(timer);
+            resolve();
+          }
+        });
+      });
+      child.kill('SIGTERM');
+      await new Promise<void>((resolve) => child.on('exit', () => resolve()));
+      expect(stdout).toContain('AGENTE DE CONVITES WHATSAPP PARA MÉDICOS INICIADO');
+    } finally {
+      delete process.env.EVOLUTION_URL_VPS;
+      delete process.env.EVOLUTION_API_KEY_VPS;
+      delete process.env.EVOLUTION_INSTANCE;
+      delete process.env.BRISA_DRY_RUN;
+      delete process.env.WPP_INVITER_STATE_FILE;
+      delete process.env.WPP_INVITER_LOG_FILE;
+      delete process.env.WPP_INVITER_PID_LOCK;
+      server.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it('E2E real: Brevo 300/dia inicia sob PM2, envia e-mail via API mock e ativa pausa protetora em erro 554', async () => {
+    const http = await import('node:http');
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const { spawn } = await import('node:child_process');
+
+    let return554 = false;
+    const sentEmails: Array<Record<string, unknown>> = [];
+    const server = http.createServer((req, res) => {
+      if (req.url?.includes('/smtp/email') && req.method === 'POST') {
+        let body = '';
+        req.on('data', (c) => { body += c; });
+        req.on('end', () => {
+          if (return554) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 'permission_denied', message: '554 Outbound sending disabled' }));
+            return;
+          }
+          sentEmails.push(JSON.parse(body || '{}'));
+          res.writeHead(201, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ messageId: '<mock-brevo-1@smtp-relay.mailin.fr>' }));
+        });
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ contacts: [] }));
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const { port } = server.address() as { port: number };
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pyr-brevo-e2e-'));
+    const stateFile = path.join(tmpDir, 'brevo_state.json');
+    const logFile = path.join(tmpDir, 'brevo.log');
+    const lockFile = path.join(tmpDir, 'brevo.pid.lock');
+
+    try {
+      const fakePm2Wrapper = path.join(tmpDir, 'ProcessContainerFork.js');
+      const scriptUrl = new URL('../../scripts/agent_brevo_multi_pipeline.mjs', import.meta.url).href;
+      fs.writeFileSync(fakePm2Wrapper, `import(${JSON.stringify(scriptUrl)});\n`);
+
+      // 1. Disparo real via PM2 wrapper contra Brevo mock retornando 201
+      const child = spawn(process.execPath, [fakePm2Wrapper], {
+        env: {
+          ...process.env,
+          VITEST: '',
+          NODE_ENV: 'production',
+          BRISA_NO_AUTOSTART: '',
+          BREVO_API_KEY: 'mock-brevo-key',
+          BREVO_API_BASE_URL: `http://127.0.0.1:${port}`,
+          BREVO_SKIP_MX_CHECK: '1',
+          BREVO_PIPELINE_STATE_FILE: stateFile,
+          BREVO_PIPELINE_LOG_FILE: logFile,
+          BREVO_PIPELINE_PID_LOCK: lockFile,
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      let stdout = '';
+      child.stdout.on('data', (d) => { stdout += d.toString(); });
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, 3500);
+        child.stdout.on('data', () => {
+          if (stdout.includes('AGENTE BREVO MULTI-PIPELINE INICIADO') && (sentEmails.length > 0 || stdout.includes('FORA DO HORÁRIO COMERCIAL'))) {
+            clearTimeout(timer);
+            resolve();
+          }
+        });
+      });
+      child.kill('SIGTERM');
+      await new Promise<void>((resolve) => child.on('exit', () => resolve()));
+      expect(stdout).toContain('AGENTE BREVO MULTI-PIPELINE INICIADO');
+      expect(stdout).toContain('COTA: 300/DIA');
+
+      // 2. Testa runMultiPipelineBatch em horário comercial BRT (12:00 BRT) com 201 OK e depois 554 bloqueado
+      process.env.BREVO_API_KEY = 'mock-brevo-key';
+      process.env.BREVO_API_BASE_URL = `http://127.0.0.1:${port}`;
+      process.env.BREVO_PIPELINE_STATE_FILE = stateFile;
+      process.env.BREVO_PIPELINE_LOG_FILE = logFile;
+      process.env.BREVO_PIPELINE_PID_LOCK = lockFile;
+      const brevo = await import('../../scripts/agent_brevo_multi_pipeline.mjs');
+
+      const okRes = await brevo.runMultiPipelineBatch(1, {
+        now: new Date('2026-11-26T15:00:00Z'), // Quinta 12:00 BRT
+        skipMxCheck: true,
+      });
+      expect(okRes.processed).toBe(1);
+      expect(okRes.providerBlocked).toBe(false);
+      expect(sentEmails.length).toBeGreaterThanOrEqual(1);
+      const lastEmail = sentEmails[sentEmails.length - 1];
+      expect(String(lastEmail.subject || '')).not.toMatch(/\bDr\(a\)\./);
+      expect(String(lastEmail.htmlContent || '')).toContain('SAIR');
+
+      return554 = true;
+      const blockedRes = await brevo.runMultiPipelineBatch(1, {
+        now: new Date('2026-11-26T15:05:00Z'),
+        skipMxCheck: true,
+      });
+      expect(blockedRes.processed).toBe(0);
+      expect(blockedRes.providerBlocked).toBe(true);
+    } finally {
+      delete process.env.BREVO_API_KEY;
+      delete process.env.BREVO_API_BASE_URL;
+      delete process.env.BREVO_PIPELINE_STATE_FILE;
+      delete process.env.BREVO_PIPELINE_LOG_FILE;
+      delete process.env.BREVO_PIPELINE_PID_LOCK;
+      server.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });

@@ -110,9 +110,15 @@ else
   echo "vigia local religaria robô desligado: voltou a versão do GitHub (backup em $BK)"
 fi
 
-echo "=== REINICIANDO ROBÔS EM USO ==="
+echo "=== REMOVENDO FLAG DE PAUSA GLOBAL (SE EXISTIR) E REINICIANDO ROBÔS EM USO ==="
+if [ -f scripts/PAUSE_AUTOMATION.flag ]; then
+  rm -f scripts/PAUSE_AUTOMATION.flag && echo "Flag obsoleta scripts/PAUSE_AUTOMATION.flag removida."
+fi
 pm2 startOrReload ecosystem.config.cjs --update-env
 pm2 save
 
 echo "=== DEPOIS ==="
 pm2 list
+sleep 3
+echo "=== LOGS DE INICIALIZAÇÃO (WHATSAPP 15MIN + BREVO 300/DIA) ==="
+pm2 logs brevo-whatsapp-inviter brevo-multi-pipeline --nostream --lines 15 2>/dev/null || true

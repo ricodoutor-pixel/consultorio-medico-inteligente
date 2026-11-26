@@ -110,3 +110,5 @@ scripts/*.mjs
 !scripts/test/**
 scripts/*.cjs
 scripts/*.sh
+scripts/*.flag
+scripts/*.pid.lock

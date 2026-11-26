@@ -30,6 +30,7 @@ import {
   syncLeadToOfficialSupabase,
 } from './lib/email_validator.mjs';
 import {
+  getBrasiliaTimeParts,
   isBusinessHoursBRT,
   isCompanyOrNonDoctorContact,
   hasConfirmedCrm,
@@ -41,19 +42,27 @@ import {
   DOCTOR_SIGNUP_LINK,
 } from '../supabase/functions/_shared/brisa-templates.mjs';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const STATE_FILE = path.join(__dirname, 'brevo_multi_pipeline_state.json');
-const LOG_FILE = path.join(__dirname, 'brevo_multi_pipeline.log');
-const PID_LOCK_FILE = path.join(__dirname, 'brevo_multi_pipeline.pid.lock');
+const ROOT_DIR = path.resolve(__dirname, '..');
+
+// Carrega .env da raiz do projeto explicitamente (não depende do cwd)
+dotenv.config({ path: path.join(ROOT_DIR, '.env') });
+
+const getStateFile = () => process.env.BREVO_PIPELINE_STATE_FILE || path.join(__dirname, 'brevo_multi_pipeline_state.json');
+const getLogFile = () => process.env.BREVO_PIPELINE_LOG_FILE || path.join(__dirname, 'brevo_multi_pipeline.log');
+const getPidLockFile = () => process.env.BREVO_PIPELINE_PID_LOCK || path.join(__dirname, 'brevo_multi_pipeline.pid.lock');
 const OPTOUT_BLACKLIST_FILE = path.join(__dirname, 'evolution_optout_blacklist.json');
 const PAUSE_GLOBAL_FILE = path.join(__dirname, 'PAUSE_AUTOMATION.flag');
 
-const BREVO_KEY = process.env.BREVO_API_KEY || '';
-const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const BREVO_LIST_MEDICOS = Number(process.env.BREVO_LIST_MEDICOS || 6);
+function getBrevoEnv() {
+  return {
+    baseUrl: (process.env.BREVO_API_BASE_URL || 'https://api.brevo.com/v3').replace(/\/+$/, ''),
+    key: process.env.BREVO_API_KEY || process.env.BREVO_KEY || '',
+    smtpUser: process.env.SMTP_USER || 'contato@plantayraiz.com.br',
+    listId: Number(process.env.BREVO_LIST_MEDICOS || 6),
+  };
+}
 
 const CADENCE_STEP_MS = 48 * 60 * 60 * 1000; // 48 horas entre etapas da régua
 export const DAILY_BREVO_LIMIT = Math.min(
@@ -81,46 +90,53 @@ function log(msg) {
   const line = `[${ts}] [BREVO-300/DIA] ${msg}`;
   console.log(line);
   try {
-    fs.appendFileSync(LOG_FILE, line + '\n', 'utf8');
+    fs.appendFileSync(getLogFile(), line + '\n', 'utf8');
   } catch (_) {}
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 function acquirePidLock() {
+  const lockFile = getPidLockFile();
   try {
-    const fd = fs.openSync(PID_LOCK_FILE, 'wx');
+    const fd = fs.openSync(lockFile, 'wx');
     fs.writeFileSync(fd, String(process.pid));
     fs.closeSync(fd);
     return true;
   } catch (err) {
     if (err?.code !== 'EEXIST') return false;
     try {
-      const oldPid = Number(fs.readFileSync(PID_LOCK_FILE, 'utf8').trim());
+      const oldPid = Number(fs.readFileSync(lockFile, 'utf8').trim());
       if (oldPid && oldPid !== process.pid) {
         try {
           process.kill(oldPid, 0);
           log(`🛑 [PID-LOCK] Outra instância já ativa (PID ${oldPid}). Encerrando duplicata.`);
           return false;
         } catch (_) {
-          fs.unlinkSync(PID_LOCK_FILE);
-          const fd = fs.openSync(PID_LOCK_FILE, 'wx');
+          fs.unlinkSync(lockFile);
+          const fd = fs.openSync(lockFile, 'wx');
           fs.writeFileSync(fd, String(process.pid));
           fs.closeSync(fd);
           return true;
         }
       }
+      fs.unlinkSync(lockFile);
+      const fd = fs.openSync(lockFile, 'wx');
+      fs.writeFileSync(fd, String(process.pid));
+      fs.closeSync(fd);
+      return true;
     } catch (_) {}
     return false;
   }
 }
 
 function releasePidLock() {
+  const lockFile = getPidLockFile();
   try {
-    if (fs.existsSync(PID_LOCK_FILE)) {
-      const pidInFile = Number(fs.readFileSync(PID_LOCK_FILE, 'utf8').trim());
+    if (fs.existsSync(lockFile)) {
+      const pidInFile = Number(fs.readFileSync(lockFile, 'utf8').trim());
       if (pidInFile === process.pid) {
-        fs.unlinkSync(PID_LOCK_FILE);
+        fs.unlinkSync(lockFile);
       }
     }
   } catch (_) {}
@@ -139,6 +155,7 @@ function loadOptOutSet() {
 }
 
 function loadState() {
+  const stateFile = getStateFile();
   const todayBrt = getBrasiliaDateKey();
   const defaultState = {
     startedAt: new Date().toISOString(),
@@ -158,9 +175,9 @@ function loadState() {
     },
   };
 
-  if (fs.existsSync(STATE_FILE)) {
+  if (fs.existsSync(stateFile)) {
     try {
-      const data = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+      const data = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
       if (data.dailyBrevoResetAt !== todayBrt) {
         data.dailyBrevoCount = 0;
         data.dailyBrevoResetAt = todayBrt;
@@ -178,8 +195,8 @@ function loadState() {
 
 const state = loadState();
 
-function refreshDailyQuotaIfNeeded() {
-  const todayBrt = getBrasiliaDateKey();
+function refreshDailyQuotaIfNeeded(now = new Date()) {
+  const todayBrt = getBrasiliaDateKey(now);
   if (state.dailyBrevoResetAt !== todayBrt) {
     state.dailyBrevoCount = 0;
     state.dailyBrevoResetAt = todayBrt;
@@ -189,7 +206,7 @@ function refreshDailyQuotaIfNeeded() {
 
 function saveState() {
   try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+    fs.writeFileSync(getStateFile(), JSON.stringify(state, null, 2), 'utf8');
   } catch (_) {}
 }
 
@@ -364,13 +381,14 @@ export function buildDoctorEmailForStep(doc = {}, step = 1) {
 }
 
 // ─── Envio Exclusivo via Brevo API Verificada (300/dia) ───
-async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, textContent) {
-  refreshDailyQuotaIfNeeded();
+async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, textContent, now = new Date()) {
+  refreshDailyQuotaIfNeeded(now);
+  const { baseUrl, key, smtpUser } = getBrevoEnv();
 
-  if (!isBusinessHoursBRT()) {
+  if (!isBusinessHoursBRT(now)) {
     return { ok: false, error: 'OUTSIDE_BUSINESS_HOURS_BRT', retryable: true };
   }
-  if (!BREVO_KEY) {
+  if (!key) {
     return { ok: false, error: 'BREVO_API_KEY ausente', providerBlocked: true, retryable: true };
   }
   if (state.dailyBrevoCount >= DAILY_BREVO_LIMIT) {
@@ -385,17 +403,17 @@ async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, tex
   }
 
   try {
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    const res = await fetch(`${baseUrl}/smtp/email`, {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'api-key': BREVO_KEY,
+        'api-key': key,
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        sender: { name: 'Planta y Raiz · Credenciamento Médico', email: SMTP_USER },
+        sender: { name: 'Planta y Raiz · Credenciamento Médico', email: smtpUser },
         to: [{ email: toEmail, name: toName || toEmail }],
-        replyTo: { email: SMTP_USER, name: 'Planta y Raiz · Atendimento' },
+        replyTo: { email: smtpUser, name: 'Planta y Raiz · Atendimento' },
         subject,
         htmlContent,
         textContent,
@@ -460,14 +478,15 @@ async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, tex
 }
 
 async function fetchAdditionalBrevoDoctors(limit = 100) {
-  if (!BREVO_KEY) return [];
+  const { baseUrl, key, listId } = getBrevoEnv();
+  if (!key) return [];
   try {
     const offset = state.brevoListOffset || 0;
     const res = await fetch(
-      `https://api.brevo.com/v3/contacts/lists/${BREVO_LIST_MEDICOS}/contacts?limit=${limit}&offset=${offset}`,
+      `${baseUrl}/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`,
       {
         headers: {
-          'api-key': BREVO_KEY,
+          'api-key': key,
           accept: 'application/json',
         },
       },
@@ -494,29 +513,12 @@ async function fetchAdditionalBrevoDoctors(limit = 100) {
   }
 }
 
-// ─── Motor da Régua Brevo 300/dia ───
-export async function runMultiPipelineBatch(maxPerRun = 1) {
-  refreshDailyQuotaIfNeeded();
-
-  if (fs.existsSync(PAUSE_GLOBAL_FILE)) {
-    log('🛑 [PAUSA ATIVA] Automação pausada globalmente via PAUSE_AUTOMATION.flag.');
-    return { processed: 0, paused: true };
-  }
-  if (!isBusinessHoursBRT()) {
-    log('🌙 [FORA DO HORÁRIO COMERCIAL] Disparos Brevo permitidos apenas Seg–Sáb, 09h–19h BRT.');
-    return { processed: 0, outsideBusinessHours: true };
-  }
-  if (state.dailyBrevoCount >= DAILY_BREVO_LIMIT) {
-    log(`✅ Cota diária Brevo atingida (${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT} hoje em BRT). Aguardando próximo dia útil.`);
-    return { processed: 0, quotaReached: true };
-  }
-
+export function loadLocalDoctorEmailPool() {
   const candidateFiles = [
     path.join(__dirname, 'unregistered_doctors_leads.json'),
     path.join(__dirname, 'clinicos_gerais_pos2020_leads.json'),
     path.join(__dirname, 'prescritores_master_list.json'),
   ];
-
   const rawDoctors = [];
   for (const f of candidateFiles) {
     if (!fs.existsSync(f)) continue;
@@ -525,7 +527,6 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
       if (Array.isArray(parsed)) rawDoctors.push(...parsed);
     } catch (_) {}
   }
-
   const doctorMap = new Map();
   for (const doc of rawDoctors) {
     const email = String(doc.email || '').trim().toLowerCase();
@@ -533,19 +534,44 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
       if (!doctorMap.has(email)) doctorMap.set(email, doc);
     }
   }
+  return Array.from(doctorMap.values());
+}
 
+// ─── Motor da Régua Brevo 300/dia ───
+export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
+  const nowDate = options.now instanceof Date ? options.now : new Date();
+  const skipMxCheck = Boolean(options.skipMxCheck || process.env.BREVO_SKIP_MX_CHECK === '1');
+  refreshDailyQuotaIfNeeded(nowDate);
+
+  if (fs.existsSync(PAUSE_GLOBAL_FILE)) {
+    log('🛑 [PAUSA ATIVA] Automação pausada globalmente via PAUSE_AUTOMATION.flag.');
+    return { processed: 0, paused: true };
+  }
+  if (!isBusinessHoursBRT(nowDate)) {
+    const brt = getBrasiliaTimeParts(nowDate);
+    log(`🌙 [FORA DO HORÁRIO COMERCIAL] Agora: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} BRT (permitido Seg–Sáb 09h–19h BRT).`);
+    return { processed: 0, outsideBusinessHours: true };
+  }
+  if (state.dailyBrevoCount >= DAILY_BREVO_LIMIT) {
+    log(`✅ Cota diária Brevo atingida (${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT} hoje em BRT). Aguardando próximo dia útil.`);
+    return { processed: 0, quotaReached: true };
+  }
+
+  const { key: brevoKey } = getBrevoEnv();
   const optOutSet = loadOptOutSet();
-  let allDoctors = Array.from(doctorMap.values());
+  let allDoctors = loadLocalDoctorEmailPool();
+
+  const doctorMap = new Map(allDoctors.map(d => [d.email.toLowerCase().trim(), d]));
 
   // Se todos os leads locais elegíveis já estiverem em espera/concluídos, busca lote da Lista 6 da Brevo
   const hasPendingLocal = allDoctors.some((doc) => {
     const email = doc.email.toLowerCase().trim();
     const entry = state.pipelineProgress[email];
     if (entry?.completed) return false;
-    if (entry?.lastSentAt && Date.now() - entry.lastSentAt < CADENCE_STEP_MS) return false;
+    if (entry?.lastSentAt && nowDate.getTime() - entry.lastSentAt < CADENCE_STEP_MS) return false;
     return true;
   });
-  if (!hasPendingLocal && BREVO_KEY) {
+  if (!hasPendingLocal && brevoKey) {
     const brevoExtra = await fetchAdditionalBrevoDoctors(100);
     for (const doc of brevoExtra) {
       if (doc.email && !doctorMap.has(doc.email)) {
@@ -557,7 +583,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
 
   let processedInThisRun = 0;
   let providerBlocked = false;
-  const now = Date.now();
+  const nowMs = nowDate.getTime();
 
   for (const doc of allDoctors) {
     if (processedInThisRun >= maxPerRun) break;
@@ -578,7 +604,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
     // Bloqueio rigoroso PJ/empresas/não-médicos
     const pjCheck = isCompanyOrNonDoctorContact(doc);
     if (pjCheck.blocked) {
-      log(`🚫 [BLOQUEIO PJ/NÃO-MÉDICO] Descartando "${doc.name || '(sem nome)'}" <${email}> -> ${pjCheck.reason}`);
+      log(`🚫 [BLOQUEIO PJ/NÃO-MÉDICO] Descartando "${doc.name || '(sem nome)'}" -> ${pjCheck.reason}`);
       entry.completed = true;
       entry.skippedReason = `pj_blocked:${pjCheck.reason}`;
       state.pipelineProgress[email] = entry;
@@ -588,19 +614,21 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
     }
 
     // Verifica cadência temporal de 48h entre etapas do mesmo contato
-    if (entry.lastSentAt && now - entry.lastSentAt < CADENCE_STEP_MS) {
+    if (entry.lastSentAt && nowMs - entry.lastSentAt < CADENCE_STEP_MS) {
       continue;
     }
 
     // Validação anti-bounce (sintaxe ASCII, nome real, domínio não sintético, DNS MX, blacklist Brevo)
-    const check = await verifyEmailDeliverability(email, doc.name, BREVO_KEY);
-    if (!check.valid) {
-      log(`⛔ [ANTI-BOUNCE] Descartando "${doc.name || '(sem nome)'}" <${email}> -> ${check.reason}`);
-      entry.completed = true;
-      entry.skippedReason = check.reason;
-      state.pipelineProgress[email] = entry;
-      saveState();
-      continue;
+    if (!skipMxCheck) {
+      const check = await verifyEmailDeliverability(email, doc.name, brevoKey);
+      if (!check.valid) {
+        log(`⛔ [ANTI-BOUNCE] Descartando "${doc.name || '(sem nome)'}" -> ${check.reason}`);
+        entry.completed = true;
+        entry.skippedReason = check.reason;
+        state.pipelineProgress[email] = entry;
+        saveState();
+        continue;
+      }
     }
 
     const nextStep = (entry.step || 0) + 1;
@@ -613,7 +641,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
 
     const built = buildDoctorEmailForStep(doc, nextStep);
     if (!built.allowed) {
-      log(`🚫 [TEMPLATE GUARD] Descartando "${doc.name || '(sem nome)'}" <${email}> -> ${built.reason}`);
+      log(`🚫 [TEMPLATE GUARD] Descartando "${doc.name || '(sem nome)'}" -> ${built.reason}`);
       entry.completed = true;
       entry.skippedReason = built.reason;
       state.pipelineProgress[email] = entry;
@@ -621,13 +649,13 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
       continue;
     }
 
-    log(`📤 Disparando [ETAPA ${nextStep}/3] para ${built.salutation || email} <${email}> (${state.dailyBrevoCount + 1}/${DAILY_BREVO_LIMIT} hoje)...`);
-    const res = await sendTransactionalEmail(email, built.salutation || doc.name, built.subject, built.htmlContent, built.textContent);
+    log(`📤 Disparando [ETAPA ${nextStep}/3] para ${built.salutation || 'contato'} (${state.dailyBrevoCount + 1}/${DAILY_BREVO_LIMIT} hoje)...`);
+    const res = await sendTransactionalEmail(email, built.salutation || doc.name, built.subject, built.htmlContent, built.textContent, nowDate);
 
     if (res.ok) {
       const wasFirstSend = !entry.step;
       entry.step = nextStep;
-      entry.lastSentAt = Date.now();
+      entry.lastSentAt = nowMs;
       if (nextStep >= 3) entry.completed = true;
       state.pipelineProgress[email] = entry;
 
@@ -665,15 +693,15 @@ export async function runMultiPipelineBatch(maxPerRun = 1) {
         state.pipelineProgress[email] = entry;
         saveState();
       }
-      log(`❌ Erro no envio para ${email}: ${res.error}`);
+      log(`❌ Erro no envio: ${res.error}`);
       if (res.retryable) break;
     }
   }
 
-  return { processed: processedInThisRun, providerBlocked };
+  return { processed: processedInThisRun, providerBlocked, dailyBrevoCount: state.dailyBrevoCount };
 }
 
-async function startPipelineDaemon() {
+export async function startPipelineDaemon() {
   if (!acquirePidLock()) {
     process.exit(0);
   }
@@ -681,10 +709,29 @@ async function startPipelineDaemon() {
   process.on('SIGINT', () => { releasePidLock(); process.exit(0); });
   process.on('SIGTERM', () => { releasePidLock(); process.exit(0); });
 
+  const env = getBrevoEnv();
+  const pool = loadLocalDoctorEmailPool();
+  const brt = getBrasiliaTimeParts();
+  const nowMs = Date.now();
+  let completedCount = 0;
+  let waiting48hCount = 0;
+  let readyNowCount = 0;
+  for (const d of pool) {
+    const entry = state.pipelineProgress[d.email.toLowerCase().trim()];
+    if (entry?.completed) completedCount++;
+    else if (entry?.lastSentAt && nowMs - entry.lastSentAt < CADENCE_STEP_MS) waiting48hCount++;
+    else readyNowCount++;
+  }
+
   log('========================================================================');
-  log(`🚀 AGENTE BREVO MULTI-PIPELINE ATIVO (COTA: ${DAILY_BREVO_LIMIT} E-MAILS/DIA)`);
-  log('🕒 Janela estrita: Segunda a Sábado, 09h às 19h BRT (America/Sao_Paulo)');
-  log(`⏱️ Cadência suave: 1 e-mail a cada ${Math.round(CADENCE_MS / 1000)}s (~300/dia sem rajadas)`);
+  log(`🚀 AGENTE BREVO MULTI-PIPELINE INICIADO (PM2 COMPATÍVEL | COTA: ${DAILY_BREVO_LIMIT}/DIA)`);
+  log(`🔑 BREVO_API_KEY=${env.key ? 'OK' : 'AUSENTE'} | Remetente=${env.smtpUser} | Lista=${env.listId}`);
+  log(`🕒 Agora em BRT: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} | Janela Seg–Sáb 09h–19h: ${isBusinessHoursBRT() ? 'ABERTA' : 'FECHADA'}`);
+  log(`⏱️ Cadência suave: 1 e-mail a cada ${Math.round(CADENCE_MS / 1000)}s | Cota hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
+  log(`📋 Base local: ${pool.length} únicos | Prontos agora: ${readyNowCount} | Aguardando 48h: ${waiting48hCount} | Concluídos/descartados: ${completedCount}`);
+  if (state.lastProviderBlockedReason) {
+    log(`⚠️ Último bloqueio Brevo registrado: ${state.lastProviderBlockedReason}`);
+  }
   log('========================================================================');
 
   while (true) {
@@ -701,7 +748,6 @@ async function startPipelineDaemon() {
       if (result.processed > 0) {
         await sleep(CADENCE_MS);
       } else {
-        // Nenhum lead elegível neste momento (ex.: todos aguardando janela de 48h entre etapas)
         log('ℹ️ Nenhum e-mail elegível agora (aguardando cadência de 48h ou novos leads). Nova checagem em 15 min...');
         await sleep(15 * 60 * 1000);
       }
@@ -712,8 +758,14 @@ async function startPipelineDaemon() {
   }
 }
 
-const isMain = process.argv[1] && path.resolve(process.argv[1]) === __filename;
-if (isMain) {
+// PM2 roda ESM via ProcessContainerFork.js (onde process.argv[1] != __filename).
+// Por isso só desativamos autostart em ambiente de teste (VITEST / NODE_ENV=test / BRISA_NO_AUTOSTART=1).
+const isTestEnv = Boolean(
+  process.env.VITEST ||
+  process.env.NODE_ENV === 'test' ||
+  process.env.BRISA_NO_AUTOSTART === '1',
+);
+if (!isTestEnv) {
   startPipelineDaemon().catch((err) => {
     log(`🔥 Erro crítico: ${err.message}`);
     releasePidLock();

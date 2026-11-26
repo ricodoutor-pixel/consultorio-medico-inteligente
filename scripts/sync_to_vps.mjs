@@ -2,12 +2,10 @@ import { execSync } from 'child_process';
 import path from 'path';
 
 const filesToUpload = [
-  'scripts/PAUSE_AUTOMATION.flag',
   'scripts/lib/brisa_security.mjs',
   'scripts/agent_evolution_brisa_live_responder.mjs',
-  'scripts/agent_cadence_10min_inviter.mjs',
   'scripts/agent_brevo_doctor_whatsapp_inviter.mjs',
-  'scripts/medico_socio_campaign_state.json'
+  'scripts/agent_brevo_multi_pipeline.mjs'
 ];
 
 const keyPath = process.platform === 'win32' ? 'C:\\Users\\ricod\\.ssh\\id_ed25519' : '~/.ssh/id_ed25519';

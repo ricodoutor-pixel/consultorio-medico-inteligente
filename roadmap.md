@@ -1,5 +1,10 @@
 # Roadmap
 
+## Orientação operacional da VPS — 27/11/2026
+- [x] Registrar o acesso pelo GitHub com atualização automática da VPS e os três caminhos de operação
+- [x] Alinhar as instruções permanentes sem religar robôs legados nem alterar a plataforma
+- [x] Conferir a lista dos oito processos autorizados e validar as instruções antes do commit; estado remoto do auto-deploy não verificado por falta de acesso SSH
+
 ## Checkout consent and referral deployment — 26/11/2026
 - [x] Apply corrected consent migration and verify table existence, RLS and server INSERT permission
 - [x] Restrict both referral-payment functions to subscriptions and catalog purchases; consultations earn no referral commission

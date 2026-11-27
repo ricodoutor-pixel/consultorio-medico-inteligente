@@ -1,6 +1,14 @@
 # Orientação atual para todos os agentes — Planta y Raiz
 
-Atualizado em 20/10/2026. Leia este documento e o `AGENTS.md` antes de executar tarefas.
+Atualizado em 27/11/2026. Leia este documento e o `AGENTS.md` antes de executar tarefas.
+
+## 0. Operação da VPS e atualização pelo GitHub
+
+- O runbook operacional oficial é `docs/OPERACAO_VPS_AGENTES.md`; ele registra os três caminhos de acesso, os oito processos autorizados e os comandos de emergência para agentes com acesso remoto.
+- No Lovable, correções das automações sobem por commit na `main`. Conforme instrução do proprietário, `/root/auto-deploy.sh` aplica a `main` na VPS a cada cinco minutos com `pm2 startOrReload` e `pm2 save`.
+- Não pedir que o Dr. Edilson execute comandos. O Lovable não possui SSH direto: entrega o commit e, quando houver acesso remoto por outro caminho autorizado, confirma `/var/log/plantayraiz-autodeploy.log` e os processos.
+- A configuração relatada e o commit disponível não comprovam sozinhos que o deploy remoto terminou. Essa distinção deve constar no relatório final.
+- Os processos listados em `DESLIGADOS` no `ecosystem.config.cjs` continuam proibidos; a nova orientação não autoriza religá-los.
 
 ## 1. Fonte oficial e limites
 

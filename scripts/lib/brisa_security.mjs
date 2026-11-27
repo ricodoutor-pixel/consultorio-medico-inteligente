@@ -18,10 +18,19 @@ import { FORBIDDEN_PHRASES } from '../../supabase/functions/_shared/brisa-templa
 import {
   hasConfirmedCrm,
   isBusinessHoursBRT,
+  isOutreachHoursAllowed,
+  parseOutreachHoursSpec,
   isCompanyOrNonDoctorContact,
 } from '../../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 
-export { hasConfirmedCrm, isBusinessHoursBRT, isBusinessOrNonDoctorSender, isCompanyOrNonDoctorContact };
+export {
+  hasConfirmedCrm,
+  isBusinessHoursBRT,
+  isOutreachHoursAllowed,
+  parseOutreachHoursSpec,
+  isBusinessOrNonDoctorSender,
+  isCompanyOrNonDoctorContact,
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = path.join(__dirname, '..');
@@ -760,13 +769,14 @@ export function preSendGuard(jid, text, options = {}) {
     }
   }
 
-  // 0d. Regras estritas de disparo ativo (outreach): horário comercial BRT, bloqueio PJ e CRM confirmado para Dr(a).
+  // 0d. Regras estritas de disparo ativo (outreach): janela configurada (24x7 por padrão ou OUTREACH_HOURS), bloqueio PJ e CRM confirmado para Dr(a).
   if (options.isOutreach) {
-    if (!isBusinessHoursBRT(options.now || new Date())) {
+    if (!isOutreachHoursAllowed(options.now || new Date(), options.outreachHours)) {
+      const hoursCfg = parseOutreachHoursSpec(options.outreachHours);
       return {
         canSend: false,
-        reason: 'OUTSIDE_BUSINESS_HOURS_BRT',
-        log: `[BLOQUEIO HORÁRIO] Disparo fora do horário comercial (Seg-Sáb 9h-19h BRT) barrado para ${jid}.`
+        reason: 'OUTSIDE_OUTREACH_HOURS_BRT',
+        log: `[BLOQUEIO HORÁRIO] Disparo fora da janela configurada (${hoursCfg.label}) barrado para ${jid}.`
       };
     }
     if (options.contact) {

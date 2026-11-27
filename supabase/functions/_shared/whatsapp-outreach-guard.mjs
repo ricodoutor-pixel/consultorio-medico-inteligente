@@ -73,6 +73,96 @@ export function isBusinessHoursBRT(now = new Date()) {
   );
 }
 
+function readEnvOutreachHours() {
+  try {
+    if (typeof process !== 'undefined' && process?.env && typeof process.env.OUTREACH_HOURS === 'string') {
+      return process.env.OUTREACH_HOURS;
+    }
+  } catch (_) {}
+  try {
+    if (typeof globalThis !== 'undefined' && globalThis?.Deno?.env?.get) {
+      return globalThis.Deno.env.get('OUTREACH_HOURS') || '';
+    }
+  } catch (_) {}
+  return '';
+}
+
+/**
+ * Parses optional OUTREACH_HOURS window (e.g. "09-19").
+ * Default when unset/empty/"24x7"/"00-24": 24x7 (no day or hour restriction).
+ */
+export function parseOutreachHoursSpec(hoursSpec = undefined) {
+  const raw = String(hoursSpec !== undefined ? hoursSpec : readEnvOutreachHours()).trim();
+  if (!raw || /^(24x7|24\/7|all|always|0?0\s*[-:]\s*24)$/i.test(raw)) {
+    return {
+      restricted: false,
+      mode: '24x7',
+      raw: raw || '24x7',
+      startHour: 0,
+      endHour: 24,
+      label: '24x7 (sem restrição de dia/horário)',
+    };
+  }
+
+  const match = raw.match(/^(\d{1,2})\s*[-:]\s*(\d{1,2})$/);
+  if (!match) {
+    return {
+      restricted: false,
+      mode: '24x7',
+      raw,
+      startHour: 0,
+      endHour: 24,
+      label: '24x7 (OUTREACH_HOURS inválido ignorado)',
+    };
+  }
+
+  const startHour = Number(match[1]);
+  const endHour = Number(match[2]);
+  if (
+    !Number.isInteger(startHour) ||
+    !Number.isInteger(endHour) ||
+    startHour < 0 ||
+    startHour > 23 ||
+    endHour < 0 ||
+    endHour > 24 ||
+    startHour === endHour
+  ) {
+    return {
+      restricted: false,
+      mode: '24x7',
+      raw,
+      startHour: 0,
+      endHour: 24,
+      label: '24x7 (OUTREACH_HOURS fora do intervalo ignorado)',
+    };
+  }
+
+  return {
+    restricted: true,
+    mode: 'window',
+    raw,
+    startHour,
+    endHour,
+    label: `${String(startHour).padStart(2, '0')}h-${String(endHour).padStart(2, '0')}h BRT (OUTREACH_HOURS=${raw})`,
+  };
+}
+
+/**
+ * Active WhatsApp doctor-invite schedule policy (owner order 2026-11-26):
+ * - Default: 24x7 (always returns true, any day/hour).
+ * - Optional restriction: set OUTREACH_HOURS=09-19 (checked in America/Sao_Paulo).
+ */
+export function isOutreachHoursAllowed(now = new Date(), hoursSpec = undefined) {
+  const cfg = parseOutreachHoursSpec(hoursSpec);
+  if (!cfg.restricted) return true;
+  const { hour, valid } = getBrasiliaTimeParts(now);
+  if (!valid) return false;
+  if (cfg.startHour < cfg.endHour) {
+    return hour >= cfg.startHour && hour < cfg.endHour;
+  }
+  return hour >= cfg.startHour || hour < cfg.endHour;
+}
+
 // ============================================================================
 // CONFIRMED CRM VALIDATION
 // ============================================================================
@@ -143,6 +233,8 @@ const PJ_LEGAL_ENTITY_NAME_PATTERNS = [
   /\b(agencia|marketing|publicidade|propaganda|midia|digital|estetica|salao\s+de\s+beleza|estetica\s+e\s+beleza|clinica\s+de\s+beleza|espaco\s+beleza|instituto\s+de\s+beleza|studio\s+de\s+beleza|salao|barbearia|academia|otica|optica)\b/i,
   /\b(associacao|cooperativa|sindicato|fundacao|igreja|escola|colegio|faculdade|universidade)\b/i,
   /\b(supermercado|mercado|restaurante|padaria|loja|oficina|transportadora|logistica|distribuidora|industria|comercial)\b/i,
+  /^(?:dr\(a\)\.?|dra?\.?)?\s*(?:simples\s+|santa\s+)?(cannabis|canabis|canabidiol|cbd|hemp|saude\s+verde)\b/i,
+  /\b(clinicannabis|clinicann|cannaid|labs)\b/i,
 ];
 
 /**
@@ -174,7 +266,7 @@ const NON_DOCTOR_PROFESSION_PATTERNS = [
   /\b(enfermagem|enfermeir[oa]s?|tecnic[oa]\s+de\s+enfermagem)\b/i,
   /\b(fonoaudiologia|fonoaudiolog[oa]s?)\b/i,
   /\b(biomedicina|biomedic[oa]s?)\b/i,
-  /\b(esteticista|podologia|podolog[oa]s?|optometria|terapia\s+ocupacional)\b/i,
+  /\b(esteticista|podologia|podolog[oa]s?|optometria|terapia\s+ocupacional|consultor(?:a)?\s+de\s+saude|agente\s+comercial|escritorio\s+da\s+empresa|servico(?:s)?\s+de\s+(?:noticias|informacao))\b/i,
   NON_MEDICAL_COUNCIL_PATTERN,
 ];
 

@@ -148,7 +148,7 @@ export function buildOfficialInvitationMessage(contactName = '', options = {}) {
   const saudacao = addressing.salutation ? `Olá, ${addressing.salutation}!` : 'Olá!';
   return `${saudacao} Tudo bem? 🌿
 
-Sou a Enfª Brisa, da plataforma Planta y Raíz (plantayraiz.com.br).
+Sou a Enfª Brisa, assistente virtual do marketing médico da Planta y Raíz (plantayraiz.com.br).
 
 Estamos credenciando médicos prescritores para telemedicina integrativa em todo o Brasil:
 
@@ -161,5 +161,7 @@ Estamos credenciando médicos prescritores para telemedicina integrativa em todo
 👉 Conheça e ative seu consultório:
 ${BRISA_CONFIG.URLS.cadastroProfissional}
 
-Caso prefira tirar dúvidas por aqui, basta responder esta mensagem. (Para não receber novos avisos, responda SAIR).`;
+Caso prefira tirar dúvidas por aqui, basta responder esta mensagem. (Para não receber novos avisos, responda SAIR).
+
+— Enfª Brisa, marketing médico`;
 }

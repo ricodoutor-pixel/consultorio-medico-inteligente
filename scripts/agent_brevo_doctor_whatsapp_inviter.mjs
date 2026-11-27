@@ -274,8 +274,37 @@ function hasPhoneMatch(targetSet, phone, email = '') {
   return false;
 }
 
-function buildInvitedPhoneKeySet(state) {
+// Campanhas antigas que já mandaram convite frio ("Parabéns, Dr(a)...") pelo mesmo WhatsApp.
+// Quem já recebeu por elas nunca recebe de novo (ordem do Dr. Edilson: nunca repetir o mesmo número).
+export const PREVIOUS_CAMPAIGN_STATE_FILES = Object.freeze([
+  'priority_campaign_state.json',     // priority-15min-inviter
+  'medico_socio_campaign_state.json', // cadence-10min-inviter
+]);
+
+export function loadPreviousCampaignPhones(dir = __dirname) {
   const set = new Set();
+  for (const fileName of PREVIOUS_CAMPAIGN_STATE_FILES) {
+    try {
+      const full = path.join(dir, fileName);
+      if (!fs.existsSync(full)) continue;
+      const data = JSON.parse(fs.readFileSync(full, 'utf8'));
+      const sent = [
+        ...(Array.isArray(data?.sentWhatsapps) ? data.sentWhatsapps : []),
+        ...(Array.isArray(data?.invalidWhatsapps) ? data.invalidWhatsapps : []),
+      ];
+      for (const item of sent) addPhoneKeysToSet(set, typeof item === 'string' ? item : item?.phone || '');
+      for (const info of Object.values(data?.history || {})) {
+        if (info?.phone && (info.whatsappAt || info.status === 'ENVIADO' || info.status === 'JA_ENVIADO_NO_EVOLUTION')) {
+          addPhoneKeysToSet(set, info.phone);
+        }
+      }
+    } catch (_) { /* arquivo corrompido não bloqueia o robô */ }
+  }
+  return set;
+}
+
+function buildInvitedPhoneKeySet(state) {
+  const set = loadPreviousCampaignPhones();
   for (const k of Object.keys(state?.invitedPhones || {})) {
     addPhoneKeysToSet(set, k);
   }

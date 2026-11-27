@@ -55,12 +55,24 @@ const getPidLockFile = () => process.env.BREVO_PIPELINE_PID_LOCK || path.join(__
 const OPTOUT_BLACKLIST_FILE = path.join(__dirname, 'evolution_optout_blacklist.json');
 const PAUSE_GLOBAL_FILE = path.join(__dirname, 'PAUSE_AUTOMATION.flag');
 
-function getBrevoEnv() {
+export function getBrevoEnv() {
+  const fallbackKey = process.env.BREVO_API_KEY || process.env.BREVO_KEY || '';
+  const sendKey = process.env.BREVO_SEND_API_KEY || fallbackKey;
+  const crmKey = process.env.BREVO_CRM_API_KEY || fallbackKey;
+  const smtpUser = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || smtpUser;
+  const replyToEmail = process.env.BREVO_REPLY_TO_EMAIL || smtpUser;
   return {
     baseUrl: (process.env.BREVO_API_BASE_URL || 'https://api.brevo.com/v3').replace(/\/+$/, ''),
-    key: process.env.BREVO_API_KEY || process.env.BREVO_KEY || '',
-    smtpUser: process.env.SMTP_USER || 'contato@plantayraiz.com.br',
+    crmBaseUrl: (process.env.BREVO_CRM_API_BASE_URL || process.env.BREVO_API_BASE_URL || 'https://api.brevo.com/v3').replace(/\/+$/, ''),
+    key: sendKey,
+    sendKey,
+    crmKey,
+    smtpUser,
+    senderEmail,
+    replyToEmail,
     listId: Number(process.env.BREVO_LIST_MEDICOS || 6),
+    prioritizeCrmList: process.env.BREVO_PRIORITIZE_CRM_LIST === 'true',
   };
 }
 
@@ -383,13 +395,13 @@ export function buildDoctorEmailForStep(doc = {}, step = 1) {
 // ─── Envio Exclusivo via Brevo API Verificada (300/dia) ───
 async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, textContent, now = new Date()) {
   refreshDailyQuotaIfNeeded(now);
-  const { baseUrl, key, smtpUser } = getBrevoEnv();
+  const { baseUrl, sendKey: key, senderEmail, replyToEmail } = getBrevoEnv();
 
   if (!isBusinessHoursBRT(now)) {
     return { ok: false, error: 'OUTSIDE_BUSINESS_HOURS_BRT', retryable: true };
   }
   if (!key) {
-    return { ok: false, error: 'BREVO_API_KEY ausente', providerBlocked: true, retryable: true };
+    return { ok: false, error: 'BREVO_SEND_API_KEY/BREVO_API_KEY ausente', providerBlocked: true, retryable: true };
   }
   if (state.dailyBrevoCount >= DAILY_BREVO_LIMIT) {
     return { ok: false, error: 'DAILY_QUOTA_REACHED', retryable: true };
@@ -411,9 +423,9 @@ async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, tex
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        sender: { name: 'Planta y Raiz · Credenciamento Médico', email: smtpUser },
+        sender: { name: 'Planta y Raiz · Credenciamento Médico', email: senderEmail },
         to: [{ email: toEmail, name: toName || toEmail }],
-        replyTo: { email: smtpUser, name: 'Planta y Raiz · Atendimento' },
+        replyTo: { email: replyToEmail, name: 'Planta y Raiz · Atendimento' },
         subject,
         htmlContent,
         textContent,
@@ -477,40 +489,72 @@ async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, tex
   }
 }
 
-async function fetchAdditionalBrevoDoctors(limit = 100) {
-  const { baseUrl, key, listId } = getBrevoEnv();
-  if (!key) return [];
+// Buffer em memória da página atual da Lista CRM Brevo para nunca pular contatos entre ticks de 1 envio
+let brevoPageBuffer = { listId: null, items: [], exhausted: false };
+
+export function resetBrevoPageBufferForTests() {
+  brevoPageBuffer = { listId: null, items: [], exhausted: false };
+}
+
+async function fetchBrevoCrmPage(offset, limit = 100) {
+  const { crmBaseUrl, crmKey, listId } = getBrevoEnv();
+  if (!crmKey) return { ok: false, contacts: [] };
   try {
-    const offset = state.brevoListOffset || 0;
     const res = await fetch(
-      `${baseUrl}/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`,
+      `${crmBaseUrl}/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`,
       {
         headers: {
-          'api-key': key,
+          'api-key': crmKey,
           accept: 'application/json',
         },
       },
     );
-    if (!res.ok) return [];
-    const data = await res.json().catch(() => ({}));
-    const contacts = Array.isArray(data.contacts) ? data.contacts : [];
-    if (contacts.length > 0) {
-      state.brevoListOffset = offset + contacts.length;
-      saveState();
+    if (!res.ok) {
+      log(`⚠️ Falha ao ler contatos da Lista Brevo #${listId} (offset=${offset}): HTTP ${res.status}`);
+      return { ok: false, contacts: [] };
     }
-    return contacts
-      .filter((c) => !c.emailBlacklisted && c.email)
-      .map((c) => ({
+    const data = await res.json().catch(() => ({}));
+    const rawContacts = Array.isArray(data.contacts) ? data.contacts : [];
+    return {
+      ok: true,
+      contacts: rawContacts.map((c) => ({
         name: c.attributes?.NOME || c.attributes?.FIRSTNAME || '',
         email: String(c.email || '').trim().toLowerCase(),
+        emailBlacklisted: Boolean(c.emailBlacklisted),
         phone: c.attributes?.WHATSAPP || c.attributes?.SMS || c.attributes?.PHONE || '',
         specialty: c.attributes?.SPECIALTY || '',
+        city: c.attributes?.CIDADE || '',
         crm: c.attributes?.CRM || '',
         uf: c.attributes?.UF || '',
-      }));
-  } catch (_) {
-    return [];
+        source: `brevo_crm_list_${listId}`,
+      })),
+    };
+  } catch (e) {
+    log(`⚠️ Erro de rede ao ler Lista Brevo #${listId}: ${e.message}`);
+    return { ok: false, contacts: [] };
   }
+}
+
+async function pullNextBrevoCrmContact() {
+  const { crmKey, listId } = getBrevoEnv();
+  if (!crmKey) return null;
+  if (brevoPageBuffer.listId !== listId) {
+    brevoPageBuffer = { listId, items: [], exhausted: false };
+  }
+  if (brevoPageBuffer.items.length === 0) {
+    if (brevoPageBuffer.exhausted) return null;
+    const offset = Number(state.brevoListOffset || 0);
+    const page = await fetchBrevoCrmPage(offset, 100);
+    if (!page.ok) return null;
+    if (page.contacts.length === 0) {
+      brevoPageBuffer.exhausted = true;
+      return null;
+    }
+    brevoPageBuffer.items = page.contacts;
+  }
+  const next = brevoPageBuffer.items.shift();
+  state.brevoListOffset = Number(state.brevoListOffset || 0) + 1;
+  return next || null;
 }
 
 export function loadLocalDoctorEmailPool() {
@@ -557,48 +601,29 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
     return { processed: 0, quotaReached: true };
   }
 
-  const { key: brevoKey } = getBrevoEnv();
+  const { crmKey, prioritizeCrmList } = getBrevoEnv();
   const optOutSet = loadOptOutSet();
-  let allDoctors = loadLocalDoctorEmailPool();
-
-  const doctorMap = new Map(allDoctors.map(d => [d.email.toLowerCase().trim(), d]));
-
-  // Se todos os leads locais elegíveis já estiverem em espera/concluídos, busca lote da Lista 6 da Brevo
-  const hasPendingLocal = allDoctors.some((doc) => {
-    const email = doc.email.toLowerCase().trim();
-    const entry = state.pipelineProgress[email];
-    if (entry?.completed) return false;
-    if (entry?.lastSentAt && nowDate.getTime() - entry.lastSentAt < CADENCE_STEP_MS) return false;
-    return true;
-  });
-  if (!hasPendingLocal && brevoKey) {
-    const brevoExtra = await fetchAdditionalBrevoDoctors(100);
-    for (const doc of brevoExtra) {
-      if (doc.email && !doctorMap.has(doc.email)) {
-        doctorMap.set(doc.email, doc);
-      }
-    }
-    allDoctors = Array.from(doctorMap.values());
-  }
+  const localDoctors = options.skipLocalPool ? [] : loadLocalDoctorEmailPool();
 
   let processedInThisRun = 0;
   let providerBlocked = false;
   const nowMs = nowDate.getTime();
 
-  for (const doc of allDoctors) {
-    if (processedInThisRun >= maxPerRun) break;
-    if (state.dailyBrevoCount >= DAILY_BREVO_LIMIT) break;
+  async function evaluateAndMaybeSend(doc) {
+    const email = String(doc?.email || '').toLowerCase().trim();
+    if (!email || !email.includes('@') || email.includes('example.com') || email.includes('teste') || email.endsWith('.fake')) {
+      return 'skip';
+    }
 
-    const email = doc.email.toLowerCase().trim();
     const entry = state.pipelineProgress[email] || { persona: 'medico', step: 0, lastSentAt: 0, completed: false };
-    if (entry.completed) continue;
+    if (entry.completed) return 'skip';
 
-    if (optOutSet.has(email)) {
+    if (doc.emailBlacklisted || optOutSet.has(email)) {
       entry.completed = true;
-      entry.skippedReason = 'opt_out_blacklist';
+      entry.skippedReason = doc.emailBlacklisted ? 'brevo_email_blacklisted' : 'opt_out_blacklist';
       state.pipelineProgress[email] = entry;
       saveState();
-      continue;
+      return 'skip';
     }
 
     // Bloqueio rigoroso PJ/empresas/não-médicos
@@ -610,24 +635,24 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       state.pipelineProgress[email] = entry;
       state.metrics.skippedPjOrNonDoctor = (state.metrics.skippedPjOrNonDoctor || 0) + 1;
       saveState();
-      continue;
+      return 'skip';
     }
 
     // Verifica cadência temporal de 48h entre etapas do mesmo contato
     if (entry.lastSentAt && nowMs - entry.lastSentAt < CADENCE_STEP_MS) {
-      continue;
+      return 'wait';
     }
 
-    // Validação anti-bounce (sintaxe ASCII, nome real, domínio não sintético, DNS MX, blacklist Brevo)
+    // Validação anti-bounce (sintaxe ASCII, nome real, domínio não sintético, DNS MX, blacklist Brevo CRM)
     if (!skipMxCheck) {
-      const check = await verifyEmailDeliverability(email, doc.name, brevoKey);
+      const check = await verifyEmailDeliverability(email, doc.name, crmKey);
       if (!check.valid) {
         log(`⛔ [ANTI-BOUNCE] Descartando "${doc.name || '(sem nome)'}" -> ${check.reason}`);
         entry.completed = true;
         entry.skippedReason = check.reason;
         state.pipelineProgress[email] = entry;
         saveState();
-        continue;
+        return 'skip';
       }
     }
 
@@ -636,7 +661,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       entry.completed = true;
       state.pipelineProgress[email] = entry;
       saveState();
-      continue;
+      return 'skip';
     }
 
     const built = buildDoctorEmailForStep(doc, nextStep);
@@ -646,7 +671,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       entry.skippedReason = built.reason;
       state.pipelineProgress[email] = entry;
       saveState();
-      continue;
+      return 'skip';
     }
 
     log(`📤 Disparando [ETAPA ${nextStep}/3] para ${built.salutation || 'contato'} (${state.dailyBrevoCount + 1}/${DAILY_BREVO_LIMIT} hoje)...`);
@@ -681,24 +706,77 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       });
 
       log(`✅ [ETAPA ${nextStep}/3] Enviado via ${res.provider}! Total hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
-    } else {
-      if (res.providerBlocked) {
-        log(`🛑 [BREVO BLOQUEADO] ${res.error} — pausando 60 min para proteger conta/reputação.`);
-        providerBlocked = true;
-        break;
-      }
-      if (res.permanent) {
-        entry.completed = true;
-        entry.skippedReason = res.error;
-        state.pipelineProgress[email] = entry;
-        saveState();
-      }
-      log(`❌ Erro no envio: ${res.error}`);
-      if (res.retryable) break;
+      return 'sent';
+    }
+
+    if (res.providerBlocked) {
+      log(`🛑 [BREVO BLOQUEADO] ${res.error} — pausando 60 min para proteger conta/reputação.`);
+      providerBlocked = true;
+      return 'stop';
+    }
+    if (res.permanent) {
+      entry.completed = true;
+      entry.skippedReason = res.error;
+      state.pipelineProgress[email] = entry;
+      saveState();
+    }
+    log(`❌ Erro no envio: ${res.error}`);
+    return res.retryable ? 'stop' : 'skip';
+  }
+
+  async function processLocalPool() {
+    for (const doc of localDoctors) {
+      if (processedInThisRun >= maxPerRun || state.dailyBrevoCount >= DAILY_BREVO_LIMIT) break;
+      const outcome = await evaluateAndMaybeSend(doc);
+      if (outcome === 'stop') break;
     }
   }
 
-  return { processed: processedInThisRun, providerBlocked, dailyBrevoCount: state.dailyBrevoCount };
+  async function processBrevoCrmList() {
+    if (!crmKey) return;
+    const maxCrmScanPerRun = Math.max(200, Number(options.maxCrmScanPerRun || 500));
+    let scanned = 0;
+    while (
+      processedInThisRun < maxPerRun &&
+      state.dailyBrevoCount < DAILY_BREVO_LIMIT &&
+      !providerBlocked &&
+      scanned < maxCrmScanPerRun
+    ) {
+      const doc = await pullNextBrevoCrmContact();
+      if (!doc) break;
+      scanned++;
+      const outcome = await evaluateAndMaybeSend(doc);
+      if (outcome === 'stop') {
+        // Devolve o contato não enviado ao topo do buffer e recua o cursor em 1 para não perdê-lo
+        brevoPageBuffer.items.unshift(doc);
+        state.brevoListOffset = Math.max(0, Number(state.brevoListOffset || 0) - 1);
+        saveState();
+        break;
+      }
+      if (scanned % 25 === 0) saveState();
+    }
+    if (scanned > 0) saveState();
+  }
+
+  const useCrmFirst = Boolean(options.prioritizeCrmList ?? prioritizeCrmList);
+  if (useCrmFirst) {
+    await processBrevoCrmList();
+    if (!providerBlocked && processedInThisRun < maxPerRun && state.dailyBrevoCount < DAILY_BREVO_LIMIT) {
+      await processLocalPool();
+    }
+  } else {
+    await processLocalPool();
+    if (!providerBlocked && processedInThisRun < maxPerRun && state.dailyBrevoCount < DAILY_BREVO_LIMIT) {
+      await processBrevoCrmList();
+    }
+  }
+
+  return {
+    processed: processedInThisRun,
+    providerBlocked,
+    dailyBrevoCount: state.dailyBrevoCount,
+    brevoListOffset: state.brevoListOffset,
+  };
 }
 
 export async function startPipelineDaemon() {
@@ -725,7 +803,7 @@ export async function startPipelineDaemon() {
 
   log('========================================================================');
   log(`🚀 AGENTE BREVO MULTI-PIPELINE INICIADO (PM2 COMPATÍVEL | COTA: ${DAILY_BREVO_LIMIT}/DIA)`);
-  log(`🔑 BREVO_API_KEY=${env.key ? 'OK' : 'AUSENTE'} | Remetente=${env.smtpUser} | Lista=${env.listId}`);
+  log(`🔑 SEND_KEY=${env.sendKey ? 'OK' : 'AUSENTE'} | CRM_KEY=${env.crmKey ? 'OK' : 'AUSENTE'} | Remetente=${env.senderEmail} | ReplyTo=${env.replyToEmail} | Lista=${env.listId} | PriorizarListaCRM=${env.prioritizeCrmList}`);
   log(`🕒 Agora em BRT: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} | Janela Seg–Sáb 09h–19h: ${isBusinessHoursBRT() ? 'ABERTA' : 'FECHADA'}`);
   log(`⏱️ Cadência suave: 1 e-mail a cada ${Math.round(CADENCE_MS / 1000)}s | Cota hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
   log(`📋 Base local: ${pool.length} únicos | Prontos agora: ${readyNowCount} | Aguardando 48h: ${waiting48hCount} | Concluídos/descartados: ${completedCount}`);

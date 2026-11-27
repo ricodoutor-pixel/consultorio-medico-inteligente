@@ -504,6 +504,114 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it('E2E dual-account Brevo: lê contatos da Lista CRM (BREVO_CRM_API_KEY), envia pela conta nova (BREVO_SEND_API_KEY) sem pular contatos no offset', async () => {
+    const http = await import('node:http');
+    const os = await import('node:os');
+    const path = await import('node:path');
+
+    const sentRecords: Array<{ apiKey: string; body: Record<string, unknown> }> = [];
+    const crmRequests: Array<{ apiKey: string; url: string }> = [];
+
+    const crmContacts = [
+      { email: 'clinica@clinicaburgos.com.br', emailBlacklisted: false, attributes: { NOME: 'Clínica Burgos Ltda' } },
+      { email: 'bl@gmail.com', emailBlacklisted: true, attributes: { NOME: 'Joao Blacklisted' } },
+      { email: 'med1@gmail.com', emailBlacklisted: false, attributes: { NOME: 'Helena Costa', CRM: '49354', UF: 'PR' } },
+      { email: 'med2@gmail.com', emailBlacklisted: false, attributes: { NOME: 'Marcos Silva', UF: 'SP' } },
+    ];
+
+    const server = http.createServer((req, res) => {
+      const url = req.url || '';
+      const apiKey = String(req.headers['api-key'] || '');
+      if (url.includes('/contacts/lists/6/contacts')) {
+        crmRequests.push({ apiKey, url });
+        const parsed = new URL(url, 'http://127.0.0.1');
+        const offset = Number(parsed.searchParams.get('offset') || 0);
+        const limit = Number(parsed.searchParams.get('limit') || 100);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ contacts: crmContacts.slice(offset, offset + limit) }));
+        return;
+      }
+      if (url.includes('/smtp/email') && req.method === 'POST') {
+        let body = '';
+        req.on('data', (c) => { body += c; });
+        req.on('end', () => {
+          sentRecords.push({ apiKey, body: JSON.parse(body || '{}') });
+          res.writeHead(201, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ messageId: `<dual-${sentRecords.length}@brevo>` }));
+        });
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const { port } = server.address() as { port: number };
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pyr-brevo-dual-'));
+    const stateFile = path.join(tmpDir, 'state.json');
+    const logFile = path.join(tmpDir, 'dual.log');
+    const lockFile = path.join(tmpDir, 'dual.pid.lock');
+
+    try {
+      process.env.BREVO_API_BASE_URL = `http://127.0.0.1:${port}/v3`;
+      process.env.BREVO_CRM_API_KEY = 'crm-account-110k-key';
+      process.env.BREVO_SEND_API_KEY = 'new-send-account-key';
+      process.env.BREVO_SENDER_EMAIL = 'plantayraizadm@gmail.com';
+      process.env.BREVO_REPLY_TO_EMAIL = 'contato@plantayraiz.com.br';
+      process.env.BREVO_PRIORITIZE_CRM_LIST = 'true';
+      process.env.BREVO_PIPELINE_STATE_FILE = stateFile;
+      process.env.BREVO_PIPELINE_LOG_FILE = logFile;
+      process.env.BREVO_PIPELINE_PID_LOCK = lockFile;
+
+      const brevo = await import('../../scripts/agent_brevo_multi_pipeline.mjs');
+      brevo.resetBrevoPageBufferForTests();
+
+      // Tick 1: pula PJ + blacklisted, envia para med1@gmail.com (offset avança exatamente para 3)
+      const r1 = await brevo.runMultiPipelineBatch(1, {
+        now: new Date('2026-11-28T13:00:00Z'), // Sáb 10:00 BRT
+        skipMxCheck: true,
+        skipLocalPool: true,
+      });
+      expect(r1.processed).toBe(1);
+      expect(r1.brevoListOffset).toBe(3);
+
+      // Tick 2: consome med2@gmail.com do buffer sem perder nenhum contato e sem refazer fetch desnecessário
+      const r2 = await brevo.runMultiPipelineBatch(1, {
+        now: new Date('2026-11-28T13:02:00Z'), // Sáb 10:02 BRT
+        skipMxCheck: true,
+        skipLocalPool: true,
+      });
+      expect(r2.processed).toBe(1);
+      expect(r2.brevoListOffset).toBe(4);
+
+      expect(crmRequests).toHaveLength(1);
+      expect(crmRequests[0].apiKey).toBe('crm-account-110k-key');
+
+      expect(sentRecords).toHaveLength(2);
+      expect(sentRecords[0].apiKey).toBe('new-send-account-key');
+      expect((sentRecords[0].body.sender as { email: string }).email).toBe('plantayraizadm@gmail.com');
+      expect((sentRecords[0].body.replyTo as { email: string }).email).toBe('contato@plantayraiz.com.br');
+      expect((sentRecords[0].body.to as Array<{ email: string }>)[0].email).toBe('med1@gmail.com');
+      expect(String(sentRecords[0].body.subject)).toContain('Dr(a). Helena Costa');
+
+      expect(sentRecords[1].apiKey).toBe('new-send-account-key');
+      expect((sentRecords[1].body.to as Array<{ email: string }>)[0].email).toBe('med2@gmail.com');
+      expect(String(sentRecords[1].body.subject)).not.toMatch(/\bDr\(a\)\./);
+    } finally {
+      delete process.env.BREVO_API_BASE_URL;
+      delete process.env.BREVO_CRM_API_KEY;
+      delete process.env.BREVO_SEND_API_KEY;
+      delete process.env.BREVO_SENDER_EMAIL;
+      delete process.env.BREVO_REPLY_TO_EMAIL;
+      delete process.env.BREVO_PRIORITIZE_CRM_LIST;
+      delete process.env.BREVO_PIPELINE_STATE_FILE;
+      delete process.env.BREVO_PIPELINE_LOG_FILE;
+      delete process.env.BREVO_PIPELINE_PID_LOCK;
+      server.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('Ordem 26/11/2026 — brevo-whatsapp-inviter 24x7 (15 min) + fila unificada multi-fontes', () => {

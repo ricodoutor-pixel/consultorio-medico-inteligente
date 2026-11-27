@@ -598,6 +598,13 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       expect(sentRecords[1].apiKey).toBe('new-send-account-key');
       expect((sentRecords[1].body.to as Array<{ email: string }>)[0].email).toBe('med2@gmail.com');
       expect(String(sentRecords[1].body.subject)).not.toMatch(/\bDr\(a\)\./);
+
+      // Verifica janela de horário: padrão Seg-Sáb 09h-19h BRT; 24x7 apenas se BREVO_OUTREACH_HOURS=24x7
+      const fridayNightBrt = new Date('2026-11-27T23:45:00Z'); // Sex 20:45 BRT
+      delete process.env.BREVO_OUTREACH_HOURS;
+      expect(brevo.isEmailScheduleAllowed(fridayNightBrt)).toBe(false);
+      process.env.BREVO_OUTREACH_HOURS = '24x7';
+      expect(brevo.isEmailScheduleAllowed(fridayNightBrt)).toBe(true);
     } finally {
       delete process.env.BREVO_API_BASE_URL;
       delete process.env.BREVO_CRM_API_KEY;
@@ -605,6 +612,7 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       delete process.env.BREVO_SENDER_EMAIL;
       delete process.env.BREVO_REPLY_TO_EMAIL;
       delete process.env.BREVO_PRIORITIZE_CRM_LIST;
+      delete process.env.BREVO_OUTREACH_HOURS;
       delete process.env.BREVO_PIPELINE_STATE_FILE;
       delete process.env.BREVO_PIPELINE_LOG_FILE;
       delete process.env.BREVO_PIPELINE_PID_LOCK;

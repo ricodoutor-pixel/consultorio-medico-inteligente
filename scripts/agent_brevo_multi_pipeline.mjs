@@ -62,6 +62,7 @@ export function getBrevoEnv() {
   const smtpUser = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
   const senderEmail = process.env.BREVO_SENDER_EMAIL || smtpUser;
   const replyToEmail = process.env.BREVO_REPLY_TO_EMAIL || smtpUser;
+  const outreachHours = String(process.env.BREVO_OUTREACH_HOURS || '').trim();
   return {
     baseUrl: (process.env.BREVO_API_BASE_URL || 'https://api.brevo.com/v3').replace(/\/+$/, ''),
     crmBaseUrl: (process.env.BREVO_CRM_API_BASE_URL || process.env.BREVO_API_BASE_URL || 'https://api.brevo.com/v3').replace(/\/+$/, ''),
@@ -73,7 +74,20 @@ export function getBrevoEnv() {
     replyToEmail,
     listId: Number(process.env.BREVO_LIST_MEDICOS || 6),
     prioritizeCrmList: process.env.BREVO_PRIORITIZE_CRM_LIST === 'true',
+    outreachHours,
   };
+}
+
+/**
+ * Padrão estrito: Seg–Sáb 09h–19h BRT.
+ * Só libera 24x7 quando o proprietário configura explicitamente BREVO_OUTREACH_HOURS=24x7 no .env.
+ */
+export function isEmailScheduleAllowed(now = new Date()) {
+  const spec = String(process.env.BREVO_OUTREACH_HOURS || '').trim();
+  if (/^(24x7|24\/7|all|always|0?0\s*[-:]\s*24)$/i.test(spec)) {
+    return true;
+  }
+  return isBusinessHoursBRT(now);
 }
 
 const CADENCE_STEP_MS = 48 * 60 * 60 * 1000; // 48 horas entre etapas da régua
@@ -397,7 +411,7 @@ async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, tex
   refreshDailyQuotaIfNeeded(now);
   const { baseUrl, sendKey: key, senderEmail, replyToEmail } = getBrevoEnv();
 
-  if (!isBusinessHoursBRT(now)) {
+  if (!isEmailScheduleAllowed(now)) {
     return { ok: false, error: 'OUTSIDE_BUSINESS_HOURS_BRT', retryable: true };
   }
   if (!key) {
@@ -591,7 +605,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
     log('🛑 [PAUSA ATIVA] Automação pausada globalmente via PAUSE_AUTOMATION.flag.');
     return { processed: 0, paused: true };
   }
-  if (!isBusinessHoursBRT(nowDate)) {
+  if (!isEmailScheduleAllowed(nowDate)) {
     const brt = getBrasiliaTimeParts(nowDate);
     log(`🌙 [FORA DO HORÁRIO COMERCIAL] Agora: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} BRT (permitido Seg–Sáb 09h–19h BRT).`);
     return { processed: 0, outsideBusinessHours: true };
@@ -804,7 +818,7 @@ export async function startPipelineDaemon() {
   log('========================================================================');
   log(`🚀 AGENTE BREVO MULTI-PIPELINE INICIADO (PM2 COMPATÍVEL | COTA: ${DAILY_BREVO_LIMIT}/DIA)`);
   log(`🔑 SEND_KEY=${env.sendKey ? 'OK' : 'AUSENTE'} | CRM_KEY=${env.crmKey ? 'OK' : 'AUSENTE'} | Remetente=${env.senderEmail} | ReplyTo=${env.replyToEmail} | Lista=${env.listId} | PriorizarListaCRM=${env.prioritizeCrmList}`);
-  log(`🕒 Agora em BRT: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} | Janela Seg–Sáb 09h–19h: ${isBusinessHoursBRT() ? 'ABERTA' : 'FECHADA'}`);
+  log(`🕒 Agora em BRT: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} | Janela (${env.outreachHours || 'Seg–Sáb 09h–19h BRT'}): ${isEmailScheduleAllowed() ? 'ABERTA' : 'FECHADA'}`);
   log(`⏱️ Cadência suave: 1 e-mail a cada ${Math.round(CADENCE_MS / 1000)}s | Cota hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
   log(`📋 Base local: ${pool.length} únicos | Prontos agora: ${readyNowCount} | Aguardando 48h: ${waiting48hCount} | Concluídos/descartados: ${completedCount}`);
   if (state.lastProviderBlockedReason) {

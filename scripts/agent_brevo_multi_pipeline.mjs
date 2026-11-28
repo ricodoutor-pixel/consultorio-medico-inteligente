@@ -35,6 +35,7 @@ import {
   isCompanyOrNonDoctorContact,
   hasConfirmedCrm,
   formatDoctorAddressing,
+  stripDoctorHonorific,
 } from '../supabase/functions/_shared/whatsapp-outreach-guard.mjs';
 import {
   FORBIDDEN_PHRASES,
@@ -74,6 +75,7 @@ export function getBrevoEnv() {
     replyToEmail,
     listId: Number(process.env.BREVO_LIST_MEDICOS || 6),
     prioritizeCrmList: process.env.BREVO_PRIORITIZE_CRM_LIST === 'true',
+    universalInviteMode: process.env.BREVO_UNIVERSAL_INVITE_MODE === 'true',
     outreachHours,
   };
 }
@@ -406,6 +408,83 @@ export function buildDoctorEmailForStep(doc = {}, step = 1) {
   return { allowed: true, crmConfirmed, salutation, subject, htmlContent, textContent };
 }
 
+/**
+ * Convite institucional universal "Venha conhecer a Planta y Raiz" (ordem do proprietário 28/11/2026):
+ * Alcança todos os públicos (médicos, pacientes, farmácias e parceiros) apresentando os 3 caminhos
+ * no site para que cada pessoa leia e escolha livremente participar ou sair (LGPD).
+ * Jamais prefixa "Dr(a)." sem CRM confirmado e bloqueia frases proibidas.
+ */
+export function buildUniversalPlatformInviteEmail(contact = {}) {
+  const crmConfirmed = Boolean(contact.crmConfirmed) || hasConfirmedCrm(
+    contact.crm || '',
+    contact.uf || contact.state || contact.crm_state || '',
+    contact.council_type || contact.councilType || '',
+  );
+  const rawName = String(contact.name || '').trim();
+  const cleanName = stripDoctorHonorific(rawName)
+    .replace(/^cons\.?\s*m[eé]dic[oa]\s+/i, '')
+    .trim();
+  const validName =
+    cleanName && cleanName.length >= 2 && !/^\d{5,}$/.test(cleanName) && !/[@_]/.test(cleanName) && !/^(lead|contato|teste)$/i.test(cleanName)
+      ? cleanName
+      : '';
+
+  const salutation = crmConfirmed
+    ? (validName ? `Dr(a). ${validName}` : '')
+    : validName;
+
+  const greetingHtml = salutation ? `Olá, ${escapeHtml(salutation)}!` : 'Olá!';
+  const greetingText = salutation ? `Olá, ${salutation}!` : 'Olá!';
+  const subject = 'Venha conhecer a Planta y Raiz — telemedicina, saúde integrativa e parcerias';
+  const homeLink = 'https://www.plantayraiz.com.br/?utm_source=brevo_email&utm_medium=convite_universal&utm_campaign=venha_conhecer';
+  const otLink = 'https://www.plantayraiz.com.br/orientacao-tecnica?utm_source=brevo_email&utm_medium=convite_universal&utm_campaign=venha_conhecer';
+  const doctorLink = `${DOCTOR_SIGNUP_LINK}?utm_source=brevo_email&utm_medium=convite_universal&utm_campaign=venha_conhecer`;
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>Venha conhecer a Planta y Raiz</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b130e; margin: 0; padding: 24px 0; color: #e2e8f0; line-height: 1.6;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #121e16; border-radius: 14px; overflow: hidden; border: 1px solid #1f3a2b;">
+    <tr>
+      <td style="background: linear-gradient(135deg, #064e3b 0%, #121e16 100%); padding: 28px 30px; text-align: center; border-bottom: 1px solid #1f3a2b;">
+        <span style="background-color: rgba(16,185,129,0.2); color: #6ee7b7; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 20px;">Convite Institucional</span>
+        <h1 style="color: #10b981; margin: 12px 0 0 0; font-size: 25px; font-weight: 800;">Venha conhecer a Planta y Raiz</h1>
+        <p style="color: #a7f3d0; margin: 6px 0 0 0; font-size: 13.5px;">Telemedicina, Consultório Virtual CFM e Ecossistema de Saúde</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 30px;">
+        <p style="font-size: 16px; font-weight: 600; color: #ffffff; margin-top: 0;">${greetingHtml}</p>
+        <p style="font-size: 14.5px; color: #cbd5e1;">Convidamos você a entrar na <strong>Planta y Raiz</strong>, conhecer tudo o que construímos e escolher livremente se faz sentido participar — seja você paciente, médico ou farmácia parceira:</p>
+        <div style="background-color: #172a1e; border-left: 4px solid #10b981; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+          <p style="margin: 0 0 8px 0; font-size: 13.5px; color: #e2e8f0;"><strong style="color: #34d399;">Para Pacientes:</strong> comece pela Orientação Técnica educativa (R$ 30) com a Enfª Brisa, assistente virtual (supervisão técnica da ${TECH_SUPERVISOR}), e agende teleconsultas com médicos credenciados.</p>
+          <p style="margin: 0 0 8px 0; font-size: 13.5px; color: #e2e8f0;"><strong style="color: #34d399;">Para Médicos (CRM ativo):</strong> cadastro gratuito de consultório virtual com vídeo, prontuário CFM, receita digital (ICP-Brasil / Gov.br) e repasse de <strong>93% de cada consulta via PIX</strong> (taxa fixa de 7%).</p>
+          <p style="margin: 0; font-size: 13.5px; color: #e2e8f0;"><strong style="color: #34d399;">Para Farmácias e Parceiros:</strong> credenciamento institucional para integrar o ecossistema Planta y Raiz (taxa de 5% no marketplace).</p>
+        </div>
+        <div style="text-align: center; margin: 26px 0;">
+          <a href="${homeLink}" target="_blank" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #042f2e; text-decoration: none; font-size: 15px; font-weight: 800; padding: 14px 30px; border-radius: 8px; display: inline-block; text-transform: uppercase;">Venha Conhecer a Planta y Raiz →</a>
+        </div>
+        <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-bottom: 0;">
+          Acesso direto: <a href="${otLink}" style="color: #34d399; text-decoration: underline;">Pacientes</a> · <a href="${doctorLink}" style="color: #34d399; text-decoration: underline;">Cadastro Médico Grátis</a> · <a href="https://wa.me/5511991363154" style="color: #34d399; text-decoration: underline;">WhatsApp (11) 99136-3154</a>
+        </p>
+      </td>
+    </tr>
+    ${LEGAL_FOOTER_HTML}
+  </table>
+</body></html>`;
+
+  const textContent = `${greetingText}\n\nVenha conhecer a Planta y Raiz! Convidamos você a acessar nossa plataforma, ler o que construímos e escolher livremente se faz sentido participar:\n\n- Pacientes: Orientação Técnica educativa (R$ 30) com a Enfª Brisa, assistente virtual (supervisão técnica da ${TECH_SUPERVISOR}) e teleconsultas em ${otLink}\n- Médicos (CRM ativo): consultório virtual gratuito com vídeo, prontuário CFM, receita digital e repasse de 93% por consulta via PIX (taxa fixa de 7%) em ${doctorLink}\n- Farmácias e Parceiros: integração institucional (taxa de 5% no marketplace) em ${homeLink}\n\nAcesse: ${homeLink}\nDúvidas pelo WhatsApp: (11) 99136-3154\n\nSe não desejar mais receber nossos e-mails, responda SAIR.\n— Enfª Brisa, assistente virtual · Planta y Raiz`;
+
+  for (const field of [subject, htmlContent, textContent]) {
+    const hit = containsForbiddenCopy(field);
+    if (hit) {
+      return { allowed: false, reason: `FORBIDDEN_COPY_BLOCKED:${hit}` };
+    }
+  }
+
+  return { allowed: true, crmConfirmed, salutation, subject, htmlContent, textContent };
+}
+
 // ─── Envio Exclusivo via Brevo API Verificada (300/dia) ───
 async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, textContent, now = new Date()) {
   refreshDailyQuotaIfNeeded(now);
@@ -503,28 +582,29 @@ async function sendTransactionalEmail(toEmail, toName, subject, htmlContent, tex
   }
 }
 
-// Buffer em memória da página atual da Lista CRM Brevo para nunca pular contatos entre ticks de 1 envio
-let brevoPageBuffer = { listId: null, items: [], exhausted: false };
+// Buffer em memória da página atual da Brevo CRM para nunca pular contatos entre ticks de 1 envio
+let brevoPageBuffer = { scopeKey: null, items: [], exhausted: false };
 
 export function resetBrevoPageBufferForTests() {
-  brevoPageBuffer = { listId: null, items: [], exhausted: false };
+  brevoPageBuffer = { scopeKey: null, items: [], exhausted: false };
 }
 
-async function fetchBrevoCrmPage(offset, limit = 100) {
+async function fetchBrevoCrmPage(offset, limit = 100, useAllContacts = false) {
   const { crmBaseUrl, crmKey, listId } = getBrevoEnv();
   if (!crmKey) return { ok: false, contacts: [] };
+  const endpoint = useAllContacts
+    ? `${crmBaseUrl}/contacts?limit=${limit}&offset=${offset}`
+    : `${crmBaseUrl}/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`;
+  const label = useAllContacts ? 'Base Geral CRM (110k)' : `Lista Brevo #${listId}`;
   try {
-    const res = await fetch(
-      `${crmBaseUrl}/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`,
-      {
-        headers: {
-          'api-key': crmKey,
-          accept: 'application/json',
-        },
+    const res = await fetch(endpoint, {
+      headers: {
+        'api-key': crmKey,
+        accept: 'application/json',
       },
-    );
+    });
     if (!res.ok) {
-      log(`⚠️ Falha ao ler contatos da Lista Brevo #${listId} (offset=${offset}): HTTP ${res.status}`);
+      log(`⚠️ Falha ao ler contatos de ${label} (offset=${offset}): HTTP ${res.status}`);
       return { ok: false, contacts: [] };
     }
     const data = await res.json().catch(() => ({}));
@@ -540,25 +620,28 @@ async function fetchBrevoCrmPage(offset, limit = 100) {
         city: c.attributes?.CIDADE || '',
         crm: c.attributes?.CRM || '',
         uf: c.attributes?.UF || '',
-        source: `brevo_crm_list_${listId}`,
+        listIds: Array.isArray(c.listIds) ? c.listIds : [],
+        source: useAllContacts ? 'brevo_crm_all_contacts' : `brevo_crm_list_${listId}`,
       })),
     };
   } catch (e) {
-    log(`⚠️ Erro de rede ao ler Lista Brevo #${listId}: ${e.message}`);
+    log(`⚠️ Erro de rede ao ler ${label}: ${e.message}`);
     return { ok: false, contacts: [] };
   }
 }
 
-async function pullNextBrevoCrmContact() {
+async function pullNextBrevoCrmContact(useAllContacts = false) {
   const { crmKey, listId } = getBrevoEnv();
   if (!crmKey) return null;
-  if (brevoPageBuffer.listId !== listId) {
-    brevoPageBuffer = { listId, items: [], exhausted: false };
+  const scopeKey = useAllContacts ? 'all_contacts' : `list_${listId}`;
+  const offsetField = useAllContacts ? 'brevoAllContactsOffset' : 'brevoListOffset';
+  if (brevoPageBuffer.scopeKey !== scopeKey) {
+    brevoPageBuffer = { scopeKey, items: [], exhausted: false };
   }
   if (brevoPageBuffer.items.length === 0) {
     if (brevoPageBuffer.exhausted) return null;
-    const offset = Number(state.brevoListOffset || 0);
-    const page = await fetchBrevoCrmPage(offset, 100);
+    const offset = Number(state[offsetField] || 0);
+    const page = await fetchBrevoCrmPage(offset, 100, useAllContacts);
     if (!page.ok) return null;
     if (page.contacts.length === 0) {
       brevoPageBuffer.exhausted = true;
@@ -567,7 +650,7 @@ async function pullNextBrevoCrmContact() {
     brevoPageBuffer.items = page.contacts;
   }
   const next = brevoPageBuffer.items.shift();
-  state.brevoListOffset = Number(state.brevoListOffset || 0) + 1;
+  state[offsetField] = Number(state[offsetField] || 0) + 1;
   return next || null;
 }
 
@@ -615,7 +698,8 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
     return { processed: 0, quotaReached: true };
   }
 
-  const { crmKey, prioritizeCrmList } = getBrevoEnv();
+  const { crmKey, prioritizeCrmList, universalInviteMode } = getBrevoEnv();
+  const isUniversal = Boolean(options.universalInviteMode ?? universalInviteMode);
   const optOutSet = loadOptOutSet();
   const localDoctors = options.skipLocalPool ? [] : loadLocalDoctorEmailPool();
 
@@ -629,8 +713,14 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       return 'skip';
     }
 
-    const entry = state.pipelineProgress[email] || { persona: 'medico', step: 0, lastSentAt: 0, completed: false };
-    if (entry.completed) return 'skip';
+    const entry = state.pipelineProgress[email] || { persona: isUniversal ? 'universal' : 'medico', step: 0, lastSentAt: 0, completed: false };
+    // No modo universal (todos os públicos), contatos anteriormente pulados só por pj_blocked voltam a ser elegíveis se nunca receberam e-mail
+    const reopenPjSkipped = isUniversal && entry.completed && !entry.step && String(entry.skippedReason || '').startsWith('pj_blocked');
+    if (entry.completed && !reopenPjSkipped) return 'skip';
+    if (reopenPjSkipped) {
+      entry.completed = false;
+      delete entry.skippedReason;
+    }
 
     if (doc.emailBlacklisted || optOutSet.has(email)) {
       entry.completed = true;
@@ -640,16 +730,18 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       return 'skip';
     }
 
-    // Bloqueio rigoroso PJ/empresas/não-médicos
-    const pjCheck = isCompanyOrNonDoctorContact(doc);
-    if (pjCheck.blocked) {
-      log(`🚫 [BLOQUEIO PJ/NÃO-MÉDICO] Descartando "${doc.name || '(sem nome)'}" -> ${pjCheck.reason}`);
-      entry.completed = true;
-      entry.skippedReason = `pj_blocked:${pjCheck.reason}`;
-      state.pipelineProgress[email] = entry;
-      state.metrics.skippedPjOrNonDoctor = (state.metrics.skippedPjOrNonDoctor || 0) + 1;
-      saveState();
-      return 'skip';
+    // No modo médico estrito (padrão), bloqueia PJ/empresas/não-médicos; no modo universal (todos os públicos), aceita médicos, pacientes, farmácias e clínicas
+    if (!isUniversal) {
+      const pjCheck = isCompanyOrNonDoctorContact(doc);
+      if (pjCheck.blocked) {
+        log(`🚫 [BLOQUEIO PJ/NÃO-MÉDICO] Descartando "${doc.name || '(sem nome)'}" -> ${pjCheck.reason}`);
+        entry.completed = true;
+        entry.skippedReason = `pj_blocked:${pjCheck.reason}`;
+        state.pipelineProgress[email] = entry;
+        state.metrics.skippedPjOrNonDoctor = (state.metrics.skippedPjOrNonDoctor || 0) + 1;
+        saveState();
+        return 'skip';
+      }
     }
 
     // Verifica cadência temporal de 48h entre etapas do mesmo contato
@@ -657,9 +749,9 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       return 'wait';
     }
 
-    // Validação anti-bounce (sintaxe ASCII, nome real, domínio não sintético, DNS MX, blacklist Brevo CRM)
+    // Validação técnica anti-bounce (sintaxe ASCII, domínio não sintético, DNS MX, blacklist Brevo CRM) — protege a conta Brevo contra suspensão
     if (!skipMxCheck) {
-      const check = await verifyEmailDeliverability(email, doc.name, crmKey);
+      const check = await verifyEmailDeliverability(email, isUniversal ? null : doc.name, crmKey);
       if (!check.valid) {
         log(`⛔ [ANTI-BOUNCE] Descartando "${doc.name || '(sem nome)'}" -> ${check.reason}`);
         entry.completed = true;
@@ -671,14 +763,22 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
     }
 
     const nextStep = (entry.step || 0) + 1;
-    if (nextStep > 3) {
+    if (isUniversal && entry.step >= 1) {
+      entry.completed = true;
+      state.pipelineProgress[email] = entry;
+      saveState();
+      return 'skip';
+    }
+    if (!isUniversal && nextStep > 3) {
       entry.completed = true;
       state.pipelineProgress[email] = entry;
       saveState();
       return 'skip';
     }
 
-    const built = buildDoctorEmailForStep(doc, nextStep);
+    const built = isUniversal
+      ? buildUniversalPlatformInviteEmail(doc)
+      : buildDoctorEmailForStep(doc, nextStep);
     if (!built.allowed) {
       log(`🚫 [TEMPLATE GUARD] Descartando "${doc.name || '(sem nome)'}" -> ${built.reason}`);
       entry.completed = true;
@@ -688,14 +788,15 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       return 'skip';
     }
 
-    log(`📤 Disparando [ETAPA ${nextStep}/3] para ${built.salutation || 'contato'} (${state.dailyBrevoCount + 1}/${DAILY_BREVO_LIMIT} hoje)...`);
+    const stepLabel = isUniversal ? 'CONVITE UNIVERSAL' : `ETAPA ${nextStep}/3`;
+    log(`📤 Disparando [${stepLabel}] para ${built.salutation || 'contato'} (${state.dailyBrevoCount + 1}/${DAILY_BREVO_LIMIT} hoje)...`);
     const res = await sendTransactionalEmail(email, built.salutation || doc.name, built.subject, built.htmlContent, built.textContent, nowDate);
 
     if (res.ok) {
       const wasFirstSend = !entry.step;
       entry.step = nextStep;
       entry.lastSentAt = nowMs;
-      if (nextStep >= 3) entry.completed = true;
+      if (isUniversal || nextStep >= 3) entry.completed = true;
       state.pipelineProgress[email] = entry;
 
       if (nextStep === 1) state.metrics.step1Sent++;
@@ -710,8 +811,8 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
         name: doc.name,
         email,
         phone: doc.phone || '',
-        category: '1-medico',
-        source: `brevo_pipeline_step${nextStep}`,
+        category: isUniversal ? 'convite_universal' : '1-medico',
+        source: isUniversal ? 'brevo_universal_invite' : `brevo_pipeline_step${nextStep}`,
         specialty: doc.specialty || '',
         city: doc.city || '',
         uf: doc.state || doc.uf || '',
@@ -719,7 +820,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
         status: 'invited',
       });
 
-      log(`✅ [ETAPA ${nextStep}/3] Enviado via ${res.provider}! Total hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
+      log(`✅ [${stepLabel}] Enviado via ${res.provider}! Total hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
       return 'sent';
     }
 
@@ -748,6 +849,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
 
   async function processBrevoCrmList() {
     if (!crmKey) return;
+    const offsetField = isUniversal ? 'brevoAllContactsOffset' : 'brevoListOffset';
     const maxCrmScanPerRun = Math.max(200, Number(options.maxCrmScanPerRun || 500));
     let scanned = 0;
     while (
@@ -756,14 +858,14 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
       !providerBlocked &&
       scanned < maxCrmScanPerRun
     ) {
-      const doc = await pullNextBrevoCrmContact();
+      const doc = await pullNextBrevoCrmContact(isUniversal);
       if (!doc) break;
       scanned++;
       const outcome = await evaluateAndMaybeSend(doc);
       if (outcome === 'stop') {
         // Devolve o contato não enviado ao topo do buffer e recua o cursor em 1 para não perdê-lo
         brevoPageBuffer.items.unshift(doc);
-        state.brevoListOffset = Math.max(0, Number(state.brevoListOffset || 0) - 1);
+        state[offsetField] = Math.max(0, Number(state[offsetField] || 0) - 1);
         saveState();
         break;
       }
@@ -772,7 +874,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
     if (scanned > 0) saveState();
   }
 
-  const useCrmFirst = Boolean(options.prioritizeCrmList ?? prioritizeCrmList);
+  const useCrmFirst = Boolean(options.prioritizeCrmList ?? prioritizeCrmList) || isUniversal;
   if (useCrmFirst) {
     await processBrevoCrmList();
     if (!providerBlocked && processedInThisRun < maxPerRun && state.dailyBrevoCount < DAILY_BREVO_LIMIT) {
@@ -790,6 +892,7 @@ export async function runMultiPipelineBatch(maxPerRun = 1, options = {}) {
     providerBlocked,
     dailyBrevoCount: state.dailyBrevoCount,
     brevoListOffset: state.brevoListOffset,
+    brevoAllContactsOffset: state.brevoAllContactsOffset || 0,
   };
 }
 
@@ -817,7 +920,7 @@ export async function startPipelineDaemon() {
 
   log('========================================================================');
   log(`🚀 AGENTE BREVO MULTI-PIPELINE INICIADO (PM2 COMPATÍVEL | COTA: ${DAILY_BREVO_LIMIT}/DIA)`);
-  log(`🔑 SEND_KEY=${env.sendKey ? 'OK' : 'AUSENTE'} | CRM_KEY=${env.crmKey ? 'OK' : 'AUSENTE'} | Remetente=${env.senderEmail} | ReplyTo=${env.replyToEmail} | Lista=${env.listId} | PriorizarListaCRM=${env.prioritizeCrmList}`);
+  log(`🔑 SEND_KEY=${env.sendKey ? 'OK' : 'AUSENTE'} | CRM_KEY=${env.crmKey ? 'OK' : 'AUSENTE'} | Remetente=${env.senderEmail} | ReplyTo=${env.replyToEmail} | Modo=${env.universalInviteMode ? 'UNIVERSAL (todos os públicos /v3/contacts)' : `MÉDICOS (Lista #${env.listId})`} | PriorizarListaCRM=${env.prioritizeCrmList}`);
   log(`🕒 Agora em BRT: ${brt.weekdayShort} ${String(brt.hour).padStart(2, '0')}:${String(brt.minute).padStart(2, '0')} | Janela (${env.outreachHours || 'Seg–Sáb 09h–19h BRT'}): ${isEmailScheduleAllowed() ? 'ABERTA' : 'FECHADA'}`);
   log(`⏱️ Cadência suave: 1 e-mail a cada ${Math.round(CADENCE_MS / 1000)}s | Cota hoje: ${state.dailyBrevoCount}/${DAILY_BREVO_LIMIT}`);
   log(`📋 Base local: ${pool.length} únicos | Prontos agora: ${readyNowCount} | Aguardando 48h: ${waiting48hCount} | Concluídos/descartados: ${completedCount}`);

@@ -445,6 +445,7 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
           BREVO_API_KEY: 'mock-brevo-key',
           BREVO_API_BASE_URL: `http://127.0.0.1:${port}`,
           BREVO_SKIP_MX_CHECK: '1',
+          BREVO_UNIVERSAL_INVITE_MODE: 'false',
           BREVO_PIPELINE_STATE_FILE: stateFile,
           BREVO_PIPELINE_LOG_FILE: logFile,
           BREVO_PIPELINE_PID_LOCK: lockFile,
@@ -471,6 +472,7 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       // 2. Testa runMultiPipelineBatch em horário comercial BRT (12:00 BRT) com 201 OK e depois 554 bloqueado
       process.env.BREVO_API_KEY = 'mock-brevo-key';
       process.env.BREVO_API_BASE_URL = `http://127.0.0.1:${port}`;
+      process.env.BREVO_UNIVERSAL_INVITE_MODE = 'false';
       process.env.BREVO_PIPELINE_STATE_FILE = stateFile;
       process.env.BREVO_PIPELINE_LOG_FILE = logFile;
       process.env.BREVO_PIPELINE_PID_LOCK = lockFile;
@@ -560,6 +562,7 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       process.env.BREVO_SENDER_EMAIL = 'plantayraizadm@gmail.com';
       process.env.BREVO_REPLY_TO_EMAIL = 'contato@plantayraiz.com.br';
       process.env.BREVO_PRIORITIZE_CRM_LIST = 'true';
+      process.env.BREVO_UNIVERSAL_INVITE_MODE = 'false';
       process.env.BREVO_PIPELINE_STATE_FILE = stateFile;
       process.env.BREVO_PIPELINE_LOG_FILE = logFile;
       process.env.BREVO_PIPELINE_PID_LOCK = lockFile;
@@ -605,6 +608,20 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       expect(brevo.isEmailScheduleAllowed(fridayNightBrt)).toBe(false);
       process.env.BREVO_OUTREACH_HOURS = '24x7';
       expect(brevo.isEmailScheduleAllowed(fridayNightBrt)).toBe(true);
+
+      // Modo universal "Venha conhecer a Planta y Raiz" aceita médicos, pacientes, farmácias e clínicas sem Dr(a). sem CRM e com SAIR
+      const univFarmacia = brevo.buildUniversalPlatformInviteEmail({ name: 'Farmácia Central Ltda', email: 'contato@farmaciacentral.com.br' });
+      expect(univFarmacia.allowed).toBe(true);
+      expect(univFarmacia.subject).toContain('Venha conhecer a Planta y Raiz');
+      expect(univFarmacia.htmlContent).not.toMatch(/\bDr\(a\)\./);
+      expect(univFarmacia.htmlContent).toContain('Para Pacientes');
+      expect(univFarmacia.htmlContent).toContain('Para Médicos');
+      expect(univFarmacia.htmlContent).toContain('Para Farmácias');
+      expect(univFarmacia.htmlContent).toContain('SAIR');
+
+      const univCrm = brevo.buildUniversalPlatformInviteEmail({ name: 'Ana Paula', email: 'ana@gmail.com', crm: '49354', uf: 'PR' });
+      expect(univCrm.allowed).toBe(true);
+      expect(univCrm.htmlContent).toContain('Olá, Dr(a). Ana Paula!');
     } finally {
       delete process.env.BREVO_API_BASE_URL;
       delete process.env.BREVO_CRM_API_KEY;
@@ -612,6 +629,7 @@ describe('Agentes reativados — WhatsApp 15 min e Brevo 300/dia com guardrails 
       delete process.env.BREVO_SENDER_EMAIL;
       delete process.env.BREVO_REPLY_TO_EMAIL;
       delete process.env.BREVO_PRIORITIZE_CRM_LIST;
+      delete process.env.BREVO_UNIVERSAL_INVITE_MODE;
       delete process.env.BREVO_OUTREACH_HOURS;
       delete process.env.BREVO_PIPELINE_STATE_FILE;
       delete process.env.BREVO_PIPELINE_LOG_FILE;
